@@ -1,0 +1,1738 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="编写Bash自动补全脚本, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>编写Bash自动补全脚本 | Escape</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Escape</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Escape</div>
+        <div class="logo-desc">
+            
+            听摇滚,但不偏颇;也挺古典,但不安逸
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/EscapeLife" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/EscapeLife" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/learn-bash-completion.png')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">编写Bash自动补全脚本</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Linux/">
+                                <span class="chip bg-color">Linux</span>
+                            </a>
+                        
+                            <a href="/tags/Tools/">
+                                <span class="chip bg-color">Tools</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Tools工具分享/" class="post-category">
+                                Tools工具分享
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2020-01-21
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2020-04-13
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    3.2k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    14 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <blockquote>
+<p><strong>Bash 上的自动补全极为适合于写一些基于命令行的小程序</strong></p>
+</blockquote>
+<p><img src="../images/learn-bash-completion.png" alt="编写Bash补全脚本"></p>
+<hr>
+<h2 id="1-自动补全工具"><a href="#1-自动补全工具" class="headerlink" title="1. 自动补全工具"></a>1. 自动补全工具</h2><blockquote>
+<p><strong>主要讲述自动补全命令的用处</strong></p>
+</blockquote>
+<ul>
+<li>我们日常在使用 <code>bash</code> 命令行的时候，常常会在提示符下输入某个命令的前面几个字符， 然后使用 <code>TAB</code> 键，之后命令行就会列出以这几个字符开头的命令。这时，我们就可以根据实际情况进行选择使用了。 同时，不仅可以补全命令，而且还可以进行参数补全，但只限于文件参数。当输入到参数部分时，按 <code>TAB</code> 键就会列出以这个参数开头的文件路径供我们选择。在 <code>bash</code> 中内置提供了一个 <code>complete</code> 命令，用来规定参数的自动补全方式，我们这里主要就是对其进行讲解和说明。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 可以看出complete命令是内置命令</span>
+ci@f9539272e3df:/opt$ <span class="token function">type</span> complete
+complete is a shell <span class="token function">builtin</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>在我们学习自动补签的技巧之前，首先需要学习 <code>complete</code> 命令的基本参数已经使用方式，该命令是自动补全的基石。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># complete命令的帮助信息</span>
+ci@f9539272e3df:/opt$ complete --help
+complete: complete <span class="token punctuation">[</span>-abcdefgjksuv<span class="token punctuation">]</span> <span class="token punctuation">[</span>-pr<span class="token punctuation">]</span> <span class="token punctuation">[</span>-DE<span class="token punctuation">]</span> <span class="token punctuation">[</span>-o option<span class="token punctuation">]</span> <span class="token punctuation">[</span>-A action<span class="token punctuation">]</span> <span class="token punctuation">[</span>-G globpat<span class="token punctuation">]</span> <span class="token punctuation">[</span>-W wordlist<span class="token punctuation">]</span>  <span class="token punctuation">[</span>-F function<span class="token punctuation">]</span> <span class="token punctuation">[</span>-C command<span class="token punctuation">]</span> <span class="token punctuation">[</span>-X filterpat<span class="token punctuation">]</span> <span class="token punctuation">[</span>-P prefix<span class="token punctuation">]</span> <span class="token punctuation">[</span>-S suffix<span class="token punctuation">]</span> <span class="token punctuation">[</span>name <span class="token punctuation">..</span>.<span class="token punctuation">]</span>
+    Specify how arguments are to be completed by Readline.
+
+    For each NAME, specify how arguments are to be completed.  If no options
+    are supplied, existing completion specifications are printed <span class="token keyword">in</span> a way that
+    allows them to be reused as input.
+
+    Options:
+      -p    print existing completion specifications <span class="token keyword">in</span> a reusable <span class="token function">format</span>
+      -r    remove a completion specification <span class="token keyword">for</span> each NAME, or, <span class="token keyword">if</span> no
+            NAMEs are supplied, all completion specifications
+      -D    apply the completions and actions as the default <span class="token keyword">for</span> commands
+            without any specific completion defined
+      -E    apply the completions and actions to <span class="token string">"empty"</span> commands --
+            completion attempted on a blank line
+
+    When completion is attempted, the actions are applied <span class="token keyword">in</span> the order the
+    uppercase-letter options are listed above.  The -D option takes
+    precedence over -E.
+
+    Exit Status:
+    Returns success unless an invalid option is supplied or an error occurs.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>内置 complete 命令参数</th>
+<th>参数作用解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><strong><code>-W wordlist</code></strong></td>
+<td>指定候选的单词列表</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong><code>-F function</code></strong></td>
+<td>指定一个补全函数</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong><code>-o comp-option</code></strong></td>
+<td>内置多种参数类型</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong><code>-A action</code></strong></td>
+<td>内置多种参数类型</td>
+</tr>
+</tbody></table>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用函数来匹配完成自动补全(man complete)</span>
+ci@f9539272e3df:/opt$ complete
+complete -F _longopt <span class="token function">ls</span>
+complete -F _longopt <span class="token function">tail</span>
+complete -F _service /etc/init.d/rsyslog
+complete -F _service /etc/init.d/hwclock.sh
+complete -o filenames -F _grub_set_entry grub-reboot
+complete -o filenames -F _grub_mkconfig grub-mkconfig
+complete -u w
+complete -u slay
+complete -c <span class="token function">type</span>
+complete -c <span class="token function">which</span>
+complete -v unset
+complete -A setopt <span class="token keyword">set</span>
+complete -A helptopic <span class="token function">help</span>
+complete -b <span class="token function">builtin</span>
+complete -j -P <span class="token string">'"%'</span> -S <span class="token string">'"'</span> <span class="token function">fg</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><code>bash-completion</code> 这个包的安装位置因不同的发行版会有所区别，但是大致上启用的原理是类似的，一般会有一个名为 <code>bash_completion</code> 的脚本，这个脚本会在 <code>shell</code> 初始化时加载。对于 <code>Ubuntu</code> 的操作系统来说，这个脚本位于 <code>/usr/share/bash-completion/bash_completion</code>，而该脚本会由 <code>/etc/profile.d/bash_completion.sh</code> 中导入。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># /etc/profile.d/bash_completion.sh</span>
+ci@f9539272e3df:/opt$ <span class="token function">cat</span> /etc/profile.d/bash_completion.sh
+<span class="token comment" spellcheck="true"># Check for interactive bash and that we haven't already been sourced.</span>
+<span class="token punctuation">[</span> -z <span class="token string">"<span class="token variable">$BASH_VERSION</span>"</span> -o -z <span class="token string">"<span class="token variable">$PS1</span>"</span> -o -n <span class="token string">"<span class="token variable">$BASH_COMPLETION_COMPAT_DIR</span>"</span> <span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token keyword">return</span>
+
+<span class="token comment" spellcheck="true"># Check for recent enough version of bash.</span>
+bash<span class="token operator">=</span><span class="token variable">${BASH_VERSION%.*}</span><span class="token punctuation">;</span> bmajor<span class="token operator">=</span><span class="token variable">${bash%.*}</span><span class="token punctuation">;</span> bminor<span class="token operator">=</span>$<span class="token punctuation">{</span>bash<span class="token comment" spellcheck="true">#*.}</span>
+<span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token variable">$bmajor</span> -gt 4 <span class="token punctuation">]</span> <span class="token operator">||</span> <span class="token punctuation">[</span> <span class="token variable">$bmajor</span> -eq 4 -a <span class="token variable">$bminor</span> -ge 1 <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+    <span class="token punctuation">[</span> -r <span class="token string">"<span class="token variable">${XDG_CONFIG_HOME:-$HOME/.config}</span>/bash_completion"</span> <span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> \
+        <span class="token keyword">.</span> <span class="token string">"<span class="token variable">${XDG_CONFIG_HOME:-$HOME/.config}</span>/bash_completion"</span>
+    <span class="token keyword">if</span> <span class="token function">shopt</span> -q progcomp <span class="token operator">&amp;&amp;</span> <span class="token punctuation">[</span> -r /usr/share/bash-completion/bash_completion <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+        <span class="token comment" spellcheck="true"># Source completion code.</span>
+        <span class="token keyword">.</span> /usr/share/bash-completion/bash_completion
+    <span class="token keyword">fi</span>
+<span class="token keyword">fi</span>
+unset <span class="token function">bash</span> bmajor bminor<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>而在 <code>bash_completion</code> 脚本中会加载 <code>/etc/bash_completion.d</code> 下面的补全脚本。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token keyword">if</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token variable">$BASH_COMPLETION_DIR</span> <span class="token operator">!=</span> <span class="token variable">$BASH_COMPLETION_COMPAT_DIR</span> <span class="token operator">&amp;&amp;</span> \
+    -d <span class="token variable">$BASH_COMPLETION_DIR</span> <span class="token operator">&amp;&amp;</span> -r <span class="token variable">$BASH_COMPLETION_DIR</span> <span class="token operator">&amp;&amp;</span> \
+    -x <span class="token variable">$BASH_COMPLETION_DIR</span> <span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token punctuation">$(</span>LC_ALL<span class="token operator">=</span>C <span class="token function">command</span> <span class="token function">ls</span> <span class="token string">"<span class="token variable">$BASH_COMPLETION_DIR</span>"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token keyword">do</span>
+        i<span class="token operator">=</span><span class="token variable">$BASH_COMPLETION_DIR</span>/<span class="token variable">$i</span>
+        <span class="token punctuation">[</span><span class="token punctuation">[</span> $<span class="token punctuation">{</span>i<span class="token comment" spellcheck="true">##*/} != @(*~|*.bak|*.swp|\#*\#|*.dpkg*|*.rpm@(orig|new|save)|Makefile*) \</span>
+            <span class="token operator">&amp;&amp;</span> -f <span class="token variable">$i</span> <span class="token operator">&amp;&amp;</span> -r <span class="token variable">$i</span> <span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token keyword">.</span> <span class="token string">"<span class="token variable">$i</span>"</span>
+    <span class="token keyword">done</span>
+<span class="token keyword">fi</span>
+unset i<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="2-内置补全命令"><a href="#2-内置补全命令" class="headerlink" title="2. 内置补全命令"></a>2. 内置补全命令</h2><blockquote>
+<p><strong>命都没了，还提什么被打扰？</strong></p>
+</blockquote>
+<p><img src="../images/learn-bash-completion-1.gif" alt="编写Bash补全脚本"></p>
+<ul>
+<li><code>Bash</code> 有 <code>compgen</code> 和 <code>complete</code> 两个内置补全命令。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>内置补全命令</th>
+<th>命令作用解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><strong><code>compgen</code></strong></td>
+<td>根据不同的参数生成匹配单词的候选补全列表</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong><code>complete</code></strong></td>
+<td>在命令行中根据不用的前缀补全对应参数候选补全列表</td>
+</tr>
+</tbody></table>
+<p><img src="../images/learn-bash-completion-1.png" alt="编写Bash补全脚本"></p>
+<ul>
+<li>其中 <code>compgen</code> 命令会根据不同的参数生成匹配单词的候选补全列表，最常用的选项是 <code>-W</code> 参数，通过 <code>-W</code> 参数指定以空格分隔的单词列表。从下面例子中输入 <code>h</code> 单词后输出候选的匹配列表。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 配置以h开头的单词</span>
+ci@f9539272e3df:/opt$ compgen -W <span class="token string">'hi hello how world'</span> h
+hi
+hello
+how
+
+<span class="token comment" spellcheck="true"># 配置以w开头的单词</span>
+ci@f9539272e3df:/opt$ compgen -W <span class="token string">'hi hello how world'</span> w
+world<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><code>complete</code> 命令的有点类似 <code>compgen</code> 命令，不过它的作用是说明命令如何进行补全。例如使用 <code>-W</code> 参数指定候选的单词列表，还可以通过 <code>-F</code> 参数指定一个补全函数。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 设置候选参数</span>
+ci@f9539272e3df:/opt$ complete -W <span class="token string">'word1 word2 word3 hello'</span> foo
+
+<span class="token comment" spellcheck="true"># Tab补全</span>
+ci@f9539272e3df:/opt$ foo <span class="token operator">&lt;</span>TAB<span class="token operator">></span><span class="token operator">&lt;</span>TAB<span class="token operator">></span>
+hello  word1  word2  word3
+ci@f9539272e3df:/opt$ foo word<span class="token operator">&lt;</span>Tab<span class="token operator">></span>
+word1  word2  word3<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="3-补全内置变量"><a href="#3-补全内置变量" class="headerlink" title="3. 补全内置变量"></a>3. 补全内置变量</h2><blockquote>
+<p><strong>内置变量在编写脚本时常常会被使用到</strong></p>
+</blockquote>
+<p>除了上面两个补全命令以外，<code>Bash</code> 还有几个内置的变量用来辅助补全功能，我们这里主要介绍其中三个。</p>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>内置变量</th>
+<th>变量作用解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><strong><code>COMP_WORDS</code></strong></td>
+<td>类型为数组；存放当前命令行中输入的所有单词</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong><code>COMP_CWORD</code></strong></td>
+<td>类型为整数；当前光标下输入的单词位于 COMP_WORDS 数组中的索引</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong><code>COMP_LINE</code></strong></td>
+<td>类型为字符串；表示当前的命令行输入</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong><code>COMP_WORDBREAKS</code></strong></td>
+<td>类型为字符串；表示单词之间的分隔符</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong><code>COMPREPLY</code></strong></td>
+<td>类型为数组；候选的补全结果</td>
+</tr>
+</tbody></table>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 定义一个补全函数(_foo)</span>
+<span class="token keyword">function</span> _foo<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">declare</span> -p COMP_WORDS
+    <span class="token keyword">declare</span> -p COMP_CWORD
+    <span class="token keyword">declare</span> -p COMP_LINE
+    <span class="token keyword">declare</span> -p COMP_WORDBREAKS
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true"># 设置命令补全(foo)</span>
+complete -F _foo foo
+
+<span class="token comment" spellcheck="true"># 理解这几个变量的含义</span>
+$ foo b<span class="token operator">&lt;</span>TAB<span class="token operator">></span>
+<span class="token keyword">declare</span> -a COMP_WORDS<span class="token operator">=</span><span class="token string">'([0]="foo" [1]="b")'</span>
+<span class="token keyword">declare</span> -- COMP_CWORD<span class="token operator">=</span><span class="token string">"1"</span>
+<span class="token keyword">declare</span> -- COMP_LINE<span class="token operator">=</span><span class="token string">"foo b"</span>
+<span class="token keyword">declare</span> -- COMP_WORDBREAKS<span class="token operator">=</span><span class="token string">"
+\"'@>&lt;=;|&amp;(:"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="4-编写补全脚本"><a href="#4-编写补全脚本" class="headerlink" title="4. 编写补全脚本"></a>4. 编写补全脚本</h2><blockquote>
+<p><strong>光说不练假把式</strong></p>
+</blockquote>
+<p>编写一个自动补全的脚本或者说是一个自动补全的工具，主要分为两个部分，即编写一个补全函数和使用 <code>complete</code> 命令应用补全函数。使用 <code>complete</code> 命令非常简单，主要的难点在于补全函数的编写，这里我们可以借鉴 <code>bash-completion</code> 自带的一些补全脚本来学习，理解之后，基本就是改吧改吧就可以使用了。</p>
+<ul>
+<li>一般补全函数都会定义 <code>cur</code> 和 <code>prev</code> 这两个变量，其中 <code>cur</code> 表示当前光标下的单词，而 <code>prev</code> 则表示对应上一个单词。初始化相应的变量之后，我们需要定义命令的补全行为，即输入什么的情况下补全什么内容。例如，当输入 <code>-</code> 开头的选项的时候，我们将所有的选项作为候选的补全结果。需要注意的是给 <code>COMPREPLY</code> 赋值之前，最好将它重置清空，避免被其它补全函数干扰。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># /etc/bash_completion.d/fcoemon</span>
+have fcoemon <span class="token operator">&amp;&amp;</span> _fcoemon_options<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    local cur prev prev_prev opts
+    COMPREPLY<span class="token operator">=</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    cur<span class="token operator">=</span><span class="token string">"<span class="token variable">${COMP_WORDS[COMP_CWORD]}</span>"</span>
+    prev<span class="token operator">=</span><span class="token string">"<span class="token variable">${COMP_WORDS[COMP_CWORD-1]}</span>"</span>
+    opts<span class="token operator">=</span><span class="token string">"-f --foreground -d --debug -s --syslog -v --version -h --help"</span>
+
+    <span class="token keyword">case</span> <span class="token string">"<span class="token variable">${cur}</span>"</span> <span class="token keyword">in</span>
+        *<span class="token punctuation">)</span>
+            COMPREPLY<span class="token operator">=</span><span class="token punctuation">(</span> <span class="token punctuation">$(</span>compgen -W <span class="token string">"<span class="token variable">${opts}</span>"</span> -- <span class="token variable">${cur}</span><span class="token punctuation">)</span> <span class="token punctuation">)</span>
+            <span class="token keyword">return</span> 0
+            <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    esac
+
+    <span class="token keyword">return</span> 0
+<span class="token punctuation">}</span>
+complete -F _fcoemon_options fcoemon<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 自动补齐</span>
+ci@f9539272e3df:/opt$ fcoemon -<span class="token operator">&lt;</span>TAB<span class="token operator">></span>
+-d            --debug       -f<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>心思的你可能会发现，似乎我们这里的例子没有用到 <code>prev</code> 变量。用好 <code>prev</code> 变量可以让补全的结果更加完整，例如当我们输入 <code>--file</code> 之后，我们希望补全特殊的文件，例如以.sh 结尾的文件。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 自己构建的一个自动补全的函数</span>
+_foo<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    local cur prev prev_prev opts
+    COMPREPLY<span class="token operator">=</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    cur<span class="token operator">=</span><span class="token string">"<span class="token variable">${COMP_WORDS[COMP_CWORD]}</span>"</span>
+    prev<span class="token operator">=</span><span class="token string">"<span class="token variable">${COMP_WORDS[COMP_CWORD-1]}</span>"</span>
+    opts<span class="token operator">=</span><span class="token string">"-f --foreground -d --debug -s --syslog -v --version -h --help"</span>
+
+    <span class="token keyword">case</span> <span class="token string">"<span class="token variable">${prev}</span>"</span> <span class="token keyword">in</span>
+        -f<span class="token operator">|</span>--file<span class="token punctuation">)</span>
+            COMPREPLY<span class="token operator">=</span><span class="token punctuation">(</span> <span class="token punctuation">$(</span>compgen -o filenames -W <span class="token string">"<span class="token variable"><span class="token variable">`</span><span class="token function">ls</span> *.sh<span class="token variable">`</span></span>"</span> -- <span class="token variable">${cur}</span><span class="token punctuation">)</span> <span class="token punctuation">)</span>
+            <span class="token keyword">return</span> 0
+            <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    esac
+
+    <span class="token keyword">return</span> 0
+<span class="token punctuation">}</span>
+complete -F _fcoemon_options fcoemon<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 自动补齐</span>
+$ foo --file<span class="token operator">&lt;</span>Tab<span class="token operator">></span>
+a.sh b.sh c.sh<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="5-补全使用方式"><a href="#5-补全使用方式" class="headerlink" title="5. 补全使用方式"></a>5. 补全使用方式</h2><blockquote>
+<p><strong>即编写好脚本之后如何使之生效</strong></p>
+</blockquote>
+<ul>
+<li>现在很多 <code>Linux</code> 下的命令工具都可以使用自带的工具生成对应补全脚本，我们只需要在启动或执行对应的脚本，即可实现该命令行工具的自动补签，比如 <code>kubectl</code> 工具等。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true">#  生成bash对应的自动补签脚本</span>
+$ kubectl completion <span class="token function">bash</span>
+
+<span class="token comment" spellcheck="true"># 一种做法是写入~/.bashrc文件</span>
+$ <span class="token function">source</span> <span class="token operator">&lt;</span> <span class="token punctuation">(</span>kubectl completion bash<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 另一种做法是bash_completion.d目录中</span>
+$ kubectl completion <span class="token function">bash</span> <span class="token operator">></span> /etc/bash_completion.d/kubectl<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true">#  生成zsh对应的自动补签脚本</span>
+$ kubectl completion zsh
+
+<span class="token comment" spellcheck="true"># 一种做法是写入~/.zshrc文件</span>
+$ <span class="token function">source</span> <span class="token operator">&lt;</span> <span class="token punctuation">(</span>kubectl completion zsh<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 必须启用compdef内置功能(~/.zshrc文件)</span>
+autoload -Uz compinit
+compinit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>从上面的命令我们肯定很疑问，为什么自动补全 <code>Bash</code> 和 <code>Zsh</code> 的脚本会要区别呢？主要是因为 <code>Bash</code> 和 <code>Zsh</code> 的自动补全实现细节不同，当然不同的操作系统对应的脚本也是有差异的。在 <code>Bash</code> 的自动补全主要依赖于 <a href="https://github.com/scop/bash-completion" target="_blank" rel="noopener"><code>bash-completion</code></a> 项目，而 <code>Zsh</code> 的自动补全脚本没有任何依赖项，所以不需要安装其他工具。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># CentOS</span>
+$ <span class="token function">sudo</span> yum <span class="token function">install</span> bash-completion
+
+<span class="token comment" spellcheck="true"># Ubuntu</span>
+$ <span class="token function">sudo</span> <span class="token function">apt-get</span> <span class="token function">install</span> bash-completion<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="6-使用实例展示"><a href="#6-使用实例展示" class="headerlink" title="6. 使用实例展示"></a>6. 使用实例展示</h2><blockquote>
+<p><strong>官方实例和有趣的脚本</strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] Real-World</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">_revdep_rebuild<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    local cur prev opts
+    COMPREPLY<span class="token operator">=</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    cur<span class="token operator">=</span><span class="token string">"<span class="token variable">${COMP_WORDS[COMP_CWORD]}</span>"</span>
+    prev<span class="token operator">=</span><span class="token string">"<span class="token variable">${COMP_WORDS[COMP_CWORD-1]}</span>"</span>
+    opts<span class="token operator">=</span><span class="token string">"-X --package-names --soname --soname-regexp -q --quiet"</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token variable">${cur}</span> <span class="token operator">==</span> -* <span class="token operator">||</span> <span class="token variable">${COMP_CWORD}</span> -eq 1 <span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">||</span> \
+       <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token variable">${prev}</span> <span class="token operator">==</span> @<span class="token punctuation">(</span>-q<span class="token operator">|</span>--quiet<span class="token punctuation">)</span> <span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token punctuation">;</span> <span class="token keyword">then</span>
+        COMPREPLY<span class="token operator">=</span><span class="token punctuation">(</span> <span class="token punctuation">$(</span>compgen -W <span class="token string">"<span class="token variable">${opts}</span>"</span> -- <span class="token variable">${cur}</span><span class="token punctuation">)</span> <span class="token punctuation">)</span>
+        <span class="token keyword">return</span> 0
+    <span class="token keyword">fi</span>
+
+    <span class="token keyword">case</span> <span class="token string">"<span class="token variable">${prev}</span>"</span> <span class="token keyword">in</span>
+        -X<span class="token operator">|</span>--package-names<span class="token punctuation">)</span>
+            _pkgname -I <span class="token variable">${cur}</span>
+            <span class="token punctuation">;</span><span class="token punctuation">;</span>
+        --soname<span class="token punctuation">)</span>
+            local sonames<span class="token operator">=</span><span class="token variable"><span class="token variable">$(</span><span class="token keyword">for</span> x <span class="token keyword">in</span> /lib/*.so?<span class="token punctuation">(</span>.<span class="token variable">)</span></span>* /usr/lib*/*.so\?<span class="token punctuation">(</span>.<span class="token punctuation">)</span>* <span class="token punctuation">;</span> <span class="token keyword">do</span> \
+                        <span class="token keyword">echo</span> $<span class="token punctuation">{</span>x<span class="token comment" spellcheck="true">##*/} ; \</span>
+                        done<span class="token punctuation">)</span>
+            COMPREPLY<span class="token operator">=</span><span class="token punctuation">(</span> <span class="token punctuation">$(</span>compgen -W <span class="token string">"<span class="token variable">${sonames}</span>"</span> -- <span class="token variable">${cur}</span><span class="token punctuation">)</span> <span class="token punctuation">)</span>
+            <span class="token punctuation">;</span><span class="token punctuation">;</span>
+        --soname-regexp<span class="token punctuation">)</span>
+            COMPREPLY<span class="token operator">=</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token punctuation">;</span><span class="token punctuation">;</span>
+        *<span class="token punctuation">)</span>
+            <span class="token keyword">if</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token variable">${COMP_LINE}</span> <span class="token operator">==</span> *<span class="token string">" "</span>@<span class="token punctuation">(</span>-X<span class="token operator">|</span>--package-names<span class="token punctuation">)</span>* <span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token punctuation">;</span> <span class="token keyword">then</span>
+                _pkgname -I <span class="token variable">${cur}</span>
+                COMPREPLY<span class="token operator">=</span><span class="token punctuation">(</span><span class="token variable">${COMPREPLY[@]}</span> <span class="token punctuation">$(</span>compgen -W <span class="token string">"<span class="token variable">${opts}</span>"</span><span class="token punctuation">))</span>
+            <span class="token keyword">else</span>
+                COMPREPLY<span class="token operator">=</span><span class="token punctuation">(</span><span class="token punctuation">$(</span>compgen -W <span class="token string">"<span class="token variable">${opts}</span> -- <span class="token variable">${cur}</span>"</span><span class="token punctuation">))</span>
+            <span class="token keyword">fi</span>
+        <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    esac
+<span class="token punctuation">}</span>
+complete -F _revdep_rebuild revdep-rebuild<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] FizzBuzz</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token keyword">function</span> _fizzbuzz <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    length<span class="token operator">=</span><span class="token variable">${#COMP_WORDS[@]}</span>
+    number<span class="token operator">=</span><span class="token variable"><span class="token variable">$((</span>length <span class="token operator">-</span> <span class="token number">1</span><span class="token variable">))</span></span>
+    <span class="token keyword">if</span> <span class="token operator">!</span> <span class="token variable"><span class="token punctuation">((</span>number <span class="token operator">%</span> <span class="token number">15</span><span class="token punctuation">))</span></span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+        COMPREPLY<span class="token operator">=</span><span class="token punctuation">(</span>fizzbuzz<span class="token punctuation">)</span>
+    <span class="token keyword">elif</span> <span class="token operator">!</span> <span class="token variable"><span class="token punctuation">((</span>number <span class="token operator">%</span> <span class="token number">3</span><span class="token punctuation">))</span></span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+        COMPREPLY<span class="token operator">=</span><span class="token punctuation">(</span>fizz<span class="token punctuation">)</span>
+    <span class="token keyword">elif</span> <span class="token operator">!</span> <span class="token variable"><span class="token punctuation">((</span>number <span class="token operator">%</span> <span class="token number">5</span><span class="token punctuation">))</span></span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+        COMPREPLY<span class="token operator">=</span><span class="token punctuation">(</span>buzz<span class="token punctuation">)</span>
+    <span class="token keyword">else</span>
+        COMPREPLY<span class="token operator">=</span><span class="token punctuation">(</span><span class="token variable">$number</span><span class="token punctuation">)</span>
+    <span class="token keyword">fi</span>
+<span class="token punctuation">}</span>
+complete -F _fizzbuzz fizzbuzz<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] redefine_filedir</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">_filedir<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    local i IFS<span class="token operator">=</span>$<span class="token string">'\n'</span> xspec
+
+    _tilde <span class="token string">"<span class="token variable">$cur</span>"</span> <span class="token operator">||</span> <span class="token keyword">return</span> 0
+
+    local -a toks
+    local quoted x tmp
+
+    _quote_readline_by_ref <span class="token string">"<span class="token variable">$cur</span>"</span> quoted
+    x<span class="token operator">=</span><span class="token punctuation">$(</span> compgen -d -- <span class="token string">"<span class="token variable">$quoted</span>"</span> <span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span>
+    <span class="token keyword">while</span> <span class="token function">read</span> -r tmp<span class="token punctuation">;</span> <span class="token keyword">do</span>
+        toks+<span class="token operator">=</span><span class="token punctuation">(</span> <span class="token string">"<span class="token variable">$tmp</span>"</span> <span class="token punctuation">)</span>
+    <span class="token keyword">done</span> <span class="token operator">&lt;&lt;&lt;</span> <span class="token string">"<span class="token variable">$x</span>"</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token string">"<span class="token variable">$1</span>"</span> <span class="token operator">!=</span> -d <span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+        <span class="token comment" spellcheck="true"># Munge xspec to contain uppercase version too</span>
+        <span class="token comment" spellcheck="true"># http://thread.gmane.org/gmane.comp.shells.bash.bugs/15294/focus=15306</span>
+        xspec<span class="token operator">=</span>$<span class="token punctuation">{</span>1:+<span class="token string">"!*.@(<span class="token variable">$1</span>|<span class="token variable">${1^^}</span>)"</span><span class="token punctuation">}</span>
+        x<span class="token operator">=</span><span class="token punctuation">$(</span> compgen -f -X <span class="token string">"<span class="token variable">$xspec</span>"</span> -- <span class="token variable">$quoted</span> <span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span>
+        <span class="token keyword">while</span> <span class="token function">read</span> -r tmp<span class="token punctuation">;</span> <span class="token keyword">do</span>
+            toks+<span class="token operator">=</span><span class="token punctuation">(</span> <span class="token string">"<span class="token variable">$tmp</span>"</span> <span class="token punctuation">)</span>
+        <span class="token keyword">done</span> <span class="token operator">&lt;&lt;&lt;</span> <span class="token string">"<span class="token variable">$x</span>"</span>
+    <span class="token keyword">fi</span>
+
+    <span class="token comment" spellcheck="true"># If the filter failed to produce anything, try without it if configured to</span>
+    <span class="token punctuation">[</span><span class="token punctuation">[</span> -n <span class="token variable">${COMP_FILEDIR_FALLBACK:-}</span> <span class="token operator">&amp;&amp;</span> \
+        -n <span class="token string">"<span class="token variable">$1</span>"</span> <span class="token operator">&amp;&amp;</span> <span class="token string">"<span class="token variable">$1</span>"</span> <span class="token operator">!=</span> -d <span class="token operator">&amp;&amp;</span> <span class="token variable">${#toks[@]}</span> -lt 1 <span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> \
+        x<span class="token operator">=</span><span class="token variable"><span class="token variable">$(</span> compgen -f -- $quoted <span class="token variable">)</span></span> <span class="token operator">&amp;&amp;</span>
+        <span class="token keyword">while</span> <span class="token function">read</span> -r tmp<span class="token punctuation">;</span> <span class="token keyword">do</span>
+            toks+<span class="token operator">=</span><span class="token punctuation">(</span> <span class="token string">"<span class="token variable">$tmp</span>"</span> <span class="token punctuation">)</span>
+        <span class="token keyword">done</span> <span class="token operator">&lt;&lt;&lt;</span> <span class="token string">"<span class="token variable">$x</span>"</span>
+
+
+    <span class="token keyword">if</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token variable">${#toks[@]}</span> -ne 0 <span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+        <span class="token comment" spellcheck="true"># 2>/dev/null for direct invocation, e.g. in the _filedir unit test</span>
+        compopt -o filenames 2<span class="token operator">></span>/dev/null
+        COMPREPLY+<span class="token operator">=</span><span class="token punctuation">(</span> <span class="token string">"<span class="token variable">${toks[@]}</span>"</span> <span class="token punctuation">)</span>
+    <span class="token keyword">fi</span>
+<span class="token punctuation">}</span>
+_filedir<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="7-参考链接地址"><a href="#7-参考链接地址" class="headerlink" title="7. 参考链接地址"></a>7. 参考链接地址</h2><blockquote>
+<p><strong>授人玫瑰，手有余香！</strong></p>
+</blockquote>
+<p>我们要写一个命令行的客户端，支持对命令进行自动补全。我们不会从头开始写这个命令行客户端的输入输出，而是选择使用 <code>IPython</code> 和 <code>mycli/pgcli</code> 都用的一个库 <code>prompt_toolkit</code>。它是用了 <code>Python</code> 的正则表达式的 <code>named group</code> 功能，用正则表达式来验证用户输入的命令是否合法，从输入的内容中抓出来 <code>token</code>，然后对这些 <code>token</code> 进行自动补全。随着开发和支持的命令越来越多，这个正则表达式已经膨胀到几百行了，编译速度也令人难以忍受。这就很恐怖了！</p>
+<p>解决方法就是<strong>即时编译</strong>，既然启动的时候编译那么多正则表达式很慢，那么我为什么要一开始就全部编译好呢？用到哪一个再编译哪一个不就好了吗？这样，当用户输入了一个命令参数的时候，即时编译该参数的对应正则表达式，然后进行匹配。如果命令参数比较复杂的时候，会感觉到一点卡顿，可以加个一个装饰器 <code>@lru_cache</code>，将编译结果直接缓存下来，这样只在第一次输入的时候会卡，后面就好多了。</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> math
+
+<span class="token keyword">from</span> prompt_toolkit <span class="token keyword">import</span> prompt
+<span class="token keyword">from</span> prompt_toolkit<span class="token punctuation">.</span>completion <span class="token keyword">import</span> WordCompleter
+<span class="token keyword">from</span> prompt_toolkit<span class="token punctuation">.</span>contrib<span class="token punctuation">.</span>regular_languages<span class="token punctuation">.</span>compiler <span class="token keyword">import</span> compile
+<span class="token keyword">from</span> prompt_toolkit<span class="token punctuation">.</span>contrib<span class="token punctuation">.</span>regular_languages<span class="token punctuation">.</span>completion <span class="token keyword">import</span> GrammarCompleter
+<span class="token keyword">from</span> prompt_toolkit<span class="token punctuation">.</span>contrib<span class="token punctuation">.</span>regular_languages<span class="token punctuation">.</span>lexer <span class="token keyword">import</span> GrammarLexer
+<span class="token keyword">from</span> prompt_toolkit<span class="token punctuation">.</span>lexers <span class="token keyword">import</span> SimpleLexer
+<span class="token keyword">from</span> prompt_toolkit<span class="token punctuation">.</span>styles <span class="token keyword">import</span> Style
+
+operators1 <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">"add"</span><span class="token punctuation">,</span> <span class="token string">"sub"</span><span class="token punctuation">,</span> <span class="token string">"div"</span><span class="token punctuation">,</span> <span class="token string">"mul"</span><span class="token punctuation">]</span>
+operators2 <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">"cos"</span><span class="token punctuation">,</span> <span class="token string">"sin"</span><span class="token punctuation">]</span>
+
+
+<span class="token keyword">def</span> <span class="token function">create_grammar</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> compile<span class="token punctuation">(</span>
+        r<span class="token triple-quoted-string string">"""
+        (\s*  (?P&lt;operator1>[a-z]+)   \s+   (?P&lt;var1>[0-9.]+)   \s+   (?P&lt;var2>[0-9.]+)   \s*) |
+        (\s*  (?P&lt;operator2>[a-z]+)   \s+   (?P&lt;var1>[0-9.]+)   \s*)
+    """</span>
+    <span class="token punctuation">)</span>
+
+
+example_style <span class="token operator">=</span> Style<span class="token punctuation">.</span>from_dict<span class="token punctuation">(</span>
+    <span class="token punctuation">{</span>
+        <span class="token string">"operator"</span><span class="token punctuation">:</span> <span class="token string">"#33aa33 bold"</span><span class="token punctuation">,</span>
+        <span class="token string">"number"</span><span class="token punctuation">:</span> <span class="token string">"#ff0000 bold"</span><span class="token punctuation">,</span>
+        <span class="token string">"trailing-input"</span><span class="token punctuation">:</span> <span class="token string">"bg:#662222 #ffffff"</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">)</span>
+
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">"__main__"</span><span class="token punctuation">:</span>
+    g <span class="token operator">=</span> create_grammar<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    lexer <span class="token operator">=</span> GrammarLexer<span class="token punctuation">(</span>
+        g<span class="token punctuation">,</span>
+        lexers<span class="token operator">=</span><span class="token punctuation">{</span>
+            <span class="token string">"operator1"</span><span class="token punctuation">:</span> SimpleLexer<span class="token punctuation">(</span><span class="token string">"class:operator"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token string">"operator2"</span><span class="token punctuation">:</span> SimpleLexer<span class="token punctuation">(</span><span class="token string">"class:operator"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token string">"var1"</span><span class="token punctuation">:</span> SimpleLexer<span class="token punctuation">(</span><span class="token string">"class:number"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token string">"var2"</span><span class="token punctuation">:</span> SimpleLexer<span class="token punctuation">(</span><span class="token string">"class:number"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">)</span>
+
+    completer <span class="token operator">=</span> GrammarCompleter<span class="token punctuation">(</span>
+        g<span class="token punctuation">,</span>
+        <span class="token punctuation">{</span>
+            <span class="token string">"operator1"</span><span class="token punctuation">:</span> WordCompleter<span class="token punctuation">(</span>operators1<span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token string">"operator2"</span><span class="token punctuation">:</span> WordCompleter<span class="token punctuation">(</span>operators2<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">)</span>
+
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        <span class="token comment" spellcheck="true"># REPL loop.</span>
+        <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+            <span class="token comment" spellcheck="true"># Read input and parse the result.</span>
+            text <span class="token operator">=</span> prompt<span class="token punctuation">(</span>
+                <span class="token string">"Calculate: "</span><span class="token punctuation">,</span> lexer<span class="token operator">=</span>lexer<span class="token punctuation">,</span> completer<span class="token operator">=</span>completer<span class="token punctuation">,</span> style<span class="token operator">=</span>example_style
+            <span class="token punctuation">)</span>
+            m <span class="token operator">=</span> g<span class="token punctuation">.</span>match<span class="token punctuation">(</span>text<span class="token punctuation">)</span>
+            <span class="token keyword">if</span> m<span class="token punctuation">:</span>
+                vars <span class="token operator">=</span> m<span class="token punctuation">.</span>variables<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Invalid command\n"</span><span class="token punctuation">)</span>
+                <span class="token keyword">continue</span>
+
+            <span class="token keyword">print</span><span class="token punctuation">(</span>vars<span class="token punctuation">)</span>
+            <span class="token keyword">if</span> vars<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"operator1"</span><span class="token punctuation">)</span> <span class="token operator">or</span> vars<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"operator2"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">try</span><span class="token punctuation">:</span>
+                    var1 <span class="token operator">=</span> float<span class="token punctuation">(</span>vars<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"var1"</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                    var2 <span class="token operator">=</span> float<span class="token punctuation">(</span>vars<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"var2"</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token keyword">except</span> ValueError<span class="token punctuation">:</span>
+                    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Invalid command (2)\n"</span><span class="token punctuation">)</span>
+                    <span class="token keyword">continue</span>
+
+                <span class="token comment" spellcheck="true"># Turn the operator string into a function.</span>
+                operator <span class="token operator">=</span> <span class="token punctuation">{</span>
+                    <span class="token string">"add"</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token keyword">lambda</span> a<span class="token punctuation">,</span> b<span class="token punctuation">:</span> a <span class="token operator">+</span> b<span class="token punctuation">)</span><span class="token punctuation">,</span>
+                    <span class="token string">"sub"</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token keyword">lambda</span> a<span class="token punctuation">,</span> b<span class="token punctuation">:</span> a <span class="token operator">-</span> b<span class="token punctuation">)</span><span class="token punctuation">,</span>
+                    <span class="token string">"mul"</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token keyword">lambda</span> a<span class="token punctuation">,</span> b<span class="token punctuation">:</span> a <span class="token operator">*</span> b<span class="token punctuation">)</span><span class="token punctuation">,</span>
+                    <span class="token string">"div"</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token keyword">lambda</span> a<span class="token punctuation">,</span> b<span class="token punctuation">:</span> a <span class="token operator">/</span> b<span class="token punctuation">)</span><span class="token punctuation">,</span>
+                    <span class="token string">"sin"</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token keyword">lambda</span> a<span class="token punctuation">,</span> b<span class="token punctuation">:</span> math<span class="token punctuation">.</span>sin<span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                    <span class="token string">"cos"</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token keyword">lambda</span> a<span class="token punctuation">,</span> b<span class="token punctuation">:</span> math<span class="token punctuation">.</span>cos<span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token punctuation">}</span><span class="token punctuation">[</span>vars<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"operator1"</span><span class="token punctuation">)</span> <span class="token operator">or</span> vars<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"operator2"</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+
+                <span class="token comment" spellcheck="true"># Execute and print the result.</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Result: %s\n"</span> <span class="token operator">%</span> <span class="token punctuation">(</span>operator<span class="token punctuation">(</span>var1<span class="token punctuation">,</span> var2<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+            <span class="token keyword">elif</span> vars<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"operator2"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Operator 2"</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">except</span> EOFError<span class="token punctuation">:</span>
+        <span class="token keyword">pass</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><a href="https://devmanual.gentoo.org/tasks-reference/completion/index.html" target="_blank" rel="noopener">Gentoo linux completion</a></li>
+<li><a href="https://debian-administration.org/article/317/An_introduction_to_bash_completion_part_2" target="_blank" rel="noopener">An introduction to bash completion</a></li>
+<li><a href="https://tuzz.tech/blog/how-bash-completion-works" target="_blank" rel="noopener">How Bash completion works</a></li>
+<li><a href="https://tuzz.tech/blog/adding-bash-completion" target="_blank" rel="noopener">Adding Bash completion to my tool</a></li>
+<li><a href="https://www.kawabangga.com/posts/3877" target="_blank" rel="noopener">IRedis 开发记 3：编译正则的难题</a></li>
+</ul>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Escape</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://escapelife.github.io/posts/22db372f.html">https://escapelife.github.io/posts/22db372f.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Escape</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Linux/">
+                                    <span class="chip bg-color">Linux</span>
+                                </a>
+                            
+                                <a href="/tags/Tools/">
+                                    <span class="chip bg-color">Tools</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/posts/7bd312dc.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/shanghai-on-business.jpg" class="responsive-img" alt="追寻旅行的意义">
+                        
+                        <span class="card-title">追寻旅行的意义</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2020-01-30
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Wen文所未闻/" class="post-category">
+                                    Wen文所未闻
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Essays/">
+                        <span class="chip bg-color">Essays</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/posts/3ee4a863.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/connect-slow-ssh.png" class="responsive-img" alt="执行sudo命令很慢问题">
+                        
+                        <span class="card-title">执行sudo命令很慢问题</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-01-20
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Bug解决之道/" class="post-category">
+                                    Bug解决之道
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Bug/">
+                        <span class="chip bg-color">Bug</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('3'),
+            headingSelector: 'h2, h3, h4, h5'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4, h5').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="764454432"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='list'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">2017</span>
+            <a href="/about" target="_blank">Escape</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">699.3k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2017";
+                    var startMonth = "2";
+                    var startDate = "14";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/EscapeLife" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wenpanhappy@126.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/search.xml", 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

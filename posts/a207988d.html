@@ -1,0 +1,1737 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="愉快的使用rsync备份数据, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>愉快的使用rsync备份数据 | Escape</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Escape</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Escape</div>
+        <div class="logo-desc">
+            
+            听摇滚,但不偏颇;也挺古典,但不安逸
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/EscapeLife" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/EscapeLife" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/use-rsync-command.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">愉快的使用rsync备份数据</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Linux/">
+                                <span class="chip bg-color">Linux</span>
+                            </a>
+                        
+                            <a href="/tags/Command/">
+                                <span class="chip bg-color">Command</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                Linux运维之路
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2018-12-08
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2020-10-23
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    3.2k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    14 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <blockquote>
+<p><strong><code>rsync</code></strong> 命令是一个远程数据同步工具，可通过 <code>LAN</code>/<code>WAN</code> 快速同步多台主机间的文件。<code>rsync</code> 使用 <code>rsync算法</code> 使本地和远程两个主机之间的文件达到同步，这个算法只传送两个文件的不同部分，而不是每次都整份传送，因此速度相当快。</p>
+</blockquote>
+<p><img src="../images/use-rsync-command.jpg" alt="愉快的使用rsync备份数据"></p>
+<hr>
+<h2 id="1-使用方式"><a href="#1-使用方式" class="headerlink" title="1. 使用方式"></a>1. 使用方式</h2><blockquote>
+<p><a href="https://www.ibm.com/developerworks/cn/aix/library/au-spunix_rsync/index.html" target="_blank" rel="noopener"><strong>rsync 的高级应用</strong></a></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>含义解释</th>
+<th>参数列表</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>本机内同步文件或目录</td>
+<td><code>rsync [OPTION] SRC DEST</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>将本机同步到远程主机</td>
+<td><code>rsync [OPTION] SRC [USER@]host:DEST</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>将远程主机同步到本机</td>
+<td><code>rsync [OPTION] [USER@]HOST:SRC DEST</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>从 rsync 服务器中同步</td>
+<td><code>rsync [OPTION] [USER@]HOST::SRC DEST</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>往 rsync 服务器中同步</td>
+<td><code>rsync [OPTION] SRC [USER@]HOST::DEST</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>列出远程机的文件列表</td>
+<td><code>rsync [OPTION] rsync://[USER@]HOST[:PORT]/SRC [DEST]</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="2-常用参数"><a href="#2-常用参数" class="headerlink" title="2. 常用参数"></a>2. 常用参数</h2><blockquote>
+<p><a href="http://man.linuxde.net/rsync" target="_blank" rel="noopener"><strong>rsync 命令的各种参数</strong></a></p>
+</blockquote>
+<ul>
+<li><strong>[1] 文件同步属性参数</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>参数列表</th>
+<th>含义解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><code>-a</code></td>
+<td>以递归方式并保持所有文件属性，等于-rlptgoD</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>-r</code></td>
+<td>对子目录以递归模式处理</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>-l</code></td>
+<td>保留软链接</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>-p</code></td>
+<td>保持文件权限</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>-t</code></td>
+<td>保持文件时间信息</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>-g</code></td>
+<td>保持文件属组信息</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>-o</code></td>
+<td>保持文件属主信息</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>-D</code></td>
+<td>保持设备文件信息</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>[2] 同步模式相关参数</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>参数列表</th>
+<th>含义解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><code>-v</code>/<code>--verbose</code></td>
+<td>详细模式输出</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>-q</code>/<code>--quiet</code></td>
+<td>精简输出模式</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>-b</code></td>
+<td>创建备份，对于目的已经存在有同样的文件名时重命名</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>--delete</code></td>
+<td>删除那些 DST 中有而 SRC 没有的文件</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>--progress</code></td>
+<td>显示备份过程</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>--dry-run</code></td>
+<td>查看并显示哪些文件将被传输</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>--backup-dir</code></td>
+<td>将备份文件存放在在目录下</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>--exclude=PATTERN</code></td>
+<td>指定排除不需要传输的文件模式</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>--port=PORT</code></td>
+<td>指定其他的 rsync 服务端口</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>--password-file=FILE</code></td>
+<td>从 FILE 中得到密码，需要注意权限为 600</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>-e</code>/<code>--rsh=COMMAND</code></td>
+<td>指定使用 rsh 或 ssh 方式进行数据同步</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>--existing</code></td>
+<td>仅更新那些已经存在于 DST 的文件，而不备份那些新创建的文件</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>--files-from</code></td>
+<td>指定需要同步的文件或者目录列表文件集合</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>--usermap=STRING</code></td>
+<td>将属主为 apache 的文件映射为 nginx 属主</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>--groupmap=STRING</code></td>
+<td>将属组为 apache 的文件映射为 nginx 属组</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>[3] 实际使用示例和注意事项</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 常用方式</span>
+$ <span class="token function">rsync</span> -avz source_dir dest_dir<span class="token punctuation">(</span>username@host:PATH<span class="token punctuation">)</span> --exclude <span class="token string">"*.pyc*"</span> --delete
+    -v  详细输出
+    -a  递归方式传输文件
+    -z  压缩文件传输
+    -h  输出友好
+    --exclude  不包括pyc的文件
+    --delete   删除在源端不存在的文件，不加不会默认删除
+
+
+<span class="token comment" spellcheck="true"># SSH方式是通过系统用户来进行备份</span>
+$ <span class="token function">rsync</span> -vzrtopg --progress -e <span class="token string">'ssh -p 2234'</span> \
+    --delete escape@172.16.78.192:/www/data \
+    /databack/experiment/rsync<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 当然也是可以是用scp进行文件和目录同步的，走SSH协议传输</span>
+$ <span class="token function">scp</span> -r -P 55822 data.tar.gz escape@www.hello.com:/home/escape
+
+<span class="token comment" spellcheck="true"># 排除目录或文件，注意目录路径不需要带/符号，否则排除目录不生效</span>
+<span class="token comment" spellcheck="true"># 第一个将排除data/logs及其子目录和文件，第二个只排除其子目录和文件</span>
+$ <span class="token function">tar</span> -zcvf data.tar.gz --exclude<span class="token operator">=</span>data/logs data
+$ <span class="token function">tar</span> -zcvf data.tar.gz --exclude<span class="token operator">=</span>data/logs/nginx/* data
+
+<span class="token comment" spellcheck="true"># 排除以txt为后缀的所有文件，包括子目录</span>
+<span class="token comment" spellcheck="true"># 注意要打包的data文件夹或文件必须在命令最后，否则不会生效</span>
+$ <span class="token function">tar</span> -zcvf data.tar.gz --exclude<span class="token operator">=</span>*.txt data<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用ssh协议作为rsync来传输</span>
+$ <span class="token function">rsync</span> -avz --progress -e <span class="token function">ssh</span> --delete ~/ftp/pub/samba nimbus:<span class="token string">"~ftp/pub/tridge"</span>
+
+<span class="token comment" spellcheck="true"># 对应ssh服务不在22端口上的情况，需要使用-p参数来指定端口</span>
+$ <span class="token function">rsync</span> -avz --progress -e <span class="token string">'ssh -p 2234'</span> app escape@bj.baidu.com:/home/escape \
+    --exclude app/nginx/logs/
+
+<span class="token comment" spellcheck="true"># 当然可以添加更多参数</span>
+$ <span class="token function">rsync</span> -avz -e <span class="token string">'ssh -o "ProxyCommand nohup ssh firewall nc -w1 %h %p"'</span>
+
+<span class="token comment" spellcheck="true"># 改变映射属主属组</span>
+$ <span class="token function">rsync</span> -avz --progress -e <span class="token function">ssh</span> --usermap<span class="token operator">=</span>apache:nginx --groupmap<span class="token operator">=</span>apache:nginx \
+    data.tar.gz --exclude<span class="token operator">=</span>*.txt data<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] 并发同步文件或目录(最佳实践)</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 最佳实践</span>
+--dry-run <span class="token operator">==</span><span class="token operator">></span> rsync_files_list.txt <span class="token operator">==</span><span class="token operator">></span> <span class="token function">rsync</span>
+
+<span class="token comment" spellcheck="true"># 即先使用--dry-run参数先跑一遍将需要需要同步的文件路径都记录到txt文本</span>
+$ <span class="token function">rsync</span> -avz --progress -e <span class="token string">'ssh -p 2222'</span> --dry-run \
+    /data/app/data/files/* \
+    escape@app.escapelife.site:/data_backup/app/files \
+    <span class="token operator">></span> /tmp/rsync_files_list.txt
+
+<span class="token comment" spellcheck="true"># 然后对输出到txt文本的内容进行筛选，删除无用的信息，在使用rsync命令并发同步文件</span>
+$ <span class="token function">cat</span> /tmp/rsync_files_list.txt <span class="token operator">|</span> <span class="token function">xargs</span> -n1 -P4 -I<span class="token punctuation">{</span><span class="token punctuation">}</span> \
+    <span class="token function">rsync</span> -avhz --progress <span class="token punctuation">{</span><span class="token punctuation">}</span> remote_server:/data<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="../images/use-rsync-command-1.png" alt="愉快的使用rsync备份数据"></p>
+<hr>
+<h2 id="3-注意事项"><a href="#3-注意事项" class="headerlink" title="3. 注意事项"></a>3. 注意事项</h2><blockquote>
+<p><strong>同步文件时候的坑点</strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] 同步方式</strong></li>
+</ul>
+<p>在我们日常生活中，同步文件有以下三种模式，分别是：</p>
+<ul>
+<li><strong>把源路径下文件，同步到目标路径</strong><ul>
+<li>目标路径将自动创建多层目录存放 nginx.conf 文件</li>
+<li><code>rsync -aR /data/nginx/config/nginx.conf 192.168.1.100:/data</code></li>
+</ul>
+</li>
+<li><strong>把源站某个目录，同步到目录路径</strong><ul>
+<li>目标路径将自动创建多层目录存放 config 目录</li>
+<li><code>rsync -aR /data/nginx/config/ 192.168.1.100:/data</code></li>
+</ul>
+</li>
+<li><strong>把源站某个文件，同步到目标文件</strong><ul>
+<li>不会自动穿件多目录，只是传送 nginx.conf 文件到目标文件</li>
+<li><code>rsync -aR /data/nginx/config/nginx.conf 192.168.1.100:/data/backup/nginx/nginx.conf</code></li>
+</ul>
+</li>
+</ul>
+<p>前两种情况，目标路径最好事前创建好，不存在的话会自动创建的。第三种情况，<code>rsync</code> 只支持创建一层目录，也就是说可以允许 <code>nginx</code> 目录不存在，否则会报错的。而且需要重点注意的是，对应目标路径的 <code>/data</code> 不需事前存在，否则目录文件都无法创建和传送。</p>
+<ul>
+<li><strong>[2] 使用细节</strong></li>
+</ul>
+<ol>
+<li>要使<code>--delete</code>参数生效，后面源目录(<code>a</code>)必须已<code>/</code>符号结尾，目标目录则无所谓</li>
+<li>参数<code>--exclude</code>可以使用绝对路径，也可以使用相对路径，且使用效果是一样的</li>
+<li>如使用<code>--exclude=data</code>则会排除源目录(<code>a</code>)和目标目录(<code>b</code>)下所有的<code>data</code>目录及其文件</li>
+<li>如使用<code>--exclude=/data</code>则会排除源目录(<code>a</code>)和目标目录(<code>b</code>)下第一层的<code>data</code>目录及其文件</li>
+</ol>
+<pre class="line-numbers language-bash"><code class="language-bash">------------------------------------------------------------
+~/MissSun/dailyTool » <span class="token function">rsync</span> -av --delete --exclude<span class="token operator">=</span>data --dry-run a/ b/
+building <span class="token function">file</span> list <span class="token punctuation">..</span>. <span class="token keyword">done</span>
+deleting name/log5
+deleting name/
+deleting files/log4
+deleting files/
+deleting log6
+./
+bin/
+bin/log2
+sent 122 bytes  received 38 bytes  320.00 bytes/sec
+total size is 0  speedup is 0.00
+
+------------------------------------------------------------
+~/MissSun/dailyTool » <span class="token function">rsync</span> -av --delete --exclude<span class="token operator">=</span>/data --dry-run a/ b/
+building <span class="token function">file</span> list <span class="token punctuation">..</span>. <span class="token keyword">done</span>
+deleting name/log5
+deleting name/
+deleting files/log4
+deleting files/
+deleting log6
+./
+bin/
+bin/log2
+bin/data/
+bin/data/log1
+sent 223 bytes  received 62 bytes  570.00 bytes/sec
+total size is 0  speedup is 0.00<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="4-实例说明"><a href="#4-实例说明" class="headerlink" title="4. 实例说明"></a>4. 实例说明</h2><blockquote>
+<p><strong>还是那句话，光看不练假把式，哈哈哈</strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] 备份到中央备份服务器，增量为 7 天</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/sh</span>
+
+<span class="token comment" spellcheck="true"># This script does personal backups to a rsync backup server. You will end up</span>
+<span class="token comment" spellcheck="true"># with a 7 day rotating incremental backup. The incrementals will go</span>
+<span class="token comment" spellcheck="true"># into subdirectories named after the day of the week, and the current</span>
+<span class="token comment" spellcheck="true"># full backup goes into a directory called "current"</span>
+<span class="token comment" spellcheck="true"># tridge@linuxcare.com</span>
+
+<span class="token comment" spellcheck="true"># directory to backup</span>
+BDIR<span class="token operator">=</span>/home/<span class="token variable">$USER</span>
+
+<span class="token comment" spellcheck="true"># excludes file - this contains a wildcard pattern per line of files to exclude</span>
+EXCLUDES<span class="token operator">=</span><span class="token variable">$HOME</span>/cron/excludes
+
+<span class="token comment" spellcheck="true"># the name of the backup machine</span>
+BSERVER<span class="token operator">=</span>owl
+
+<span class="token comment" spellcheck="true"># your password on the backup server</span>
+<span class="token function">export</span> RSYNC_PASSWORD<span class="token operator">=</span>XXXXXX
+
+<span class="token comment" spellcheck="true">########################################################################</span>
+
+BACKUPDIR<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token function">date</span> +%A<span class="token variable">`</span></span>
+OPTS<span class="token operator">=</span><span class="token string">"--force --ignore-errors --delete-excluded --exclude-from=<span class="token variable">$EXCLUDES</span> \
+    --delete --backup --backup-dir=/<span class="token variable">$BACKUPDIR</span> -a"</span>
+
+<span class="token function">export</span> PATH<span class="token operator">=</span><span class="token variable">$PATH</span>:/bin:/usr/bin:/usr/local/bin
+
+<span class="token comment" spellcheck="true"># the following line clears the last weeks incremental directory</span>
+<span class="token punctuation">[</span> -d <span class="token variable">$HOME</span>/emptydir <span class="token punctuation">]</span> <span class="token operator">||</span> <span class="token function">mkdir</span> <span class="token variable">$HOME</span>/emptydir
+<span class="token function">rsync</span> --delete -a <span class="token variable">$HOME</span>/emptydir/ <span class="token variable">$BSERVER</span>::<span class="token variable">$USER</span>/<span class="token variable">$BACKUPDIR</span>/
+<span class="token function">rmdir</span> <span class="token variable">$HOME</span>/emptydir
+
+<span class="token comment" spellcheck="true"># now the actual transfer</span>
+<span class="token function">rsync</span> <span class="token variable">$OPTS</span> <span class="token variable">$BDIR</span> <span class="token variable">$BSERVER</span>::<span class="token variable">$USER</span>/current<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 备份到备用磁盘</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/sh</span>
+
+<span class="token function">export</span> PATH<span class="token operator">=</span>/usr/local/bin:/usr/bin:/bin
+
+LIST<span class="token operator">=</span><span class="token string">"rootfs usr data data2"</span>
+
+<span class="token keyword">for</span> d <span class="token keyword">in</span> <span class="token variable">$LIST</span><span class="token punctuation">;</span> <span class="token keyword">do</span>
+<span class="token function">mount</span> /backup/<span class="token variable">$d</span>
+<span class="token function">rsync</span> -ax --exclude fstab --delete /<span class="token variable">$d</span>/ /backup/<span class="token variable">$d</span>/
+<span class="token function">umount</span> /backup/<span class="token variable">$d</span>
+<span class="token keyword">done</span>
+
+DAY<span class="token operator">=</span>`date <span class="token string">"+%A"</span>`
+
+<span class="token function">rsync</span> -a --delete /usr/local/apache /data2/backups/<span class="token variable">$DAY</span>
+<span class="token function">rsync</span> -a --delete /data/solid /data2/backups/<span class="token variable">$DAY</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 在家自动备份</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/sh</span>
+<span class="token function">cd</span> ~susan
+<span class="token punctuation">{</span>
+<span class="token keyword">echo</span>
+<span class="token function">date</span>
+dest<span class="token operator">=</span>~/backup/<span class="token variable"><span class="token variable">`</span><span class="token function">date</span> +%A<span class="token variable">`</span></span>
+<span class="token function">mkdir</span> <span class="token variable">$dest</span>.new
+<span class="token function">find</span> <span class="token keyword">.</span> -xdev -type f \<span class="token punctuation">(</span> -mtime 0 -or -mtime 1 \<span class="token punctuation">)</span> -exec <span class="token function">cp</span> -aPv <span class="token string">"{}"</span>
+<span class="token variable">$dest</span>.new \<span class="token punctuation">;</span>
+cnt<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token function">find</span> $dest.new -type f <span class="token operator">|</span> <span class="token function">wc</span> -l<span class="token variable">`</span></span>
+<span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token variable">$cnt</span> -gt 0 <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+    <span class="token function">rm</span> -rf <span class="token variable">$dest</span>
+    <span class="token function">mv</span> <span class="token variable">$dest</span>.new <span class="token variable">$dest</span>
+<span class="token keyword">fi</span>
+<span class="token function">rm</span> -rf <span class="token variable">$dest</span>.new
+<span class="token function">rsync</span> -Cavze <span class="token function">ssh</span> <span class="token keyword">.</span> samba:backup
+<span class="token punctuation">}</span> <span class="token operator">>></span> ~/backup/backup.log 2<span class="token operator">></span><span class="token operator">&amp;</span>1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] 花式备份远程文件列表</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">rsync</span> -avR remote:<span class="token string">'<span class="token variable"><span class="token variable">`</span><span class="token function">find</span> /home -name "*.<span class="token punctuation">[</span>ch<span class="token punctuation">]</span>"<span class="token variable">`</span></span>'</span> /tmp/<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<hr>
+<h2 id="5-常见错误"><a href="#5-常见错误" class="headerlink" title="5. 常见错误"></a>5. 常见错误</h2><blockquote>
+<p><strong>出错不可怕，害怕的是不知道怎么解决</strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] 切换目录报错</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息</span>
+@ERROR: <span class="token function">chroot</span> failed
+<span class="token function">rsync</span> error: error starting client-server protocol <span class="token punctuation">(</span>code 5<span class="token punctuation">)</span> at main.c<span class="token punctuation">(</span>1522<span class="token punctuation">)</span> <span class="token punctuation">[</span>receiver<span class="token operator">=</span>3.0.3<span class="token punctuation">]</span>
+
+<span class="token comment" spellcheck="true"># 大致原因</span>
+服务器端的目录不存在或无权限，创建目录并修正权限可解决问题<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 需要用户认证</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息</span>
+@ERROR: auth failed on module <span class="token function">tee</span>
+<span class="token function">rsync</span> error: error starting client-server protocol <span class="token punctuation">(</span>code 5<span class="token punctuation">)</span> at main.c<span class="token punctuation">(</span>1522<span class="token punctuation">)</span> <span class="token punctuation">[</span>receiver<span class="token operator">=</span>3.0.3<span class="token punctuation">]</span>
+
+<span class="token comment" spellcheck="true"># 大致原因</span>
+服务器端该模块tee需要验证用户名密码，但客户端没有提供正确的用户名密码认证失败，提供正确用户名和密码即可<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 指定模块不存在</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息</span>
+@ERROR: Unknown module <span class="token string">'tee_nonexists'</span>
+<span class="token function">rsync</span> error: error starting client-server protocol <span class="token punctuation">(</span>code 5<span class="token punctuation">)</span> at main.c<span class="token punctuation">(</span>1522<span class="token punctuation">)</span> <span class="token punctuation">[</span>receiver<span class="token operator">=</span>3.0.3<span class="token punctuation">]</span>
+
+<span class="token comment" spellcheck="true"># 大致原因</span>
+服务器不存在指定模块，提供正确的模块名或在服务器端修改成你要的模块以解决问题<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] 密码权限问题</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息</span>
+password <span class="token function">file</span> must not be other-accessible
+continuing without password <span class="token function">file</span>
+Password:
+
+<span class="token comment" spellcheck="true"># 大致原因</span>
+这是因为rsyncd.pwd或rsyncd.secrets的权限不对，应该设置为600<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] 防火墙限制</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息</span>
+rsync: failed to connect to 218.107.243.2: No route to host <span class="token punctuation">(</span>113<span class="token punctuation">)</span>
+<span class="token function">rsync</span> error: error <span class="token keyword">in</span> socket IO <span class="token punctuation">(</span>code 10<span class="token punctuation">)</span> at clientserver.c<span class="token punctuation">(</span>104<span class="token punctuation">)</span> <span class="token punctuation">[</span>receiver<span class="token operator">=</span>2.6.9<span class="token punctuation">]</span>
+
+<span class="token comment" spellcheck="true"># 大致原因</span>
+对方没开机、防火墙阻挡、通过的网络上有防火墙阻挡，都有可能
+关闭防火墙，其实就是把tcp和udp的873端口打开，当然也可以添加防火墙规则<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[6] 配置文件有误</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息</span>
+@ERROR: access denied to www from unknown <span class="token punctuation">(</span>192.168.1.123<span class="token punctuation">)</span>
+<span class="token function">rsync</span> error: error starting client-server protocol <span class="token punctuation">(</span>code 5<span class="token punctuation">)</span> at main.c<span class="token punctuation">(</span>1524<span class="token punctuation">)</span> <span class="token punctuation">[</span>Receiver<span class="token operator">=</span>3.0.7<span class="token punctuation">]</span>
+
+<span class="token comment" spellcheck="true"># 大致原因</span>
+很有可能是因为没有在hosts allow后面添加另一个IP段，重新启动rsync服务
+hosts allow <span class="token operator">=</span> 192.168.1.0/24 192.168.2.0/24<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[7] 同步软连接</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息</span>
+@ERROR: daemon security issue -- contact admin
+<span class="token function">rsync</span> error: error starting client-server protocol <span class="token punctuation">(</span>code 5<span class="token punctuation">)</span> at main.c<span class="token punctuation">(</span>1530<span class="token punctuation">)</span> <span class="token punctuation">[</span>sender<span class="token operator">=</span>3.0.6<span class="token punctuation">]</span>
+
+<span class="token comment" spellcheck="true"># 大致原因</span>
+同步的目录里面有软连接文件，需要服务器端的/etc/rsyncd.conf打开use <span class="token function">chroot</span> <span class="token operator">=</span> yes，掠过软连接文件<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[8] 服务没有正常启动</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息</span>
+rsync: <span class="token function">read</span> error: Connection reset by peer <span class="token punctuation">(</span>104<span class="token punctuation">)</span>
+<span class="token function">rsync</span> error: error <span class="token keyword">in</span> <span class="token function">rsync</span> protocol data stream <span class="token punctuation">(</span>code 12<span class="token punctuation">)</span> at io.c<span class="token punctuation">(</span>794<span class="token punctuation">)</span> <span class="token punctuation">[</span>receiver<span class="token operator">=</span>3.0.2<span class="token punctuation">]</span>
+
+<span class="token comment" spellcheck="true"># 大致原因</span>
+1.很大可能是服务器端没有开启rsync服务，开启服务
+2.未启动xinetd守护进程，使用service xinetd start命令来启动<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[9] 文件加锁限制</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息</span>
+@ERROR: failed to <span class="token function">open</span> lock <span class="token function">file</span>
+<span class="token function">rsync</span> error: error starting client-server protocol <span class="token punctuation">(</span>code 5<span class="token punctuation">)</span> at main.c<span class="token punctuation">(</span>1495<span class="token punctuation">)</span> <span class="token punctuation">[</span>receiver<span class="token operator">=</span>3.0.2<span class="token punctuation">]</span>
+
+<span class="token comment" spellcheck="true"># 大致原因</span>
+配置文件rsync.conf中添加 lock <span class="token function">file</span> <span class="token operator">=</span> rsyncd.lock 即可解决<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[10] 磁盘空间不足</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息</span>
+rsync: recv_generator: <span class="token function">mkdir</span> <span class="token string">"/teacherclubBackup/rsync……"</span> failed: No space left on device <span class="token punctuation">(</span>28<span class="token punctuation">)</span>
+*** Skipping any contents from this failed directory ***
+
+<span class="token comment" spellcheck="true"># 大致原因</span>
+磁盘空间满了，需要释放一些空间在备份<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[11] 域名反解析异常</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息</span>
+2018/12/06 04:00:42 <span class="token punctuation">[</span>16950<span class="token punctuation">]</span> params.c:Parameter<span class="token punctuation">(</span><span class="token punctuation">)</span> - Ignoring badly formed line <span class="token keyword">in</span> config file: ignore errors
+2018/12/06 04:00:52 <span class="token punctuation">[</span>16950<span class="token punctuation">]</span> name lookup failed <span class="token keyword">for</span> 1.x.x.51: Temporary failure <span class="token keyword">in</span> name resolution
+2018/12/06 04:00:52 <span class="token punctuation">[</span>16950<span class="token punctuation">]</span> connect from UNKNOWN <span class="token punctuation">(</span>1.x.x.51<span class="token punctuation">)</span>
+2018/12/06 04:00:52 <span class="token punctuation">[</span>16950<span class="token punctuation">]</span> <span class="token function">rsync</span> denied on module app1_backup from UNKNOWN <span class="token punctuation">(</span>1.x.x.51<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 大致原因</span>
+上述报错不影响同步文件的正常使用，只是会出现较长时间的延迟
+第一行，可以通过去掉配置文件中的<span class="token string">"ignore errors"</span>注释来忽略掉一些无关的IO错误
+剩余行，rsync服务端对连接进来的客户端的IP地址进行域名反查，导致了延时的出现
+
+在rsync3.10.x版本以后，rsync提供了禁用反向搜索的配置项<span class="token string">"reverse lookup = no"</span>
+但对于早期的版本不支持禁用反向搜索功能，可以在服务端的/etc/hosts文件中配置客户端的IP和主机名
+通过配置<span class="token string">"192.168.0.30 escapelife.github.io"</span>之后，重启服务可以降低延时<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[12] 远程地址文件和本地链接文件冲突</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息</span>
+could not <span class="token function">make</span> way <span class="token keyword">for</span> new symlink: system/nrcalc
+<span class="token function">rsync</span> error: some files could not be transferred <span class="token punctuation">(</span>code 23<span class="token punctuation">)</span> at main.c<span class="token punctuation">(</span>692<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 大致原因</span>
+原因是因为，远程服务器上面的对应的文件是一个目录文件且是有内容的，但是本地的对应文件是一个链接文件
+这就导致同步的时候，工具不知道如何处理了，所以报错了
+可以使用--force或者--delete参数，强制对其进行处理，删除远程服务器的对应目录文件，即可<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Escape</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://escapelife.github.io/posts/a207988d.html">https://escapelife.github.io/posts/a207988d.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Escape</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Linux/">
+                                    <span class="chip bg-color">Linux</span>
+                                </a>
+                            
+                                <a href="/tags/Command/">
+                                    <span class="chip bg-color">Command</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/posts/d6395dd2.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/rsync-transfer-file.png" class="responsive-img" alt="搭建rsync服务来同步配置">
+                        
+                        <span class="card-title">搭建rsync服务来同步配置</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2018-12-16
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/posts/6d8795c8.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/gitlab-idea-for-working.jpg" class="responsive-img" alt="使用GitLab进行代码管理">
+                        
+                        <span class="card-title">使用GitLab进行代码管理</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2018-12-04
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('3'),
+            headingSelector: 'h2, h3, h4, h5'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4, h5').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="764454432"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='list'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">2017</span>
+            <a href="/about" target="_blank">Escape</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">699.3k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2017";
+                    var startMonth = "2";
+                    var startDate = "14";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/EscapeLife" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wenpanhappy@126.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/search.xml", 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

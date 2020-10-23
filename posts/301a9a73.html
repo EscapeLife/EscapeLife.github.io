@@ -1,0 +1,2478 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Linux进程及作业管理, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Linux进程及作业管理 | Escape</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Escape</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Escape</div>
+        <div class="logo-desc">
+            
+            听摇滚,但不偏颇;也挺古典,但不安逸
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/EscapeLife" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/EscapeLife" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/jobs.png')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Linux进程及作业管理</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Linux/">
+                                <span class="chip bg-color">Linux</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                Linux运维之路
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2017-11-08
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2020-03-06
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    14.6k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    59 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <blockquote>
+<p><strong>纸上得来终觉浅，绝知此事要躬行。</strong></p>
+</blockquote>
+<p><img src="../images/jobs.png" alt="Linux进程及作业管理"></p>
+<hr>
+<h1 id="Linux-进程及作业管理"><a href="#Linux-进程及作业管理" class="headerlink" title="Linux 进程及作业管理"></a>Linux 进程及作业管理</h1><h2 id="1-程序、进程与线程"><a href="#1-程序、进程与线程" class="headerlink" title="1.程序、进程与线程"></a>1.程序、进程与线程</h2><blockquote>
+<p>程序是计算机为完成特定任务所执行的指令序列，对程序的管理也是操作系统的主要工作之一。</p>
+<ul>
+<li>操作系统的重要任务之一就是使用户充分而有效地利用系统资源，并发性是操作系统最主要的特征。处理机的管理也称为<strong>进程的管理</strong>。</li>
+<li>操作系统允许多道程序并发执行共享系统资源，而程序在并发执行时所产生的一系列特点使得传统的程序概念已经不足以对其进行描述，因此，引入了进程（<code>Process</code>）</li>
+<li><strong>进程</strong>可以更好的描述计算机程序的执行过程，反映操作系统的并发执行、资源共享及用户随机访问的特性，并以此作为<strong>资源分配</strong>的基本单位</li>
+<li>操作系统的<strong>基本任务</strong>就是对进程实施管理，有效的控制进程的执行，给进程分配所需要的资源，允许进程之间共享和交换信息，并保护每个进程在运行期间不受其他进程的干扰，允许进程进行同步执行</li>
+</ul>
+</blockquote>
+<hr>
+<h3 id="1-1-进程的概念"><a href="#1-1-进程的概念" class="headerlink" title="1.1 进程的概念"></a>1.1 进程的概念</h3><blockquote>
+<p>每当用户运行一个程序时，操作系统就为该程序创建了一个进程，并为它分配资源、调度其运行。程序执行结束后，进程也就消亡了。一个程序被同时执行多次，系统就会创建多个进程。因此，一个程序可以被多个进程执行，一个进程也可以同时执行多个程序。</p>
+</blockquote>
+<ul>
+<li>进程是程序的<strong>一次执行</strong>过程</li>
+<li>进程是可以和其他计算<strong>并发执行</strong>的计算</li>
+<li>进程是<strong>内存区域</strong>中的一组指令序列与其数据在处理机上<strong>顺序执行</strong>的一次活动</li>
+<li><strong>进程是</strong>一个可并发执行的程序在一个数据集上的一次运行，是操作系统资源分配的<strong>基本单位</strong></li>
+</ul>
+<hr>
+<h3 id="1-2-进程的状态"><a href="#1-2-进程的状态" class="headerlink" title="1.2 进程的状态"></a>1.2 进程的状态</h3><blockquote>
+<p>进程在执行过程中，由于操作系统中出现的不同事件导致进程执行的间歇性、不确定性，使进程的状态也随执行过程发生变化，进程在其生命周期中可划分为三种基本状态。</p>
+</blockquote>
+<p>三种基本状态</p>
+<ul>
+<li><code>就绪状态</code> - 进程已经获得了除 CPU 以外的一切资源，已经具备运行的条件。一旦得到 CPU 的使用权，便可立即投入运行。处于就绪状态的进程可以有多个，通常把它们放在一个队列中。</li>
+<li><code>运行状态</code> - 进程已经获得 CPU 的使用权，其程序正在运行。在单 CPU 系统中，只有一个进程处于运行状态，而在多 CPU 系统中，则可能有多个进程处于运行状态。</li>
+<li><code>阻塞状态</code> - 正在运行中的进程由于等待某个事件，如申请打印机输出，而打印机正在被其他进程占用，而暂停运行被挂起，其状态由运行状态变为阻塞状态。处于阻塞状态的进程也可以有多个，需要将它们组织为一个队列。</li>
+</ul>
+<blockquote>
+<p>在运行期间，进程的状态是变化的，不断地从一个状态转换为另一个状态。处于运行状态的进程，因时间片用完被强行转换为<strong>就绪状态</strong>，也可能因为需要使用某个资源，而该资源被其他进程占用，而被转换为<strong>阻塞状态</strong>；处于阻塞状态的进程，因发生了某个事件，如需要的资源满足了，就立刻从阻塞状态转变为就绪状态；处于就绪状态的进程在得到了 CPU 的使用权后，被转换为<strong>运行状态</strong>。</p>
+</blockquote>
+<p><img src="../images/jobs1.png" alt="Linux进程及作业管理"></p>
+<h3 id="1-3-线程作用"><a href="#1-3-线程作用" class="headerlink" title="1.3 线程作用"></a>1.3 线程作用</h3><blockquote>
+<p>随着计算机硬件和软件技术的发展，许多操作系统设计的目标是追求更高地系统效能和更好地资源共享，为了达到此目标，人们又提出了比进程更小的能够独立运行的基本单位<strong>线程</strong>（<code>Thread</code>），<strong>以此作为 CPU 分配的基本单位。</strong></p>
+<ul>
+<li><strong>线程</strong>是对进程再进行细分，是一个进程内的基本调度单位。</li>
+<li>引入线程的目的是为了<strong>提高操作系统并发执行的程度</strong>，从而进一步提高系统的吞吐量，减少程序并发执行时所付出的时间和空间开销。</li>
+<li>一个进程至少拥有一个线程，进程还可以根据需要创建多个线程。进程中的所有线程共享该进程的资源，驻留同一块内存空间，可以访问相同的数据。</li>
+<li>当一个线程改变了内存中某个单元的数据时，其他线程在访问该数据单元时会共享变化后的数据。因此线程之间的通信变得更为简单、容易了。</li>
+<li>在<code>UNIX</code>系统中，进程作为 CPU 的分配单位，在<code>Windows</code>系统中，则采用线程作为 CPU 的分配单位，进程成为（除 CPU 以外）资源的分配单位。</li>
+<li>使用线程作为 CPU 分配的基本单位，可以充分共享资源，减少内存开销，提高并发性，加快切换速度，便于系统管理。</li>
+</ul>
+</blockquote>
+<p><img src="../images/jobs2.png" alt="Linux进程及作业管理"></p>
+<hr>
+<h3 id="1-4-进程与程序的区别"><a href="#1-4-进程与程序的区别" class="headerlink" title="1.4 进程与程序的区别"></a>1.4 进程与程序的区别</h3><blockquote>
+<p>由于计算机中的资源是有限的，不能满足所有进程的需要，因此就导致了进程间的资源竞争。使进程在运行期间相互制约，间歇性地异步运行。操作系统的处理机管理部分就是负责进程的管理以及各个进程之间的协调运行。</p>
+</blockquote>
+<p><strong>主要区别</strong></p>
+<ul>
+<li>进程的实质就是程序的执行过程，是一个<strong>动态</strong>的过程，而程序则是描述问题解题步骤和方法的指令集合，是<strong>静态</strong>的。</li>
+<li>进程的生命期是<strong>暂时</strong>的，在执行初期被创建，执行结束后被撤消。而程序的存在是<strong>永久</strong>的。</li>
+<li>进程是一个能够<strong><code>独立调度</code></strong>并能和其他进程<strong><code>并行执行</code></strong>的单位，能确切地描述并发执行；而程序<strong>不能</strong>作为独立调度执行单位，不具备这种特征。</li>
+<li>一个程序可以多次执行并产生多个不同的进程，而一个进程仅对应一个程序。</li>
+<li>进程由<code>程序</code>、<code>数据</code>、<code>进程控制块</code>3 部分组成，而程序不是。</li>
+</ul>
+<hr>
+<h3 id="1-5-知识扩展"><a href="#1-5-知识扩展" class="headerlink" title="1.5 知识扩展"></a>1.5 知识扩展</h3><blockquote>
+<p>了解更多关于，进程和线程的知识，请点击这里查看 ==&gt; <a href="https://defrur.gitbooks.io/introduction-to-process/content/index.html" target="_blank" rel="noopener">理解 linux 进程</a></p>
+</blockquote>
+<hr>
+<h2 id="2-进程相关知识"><a href="#2-进程相关知识" class="headerlink" title="2. 进程相关知识"></a>2. 进程相关知识</h2><h3 id="2-1-虚拟地址空间"><a href="#2-1-虚拟地址空间" class="headerlink" title="2.1 虚拟地址空间"></a>2.1 虚拟地址空间</h3><blockquote>
+<p>在内存中，每个程序的运行都是孤立的，每个程序只知道当前内存空间只运行了自己和内核，而看不到其它的进程。</p>
+</blockquote>
+<hr>
+<h3 id="2-2-内核模式与用户模式"><a href="#2-2-内核模式与用户模式" class="headerlink" title="2.2 内核模式与用户模式"></a>2.2 内核模式与用户模式</h3><blockquote>
+<ul>
+<li>以<code>32bit</code>系统为例，Linux 的虚拟地址空间为<code>0～4G</code>。Linux 内核将这 4G 字节的空间分为两部分。将最高的<strong>1G</strong>字节（从虚拟地址<code>0xC0000000</code>到<code>0xFFFFFFFF</code>），供内核使用，称为“<strong>内核空间</strong>”。</li>
+<li>而将较低的<strong>3G</strong>字节（从虚拟地址<code>0x00000000</code>到<code>0xBFFFFFFF</code>)，供各个进程使用，称为“<strong>用户空间</strong>。</li>
+<li>Linux 使用两级保护机制：<strong>0 级</strong>供内核使用，<strong>3 级</strong>供用户程序使用。</li>
+</ul>
+</blockquote>
+<p><img src="../images/jobs3.png" alt="Linux进程及作业管理"></p>
+<hr>
+<h3 id="2-3-进程的状态"><a href="#2-3-进程的状态" class="headerlink" title="2.3 进程的状态"></a>2.3 进程的状态</h3><ul>
+<li>运行态：<code>runnnig</code></li>
+<li>睡眠态：<code>sleeping</code></li>
+<li>可中断睡眠：<code>interruptable</code> - 随时来请求，随时能唤醒 - 比如处理完当前请求后暂时还没有更多请求下，这种<code>sleep</code>就是可中断</li>
+<li>不可中断睡眠：<code>uninterruptable</code> - 等待外部条件满足之前无法继续运行</li>
+<li>停止态：<code>stopped</code> - 不会再被内核调度并运行</li>
+<li>僵死态：<code>zombie</code> - 父进程先于子进程结束了，子进程再也不能被停掉的进程</li>
+</ul>
+<hr>
+<h3 id="2-4-进程的优先级"><a href="#2-4-进程的优先级" class="headerlink" title="2.4 进程的优先级"></a>2.4 进程的优先级</h3><blockquote>
+<p>Linux 使用抢占式多任务：当时钟信号到达时，高优先级进程可以抢占 CPU。</p>
+</blockquote>
+<ul>
+<li><p><code>CPU</code>挑选进程是根据<strong>进程的优先级</strong>进行的，进程优先级的取值范围为<code>0-139</code> - 实时优先级：<code>0-99</code> - 数字越大，优先级越高 - 内核控制 - 静态优先级：<code>100-139</code> - 数字越小，优先级越高 - 用户可控制的优先级</p>
+</li>
+<li><p>用户可以通过调整<code>nice</code>值来改变进程的优先级 - nice 值：<code>-20-19</code> 调整静态优先级 - <strong>进程启动</strong>时，默认 nice 值为<code>0</code>，优先级对应为<code>120</code> - 动态优先级，由内核维护，动态调整</p>
+</li>
+</ul>
+<hr>
+<h3 id="2-5-进程间通信方式"><a href="#2-5-进程间通信方式" class="headerlink" title="2.5 进程间通信方式"></a>2.5 进程间通信方式</h3><ul>
+<li>同一主机 - <code>singnal</code>：信号 - <code>shm</code>：共享内存 - <code>semerphor</code>：旗语</li>
+<li>不同主机 - <code>rpc</code>：<code>remote procedure calling</code>，远程过程调用 - <code>socket</code>：<code>IP:port</code>，套接字</li>
+</ul>
+<hr>
+<h3 id="2-6-进程的分类"><a href="#2-6-进程的分类" class="headerlink" title="2.6 进程的分类"></a>2.6 进程的分类</h3><ul>
+<li><code>CPU-Bound</code> - CPU 密集型 - 对于 CPU 占用率高的进程</li>
+<li><code>I/O-Bound</code> - I/O 密集型 - 等待 I/O 时间长的进程</li>
+</ul>
+<hr>
+<h3 id="2-7-子进程"><a href="#2-7-子进程" class="headerlink" title="2.7 子进程"></a>2.7 子进程</h3><ul>
+<li>进程运行是单线运行的，进程中的指令必须顺序执行</li>
+<li>父进程有无法完成的任务时，启用子进程来执行，此时父进程进入睡眠，子进程执行完成后，返回父进程继续执行</li>
+<li>进程创建机制，每一个进程都是由其父进程<code>fork()</code>、<code>clone()</code>自身而来</li>
+</ul>
+<hr>
+<h3 id="2-8-线程"><a href="#2-8-线程" class="headerlink" title="2.8 线程"></a>2.8 线程</h3><ul>
+<li>线程是比进程更小的可以被单独调度的单位</li>
+<li>线程将进程的任务指令拆分，分配到不同的<code>CPU</code>上同时运行</li>
+<li>不过<code>Linux</code>中的进程都是轻量级进程，已经相当于线程的级别了</li>
+</ul>
+<hr>
+<h2 id="3-进程管理命令"><a href="#3-进程管理命令" class="headerlink" title="3. 进程管理命令"></a>3. 进程管理命令</h2><h3 id="3-1-命令分类概况"><a href="#3-1-命令分类概况" class="headerlink" title="3.1 命令分类概况"></a>3.1 命令分类概况</h3><ul>
+<li><strong>工作管理</strong> - <code>jobs</code> - <code>ctrl+z</code>，<code>&amp;</code> - <code>bg</code>，<code>fg</code> - <code>nohup</code></li>
+<li><strong>进程资源管理</strong> - 查看：<code>pstree</code>，<code>ps</code>，<code>top</code>，<code>vmstat</code>，<code>pmap</code> - 查询：<code>pgrep</code>，<code>pidof</code>，<code>fuser</code>，<code>lsof</code> - 管理：<code>kill</code>，<code>killall</code>，<code>pkill</code>，<code>xkill</code>，<code>nice</code>，<code>renice</code></li>
+<li><strong>管理软件工具</strong> - <code>htop</code> - <code>glances</code> - <code>dstat</code></li>
+<li><strong>额外常用的命令和工具</strong> - <code>iostat</code> - <code>sar</code> - <code>iftop</code></li>
+</ul>
+<hr>
+<h3 id="3-2-工作管理"><a href="#3-2-工作管理" class="headerlink" title="3.2 工作管理"></a>3.2 工作管理</h3><blockquote>
+<p>作业控制指的是，在一个登录会话里，允许用户在不通进程组（或者<code>jobs</code>）之间的切换。</p>
+</blockquote>
+<p><strong>作业分类</strong></p>
+<ul>
+<li><code>前台作业</code> - 通过终端启动，且启动后一直占据终端</li>
+<li><code>后台作业</code> - 可以通过终端启动，但启动后即转入后台运行（释放终端）</li>
+</ul>
+<p><strong>将作业运行于后台</strong></p>
+<ul>
+<li>运行中的作业 - <code>Ctrl+z</code></li>
+<li>尚未启动的作业 - <code># COMMAND &amp;</code></li>
+<li>不中断作业于后台 - <code># nohup COMMAND &amp;</code> - 上面两种作业虽然被送往后台运行，但其依然与终端相关 - 不中断作业于后台，剥离与终端的关系</li>
+</ul>
+<p><strong>查看所有作业</strong></p>
+<ul>
+<li><code># jobs</code></li>
+</ul>
+<p><strong>作业控制</strong></p>
+<ul>
+<li><code># fg [[%]JOB_NUM]</code>：把指定的后台作业调回前台</li>
+<li><code># bg [[%]JOB_NUM]</code>：让送往后台的作业在后台继续运行</li>
+<li><code># kill [%JOB_NUM]</code>：终止指定的作业</li>
+</ul>
+<hr>
+<h3 id="3-2-pstree命令"><a href="#3-2-pstree命令" class="headerlink" title="3.2 pstree命令"></a>3.2 <code>pstree</code>命令</h3><blockquote>
+<p>pstree 命令以树状图的方式展现进程之间的派生关系，显示效果比较直观。</p>
+</blockquote>
+<p><strong>语法</strong></p>
+<pre><code>`pstree(选项)`</code></pre><p><strong>选项</strong></p>
+<ul>
+<li><code>-a</code><br>显示每个程序的完整指令，包含路径，参数或是常驻服务的标示</li>
+<li><code>-c</code><br>不使用精简标示法</li>
+<li><code>-G</code><br>使用<code>VT100</code>终端机的列绘图字符</li>
+<li><code>-h</code><br>列出树状图时，特别标明现在执行的程序</li>
+<li><code>-H&lt;程序识别码&gt;</code><br>此参数的效果和指定”<code>-h</code>“参数类似，但特别标明指定的程序</li>
+<li><code>-l</code><br>采用长列格式显示树状图</li>
+<li><code>-n</code><br>用程序识别码排序。预设是以程序名称来排序</li>
+<li><code>-p</code><br>显示程序识别码</li>
+<li><code>-u</code><br>显示用户名称</li>
+<li><code>-U</code><br>使用<code>UTF-8</code>列绘图字符</li>
+<li><code>-V</code><br>显示版本信息</li>
+</ul>
+<p><img src="../images/jobs4.png" alt="Linux进程及作业管理"></p>
+<hr>
+<h3 id="3-3-ps命令"><a href="#3-3-ps命令" class="headerlink" title="3.3 ps命令"></a>3.3 <code>ps</code>命令</h3><blockquote>
+<p>Linux 系统各进程的相关信息均保存在<code>/proc/PID</code>目录下的各文件中</p>
+</blockquote>
+<p><img src="../images/jobs5.png" alt="Linux进程及作业管理"></p>
+<p><strong>命令参数</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash">a：以BSD风格显示当前终端的进程信息。       注意BSD风格是不带<span class="token variable"><span class="token variable">`</span>-<span class="token variable">`</span></span>
+u：以BSD风格显示当前用户的进程信息。
+x：以BSD风格显示与当前终端无关的信息。
+
+-e：显示所有进程信息
+-l：显示长信息
+-f：显示全框架扩展信息
+-h：以树状显示<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>常用用法</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># ps aux</span>
+<span class="token comment" spellcheck="true"># ps -elf</span>
+<span class="token comment" spellcheck="true"># ps -eh</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p><strong>字段含义</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># ps aux</span>
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         1  0.0  0.1   2920  1408 ?        Ss   Apr18   0:00 /sbin/init
+root         2  0.0  0.0      0     0 ?        S    Apr18   0:00 <span class="token punctuation">[</span>kthreadd<span class="token punctuation">]</span>
+root         3  0.0  0.0      0     0 ?        S    Apr18   0:01 <span class="token punctuation">[</span>migration/0<span class="token punctuation">]</span>
+root         4  0.0  0.0      0     0 ?        S    Apr18   0:00 <span class="token punctuation">[</span>ksoftirqd/0<span class="token punctuation">]</span>
+root         5  0.0  0.0      0     0 ?        S    Apr18   0:00 <span class="token punctuation">[</span>stopper/0<span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><code>USER</code>：进程的属主</li>
+<li><code>PID</code>：PID 号</li>
+<li><code>%CPU</code>：占用的当前 CPU 百分比</li>
+<li><code>%MEM</code>：占用的当前内存百分比</li>
+<li><code>VSZ</code>：虚拟内存大小。</li>
+<li><code>RSS TTY</code>：常驻内存集大小，无法被交换的内存空间。</li>
+<li><code>STAT</code>：进程状态 - <code>S</code>：sleep，可中断睡眠 - <code>D</code>：不可中断睡眠 - <code>R</code>：running，运行中 - <code>T</code>：stop，停止的 - <code>Z</code>：zombie，僵尸程序 - <code>N</code>：NICE，低优先级 - <code>&lt;</code>：高优先级 - <code>l</code>：多线程进程 - <code>s</code>：是多个进程的首进程 - <code>+</code>：前台进程组进程</li>
+<li><code>START</code>：被触发的时间</li>
+<li><code>TIME</code>：实际占用的 CPU 运行时间</li>
+<li><code>COMMAND</code>：触发的命令</li>
+</ul>
+<p><img src="../images/jobs6.png" alt="Linux进程及作业管理"></p>
+<hr>
+<h3 id="3-4-top命令"><a href="#3-4-top命令" class="headerlink" title="3.4 top命令"></a>3.4 <code>top</code>命令</h3><blockquote>
+<p><strong><code>top</code></strong>是一个以交互界面为主的监控当前系统资源，进程状态的工具。</p>
+</blockquote>
+<p><strong>命令参数</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash">-d n：n秒刷新一次
+-b：以批次刷新
+-n：刷新的次数
+-p：指定某一个PID单独检测<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>交互命令</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash">P：按照使用的CPU百分比排序
+M：按照占用内存的百分比排序
+T：按照实际占用的CPU时间和排序
+N：按照PID排序
+1：显示第一颗CPU核心信息
+ <span class="token punctuation">..</span>.
+k：按下k之后输入一个PID，然后输入信号传递执行
+r：按下r之后输入一个PID，然后输入nice值设置
+q：quit
+ <span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>字段含义</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># top</span>
+<span class="token function">top</span> - 21:05:05 up  5:07,  2 users,  load average: 0.00, 0.01, 0.05
+Tasks:  96 total,   1 running,  95 sleeping,   0 stopped,   0 zombie
+%Cpu<span class="token punctuation">(</span>s<span class="token punctuation">)</span>:  0.0 us,  0.0 sy,  0.0 ni, 99.7 id,  0.0 wa,  0.0 hi,  0.0 si,  0.3 st
+KiB Mem <span class="token keyword">:</span>  1015476 total,   829448 free,    39864 used,   146164 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   838364 avail Mem
+
+PID     USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+25      root      20   0       0      0      0 S  0.3  0.0   0:01.98 rcuos/0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>LINE1</strong> - <code>21:05:05</code>：系统当前时间 - <code>up 5:07</code>：系统已经运行了多久 - <code>2 users</code>：有几个用户在线 - <code>load average: 0.00, 0.01, 0.05</code>：CPU 平均负载，1 分钟，5 分钟，15 分钟。</li>
+<li><strong>LINE2</strong> - <code>Tasks: 96 total</code>：进程总数 - <code>1 running</code>：运行数量 - <code>95 sleeping</code>：睡眠数量  <ul>
+<li><code>0 stopped</code>：停止数量  </li>
+<li><code>0 zombie</code>：僵尸数量</li>
+</ul>
+</li>
+<li><strong>LINE3</strong> - <code>0.0 us</code>：用户空间占用 CPU 百分比  <ul>
+<li><code>0.0 sy</code>：内核空间占用 CPU 百分比  </li>
+<li><code>0.0 ni</code>：更改过 NICE 值得进程所占用 CPU 百分比 - <code>99.7 id</code>：空闲的 CPU 百分比  </li>
+<li><code>0.0 wa</code>：IO 等待所占用的 CPU 百分比  </li>
+<li><code>0.0 hi</code>：硬中断所占用的 CPU 百分比  </li>
+<li><code>0.0 si</code>：软中断所占用的 CPU 百分比  </li>
+<li><code>0.3 st</code>：虚拟化所占用的 CPU 百分比</li>
+</ul>
+</li>
+<li><strong>LINE4</strong> - <code>1015476 total</code>：内存总大小 - <code>829448 free</code>：空闲的内存 - <code>39864 used</code>：被使用的内存 - <code>146164 buff/cache</code>：缓冲/缓存所占用的内存</li>
+<li><strong>LINE5</strong> - <code>0 total</code>：swap 数量。 - <code>0 free</code>：swap 空闲的数量 - <code>0 used</code>：使用的 swap - <code>838364 avail Mem</code>：真正可用的内存大小</li>
+<li><strong>LINE6</strong> - <code>PID</code>：PID 号 - <code>USER</code>：进程属主 - <code>PR</code>：进程优先级 - <code>NI</code>：NICE 值 - <code>VIRT</code>：进程使用的虚拟内存总量 - <code>RES</code>：进程使用的物理内存总量 - <code>SHR</code>：共享内存大小。 - <code>S</code>：status - <code>%CPU</code>：占用的当前 CPU 百分比 - <code>%MEM</code>：占用的当前内存百分比 - <code>TIME</code>：实际占用的 CPU 运行时间 - <code>COMMAND</code>：触发的命令</li>
+</ul>
+<hr>
+<h3 id="3-5-vmstat命令"><a href="#3-5-vmstat命令" class="headerlink" title="3.5 vmstat命令"></a>3.5 <code>vmstat</code>命令</h3><blockquote>
+<p><strong><code>vmstat</code></strong>命令是最常见的 Linux/Unix 监控工具，可以展现给定时间间隔的服务器的状态值,包括服务器的 CPU 使用率，内存使用，虚拟内存交换情况，IO 读写情况。这个命令是我查看 Linux/Unix 最喜爱的命令，一个是 Linux/Unix 都支持，二是相比<code>top</code>，我可以看到整个机器的<strong>CPU</strong>、内存<strong>、</strong>IO 的使用情况**，而不是单单看到各个进程的 CPU 使用率和内存使用率(使用场景不一样)。</p>
+</blockquote>
+<p><strong>语法</strong></p>
+<ul>
+<li><code>vmstat(选项)(参数)</code></li>
+</ul>
+<p><strong>选项</strong></p>
+<ul>
+<li><code>-a</code><br>显示活动内页</li>
+<li><code>-f</code><br>显示启动后创建的进程总数</li>
+<li><code>-n</code><br>头信息仅显示一次</li>
+<li><code>-s</code><br>以表格方式显示事件计数器和内存状态</li>
+<li><code>-d</code><br>报告磁盘状态</li>
+<li><code>-p</code><br>显示指定的硬盘分区状态</li>
+<li><code>-S</code><br>输出信息的单位，<code>[K | M]</code>单位为 KB、MB</li>
+</ul>
+<p><strong>参数</strong></p>
+<ul>
+<li><code>事件间隔</code>：状态信息刷新的时间间隔</li>
+<li><code>次数</code>：显示报告的次数</li>
+</ul>
+<p><strong>字段含义</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># vmstat -S M 2 1</span>
+procs -----------memory---------- ---swap-- -----io---- --system-- -----cpu-----
+ r  b   swpd   <span class="token function">free</span>   buff  cache   si   so    bi    bo   <span class="token keyword">in</span>   cs us sy <span class="token function">id</span> wa st
+ 0  0      0    818    115     37    0    0     0     2   15    7  0  0 100  0  0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>Procs</strong>（进程） - <code>r</code>: 运行队列中进程数量，这个值也可以判断是否需要增加 CPU，长期大于 1 - 如果这个数字大于 CPU 的数目，至少有一个线程要等待 CPU，等待 CPU 的线程越多，越有可能对性能产生影响。 - <code>b</code>: 等待 IO 的进程数量</li>
+<li><strong>Memory</strong>（内存） - <code>swpd</code>: 使用虚拟内存大小 - 如果 swpd 的值不为 0，但是<code>SI</code>，SO 的值长期为 0，这种情况不会影响系统性能 - <code>free</code>: 空闲物理内存大小 - <code>buff</code>: 用作缓冲的内存大小 - <code>cache</code>: 用作缓存的内存大小 - 如果 cache 的值大的时候，说明 cache 处的文件数多 - 如果频繁访问到的文件都能被 cache 处，那么磁盘的读<code>IO bi</code>会非常小</li>
+<li><strong>Swap</strong> - <code>si</code>: 每秒从交换区写到内存的大小，由磁盘调入内存 - <code>so</code>: 每秒写入交换区的内存大小，由内存调入磁盘 - <strong>注意</strong> - 内存够用的时候，这 2 个值都是<code>0</code> - 如果这 2 个值长期大于<code>0</code>时，系统性能会受到影响，磁盘 IO 和 CPU 资源都会被消耗 - 有些朋友看到空闲内存（<code>free</code>）很少的或接近于 0 时，就认为内存不够用了，不能光看这一点，还要结合<code>si</code>和<code>so</code>。如果<code>free</code>很少，但是<code>s</code>i 和<code>so</code>也很少（大多时候是<code>0</code>），那么不用担心，系统性能这时不会受到影响的。</li>
+<li><strong>IO</strong>（现在的 Linux 版本块的大小为<code>1kb</code>） - <code>bi</code>: 每秒读取的块数 - <code>bo</code>: 每秒写入的块数 - <strong>注意</strong> - 随机磁盘读写的时候，这 2 个值越大（如超出<code>1024k</code>)，能看到 CPU 在 IO 等待的值也会越大。</li>
+<li><strong>system</strong>（系统） - <code>in</code>: 每秒中断数，包括时钟中断 - <code>cs</code>: 每秒上下文切换数 - <strong>注意</strong> - 上面 2 个值越大，会看到由内核消耗的 CPU 时间会越大</li>
+<li><strong>CPU</strong>（以百分比表示） - <code>us</code>: 用户进程执行时间百分比(user time) - <code>us</code>的值比较高时，说明用户进程消耗的 CPU 时间多，但是如果长期超<code>50%</code>的使用，那么我们就该考虑优化程序算法或者进行加速 - <code>sy</code>: 内核系统进程执行时间百分比(system time) - <code>sy</code>的值高时，说明系统内核消耗的 CPU 资源多，这并不是良性表现，我们应该检查原因 - <code>wa</code>: IO 等待时间百分比 - <code>wa</code>的值高时，说明 IO 等待比较严重，这可能由于磁盘大量作随机访问造成，也有可能磁盘出现瓶颈（块操作） - <code>id</code>: 空闲时间百分比 - <strong>注意</strong> - 一般来说，<code>id + us + sy = 100</code>,一般我认为<code>id</code>是空闲 CPU 使用率，<code>us</code>是用户 CPU 使用率，<code>sy</code>是系统 CPU 使用率。</li>
+</ul>
+<p><strong>参考资料</strong></p>
+<blockquote>
+<p><a href="http://www.computerhope.com/unix/vmstat.htm" target="_blank" rel="noopener">Linux and UNIX vmstat command help and examples</a></p>
+</blockquote>
+<hr>
+<h3 id="3-6-pmap命令"><a href="#3-6-pmap命令" class="headerlink" title="3.6 pmap命令"></a>3.6 <code>pmap</code>命令</h3><blockquote>
+<p><code>pmap</code>命令用于报告进程的内存映射关系，是 Linux 调试及运维一个很好的工具。</p>
+<ul>
+<li><code>pmap</code> 提供了进程的内存映射，<code>pmap</code>命令用于显示一个或多个进程的内存状态，其报告进程的地址空间和内存状态信息。</li>
+<li><code>pmap</code>实际上是一个 Sun OS 上的命令，linux 仅支持其有限的功能。但是它还是对查看完整的进程地址空间很有帮助。</li>
+<li>我们需要 PID 或者运行的进程的唯一进程 ID 来查看进程内存状态，我们可以通过<code>/proc</code>或者常规命令比如<code>top</code>或<code>ps</code>得到它。</li>
+</ul>
+</blockquote>
+<p><strong>语法</strong></p>
+<pre><code>`pmap [选项] pid(参数)`</code></pre><p><strong>选项</strong></p>
+<ul>
+<li><code>-x</code><br>显示扩展格式</li>
+<li><code>-d</code><br>显示设备格式</li>
+<li><code>-q</code><br>不显示头尾行，不显示<code>header</code>/<code>footer</code>行</li>
+<li><code>-V</code><br>显示指定版本</li>
+</ul>
+<p><strong>参数</strong></p>
+<ul>
+<li>进程号：指定需要显示内存映射关系的进程号，可以是多个进程号</li>
+</ul>
+<p><strong>另外一种实现</strong></p>
+<ul>
+<li><code>pmap</code>另外一种实现，<code># cat /proc/PID/maps</code></li>
+<li>这个命令的本质就是，<code>pmap</code>其实是读取 <code>/proc</code>对应的 <code>PID</code>下的<code>maps</code>信息，进行展示的</li>
+</ul>
+<p><strong>实战演示</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 单一进程内存状态</span>
+pmap 1013
+
+<span class="token comment" spellcheck="true"># 多进程内存状态</span>
+pmap 1013 1217 1118
+
+<span class="token comment" spellcheck="true"># 扩展进程内存</span>
+pmap -x 1013<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 扩展进程内存</span>
+<span class="token comment" spellcheck="true"># pmap -x 1013</span>
+1013: /usr/sbin/sshd
+Address Kbytes RSS Dirty Mode Mapping
+00110000 1480 92 0 r-x- libcrypto.so.1.0.0
+00282000 80 80 80 rw-- libcrypto.so.1.0.0
+00296000 12 8 4 rw-- <span class="token punctuation">[</span> anon <span class="token punctuation">]</span>
+00299000 36 0 0 r-x- libkrb5support.so.0.1
+002a2000 4 4 4 rw-- libkrb5support.so.0.1
+002a3000 16 0 0 r-x- libplc4.so
+002a7000 4 4 4 rw-- libplc4.so
+002ab000 88 4 0 r-x- libaudit.so.1.0.0
+002c1000 4 4 4 r--- libaudit.so.1.0.0
+002c2000 4 4 4 rw-- libaudit.so.1.0.0
+002c3000 216 4 0 r-x- libgssapi_krb5.so.2.2
+002f9000 4 4 4 rw-- libgssapi_krb5.so.2.2
+002fa000 808 4 0 r-x- libkrb5.so.3.3
+003c4000 24 24 24 rw-- libkrb5.so.3.3
+003ca000 152 4 0 r-x- libk5crypto.so.3.1
+003f0000 4 4 4 rw-- libk5crypto.so.3.1
+003f1000 92 0 0 r-x- libnssutil3.so
+00408000 12 12 12 rw-- libnssutil3.so
+0040b000 12 0 0 r-x- libplds4.so
+0040e000 4 4 4 rw-- libplds4.so
+ --- --- --- --- ---
+total kB 8232 - - -
+
+<span class="token comment" spellcheck="true"># 扩展和设备格式区域</span>
+Address:
+    内存开始地址
+Kbytes:
+    占用内存的字节数（KB）
+RSS:
+    保留内存的字节数（KB）
+Dirty:
+    脏页的字节数（包括共享和私有的）（KB）
+Mode:
+    内存的权限：read、write、execute、shared、private <span class="token punctuation">(</span>写时复制<span class="token punctuation">)</span>
+Mapping:
+    占用内存的文件、或<span class="token punctuation">[</span>anon<span class="token punctuation">]</span>（分配的内存）、或<span class="token punctuation">[</span>stack<span class="token punctuation">]</span>（堆栈）
+Offset:
+    文件偏移
+Device:
+    设备名 <span class="token punctuation">(</span>major:minor<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># pmap 1</span>
+1:   /sbin/init
+00117000    116K r-x--  /lib/libgcc_s-4.4.7-20120601.so.1
+00134000      4K rw---  /lib/libgcc_s-4.4.7-20120601.so.1
+00357000     28K r-x--  /lib/librt-2.12.so
+0035e000      4K r----  /lib/librt-2.12.so
+0035f000      4K rw---  /lib/librt-2.12.so
+003a9000      4K r-x--    <span class="token punctuation">[</span> anon <span class="token punctuation">]</span>
+004b2000   1620K r-x--  /lib/i686/nosegneg/libc-2.12.so
+00647000      4K -----  /lib/i686/nosegneg/libc-2.12.so
+00648000      8K r----  /lib/i686/nosegneg/libc-2.12.so
+0064a000      4K rw---  /lib/i686/nosegneg/libc-2.12.so
+0064b000     12K rw---    <span class="token punctuation">[</span> anon <span class="token punctuation">]</span>
+006e4000    276K r-x--  /lib/libdbus-1.so.3.4.0
+00729000      4K r----  /lib/libdbus-1.so.3.4.0
+0072a000      4K rw---  /lib/libdbus-1.so.3.4.0
+00786000     48K r-x--  /lib/libnss_files-2.12.so
+00792000      4K r----  /lib/libnss_files-2.12.so
+00793000      4K rw---  /lib/libnss_files-2.12.so
+008ef000    120K r-x--  /lib/ld-2.12.so
+0090d000      4K r----  /lib/ld-2.12.so
+0090e000      4K rw---  /lib/ld-2.12.so
+009d9000     36K r-x--  /lib/libnih-dbus.so.1.0.0
+009e2000      4K r----  /lib/libnih-dbus.so.1.0.0
+009e3000      4K rw---  /lib/libnih-dbus.so.1.0.0
+00b0f000     92K r-x--  /lib/i686/nosegneg/libpthread-2.12.so
+00b26000      4K r----  /lib/i686/nosegneg/libpthread-2.12.so
+00b27000      4K rw---  /lib/i686/nosegneg/libpthread-2.12.so
+00b28000      8K rw---    <span class="token punctuation">[</span> anon <span class="token punctuation">]</span>
+00bd6000     96K r-x--  /lib/libnih.so.1.0.0
+00bee000      4K r----  /lib/libnih.so.1.0.0
+00bef000      4K rw---  /lib/libnih.so.1.0.0
+00f37000    144K r-x--  /sbin/init
+00f5b000      4K r----  /sbin/init
+00f5c000      4K rw---  /sbin/init
+02089000    132K rw---    <span class="token punctuation">[</span> anon <span class="token punctuation">]</span>
+b774f000     12K rw---    <span class="token punctuation">[</span> anon <span class="token punctuation">]</span>
+b7758000      4K rw---    <span class="token punctuation">[</span> anon <span class="token punctuation">]</span>
+bf863000     84K rw---    <span class="token punctuation">[</span> stack <span class="token punctuation">]</span>
+ total     2916K
+
+<span class="token comment" spellcheck="true"># cat /proc/1/maps</span>
+00117000-00134000 r-xp 00000000 fd:00 389530     /lib/libgcc_s-4.4.7-20120601.so.1
+00134000-00135000 rw-p 0001d000 fd:00 389530     /lib/libgcc_s-4.4.7-20120601.so.1
+00357000-0035e000 r-xp 00000000 fd:00 389685     /lib/librt-2.12.so
+0035e000-0035f000 r--p 00006000 fd:00 389685     /lib/librt-2.12.so
+0035f000-00360000 rw-p 00007000 fd:00 389685     /lib/librt-2.12.so
+003a9000-003aa000 r-xp 00000000 00:00 0          <span class="token punctuation">[</span>vdso<span class="token punctuation">]</span>
+004b2000-00647000 r-xp 00000000 fd:00 389551     /lib/i686/nosegneg/libc-2.12.so
+00647000-00648000 ---p 00195000 fd:00 389551     /lib/i686/nosegneg/libc-2.12.so
+00648000-0064a000 r--p 00195000 fd:00 389551     /lib/i686/nosegneg/libc-2.12.so
+0064a000-0064b000 rw-p 00197000 fd:00 389551     /lib/i686/nosegneg/libc-2.12.so
+0064b000-0064e000 rw-p 00000000 00:00 0
+006e4000-00729000 r-xp 00000000 fd:00 397119     /lib/libdbus-1.so.3.4.0
+00729000-0072a000 r--p 00044000 fd:00 397119     /lib/libdbus-1.so.3.4.0
+0072a000-0072b000 rw-p 00045000 fd:00 397119     /lib/libdbus-1.so.3.4.0
+00786000-00792000 r-xp 00000000 fd:00 389679     /lib/libnss_files-2.12.so
+00792000-00793000 r--p 0000b000 fd:00 389679     /lib/libnss_files-2.12.so
+00793000-00794000 rw-p 0000c000 fd:00 389679     /lib/libnss_files-2.12.so
+008ef000-0090d000 r-xp 00000000 fd:00 389528     /lib/ld-2.12.so
+0090d000-0090e000 r--p 0001d000 fd:00 389528     /lib/ld-2.12.so
+0090e000-0090f000 rw-p 0001e000 fd:00 389528     /lib/ld-2.12.so
+009d9000-009e2000 r-xp 00000000 fd:00 389781     /lib/libnih-dbus.so.1.0.0
+009e2000-009e3000 r--p 00008000 fd:00 389781     /lib/libnih-dbus.so.1.0.0
+009e3000-009e4000 rw-p 00009000 fd:00 389781     /lib/libnih-dbus.so.1.0.0
+00b0f000-00b26000 r-xp 00000000 fd:00 389522     /lib/i686/nosegneg/libpthread-2.12.so
+00b26000-00b27000 r--p 00016000 fd:00 389522     /lib/i686/nosegneg/libpthread-2.12.so
+00b27000-00b28000 rw-p 00017000 fd:00 389522     /lib/i686/nosegneg/libpthread-2.12.so
+00b28000-00b2a000 rw-p 00000000 00:00 0
+00bd6000-00bee000 r-xp 00000000 fd:00 389783     /lib/libnih.so.1.0.0
+00bee000-00bef000 r--p 00017000 fd:00 389783     /lib/libnih.so.1.0.0
+00bef000-00bf0000 rw-p 00018000 fd:00 389783     /lib/libnih.so.1.0.0
+00f37000-00f5b000 r-xp 00000000 fd:00 389949     /sbin/init
+00f5b000-00f5c000 r--p 00024000 fd:00 389949     /sbin/init
+00f5c000-00f5d000 rw-p 00025000 fd:00 389949     /sbin/init
+02089000-020aa000 rw-p 00000000 00:00 0          <span class="token punctuation">[</span>heap<span class="token punctuation">]</span>
+b774f000-b7752000 rw-p 00000000 00:00 0
+b7758000-b7759000 rw-p 00000000 00:00 0
+bf863000-bf878000 rw-p 00000000 00:00 0          <span class="token punctuation">[</span>stack<span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-7-pgrep命令"><a href="#3-7-pgrep命令" class="headerlink" title="3.7 pgrep命令"></a>3.7 <code>pgrep</code>命令</h3><blockquote>
+<p><strong><code>pgrep</code></strong>命令以名称为依据从运行进程队列中查找进程，并显示查找到的进程 id。每一个进程 ID 以一个十进制数表示，通过一个分割字符串和下一个 ID 分开，默认的分割字符串是一个新行。对于每个属性选项，用户可以在命令行上指定一个以逗号分割的可能值的集合。<br><strong><code>pgrep</code></strong> 是通过程序的名字来查询进程的工具，一般是用来判断程序是否正在运行。在服务器的配置和管理中，这个工具常被应用，简单明了。</p>
+</blockquote>
+<p><strong>命令参数</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash">-u uid：effective user
+-U uid：real user
+-t terminal：与指定终端相关的进程
+-l：显示进程名
+-a：显示完整格式的进程名
+-P pid：显示其父进程为此处指定的进程的进程列表
+-o：仅显示找到的最小（起始）进程号
+-n：仅显示找到的最大（结束）进程号
+-g：指定进程组<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>实战演示</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># pgrep -lo nginx</span>
+28433 nginx
+
+<span class="token comment" spellcheck="true"># pgrep -l nginx</span>
+28433 nginx
+28541 nginx
+28542 nginx
+28543 nginx
+28544 nginx
+
+<span class="token comment" spellcheck="true"># pgrep -ln nginx</span>
+28544 nginx
+
+<span class="token comment" spellcheck="true"># pgrep nginx</span>
+28433
+28541
+28542
+28543
+28544
+
+<span class="token comment" spellcheck="true"># ps x | grep xxx  | awk '{print $1}'</span>
+<span class="token function">ps</span> x <span class="token operator">|</span> <span class="token function">grep</span> java <span class="token operator">|</span> <span class="token function">awk</span>  <span class="token string">'{print <span class="token variable">$1</span>}'</span>
+
+<span class="token comment" spellcheck="true"># ps -ef | grep xxx | grep -v 'grep' | awk '{print $2}'</span>
+<span class="token function">ps</span> -ef <span class="token operator">|</span> <span class="token function">grep</span> nginx <span class="token operator">|</span> <span class="token function">grep</span> -v <span class="token string">'grep'</span> <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$2</span>}'</span>
+28433
+28541
+28542
+28543
+28544<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-8-pidof命令"><a href="#3-8-pidof命令" class="headerlink" title="3.8 pidof命令"></a>3.8 <code>pidof</code>命令</h3><p><strong>功能作用</strong></p>
+<ul>
+<li>找出正在运行程序的<code>进程ID</code></li>
+</ul>
+<p><strong>位置</strong></p>
+<ul>
+<li><code>/bin/pidof</code></li>
+</ul>
+<p><strong>格式用法</strong></p>
+<ul>
+<li><code>pidof[必要参数][选择参数][程序]</code></li>
+</ul>
+<p><strong>主要参数</strong></p>
+<ul>
+<li><code>-s</code><br> 单一命中， 表示只返回一个<code>pid</code></li>
+<li><code>-c</code><br> 只返回进程 ID</li>
+<li><code>-x</code><br> 重复命中，表示同时返回运行给定程序的 shell 的 <code>pid</code></li>
+<li><code>-o omitpid</code><br>告诉 <code>pidof</code> 忽略带有进程<code>id</code>的进程。 这个特定的<code>pid %PPID</code>能够被用对<code>pidof</code>的程序的父亲进程来命名，换句话说就是调用<code>shell</code>或<code>shell脚本</code></li>
+</ul>
+<p><strong>应用实例</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 得到正在运行程序的进程ID</span>
+pidof nginx
+
+<span class="token comment" spellcheck="true"># 只命中一个正在运行程序的进程ID</span>
+pidof -s nginx
+
+<span class="token comment" spellcheck="true"># 找出shell脚本script的进程PID</span>
+pidof -x script<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-9-fuser命令"><a href="#3-9-fuser命令" class="headerlink" title="3.9 fuser命令"></a>3.9 <code>fuser</code>命令</h3><blockquote>
+<p><code>fuser</code>命令是用来显示所有正在使用着指定的<code>file</code>, <code>file system</code> 或者 <code>sockets</code>的进程信息。</p>
+<ul>
+<li><code>fuser</code>能识别出正在对某个文件或端口访问的进程是，<code>lsof</code>也能够找出正在对指定文件访问的进程</li>
+<li>那么它们两者之间有何区别在于，<code>fuser</code>有一个特别的用法在于它可以一次杀死那些正在访问指定文件的进程</li>
+<li><code>fuser</code>命令列出了本地进程的进程号，那些本地进程使用<code>file</code>，参数指定的本地或远程文件</li>
+<li>对于阻塞特别设备，此命令列出了使用该设备上任何文件的进程</li>
+</ul>
+</blockquote>
+<p><strong>语法</strong></p>
+<pre><code>`fuser(选项)(参数)`</code></pre><p><strong>选项</strong></p>
+<ul>
+<li><code>-c</code> - 包含 <code>File</code> 的文件系统中关于任何打开的文件的报告</li>
+<li><code>-d</code> - 包含 <code>File</code> 的文件系统中关于任何打开的已取消链接（已删除）文件的报告 - 当与 <code>-V</code> 标志一起使用时，它也会报告被删除文件的节点号和大小。</li>
+<li><code>-f</code> - 仅对 <code>File</code> 的打开实例报告</li>
+<li><code>-m</code> - 指定一个被加载的文件系统或一个被加载的块设备</li>
+<li><code>-l</code> - 列出所有已知信号名</li>
+<li><code>-K SignalNumber | SignalName</code> - 将指定信号发送到每个本地进程 - 仅 <code>root</code> 用户才能终止另一用户的进程 - 信号可以指定为 <code>SignalName</code>，例如对 SIGKILL 信号指定 KILL 或指定 SignalNumber（如 <code>9</code>） - SignalName 的有效值是 <code>kill -l</code> 命令所显示的那些值</li>
+<li><code>-k</code> - 将 <code>SIGKILL</code> 信号发送到每个本地进程 - 仅 <code>root</code> 用户才能终止另一用户的进程 - 注意 - fuser <code>-k</code> 或 <code>-K</code> 可能无法检测和杀死程序开始运行后立即创建的新进程</li>
+<li><code>-u</code> - 为进程号后圆括号中的本地进程提供登录名。</li>
+<li><code>-V</code> - 提供详细输出</li>
+<li><code>-x</code> - 与 <code>-c</code> 或 <code>-f</code> 连用，报告除标准 fuser 输出以外的可执行的和可装入对象</li>
+</ul>
+<p><strong>参数</strong></p>
+<ul>
+<li><code>文件</code>：可以是文件名或者 TCP、UDP 端口号</li>
+</ul>
+<p><strong>数字标识</strong></p>
+<blockquote>
+<p>每个进程号后面都跟随一个字母，该字母指示进程如何使用文件。</p>
+</blockquote>
+<ul>
+<li><code>c</code><br>指示进程的工作目录</li>
+<li><code>e</code><br>指示该文件为进程的可执行文件(即进程由该文件拉起)</li>
+<li><code>f</code><br>指示该文件被进程打开，默认情况下 f 字符不显示</li>
+<li><code>F</code><br>指示该文件被进程打开进行写入，默认情况下 F 字符不显示</li>
+<li><code>r</code><br>指示该目录为进程的根目录</li>
+<li><code>m</code><br>指示进程使用该文件进行内存映射，抑或该文件为共享库文件，被进程映射进内存</li>
+</ul>
+<p><strong>实例展示</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># fuser -vm /usr/local/</span>
+                     用户     进程号 权限   命令
+/usr/local/:         root          1 .rce. init
+                     root          2 .rc<span class="token punctuation">..</span> kthreadd
+                     root          3 .rc<span class="token punctuation">..</span> migration/0
+                     root          4 .rc<span class="token punctuation">..</span> ksoftirqd/0
+                     root          5 .rc<span class="token punctuation">..</span> stopper/0
+                     root          6 .rc<span class="token punctuation">..</span> watchdog/0
+                     root          7 .rc<span class="token punctuation">..</span> migration/1
+                     root          8 .rc<span class="token punctuation">..</span> stopper/1
+                     root          9 .rc<span class="token punctuation">..</span> ksoftirqd/1
+                     root         10 .rc<span class="token punctuation">..</span> watchdog/1
+                     root         11 .rc<span class="token punctuation">..</span> events/0
+                     root         12 .rc<span class="token punctuation">..</span> events/1**strong text**<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 列出使用/etc/passwd文件的本地进程的进程号</span>
+<span class="token function">fuser</span> /etc/passwd
+
+<span class="token comment" spellcheck="true"># 列出使用/etc/filesystems文件的进程的进程号和用户登录名</span>
+<span class="token function">fuser</span> -u /etc/filesystems
+
+<span class="token comment" spellcheck="true"># 终止使用给定文件系统的所有进程</span>
+<span class="token function">fuser</span> -k -x -u -c /dev/hd1
+或者
+<span class="token function">fuser</span> -kxuc /home
+
+<span class="token comment" spellcheck="true"># 列出正在使用已从给定文件系统删除的文件的全部进程</span>
+<span class="token function">fuser</span> -d /usr文件
+    /dev/kmem 用于系统映像
+    /dev/mem  也用于系统映像<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-10-lsof命令"><a href="#3-10-lsof命令" class="headerlink" title="3.10 lsof命令"></a>3.10 <code>lsof</code>命令</h3><blockquote>
+<p><code>lsof</code>（list open files）是一个查看当前系统文件的工具。</p>
+<ul>
+<li>在<code>linux</code>环境下，任何事物都以文件的形式存在，通过文件不仅仅可以访问常规数据，还可以访问网络连接和硬件。</li>
+<li>如传输控制协议 (<code>TCP</code>) 和用户数据报协议 (<code>UDP</code>) 套接字等，系统在后台都为该应用程序分配了一个文件描述符，该文件描述符提供了大量关于这个应用程序本身的信息。</li>
+</ul>
+</blockquote>
+<p><strong>语法</strong></p>
+<p><code>lsof (选项)</code></p>
+<p><strong>选项</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash">-a
+    列出打开文件存在的进程
+-c<span class="token operator">&lt;</span>进程名<span class="token operator">></span>
+    列出指定进程所打开的文件
+-g
+    列出GID号进程详情
+-d<span class="token operator">&lt;</span>文件号<span class="token operator">></span>
+    列出占用该文件号的进程
++d<span class="token operator">&lt;</span>目录<span class="token operator">></span>
+    列出目录下被打开的文件
++D<span class="token operator">&lt;</span>目录<span class="token operator">></span>
+    递归列出目录下被打开的文件
+-n<span class="token operator">&lt;</span>目录<span class="token operator">></span>
+    列出使用NFS的文件
+-i<span class="token operator">&lt;</span>条件<span class="token operator">></span>
+    列出符合条件的进程。（4、6、协议、:端口、 @ip ）
+-p<span class="token operator">&lt;</span>进程号<span class="token operator">></span>
+    列出指定进程号所打开的文件
+-u
+    列出UID号进程详情
+-h
+    显示帮助信息
+-v
+    显示版本信息<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>字段含义</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 无任何参数</span>
+<span class="token comment" spellcheck="true"># lsof| more</span>
+COMMAND     PID      USER   FD      TYPE             DEVICE SIZE/OFF       NODE NAME
+init          1      root  cwd       DIR              253,0     4096          2 /
+init          1      root  rtd       DIR              253,0     4096          2 /
+init          1      root  txt       REG              253,0   150352    1310795 /sbin/init
+init          1      root  mem       REG              253,0    65928    5505054 /lib64/libnss_files-2.12.so
+init          1      root  mem       REG              253,0  1918016    5521405 /lib64/libc-2.12.so<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><code>COMMAND</code>：进程的名称</li>
+<li><code>PID</code>：进程标识符</li>
+<li><code>PPID</code>：父进程标识符（需要指定<code>-R</code>参数）</li>
+<li><code>USER</code>：进程所有者</li>
+<li><code>PGID</code>：进程所属组</li>
+<li><code>FD</code>：文件描述符，应用程序通过文件描述符识别该文件</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 文件描述符</span>
+（1）cwd
+    表示current work dirctory，即：应用程序的当前工作目录，这是该应用程序启动的目录，除非它本身对这个目录进行更改
+（2）txt
+    该类型的文件是程序代码，如应用程序二进制文件本身或共享库，如上列表中显示的 /sbin/init 程序
+（3）lnn
+    library references <span class="token punctuation">(</span>AIX<span class="token punctuation">)</span>
+（4）er
+    FD information error <span class="token punctuation">(</span>see NAME column<span class="token punctuation">)</span>
+（5）jld
+    jail directory <span class="token punctuation">(</span>FreeBSD<span class="token punctuation">)</span>
+（6）ltx
+    shared library text <span class="token punctuation">(</span>code and data<span class="token punctuation">)</span>
+（7）mxx
+    hex memory-mapped <span class="token function">type</span> number xx
+（8）m86
+    DOS Merge mapped <span class="token function">file</span>
+（9）mem
+    memory-mapped <span class="token function">file</span>
+（10）mmap
+    memory-mapped device
+（11）pd
+    parent directory
+（12）rtd
+    root directory
+（13）tr
+    kernel trace <span class="token function">file</span> <span class="token punctuation">(</span>OpenBSD<span class="token punctuation">)</span>
+（14）v86
+    VP/ix mapped <span class="token function">file</span>
+（15）0
+    表示标准输出
+（16）1
+    表示标准输入
+（17）2
+    表示标准错误
+
+一般在标准输出、标准错误、标准输入后还跟着文件状态模式：r、w、u等
+（1）u
+    表示该文件被打开并处于读取/写入模式
+（2）r
+    表示该文件被打开并处于只读模式
+（3）w
+    表示该文件被打开并处于
+（4）空格
+    表示该文件的状态模式为unknow，且没有锁定
+（5）-
+    表示该文件的状态模式为unknow，且被锁定
+
+同时在文件状态模式后面，还跟着相关的锁
+（1）N
+    <span class="token keyword">for</span> a Solaris NFS lock of unknown <span class="token function">type</span>
+（2）r
+    <span class="token keyword">for</span> <span class="token function">read</span> lock on part of the <span class="token function">file</span>
+（3）R
+    <span class="token keyword">for</span> a <span class="token function">read</span> lock on the entire <span class="token function">file</span>
+（4）w
+    <span class="token keyword">for</span> a <span class="token function">write</span> lock on part of the file（文件的部分写锁）
+（5）W
+    <span class="token keyword">for</span> a <span class="token function">write</span> lock on the entire file（整个文件的写锁）
+（6）u
+    <span class="token keyword">for</span> a <span class="token function">read</span> and <span class="token function">write</span> lock of any length
+（7）U
+    <span class="token keyword">for</span> a lock of unknown <span class="token function">type</span>
+（8）x
+    <span class="token keyword">for</span> an SCO OpenServer Xenix lock on part of the <span class="token function">file</span>
+（9）X
+    <span class="token keyword">for</span> an SCO OpenServer Xenix lock on the entire <span class="token function">file</span>
+（10）space
+    <span class="token keyword">if</span> there is no lock<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><code>TYPE</code>：文件类型，如 DIR、REG 等，常见的文件类型:</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">（1）DIR：表示目录
+（2）CHR：表示字符类型
+（3）BLK：块设备类型
+（4）UNIX： UNIX 域套接字
+（5）FIFO：先进先出 <span class="token punctuation">(</span>FIFO<span class="token punctuation">)</span> 队列
+（6）IPv4：网际协议 <span class="token punctuation">(</span>IP<span class="token punctuation">)</span> 套接字<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><code>DEVICE</code>：指定磁盘的名称</li>
+<li><code>SIZE</code>：文件的大小</li>
+<li><code>NODE</code>：索引节点（文件在磁盘上的标识）</li>
+<li><code>NAME</code>：打开文件的确切名称</li>
+</ul>
+<p><strong>实例演示</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 无任何参数</span>
+<span class="token function">lsof</span><span class="token operator">|</span> <span class="token function">more</span>
+
+<span class="token comment" spellcheck="true"># 查找某个文件相关的进程</span>
+<span class="token function">lsof</span> /bin/bash
+
+<span class="token comment" spellcheck="true"># 列出某个用户打开的文件信息</span>
+<span class="token function">lsof</span> -u username
+
+<span class="token comment" spellcheck="true"># 列出某个程序进程所打开的文件信息</span>
+<span class="token comment" spellcheck="true"># -c 选项将会列出所有以mysql这个进程开头的程序的文件，其实你也可以写成 lsof | grep mysql</span>
+<span class="token function">lsof</span> -c mysql
+
+<span class="token comment" spellcheck="true"># 列出某个用户以及某个进程所打开的文件信息</span>
+<span class="token function">lsof</span>  -u <span class="token function">test</span> -c mysql
+
+<span class="token comment" spellcheck="true"># 通过某个进程号显示该进程打开的文件</span>
+<span class="token function">lsof</span> -p 11968
+
+<span class="token comment" spellcheck="true"># 列出所有的网络连接</span>
+<span class="token function">lsof</span> -i
+
+<span class="token comment" spellcheck="true"># 列出所有tcp 网络连接信息</span>
+<span class="token function">lsof</span> -i tcp
+<span class="token function">lsof</span> -n -i tcp
+
+<span class="token comment" spellcheck="true"># 列出谁在使用某个端口</span>
+<span class="token function">lsof</span> -i :3306
+
+<span class="token comment" spellcheck="true"># 列出某个用户的所有活跃的网络端口</span>
+<span class="token function">lsof</span> -a -u <span class="token function">test</span> -i
+
+<span class="token comment" spellcheck="true"># 根据文件描述列出对应的文件信息</span>
+<span class="token function">lsof</span> -d description<span class="token punctuation">(</span>like 2<span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true"># 示例:</span>
+<span class="token function">lsof</span> -d 3 <span class="token operator">|</span> <span class="token function">grep</span> PARSER1
+<span class="token function">tail</span>      6499 tde    3r   REG    253,3   4514722     417798 /opt/applog/open/log/HOSTPARSER1_ERROR_141217.log.001
+<span class="token comment" spellcheck="true"># 说明： 0表示标准输入，1表示标准输出，2表示标准错误，从而可知：所以大多数应用程序所打开的文件的 FD 都是从 3 开始</span>
+
+<span class="token comment" spellcheck="true"># 列出被进程号为1234的进程所打开的所有IPV4 network files</span>
+<span class="token variable">$lsof</span> -i 4 -a -p 1234
+
+<span class="token comment" spellcheck="true"># 列出目前连接主机nf5260i5-td上端口为：20，21，80相关的所有文件信息，且每隔3秒重复执行</span>
+<span class="token function">lsof</span> -i @nf5260i5-td:20,21,80 -r 3<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-11-kill命令"><a href="#3-11-kill命令" class="headerlink" title="3.11 kill命令"></a>3.11 <code>kill</code>命令</h3><blockquote>
+<p>向进程发送控制信号，以实现对进程管理</p>
+</blockquote>
+<p><strong>语法</strong></p>
+<p><code>kill［信号代码] 进程ID</code></p>
+<p><strong>选项</strong></p>
+<pre><code>-l  若不加信号的编号参数，则使用“-l”参数会列出全部的信号名称
+-a  当处理当前进程时，不限制命令名和进程号的对应关系
+-p  指定kill 命令只打印相关进程的进程号，而不发送任何信号
+-s  指定发送信号
+-u  指定用户</code></pre><p><strong>显示当前系统可用信号</strong></p>
+<ul>
+<li><code>kill -l</code></li>
+<li><code>man 7 signal</code></li>
+</ul>
+<p><strong>常用信号</strong></p>
+<ul>
+<li><strong>1</strong>）<code>SIGHUP</code>: 无须关闭进程而让其重读配置文件</li>
+<li><strong>2</strong>）<code>SIGINT</code>: 中止正在运行的进程，相当于<code>Ctrl+c</code></li>
+<li><strong>9</strong>）<code>SIGKILL</code>: 杀死正在运行的进程</li>
+<li><strong>15</strong>）<code>SIGTERM</code>：终止正在运行的进程</li>
+</ul>
+<p><strong>指定信号的方法</strong></p>
+<ul>
+<li>(1) 信号的数字标识；<code>1</code>, <code>2</code>, <code>9</code></li>
+<li>(2) 信号完整名称；<code>SIGHUP</code></li>
+<li>(3) 信号的简写名称；<code>HUP</code></li>
+</ul>
+<p><strong>向进程发信号</strong></p>
+<ul>
+<li><code>kill [-SIGNAL] PID...</code></li>
+</ul>
+<p><strong>终止“名称”之下的所有进程</strong></p>
+<ul>
+<li><code>killall [-SIGNAL] Program</code></li>
+</ul>
+<p><strong>实战演示</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 杀死进程</span>
+<span class="token function">kill</span> 12345
+
+<span class="token comment" spellcheck="true"># 强制杀死进程</span>
+<span class="token function">kill</span> -KILL 123456
+
+<span class="token comment" spellcheck="true"># 发送SIGHUP信号,可以使用一下信号</span>
+<span class="token function">kill</span> -HUP pid
+
+<span class="token comment" spellcheck="true"># 彻底杀死进程</span>
+<span class="token function">kill</span> -9 123456
+
+<span class="token comment" spellcheck="true"># 杀死指定用户所有进程</span>
+<span class="token function">kill</span> -u hnlinux                  <span class="token comment" spellcheck="true"># 方法一</span>
+<span class="token function">kill</span> -9 <span class="token variable"><span class="token variable">$(</span><span class="token function">ps</span> -ef <span class="token operator">|</span> <span class="token function">grep</span> hnlinux<span class="token variable">)</span></span> <span class="token comment" spellcheck="true"># 方法二</span>
+
+<span class="token comment" spellcheck="true"># 查找杀死进程</span>
+<span class="token function">ps</span> aux <span class="token operator">|</span> <span class="token function">grep</span> gaim <span class="token punctuation">;</span> <span class="token function">kill</span> -9<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-12-killall命令"><a href="#3-12-killall命令" class="headerlink" title="3.12 killall命令"></a>3.12 <code>killall</code>命令</h3><blockquote>
+<p>杀死同名的所有进程</p>
+</blockquote>
+<p><strong>参数</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash">-Z 只杀死拥有scontext 的进程
+-e 要求匹配进程名称
+-I 忽略小写
+-g 杀死进程组而不是进程
+-i 交互模式，杀死进程前先询问用户
+-l 列出所有的已知信号名称
+-q 不输出警告信息
+-s 发送指定的信号
+-v 报告信号是否成功发送
+-w 等待进程死亡<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-13-pkill命令"><a href="#3-13-pkill命令" class="headerlink" title="3.13 pkill命令"></a>3.13 <code>pkill</code>命令</h3><p><strong>参数</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash">-f 显示完整程序
+-l 显示源代码
+-n 显示新程序
+-o 显示旧程序
+-v 与条件不符合的程序
+-x 与条件符合的程序
+
+-p<span class="token operator">&lt;</span>进程号<span class="token operator">></span> 列出父进程为用户指定进程的进程信息
+-t<span class="token operator">&lt;</span>终端<span class="token operator">></span> 指定终端下的所有程序
+-u<span class="token operator">&lt;</span>用户<span class="token operator">></span> 指定用户的程序<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>实战演示</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 杀死同义终端下的进程，杀死终端1下的所有进程</span>
+<span class="token function">pkill</span> -t tty1
+
+<span class="token comment" spellcheck="true"># 杀死指定用户进程</span>
+<span class="token function">pkill</span> -u hnlinux
+
+<span class="token comment" spellcheck="true"># 反向选择，杀死不属于hnlinux用户的所有进程</span>
+<span class="token function">pkill</span> -vu hnlinux<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-14-nice和renice命令"><a href="#3-14-nice和renice命令" class="headerlink" title="3.14 nice和renice命令"></a>3.14 <code>nice</code>和<code>renice</code>命令</h3><blockquote>
+<p>设置优先权</p>
+<ul>
+<li><code>nice</code> 命令：用来设置优先级，优先级的数值为<code>-20~19</code>，<code>-20</code>的优先级最高，<code>19</code>的优先级最低</li>
+</ul>
+</blockquote>
+<p><strong>语法</strong></p>
+<ul>
+<li><code>nice[参数][命令]</code></li>
+</ul>
+<p><strong>参数</strong></p>
+<ul>
+<li><code>-n 设置优先权</code></li>
+</ul>
+<p><strong>注意事项</strong></p>
+<ul>
+<li><strong>第一个</strong> - 不用任何参数执行命令”<code>nice</code>“，所以显示出当前的程序运行优先级为<code>0</code> - 由此可知系统缺省的程序运行优先级为<code>0</code></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># nice</span>
+0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>第二个</strong> - 第 1 个<code>nice</code>命令以缺省值来调整第 2 个<code>nice</code>命令运行的优先级，既在系统缺省的程序运行优先级 0 的基础之上增加<code>10</code> - 得到<strong>新的程序运行优先级 10</strong>，然后以优先级<code>10</code>来运行第 2 个<code>nice</code>命令 - 第 2 个<code>nice</code>命令显示当前程序运行的优先级为<code>10</code></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># nice nice</span>
+10<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>第三个</strong> - 第 1 个<code>nice</code>命令以缺省值来调整第 2 个<code>nice</code>命令运行的优先级，既在系统缺省的程序运行优先级 0 的基础之上增加<code>10</code> - 得到<strong>新的程序运行优先级 10</strong>，然后以优先级<code>10</code>来运行第 2 个<code>nice</code>命令 - 第 2 个<code>nice</code>命令又以缺省值来调整第 3 个<code>nice</code>命令运行的优先级，既在第 2 个<code>nice</code>命令运行优先级基础之上再增加<code>10</code> - 得到新的程序运行优先级<code>20</code>，但 20 大于<strong>最高程序运行优先级<code>19</code></strong>，所以以优先级<code>19</code>来运行第 3 个<code>nice</code>命令 - 第 3 个<code>nice</code>命令显示当前程序运行的优先级为<code>19</code>。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># nice nice nice</span>
+19<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><strong>实战演示</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将ls的优先序加1并执行</span>
+<span class="token function">nice</span> -n 1 <span class="token function">ls</span>
+
+<span class="token comment" spellcheck="true"># 新建一个进程并设置优先级</span>
+<span class="token comment" spellcheck="true"># 将当前目录下的documents目录打包，但不希望tar占用太多CPU</span>
+<span class="token function">nice</span> -19 <span class="token function">tar</span> zcf pack.tar.gz documents
+<span class="token comment" spellcheck="true"># 将当前目录下的documents目录打包，并且赋予tar进程最高的优先级</span>
+<span class="token function">nice</span> --19 <span class="token function">tar</span> zcf pack.tar.gz documents
+
+<span class="token comment" spellcheck="true">#修改已经存在的进程的优先级</span>
+<span class="token comment" spellcheck="true">#将PID为1799的进程优先级设置为最低（19）</span>
+<span class="token function">renice</span> 19 1799
+<span class="token comment" spellcheck="true">#将PID为1799的进程优先级设置为最高（-19）</span>
+<span class="token function">renice</span> -19 1799<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-15-htop命令"><a href="#3-15-htop命令" class="headerlink" title="3.15 htop命令"></a>3.15 <code>htop</code>命令</h3><p><strong>语法</strong></p>
+<ul>
+<li><code>htop [option]</code></li>
+</ul>
+<p><strong>参数选项</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash">-d：更新频率。
+-u：指定username
+-p：指定pid<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p><strong>交互选项</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash">P:以CPU占用百分比排序
+M:以MEM占用百分比排序
+T:按实际占用的CPU运行时间的和来排序
+F1：打开帮助菜单
+F2：打开设置界面
+F3：按照PID或者USER字段查询，删除字段，需 ctrl+backspace
+F4：按照PID或者USER字段过滤，删除字段，需 ctrl+backspace。
+F5：以树状显示进程
+F6：按照选择的字段排序
+F7：减小NICE值
+F8：加上NICE值
+F9：选定指定进程，传递选择的信号
+F10：退出，quit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="../images/jobs7.png" alt="Linux进程及作业管理"></p>
+<hr>
+<h3 id="3-18-glances命令"><a href="#3-18-glances命令" class="headerlink" title="3.18 glances命令"></a>3.18 <code>glances</code>命令</h3><blockquote>
+<p>一个跨平台的基于多视窗的监测工具</p>
+<ul>
+<li><code>glances</code> 工具可以在用户的终端上实时显示重要的系统信息，并动态地对其进行更新</li>
+<li>这个高效的工具可以工作于任何终端屏幕</li>
+<li>它并不会消耗大量的 CPU 资源，通常低于<code>百分之二</code></li>
+<li><code>glances</code> 在屏幕上对数据进行显示，并且每隔两秒钟对其进行更新</li>
+<li>可以自己将这个时间间隔更改为更长或更短的数值</li>
+<li><code>glances</code> 工具还可以将相同的数据捕获到一个文件，便于以后对报告进行分析和绘制图形</li>
+<li>输出文件可以是电子表格的格式 (<code>.csv</code>) 或者 <code>html</code> 格式。</li>
+</ul>
+</blockquote>
+<p><strong>语法</strong></p>
+<ul>
+<li><code>glances [option]</code></li>
+</ul>
+<p><strong>命令选项</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># glances 是一个命令行工具包括如下命令选项：</span>
+-b：显示网络连接速度 Byte/ 秒
+-B @IP<span class="token operator">|</span>host ：绑定服务器端 IP 地址或者主机名称
+-c @IP<span class="token operator">|</span>host：连接 glances 服务器端
+-C file：设置配置文件默认是 /etc/glances/glances.conf
+-d：关闭磁盘 I/O 模块
+-e：显示传感器温度
+-f file：设置输出文件（格式是 HTML 或者 CSV）
+-m：关闭挂载的磁盘模块
+-n：关闭网络模块
+-p PORT：设置运行端口默认是 61209
+-P password：设置客户端 / 服务器密码
+-s：设置 glances 运行模式为服务器
+-t sec：设置屏幕刷新的时间间隔，单位为秒，默认值为 2 秒，数值许可范围：1~32767
+-h <span class="token keyword">:</span> 显示帮助信息
+-v <span class="token keyword">:</span> 显示版本信息<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>交互选项</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash">a：自动排序
+c：CPU占用百分比排序
+m：MEM占用百分比排序
+p：进程名排序
+i：I/O速率，比例排序
+d：显示/隐藏，磁盘I/O状况
+f：显示/隐藏，文件系统状况
+n：显示/隐藏，网络状况
+s：显示/隐藏，sensors状况
+y：显示/隐藏，hddtemp状况
+z：隐藏/显示，process列表
+l：显示/隐藏，日志
+b：切换网络 bits 和 Bytes 的单位显示
+w：删除警告日志信息
+x：删除警告和重要日志信息
+1：全局CPU或者每颗CPU的信息
+t：显示网络的组合I/O信息
+u：显示积累的网络I/O信息
+h：help
+q：quit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>C/S 模式下运行 glances 命令</strong></p>
+<ul>
+<li>服务模式 - <code>glances -s -B IPADDR</code> - <code>IPADDR</code>: 指明监听于本机哪个地址</li>
+<li>客户端模式 - <code>glances -c IPADDR</code> - <code>IPADDR</code>：要连入的服务器端地址</li>
+</ul>
+<p><strong>字段含义</strong></p>
+<p><img src="../images/jobs8.png" alt="Linux进程及作业管理"></p>
+<pre class="line-numbers language-bash"><code class="language-bash">VIRT: 虚拟内存大小
+RES: 进程占用的物理内存值
+%CPU：该进程占用的 CPU 使用率
+%MEM：该进程占用的物理内存和总内存的百分比
+PID: 进程 ID 号
+USER: 进程所有者的用户名
+TIME+: 该进程启动后占用的总的 CPU 时间
+IO_R 和 IO_W: 进程的读写 I/O 速率
+NAME: 进程名称
+NI: 进程优先级
+S: 进程状态，其中 S 表示休眠，R 表示正在运行，Z 表示僵死状态<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-19-dstat命令"><a href="#3-19-dstat命令" class="headerlink" title="3.19 dstat命令"></a>3.19 <code>dstat</code>命令</h3><blockquote>
+<p>生成系统资源统计工具</p>
+</blockquote>
+<p><strong>语法</strong></p>
+<ul>
+<li><code>dstat [options] [刷新频率 [次数]]</code></li>
+</ul>
+<p><strong>命令选项</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash">-c <span class="token punctuation">[</span>-C <span class="token punctuation">{</span>cpu1，cpu2，total<span class="token punctuation">}</span><span class="token punctuation">..</span>.<span class="token punctuation">]</span>
+    显示CPU信息与每颗的CPU核心信息
+-d <span class="token punctuation">[</span>-D <span class="token punctuation">{</span>sda，sdb,total<span class="token punctuation">}</span><span class="token punctuation">..</span>.<span class="token punctuation">]</span>
+    显示磁盘与指定的磁盘信息
+-s <span class="token punctuation">[</span>-S <span class="token punctuation">{</span>swap1，swap2,total<span class="token punctuation">}</span><span class="token punctuation">..</span>.<span class="token punctuation">]</span>
+    显示磁盘与指定的磁盘信息
+
+-m
+    menmory信息
+-n
+    network信息
+-p
+    process信息
+-r
+    I/O信息
+-s
+    system的信息，中断与事件交换
+
+--top-cpu
+    显示最占用CPU的进程
+--top-io
+    显示最占用io的进程
+--top-mem
+    显示最占用内存的进程
+--top-lantency
+    显示延迟最大的进程
+--top-bio
+    指出块I/O最大的进程
+--disk-util
+    显示某一时间磁盘的忙碌状况
+--freespace
+    显示当前磁盘空间使用率
+--proc-count
+    显示正在运行的程序数量<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>字段分析</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># dstat</span>
+----total-cpu-usage---- -dsk/total- -net/total- ---paging-- ---system--
+usr sys idl wai hiq siq<span class="token operator">|</span> <span class="token function">read</span>  writ<span class="token operator">|</span> recv  send<span class="token operator">|</span>  <span class="token keyword">in</span>   out <span class="token operator">|</span> int   csw
+  0   0 100   0   0   0<span class="token operator">|</span> 606B 6492B<span class="token operator">|</span>   0     0 <span class="token operator">|</span>   0     0 <span class="token operator">|</span>  29    14
+  0   0 100   0   0   0<span class="token operator">|</span>   0     0 <span class="token operator">|</span> 184B  822B<span class="token operator">|</span>   0     0 <span class="token operator">|</span>  21    10
+  0   0 100   0   0   0<span class="token operator">|</span>   0     0 <span class="token operator">|</span> 276B  342B<span class="token operator">|</span>   0     0 <span class="token operator">|</span>  17     7
+  0   0 100   0   0   0<span class="token operator">|</span>   0   128k<span class="token operator">|</span> 184B  342B<span class="token operator">|</span>   0     0 <span class="token operator">|</span>  26    25
+  0   0 100   0   0   0<span class="token operator">|</span>   0     0 <span class="token operator">|</span> 780B  384B<span class="token operator">|</span>   0     0 <span class="token operator">|</span>  25     7
+  0   0 100   0   0   0<span class="token operator">|</span>   0     0 <span class="token operator">|</span> 230B  342B<span class="token operator">|</span>   0     0 <span class="token operator">|</span>  21    16 ^C<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-20-iostat命令"><a href="#3-20-iostat命令" class="headerlink" title="3.20 iostat命令"></a>3.20 <code>iostat</code>命令</h3><blockquote>
+<p><code>iostat</code>是<code>I/O statistics</code>（输入/输出统计）的缩写，用来动态监视系统的磁盘操作活动。</p>
+</blockquote>
+<p><strong>命令格式</strong></p>
+<ul>
+<li><code>iostat[参数][时间][次数]</code></li>
+</ul>
+<p><strong>命令参数</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash">-C 显示CPU使用情况
+-d 显示磁盘使用情况
+-k 以 KB 为单位显示
+-m 以 M 为单位显示
+-N 显示磁盘阵列<span class="token punctuation">(</span>LVM<span class="token punctuation">)</span> 信息
+-n 显示NFS 使用情况
+-p<span class="token punctuation">[</span>磁盘<span class="token punctuation">]</span> 显示磁盘和分区的情况
+-t 显示终端和CPU的信息
+-x 显示详细信息
+-V 显示版本信息<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>字段分析</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># iostat</span>
+Linux 2.6.32-279.el6.x86_64 <span class="token punctuation">(</span>colin<span class="token punctuation">)</span>   07/16/2014      _x86_64_        <span class="token punctuation">(</span>4 CPU<span class="token punctuation">)</span>
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+10.81    0.00   14.11    0.18    0.00   74.90
+
+Device:            tps   Blk_read/s   Blk_wrtn/s   Blk_read   Blk_wrtn
+sda               1.95         1.48        70.88    9145160  437100644
+dm-0              3.08         0.55        24.34    3392770  150087080
+dm-1              5.83         0.93        46.49    5714522  286724168
+dm-2              0.01         0.00         0.05      23930     289288<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><code>cpu</code>属性值说明</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">%user：CPU处在用户模式下的时间百分比。
+%nice：CPU处在带NICE值的用户模式下的时间百分比。
+%system：CPU处在系统模式下的时间百分比。
+%iowait：CPU等待输入输出完成时间的百分比。
+%steal：管理程序维护另一个虚拟处理器时，虚拟CPU的无意识等待时间百分比。
+%idle：CPU空闲时间百分比。
+
+注：如果%iowait的值过高，表示硬盘存在I/O瓶颈，%idle值高，表示CPU较空闲，如果%idle值高但系统响应慢时，有可能是CPU等待分配内存，此时应加大内存容量。%idle值如果持续低于10，那么系统的CPU处理能力相对较低，表明系统中最需要解决的资源是CPU。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><code>disk</code>属性值说明</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">rrqm/s: 每秒进行 merge 的读操作数目。即 rmerge/s
+wrqm/s: 每秒进行 merge 的写操作数目。即 wmerge/s
+r/s: 每秒完成的读 I/O 设备次数。即 rio/s
+w/s: 每秒完成的写 I/O 设备次数。即 wio/s
+rsec/s: 每秒读扇区数。即 rsect/s
+wsec/s: 每秒写扇区数。即 wsect/s
+rkB/s: 每秒读K字节数。是 rsect/s 的一半，因为每扇区大小为512字节。
+wkB/s: 每秒写K字节数。是 wsect/s 的一半。
+avgrq-sz: 平均每次设备I/O操作的数据大小 <span class="token punctuation">(</span>扇区<span class="token punctuation">)</span>。
+avgqu-sz: 平均I/O队列长度。
+await: 平均每次设备I/O操作的等待时间 <span class="token punctuation">(</span>毫秒<span class="token punctuation">)</span>。
+svctm: 平均每次设备I/O操作的服务时间 <span class="token punctuation">(</span>毫秒<span class="token punctuation">)</span>。
+%util: 一秒中有百分之多少的时间用于 I/O 操作，即被io消耗的cpu百分比
+
+备注：如果 %util 接近 100%，说明产生的I/O请求太多，I/O系统已经满负荷，该磁盘可能存在瓶颈。如果 svctm 比较接近 await，说明 I/O 几乎没有等待时间；如果 await 远大于 svctm，说明I/O 队列太长，io响应太慢，则需要进行必要优化。如果avgqu-sz比较大，也表示有当量io在等待。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>实战演示</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 显示所有设备负载情况</span>
+iostat
+
+<span class="token comment" spellcheck="true"># 定时显示所有信息</span>
+<span class="token comment" spellcheck="true"># 每隔2秒刷新显示，且显示3次</span>
+iostat 2 3<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看TPS和吞吐量</span>
+<span class="token comment" spellcheck="true"># iostat -d -k 1 1</span>
+Linux 2.6.32-279.el6.x86_64 <span class="token punctuation">(</span>colin<span class="token punctuation">)</span>   07/16/2014      _x86_64_        <span class="token punctuation">(</span>4 CPU<span class="token punctuation">)</span>
+
+Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+sda               1.95         0.74        35.44    4572712  218559410
+dm-0              3.08         0.28        12.17    1696513   75045968
+dm-1              5.83         0.46        23.25    2857265  143368744
+dm-2              0.01         0.00         0.02      11965     144644
+
+tps：该设备每秒的传输次数（Indicate the number of transfers per second that were issued to the device.）。“一次传输”意思是“一次I/O请求”。多个逻辑请求可能会被合并为“一次I/O请求”。“一次传输”请求的大小是未知的。
+kB_read/s：每秒从设备（drive expressed）读取的数据量；
+kB_wrtn/s：每秒向设备（drive expressed）写入的数据量；
+kB_read：读取的总数据量；kB_wrtn：写入的总数量数据量；
+这些单位都为Kilobytes。
+
+上面的例子中，我们可以看到磁盘sda以及它的各个分区的统计数据，当时统计的磁盘总TPS是1.95，下面是各个分区的TPS。（因为是瞬间值，所以总TPS并不严格等于各个分区TPS的总和）<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看设备使用率（%util）和响应时间（await）</span>
+<span class="token comment" spellcheck="true"># iostat -d -x -k 1 1</span>
+Linux 2.6.32-279.el6.x86_64 <span class="token punctuation">(</span>colin<span class="token punctuation">)</span>   07/16/2014      _x86_64_        <span class="token punctuation">(</span>4 CPU<span class="token punctuation">)</span>
+
+Device:         rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await  svctm  %util
+sda               0.02     7.25    0.04    1.90     0.74    35.47    37.15     0.04   19.13   5.58   1.09
+dm-0              0.00     0.00    0.04    3.05     0.28    12.18     8.07     0.65  209.01   1.11   0.34
+dm-1              0.00     0.00    0.02    5.82     0.46    23.26     8.13     0.43   74.33   1.30   0.76
+dm-2              0.00     0.00    0.00    0.01     0.00     0.02     8.00     0.00    5.41   3.28   0.00
+
+rrqm/s： 每秒进行 merge 的读操作数目.即 delta<span class="token punctuation">(</span>rmerge<span class="token punctuation">)</span>/s
+wrqm/s： 每秒进行 merge 的写操作数目.即 delta<span class="token punctuation">(</span>wmerge<span class="token punctuation">)</span>/s
+r/s： 每秒完成的读 I/O 设备次数.即 delta<span class="token punctuation">(</span>rio<span class="token punctuation">)</span>/s
+w/s： 每秒完成的写 I/O 设备次数.即 delta<span class="token punctuation">(</span>wio<span class="token punctuation">)</span>/s
+rsec/s： 每秒读扇区数.即 delta<span class="token punctuation">(</span>rsect<span class="token punctuation">)</span>/s
+wsec/s： 每秒写扇区数.即 delta<span class="token punctuation">(</span>wsect<span class="token punctuation">)</span>/s
+rkB/s： 每秒读K字节数.是 rsect/s 的一半,因为每扇区大小为512字节.<span class="token punctuation">(</span>需要计算<span class="token punctuation">)</span>
+wkB/s： 每秒写K字节数.是 wsect/s 的一半.<span class="token punctuation">(</span>需要计算<span class="token punctuation">)</span>
+avgrq-sz：平均每次设备I/O操作的数据大小 <span class="token punctuation">(</span>扇区<span class="token punctuation">)</span>.delta<span class="token punctuation">(</span>rsect+wsect<span class="token punctuation">)</span>/delta<span class="token punctuation">(</span>rio+wio<span class="token punctuation">)</span>
+avgqu-sz：平均I/O队列长度.即 delta<span class="token punctuation">(</span>aveq<span class="token punctuation">)</span>/s/1000 <span class="token punctuation">(</span>因为aveq的单位为毫秒<span class="token punctuation">)</span>.
+await： 平均每次设备I/O操作的等待时间 <span class="token punctuation">(</span>毫秒<span class="token punctuation">)</span>.即 delta<span class="token punctuation">(</span>ruse+wuse<span class="token punctuation">)</span>/delta<span class="token punctuation">(</span>rio+wio<span class="token punctuation">)</span>
+svctm： 平均每次设备I/O操作的服务时间 <span class="token punctuation">(</span>毫秒<span class="token punctuation">)</span>.即 delta<span class="token punctuation">(</span>use<span class="token punctuation">)</span>/delta<span class="token punctuation">(</span>rio+wio<span class="token punctuation">)</span>
+%util： 一秒中有百分之多少的时间用于 I/O 操作,或者说一秒中有多少时间 I/O 队列是非空的，即 delta<span class="token punctuation">(</span>use<span class="token punctuation">)</span>/s/1000 <span class="token punctuation">(</span>因为use的单位为毫秒<span class="token punctuation">)</span>
+如果 %util 接近 100%，说明产生的I/O请求太多，I/O系统已经满负荷，该磁盘可能存在瓶颈。 idle小于70% IO压力就较大了，一般读取速度有较多的wait。 同时可以结合vmstat 查看查看b参数<span class="token punctuation">(</span>等待资源的进程数<span class="token punctuation">)</span>和wa参数<span class="token punctuation">(</span>IO等待所占用的CPU时间的百分比，高过30%时IO压力高<span class="token punctuation">)</span>。
+
+另外 await 的参数也要多和 svctm 来参考。差的过高就一定有 IO 的问题。
+
+avgqu-sz 也是个做 IO 调优时需要注意的地方，这个就是直接每次操作的数据的大小，如果次数多，但数据拿的小的话，其实 IO 也会很小。如果数据拿的大，才IO 的数据会高。也可以通过 avgqu-sz × <span class="token punctuation">(</span> r/s or w/s <span class="token punctuation">)</span> <span class="token operator">=</span> rsec/s or wsec/s。也就是讲，读定速度是这个来决定的。
+
+svctm 一般要小于 await <span class="token punctuation">(</span>因为同时等待的请求的等待时间被重复计算了<span class="token punctuation">)</span>，svctm 的大小一般和磁盘性能有关，CPU/内存的负荷也会对其有影响，请求过多也会间接导致 svctm 的增加。await 的大小一般取决于服务时间<span class="token punctuation">(</span>svctm<span class="token punctuation">)</span> 以及 I/O 队列的长度和 I/O 请求的发出模式。如果 svctm 比较接近 await，说明 I/O 几乎没有等待时间；如果 await 远大于 svctm，说明 I/O 队列太长，应用得到的响应时间变慢，如果响应时间超过了用户可以容许的范围，这时可以考虑更换更快的磁盘，调整内核 elevator 算法，优化应用，或者升级 CPU。
+
+队列长度<span class="token punctuation">(</span>avgqu-sz<span class="token punctuation">)</span>也可作为衡量系统 I/O 负荷的指标，但由于 avgqu-sz 是按照单位时间的平均值，所以不能反映瞬间的 I/O 洪水。
+
+形象的比喻：
+r/s+w/s 类似于交款人的总数
+平均队列长度<span class="token punctuation">(</span>avgqu-sz<span class="token punctuation">)</span>类似于单位时间里平均排队人的个数
+平均服务时间<span class="token punctuation">(</span>svctm<span class="token punctuation">)</span>类似于收银员的收款速度
+平均等待时间<span class="token punctuation">(</span>await<span class="token punctuation">)</span>类似于平均每人的等待时间
+平均I/O数据<span class="token punctuation">(</span>avgrq-sz<span class="token punctuation">)</span>类似于平均每人所买的东西多少
+I/O 操作率 <span class="token punctuation">(</span>%util<span class="token punctuation">)</span>类似于收款台前有人排队的时间比例
+设备IO操作:总IO<span class="token punctuation">(</span>io<span class="token punctuation">)</span>/s <span class="token operator">=</span> r/s<span class="token punctuation">(</span>读<span class="token punctuation">)</span> +w/s<span class="token punctuation">(</span>写<span class="token punctuation">)</span>
+
+平均等待时间<span class="token operator">=</span>单个I/O服务器时间*<span class="token punctuation">(</span>1+2+<span class="token punctuation">..</span>.+请求总数-1<span class="token punctuation">)</span>/请求总数
+
+每秒发出的I/0请求很多,但是平均队列就4,表示这些请求比较均匀,大部分处理还是比较及时。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-21-sar命令"><a href="#3-21-sar命令" class="headerlink" title="3.21 sar命令"></a>3.21 <code>sar</code>命令</h3><blockquote>
+<p><code>sar</code> 找出系统瓶颈的利器</p>
+<ul>
+<li><code>sar</code>工具将对系统当前的状态进行取样，然后通过计算数据和比例来表达系统的当前运行状态</li>
+<li>它的特点是可以连续对系统取样，获得大量的取样数据；取样数据和分析的结果都可以存入文件，所需的负载很小</li>
+<li><code>sar</code>是目前 Linux 上最为全面的系统性能分析工具之一，可以从 14 个大方面对系统的活动进行报告，包括文件的读写情况、系统调用的使用情况、串口、CPU 效率、内存使用状况、进程活动及 IPC 有关的活动等，使用也是较为复杂</li>
+</ul>
+</blockquote>
+<p><strong>sar 的两种用法</strong></p>
+<ul>
+<li>追溯过去的统计数据（默认）</li>
+<li>周期性的查看当前数据</li>
+</ul>
+<hr>
+<h3 id="3-22-iftop命令"><a href="#3-22-iftop命令" class="headerlink" title="3.22 iftop命令"></a>3.22 <code>iftop</code>命令</h3><blockquote>
+<p>Linux 下的流量监控工具，和 <code>nethogs</code> 工具很类似。</p>
+</blockquote>
+<p><strong>常用的参数</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash">-i
+    设定监测的网卡，如：<span class="token comment" spellcheck="true"># iftop -i eth1</span>
+-B
+    以bytes为单位显示流量<span class="token punctuation">(</span>默认是bits<span class="token punctuation">)</span>，如：<span class="token comment" spellcheck="true"># iftop -B</span>
+-n
+    使host信息默认直接都显示IP，如：<span class="token comment" spellcheck="true"># iftop -n</span>
+-N
+    使端口信息默认直接都显示端口号，如: <span class="token comment" spellcheck="true"># iftop -N</span>
+-F
+    显示特定网段的进出流量，如iftop -F 10.10.1.0/24或iftop -F 10.10.1.0/255.255.255.0
+-h
+    帮助，显示参数信息
+-p
+    使用这个参数后，中间的列表显示的本地主机信息，出现了本机以外的IP信息
+-b
+    使流量图形条默认就显示
+-f
+    过滤计算包用的
+-P
+    使host信息及端口信息默认就都显示
+-m
+    设置界面最上边的刻度的最大值，刻度分五个大段显示，例：<span class="token comment" spellcheck="true"># iftop -m 100M</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>进入<code>iftop</code>画面后的交互操作(注意大小写)</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash">按 h 切换是否显示帮助
+按 n 切换显示本机的IP或主机名
+按 s 切换是否显示本机的host信息
+按 d 切换是否显示远端目标主机的host信息
+按 t 切换显示格式为2行/1行/只显示发送流量/只显示接收流量
+按 N 切换显示端口号或端口服务名称
+按 S 切换是否显示本机的端口信息
+按 D 切换是否显示远端目标主机的端口信息
+按 p 切换是否显示端口信息
+按 P 切换暂停/继续显示
+按 b 切换是否显示平均流量图形条
+按 B 切换计算2秒或10秒或40秒内的平均流量
+按 T 切换是否显示每个连接的总流量
+按 l 打开屏幕过滤功能，输入要过滤的字符，比如ip,按回车后，屏幕就只显示这个IP相关的流量信息
+按 L 切换显示画面上边的刻度<span class="token punctuation">;</span>刻度不同，流量图形条会有变化
+按 j 或按 k 可以向上或向下滚动屏幕显示的连接记录
+按 1 或 2 或 3 可以根据右侧显示的三列流量数据进行排序
+按 <span class="token operator">&lt;</span> 根据左边的本机名或IP排序
+按 <span class="token operator">></span> 根据远端目标主机的主机名或IP排序
+按 o 切换是否固定只显示当前的连接
+按 f 可以编辑过滤代码
+按 <span class="token operator">!</span> 可以使用shell命令
+按 q 退出监控。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="../images/jobs9.png" alt="Linux进程及作业管理"></p>
+<p><strong>参考博客</strong></p>
+<blockquote>
+<p><a href="http://kodango.com/using-iftop" target="_blank" rel="noopener">iftop: Linux 下的流量监控工具</a></p>
+</blockquote>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Escape</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://escapelife.github.io/posts/301a9a73.html">https://escapelife.github.io/posts/301a9a73.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Escape</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Linux/">
+                                    <span class="chip bg-color">Linux</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/posts/Infinity.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/ramdisk.png" class="responsive-img" alt="CentOS系统启动流程">
+                        
+                        <span class="card-title">CentOS系统启动流程</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2017-12-02
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/posts/aeb47128.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/crontab.png" class="responsive-img" alt="Linux任务计划与周期性执行">
+                        
+                        <span class="card-title">Linux任务计划与周期性执行</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2017-11-03
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('3'),
+            headingSelector: 'h2, h3, h4, h5'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4, h5').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="764454432"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='list'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">2017</span>
+            <a href="/about" target="_blank">Escape</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">699.3k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2017";
+                    var startMonth = "2";
+                    var startDate = "14";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/EscapeLife" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wenpanhappy@126.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/search.xml", 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

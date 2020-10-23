@@ -1,0 +1,1796 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Linux安全之iptables匹配条件, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Linux安全之iptables匹配条件 | Escape</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Escape</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Escape</div>
+        <div class="logo-desc">
+            
+            听摇滚,但不偏颇;也挺古典,但不安逸
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/EscapeLife" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/EscapeLife" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/linux-learn-iptables-tool-30.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Linux安全之iptables匹配条件</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Linux/">
+                                <span class="chip bg-color">Linux</span>
+                            </a>
+                        
+                            <a href="/tags/Iptables/">
+                                <span class="chip bg-color">Iptables</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                Linux运维之路
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2018-02-14
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2020-07-21
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    5.7k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    24 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <blockquote>
+<p><strong>纸上得来终觉浅，绝知此事要躬行。</strong></p>
+</blockquote>
+<p><code>iptables</code> 是运行在用户空间的应用软件，通过控制 <code>Linux</code> 内核 <code>netfilter</code> 模块，来管理网络数据包的处理和转发。在大部分 <code>Linux</code> 发行版中，可以通过手册页 或 <code>man iptables</code> 获取用户手册。通常 <code>iptables</code> 需要内核模块支持才能运行，此处相应的内核模块通常是 <code>Xtables</code>。</p>
+<p><img src="../images/linux-learn-iptables-tool-30.jpg" alt="Linux安全之iptables匹配条件"></p>
+<hr>
+<h2 id="1-匹配条件"><a href="#1-匹配条件" class="headerlink" title="1. 匹配条件"></a>1. 匹配条件</h2><blockquote>
+<p>这里对匹配条件进行一个大致的分类，可以便于我们今后的使用和理解</p>
+</blockquote>
+<p><img src="../images/linux-learn-iptables-tool-31.png" alt="Linux安全之iptables匹配条件"></p>
+<ul>
+<li><strong>基本匹配</strong><ul>
+<li><code>-p 协议名称</code>：匹配协议</li>
+<li><code>-s IP\|Netaddr</code>：匹配来源地址</li>
+<li><code>-d IP\|Netaddr</code>：匹配目标地址</li>
+</ul>
+</li>
+<li><strong>扩展匹配</strong><ul>
+<li>隐式扩展：对使用<code>-p 协议名称</code>指明的协议进行的扩展，可省略<code>-m</code>选项</li>
+<li>显式扩展：必须使用<code>-m</code>选项指定使用的扩展</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看显式扩展模块，小写的为模块，大写的为target</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># rpm -ql iptables | grep "[[:lower:]]\+\.so$"</span>
+/lib64/xtables/libipt_icmp.so
+/lib64/xtables/libxt_string.so
+/lib64/xtables/libxt_tcp.so
+/lib64/xtables/libxt_time.so
+/lib64/xtables/libxt_tos.so
+/lib64/xtables/libxt_udp.so
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="2-基本匹配"><a href="#2-基本匹配" class="headerlink" title="2. 基本匹配"></a>2. 基本匹配</h2><blockquote>
+<p>基本匹配都是我们使用<code>iptables</code>非常常用的基础匹配参数</p>
+</blockquote>
+<h3 id="2-1-匹配参数"><a href="#2-1-匹配参数" class="headerlink" title="2.1 匹配参数"></a>2.1 匹配参数</h3><table>
+<thead>
+<tr>
+<th>命令参数</th>
+<th>作用说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-p 协议名称</code></td>
+<td>匹配协议，如 TCP、UDP、ICMP 等</td>
+</tr>
+<tr>
+<td><code>-s IP|Netaddr</code></td>
+<td>匹配来源地址，IP/MASK，加叹号“!”表示除这个 IP 外</td>
+</tr>
+<tr>
+<td><code>-d IP|Netaddr</code></td>
+<td>匹配目标地址，IP/MASK，加叹号“!”表示除这个 IP 外</td>
+</tr>
+<tr>
+<td><code>-i 网卡名称</code></td>
+<td>匹配从这块网卡流入的数据；仅能用于 PREROUTING, INPUT 及 FORWARD 链上</td>
+</tr>
+<tr>
+<td><code>-o 网卡名称</code></td>
+<td>匹配从这块网卡流出的数据；仅能用于 FORWARD, OUTPUT 及 POSTROUTING 链上</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="2-2-实战演示"><a href="#2-2-实战演示" class="headerlink" title="2.2 实战演示"></a>2.2 实战演示</h3><ul>
+<li><strong>[1] 匹配条件：匹配来源地址</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 匹配来源地址</span>
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -s 192.168.31.19 -j DROP
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -s 192.168.31.0/24 -j DROP
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -s 192.168.31.19,192.168.31.173 -j DROP<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 此示例，不仅了解到了怎样对匹配条件取反，还加深了我们对默认策略的了解</span>
+<span class="token comment" spellcheck="true"># 报文的源IP不是192.168.31.19时会被接收，并不能代表，报文的源IP是192.168.31.19时就会被拒绝</span>
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT <span class="token operator">!</span> -s 192.168.31.19 -j ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 匹配条件：匹配目标地址</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 本机除了有回环地址，还有两块网卡</span>
+$ <span class="token function">sudo</span> <span class="token function">ifconfig</span> <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'/inet addr/{print <span class="token variable">$1</span>, <span class="token variable">$2</span>}'</span>
+inet addr:192.168.31.19
+inet addr:192.168.31.173
+inet addr:127.0.0.1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 匹配目标地址</span>
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -d 192.168.31.173 -j DROP
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -s 192.168.31.110 -d 192.168.31.19 -j DROP<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 匹配条件：协议类型</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># CentOS6中，-p选项支持如下协议类型:</span>
+tcp, udp, udplite, icmp, esp, ah, sctp
+
+<span class="token comment" spellcheck="true"># CentOS7中，-p选项支持如下协议类型:</span>
+tcp, udp, udplite, icmp, icmpv6,esp, ah, sctp, mh
+
+<span class="token comment" spellcheck="true"># 当不使用-p指定协议类型时，默认表示所有类型的协议都会被匹配到，与使用-p all的效果相同。</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 协议类型</span>
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp \
+    -s 192.168.31.110 -d 192.168.31.19 -j REJECT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] 匹配条件：网卡接口</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 仅能用于PREROUTING, INPUT及FORWARD链上</span>
+<span class="token comment" spellcheck="true"># 当本机有多个网卡时，我们可以使用 -i 选项去匹配报文是通过哪块网卡流入本机</span>
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -i eth0 -p icmp -j DROP<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="3-隐式扩展"><a href="#3-隐式扩展" class="headerlink" title="3. 隐式扩展"></a>3. 隐式扩展</h2><blockquote>
+<p><strong>对使用<code>-p 协议名称</code>指明的协议进行的扩展，可省略<code>-m</code>选项</strong></p>
+<ul>
+<li><strong><code>-m tcp --dport 22</code> &lt;=等价于=&gt; <code>-p tcp --dport 22</code></strong></li>
+</ul>
+</blockquote>
+<h3 id="3-1-匹配参数"><a href="#3-1-匹配参数" class="headerlink" title="3.1 匹配参数"></a>3.1 匹配参数</h3><ul>
+<li><p><strong>[!] –sport port[:port]和[!] –dport port[:port]</strong></p>
+<ul>
+<li>不管是<code>TCP</code>还是<code>UDP</code>的源端口(<code>--dport</code>)和目标端口(<code>--sport</code>)都支持单个端口或连续多个端口</li>
+<li>如果需要指定连续多个端口，使用<code>-</code>符号进行分隔即可，如<code>--dport 1024-2596</code>限制连续端口号</li>
+</ul>
+</li>
+<li><p><strong>[!] –tcp-flags mask comp</strong></p>
+<ul>
+<li>表示检查<code>mask</code>所指明的所有标志位，且这其中，<code>comp</code>所表示出的所有标记位必须为<code>1</code>，而余下的必须为<code>0</code></li>
+<li>没有在<code>mask</code>中指明的标志位，不作任何检查，可以为<code>SYN,ACK,FIN,RST,PSH,URG</code></li>
+<li>多个标志位需要使用<code>,</code>进行分隔，如<code>--tcp-flags SYN,ACK,FIN,RST SYN</code>表示<code>TCP</code>三次握手的第一次请求</li>
+</ul>
+</li>
+<li><p><strong>[!] –syn</strong></p>
+<ul>
+<li>等价于<code>--tcp-flags SYN,ACK,FIN,RST SYN</code>表示<code>TCP</code>三次握手的第一次请求</li>
+</ul>
+</li>
+<li><p><strong>[!] –icmp-type</strong></p>
+<ul>
+<li><code>0</code>：表示<code>echo-reply</code>的意思，即<code>icmp</code>请求响应包，定义在<code>OUTPUT</code>链上</li>
+<li><code>8</code>：表示<code>echo-request</code>的意思，即<code>icmp</code>请求包，定义在<code>INPUT</code>链上</li>
+</ul>
+</li>
+</ul>
+<p><img src="../images/linux-learn-iptables-tool-32.png" alt="Linux安全之iptables匹配条件"></p>
+<ul>
+<li><code>icmp</code>报文码</li>
+</ul>
+<p><img src="../images/linux-learn-iptables-tool-33.png" alt="Linux安全之iptables匹配条件"></p>
+<hr>
+<h3 id="3-2-实战演示"><a href="#3-2-实战演示" class="headerlink" title="3.2 实战演示"></a>3.2 实战演示</h3><blockquote>
+<p><strong>介绍实际使用当中编写规则的具体细则！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] 限制对本机<code>ssh</code>服务的连接</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp --dport 22 -j DROP
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp -s 192.168.31.110 --dport 22 -j DROP<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 匹配22号到25号之间的所有端口</span>
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp --dport 22:25 -j REJECT
+
+<span class="token comment" spellcheck="true"># 匹配0号到22号之间的所有端口</span>
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp -s 192.168.31.110 --dport :22 -j REJECT
+
+<span class="token comment" spellcheck="true"># 匹配80号端口以及其以后的所有端口，直到65535</span>
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp -s 192.168.31.110 --dport 80: -j REJECT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 限制<code>icmp</code>报文的连接</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 出入都禁止</span>
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p icmp -m icmp --icmp-type 8/0 -j REJECT
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p icmp --icmp-type 8 -j REJECT
+$ <span class="token function">sudo</span> iptables -t filter -I OUTPUT -p icmp -m icmp --icmp-type 0/0 -j REJECT
+$ <span class="token function">sudo</span> iptables -t filter -I OUTPUT -p icmp --icmp-type 0 -j REJECT
+
+<span class="token comment" spellcheck="true"># 和使用--icmp-type 8的效率一样</span>
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p icmp --icmp-type <span class="token string">"echo-request"</span> -j REJECT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-3-tcp-flags-参数"><a href="#3-3-tcp-flags-参数" class="headerlink" title="3.3 tcp-flags 参数"></a>3.3 tcp-flags 参数</h3><p>见名知义，<strong><code>--tcp-flags</code></strong>指的就是<code>TCP</code>头中的标志位。所有我们在使用<code>iptables</code>时，可以通过此扩展匹配条件，去匹配<code>TCP</code>报文的头部的标识位，然后根据标识位的实际情况实现访问控制的功能。</p>
+<ul>
+<li><strong>TCP 头中的标志位</strong></li>
+</ul>
+<p>在使用<code>iptables</code>时，使用<code>TCP</code>扩展模块的<code>--tcp-flags</code>选项，即可对上图中的标志位进行匹配，判断指定的标志位的值是否为<code>1</code>。我们继续聊<code>TCP</code>的标识位，在<code>TCP</code>协议建立连接的过程中，需要先进行三次握手，而三次握手就要依靠<code>TCP</code>头中的标志位进行。</p>
+<p><img src="../images/linux-learn-iptables-tool-34.png" alt="Linux安全之iptables匹配条件"></p>
+<ul>
+<li><strong>TCP 三次握手中的第一次握手</strong><ul>
+<li>下图为<code>TCP</code>三次握手中的第一次握手，客户端(IP 为<code>98</code>)使用本地的随机端口<code>54808</code>向服务端(IP 为<code>137</code>)发起连接请求，<code>TCP</code>头的标志位中，只有<code>SYN</code>位被标识为<code>1</code>，其他标志位均为<code>0</code>。</li>
+<li>在下图的下方可以看到<code>[TCP Flags: ··········S·]</code>，其中的<strong>“<code>S</code>“</strong>就表示<code>SYN</code>位，整体表示只有<code>SYN</code>位为<code>1</code>。</li>
+</ul>
+</li>
+</ul>
+<p><img src="../images/linux-learn-iptables-tool-35.png" alt="Linux安全之iptables匹配条件"></p>
+<ul>
+<li><strong>TCP 三次握手中第二次握手</strong><ul>
+<li>下图是第二次握手的，服务端回应刚才的请求，将自己的<code>TCP</code>头的<code>SYN</code>标志位也设置为<code>1</code>，同时将<code>ACK</code>标志位也设置为<code>1</code>。</li>
+<li>下图中的下方显示的标志位列表也变成了，<code>[TCP Flags: ·······A··S·]</code>，表示只有<code>ACK</code>标志位与<code>SYN</code>标志位为<code>1</code>。</li>
+</ul>
+</li>
+</ul>
+<p><img src="../images/linux-learn-iptables-tool-36.png" alt="Linux安全之iptables匹配条件"></p>
+<ul>
+<li><strong>iptables 的拒绝访问</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 匹配TCP三次握手中的第一次握手，并且拒绝</span>
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp --dport 22 \
+    --tcp-flags SYN,ACK,FIN,RST,URG,PSH SYN -j REJECT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 匹配TCP三次握手中的第二次握手，并且拒绝</span>
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp --dport 22 \
+    --tcp-flags SYN,ACK,FIN,RST,URG,PSH SYN,ACK -j REJECT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 上例中的两条命令还可以简写为如下模样</span>
+<span class="token comment" spellcheck="true"># 没错，我们可以用ALL表示SYN,ACK,FIN,RST,URG,PSH</span>
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp --dport 22 \
+    --tcp-flags ALL SYN -j REJECT
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp --dport 22 \
+    --tcp-flags ALL SYN,ACK -j REJECT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用--syn选项相当于使用--tcp-flags SYN,RST,ACK,FIN SYN，就是TCP三次握手中的第一次握手</span>
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp --dport 22 --syn -j REJECT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="4-显式扩展"><a href="#4-显式扩展" class="headerlink" title="4. 显式扩展"></a>4. 显式扩展</h2><blockquote>
+<p><strong>必须使用<code>-m</code>选项指定使用的扩展</strong></p>
+</blockquote>
+<h3 id="4-1-匹配参数"><a href="#4-1-匹配参数" class="headerlink" title="4.1 匹配参数"></a>4.1 匹配参数</h3><ul>
+<li>【1】<strong>multiport 扩展</strong><ul>
+<li>以离散方式定义多端口匹配，最多指定 15 个端口</li>
+<li><code>[!] --ports port[,port,port:port]</code>：既可以是源端口也可以是目标端口</li>
+<li><code>[!] --source-ports,--sports port[,port,port:port]</code>：指明多个离散的源端口</li>
+<li><code>[!] --destination-ports,--dports port[,port,port:port]</code>：指明多个离散的目标端口</li>
+</ul>
+</li>
+<li>【2】<strong>iprange 扩展</strong><ul>
+<li>指明连续的 IP 地址范围时使用，但一般是不能扩展为整个网络</li>
+<li><code>[!] --src-range from[-to]</code>：指明连续的源 IP 地址范围</li>
+<li><code>[!] --dst-range from[-to]</code>：指明连续的目标 IP 地址范围</li>
+</ul>
+</li>
+<li>【3】<strong>string 扩展</strong><ul>
+<li>检查报文中出现的字符串，包含所有字符串中匹配，必须给定比对算法</li>
+<li><code>--algo {bm|kmp}</code>：指明字符串比对算法</li>
+<li><code>[!] --string pattern</code>：指定字符串匹配</li>
+<li><code>[!] --hex-string pattern</code>：指定 16 进制匹配</li>
+</ul>
+</li>
+<li>【4】<strong>time 扩展</strong><ul>
+<li>根据报文到达的时间与指定的时间范围进行匹配，这里使用 UTC 的时间，如果与本机时区时间不匹配需要换算</li>
+<li><code>--datestart YYYY[-MM[-DD[Thh[:mm[:ss]]]]]</code>：指定起始日期，符号 T 表示分隔符</li>
+<li><code>--datestop YYYY[-MM[-DD[Thh[:mm[:ss]]]]]</code>：指定结束日期，符号 T 表示分隔符</li>
+<li><code>--timestart hh:mm[:ss]</code>：指定起始时间</li>
+<li><code>--timestop hh:mm[:ss]</code>：指定结束时间</li>
+<li><code>--monthdays day[,day...]</code>：指定在每月的那几日进行检查</li>
+<li><code>--weekdays day[,day...]</code>：指定在每月的周几进行检查</li>
+<li>可多个选项配合起来，来使用限制条件</li>
+</ul>
+</li>
+<li>【5】<strong>connlimit 扩展</strong><ul>
+<li>根据每客户端 IP(也可以是地址块)做并发连接数数量匹配</li>
+<li><code>--connlimit-above n</code>：连接的数量大于 n</li>
+<li><code>--connlimit-upto n</code>: 连接的数量小于等于 n</li>
+</ul>
+</li>
+<li>【6】<strong>limit 扩展</strong><ul>
+<li>基于收发报文的速率做检查，使用令牌桶过滤器算法来速率限制</li>
+<li><code>--limit-burst number</code>：限制峰值</li>
+<li><code>--limit rate[/second|/minute|/hour|/day]</code>：限制时间速率</li>
+</ul>
+</li>
+<li>【7】<strong>state 扩展</strong><ul>
+<li>根据请求状态做匹配限制，有可能需要装载模块</li>
+<li><code>[!] --state STATE1,STATE2,...</code></li>
+<li>可追踪的连接状态</li>
+<li>(1) <code>NEW</code>：新发出请求；连接追踪的记录文件中不存此连接相关的信息条目，因此将其识别为第一次发出的请求</li>
+<li>(2) <code>ESTABLISHED</code>：NEW 状态之后，连接追踪模板中为其建立的条目失效之前期间内所进行的通信的状态</li>
+<li>(3) <code>RELATED</code>：相关的连接；如 ftp 协议的命令连接与数据连接之间的关系；</li>
+<li>(4) <code>INVALIED</code>：无法识别的连接</li>
+</ul>
+</li>
+</ul>
+<p><img src="../images/linux-learn-iptables-tool-37.png" alt="Linux安全之iptables匹配条件"></p>
+<hr>
+<h3 id="4-2-简单示例"><a href="#4-2-简单示例" class="headerlink" title="4.2 简单示例"></a>4.2 简单示例</h3><ul>
+<li><strong>[1] multiport</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用了multiport扩展模块的--dports扩展条件</span>
+<span class="token comment" spellcheck="true"># 以同时指定了多个离散的端口，每个端口之间用逗号隔开</span>
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp \
+    -s 192.168.31.110 -m multiport --dport 22,80,443 -j DROP
+
+<span class="token comment" spellcheck="true"># 使用multiport模块的--sports与--dpors时，也可以指定连续的端口范围</span>
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp \
+    -s 192.168.31.110 -m multiport --dport 22,80:90 -j DROP<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 如果默认策略都是REJECT的话，放行需要INPUT和OUTPUT双向进行，这里默认策略都是REJECT</span>
+$ <span class="token function">sudo</span> iptables -I INPUT -s 172.16.0.0/16 \
+    -d 172.16.100.9 -p tcp -m multiport --dports 22,80 -j ACCEPT
+$ <span class="token function">sudo</span> iptables -I OUTPUT -d 172.16.0.0/16 \
+    -s 172.16.100.9 -p tcp -m multiport --sports 22,80 -j ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] iprange</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 如果默认策略都是REJECT的话，放行需要INPUT和OUTPUT双向进行，这里默认策略都是REJECT</span>
+$ <span class="token function">sudo</span> iptables -I INPUT -d 172.16.100.9 -p tcp -m multiport \
+    --dports 22:23,80 -m iprange --src-range 172.16.100.1-172.16.100.120 -j ACCEPT
+
+$ <span class="token function">sudo</span> iptables -I OUTPUT -s 172.16.100.9 -p tcp -m multiport \
+    --sports 22:23,80 -m iprange --dst-range 172.16.100.1-172.16.100.120 -j ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] string</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 匹配报文test_html字段</span>
+$ <span class="token function">sudo</span> iptables -I OUTPUT -m string --algo bm --string <span class="token string">'test_html'</span> -j REJECT
+
+<span class="token comment" spellcheck="true"># 匹配报文Google字段</span>
+$ <span class="token function">sudo</span> iptables -I OUTPUT -m string --algo bm --string <span class="token string">'Google'</span> -j REJECT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] time</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># web站点在在指定时间点内不允许访问</span>
+$ <span class="token function">sudo</span> iptable -I INPUT -d 172.16.100.9 -p tcp \
+    --dport 80 -m <span class="token function">time</span> --timestart 14:00 --timestop 16:00 -j REJECT
+
+<span class="token comment" spellcheck="true"># 多个时间点进行限制</span>
+$ <span class="token function">sudo</span> iptables -A INPUT -s 172.16.0.0/16 -d 172.16.100.100 -p tcp \
+    --dport 80 -m <span class="token function">time</span> --timestart 14:30 --timestop 18:30 --weekdays Sat,Sun -j DROP<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] connlimit</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 设置客户端并发数量</span>
+$ <span class="token function">sudo</span> iptables -A INPUT -p tcp --syn \
+    --dport 23 -m connlimit --connlimit-above 2 -j REJECT
+$ <span class="token function">sudo</span> iptables -A INPUT -p tcp --syn \
+    --dport 23 -m connlimit --connlimit-upto 2 -j ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[6] limit</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 限制PING限制, 使用ping -w/W/c做测试验证</span>
+<span class="token comment" spellcheck="true"># 如果默认策略都是REJECT的话，放行需要INPUT和OUTPUT双向进行，这里默认策略都是REJECT</span>
+$ <span class="token function">sudo</span> iptables -A INPUT -d 172.16.100.9 -p icmp -icmp-type 8 \
+    -m limit --limit-burst 5 --limit rate 30/minute -j ACCEPT
+
+$ <span class="token function">sudo</span> iptables -A OUTPUT -s 172.16.100.9 \
+    -p icmp -icmp-type 0 -j ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 前五个不限制，超过后每分钟只响应三个</span>
+$ <span class="token function">sudo</span> iptables -A INPUT -d 172.16.100.100 -p icmp --icmp-type 8 \
+    -m limit --limit 3/minute --limit-burst 5 -j ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[7] state</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 如果默认策略都是REJECT的话，放行需要INPUT和OUTPUT双向进行，这里默认策略都是REJECT</span>
+$ <span class="token function">sudo</span> iptables -A INPUT -d 172.16.100.100 -p tcp \
+    -m multiport --dports 22,80 -m state --state NEW,ESTABLISHED -j ACCEPT
+
+$ <span class="token function">sudo</span> iptables -A OUTPUT -s 172.16.100.100 -p tcp \
+    -m multiport --sports 22,80 -m state --state ESTABLISHED -j ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="4-3-state-扩展"><a href="#4-3-state-扩展" class="headerlink" title="4.3 state 扩展"></a>4.3 state 扩展</h3><blockquote>
+<p><strong>state 模块的连接追踪功能</strong> ==&gt; <a href="http://www.iptables.info/en/connection-state.html" target="_blank" rel="noopener">iptables 官方文档</a></p>
+</blockquote>
+<ul>
+<li><strong>连接追踪的起因</strong></li>
+</ul>
+<p>当我们作为客户端通过<code>http</code>访问网站网页的时候，会向服务端的<code>80</code>端口发起请求，服务端再通过<code>80</code>端口响应我们的请求。作为客户端，我们似乎需要放行<code>80</code>端口，以便服务端回应我们的报文可以进入客户端主机。同理，当我们通过<code>ssh</code>工具远程连接到某台服务器时，也应当的放行了<code>22</code>号端口，以便远程主机的响应请求能够通过防火墙。</p>
+<p>那么，如果我们需要管理的主机越来越多呢？如果管理成百上千主机，这样防火墙规则也就越来越多，且越来越难为维护。<code>80</code>端口就更别提了，难道你每次访问一个新的网址，都要对这个网址添加信任吗？这显然不太合理。</p>
+<p>如果我们针对对应的端口，使用<code>--tcp-flags</code>去匹配<code>TCP</code>报文的标志位，把外来的<code>第一次握手</code>的请求拒绝，是不是也可以呢？那么如果对方使用的是<code>UDP</code>协议或者<code>ICMP</code>协议呢？似乎总是有一些不完美的地方。究其原因，问题就是：<strong>怎样判断这些报文是为了回应我们之前发出的报文，还是主动向我们发送的报文呢？</strong></p>
+<p>我们可以通过<code>iptables</code>的<code>state</code>扩展模块解决上述问题，<code>state</code>模块可以让<code>iptables</code>实现<strong>“连接追踪”</strong>机制。</p>
+<ul>
+<li><strong>连接追踪的过程</strong></li>
+</ul>
+<p>在<code>TCP/IP</code>协议簇中，只有<code>TCP</code>才有连接概念(三次握手/四次挥手)，而对于<code>UDP</code>和<code>ICMP</code>是没有所谓连接的概念。但是对于<code>iptables</code>的<code>state</code>模块来说，<code>TCP</code>报文、<code>UDP</code>报文、<code>ICMP</code>报文都是有连接状态的。我们可以这样认为，对于<code>state</code>模块而言，只要两台机器在<strong>“你来我往”</strong>的通信，就算建立起了连接。</p>
+<p><img src="../images/linux-learn-iptables-tool-38.png" alt="Linux安全之iptables匹配条件"></p>
+<hr>
+<blockquote>
+<p><strong>state 模块的 5 种状态</strong></p>
+</blockquote>
+<p>对于<code>state</code>模块的连接而言，连接其中的报文可以分为 5 种状态：</p>
+<ul>
+<li><strong>NEW</strong>：连接中的第一个包，状态就是 NEW，我们可以理解为新连接的第一个包的状态为 NEW</li>
+<li><strong>ESTABLISHED</strong>：我们可以把 NEW 状态包后面的包的状态理解为 ESTABLISHED，表示连接已建立</li>
+</ul>
+<p><img src="../images/linux-learn-iptables-tool-38.png" alt="Linux安全之iptables匹配条件"></p>
+<ul>
+<li><strong>RELATED</strong>：相关的连接，如 ftp 协议的命令连接与数据连接之间的关系<ul>
+<li>比如 FTP 服务，FTP 服务端会建立两个进程，一个命令进程，一个数据进程</li>
+<li>具体传输哪些数据是由命令去控制的，所以<strong>数据连接</strong>中的报文与<strong>命令连接</strong>是有<strong>关系</strong>的</li>
+<li>那么，<strong>数据连接</strong>中的报文可能就是 RELATED 状态，因为这些报文与<strong>命令连接</strong>中的报文有关系</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 本机网卡接口</span>
+$ <span class="token function">sudo</span> <span class="token function">ifconfig</span> <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'/inet addr/ {print <span class="token variable">$1</span> <span class="token variable">$2</span>}'</span>
+inet addr:192.168.31.19
+inet addr:127.0.0.1
+
+<span class="token comment" spellcheck="true"># 设置防火墙规则</span>
+$ <span class="token function">sudo</span> iptables -t filter -F
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+$ <span class="token function">sudo</span> iptables -t filter -A INPUT -j REJECT
+
+<span class="token comment" spellcheck="true"># 远程连接19主机被拒绝</span>
+$ <span class="token function">sudo</span> <span class="token function">ssh</span> 192.168.31.19
+ssh: connect to host 192.168.31.19 port 22: Connection refused<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>UNTRACKED</strong>：报文未被追踪，通常表示无法找到相关的连接</li>
+<li><strong>INVALID</strong>：如果一个包没有办法被识别或者这个包没有任何状态，那么这个包就是 INVALID 的状态</li>
+</ul>
+<hr>
+<blockquote>
+<p><strong>state 模块的常见配置</strong></p>
+</blockquote>
+<ul>
+<li><strong>调整连接追踪功能所能够容纳的最大连接数量</strong><ul>
+<li>文件：<code>/proc/sys/net/nf_conntrack_max</code></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> <span class="token function">cat</span> /proc/sys/net/nf_conntrack_max
+15204<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>修改链接跟踪表的容量</strong><ul>
+<li><code>iptables</code>的链接跟踪表最大容量由<code>/proc/sys/net/ipv4/</code>目录下的<code>ip_conntrack_max</code>或者是<code>if_conntrack_max</code></li>
+<li>链接碰到各种状态的超时后就会从表中删除</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 所以解決方法一般有两个</span>
+
+<span class="token comment" spellcheck="true"># (1) 加大 ip_conntrack_max 值</span>
+$ <span class="token function">sudo</span> <span class="token function">vi</span> /etc/sysctl.conf
+net.ipv4.ip_conntrack_max <span class="token operator">=</span> 393216
+net.ipv4.netfilter.ip_conntrack_max <span class="token operator">=</span> 393216
+
+<span class="token comment" spellcheck="true"># (2): 降低 ip_conntrack timeout时间</span>
+$ <span class="token function">sudo</span> <span class="token function">vi</span> /etc/sysctl.conf
+net.ipv4.netfilter.ip_conntrack_tcp_timeout_established <span class="token operator">=</span> 300
+net.ipv4.netfilter.ip_conntrack_tcp_timeout_time_wait <span class="token operator">=</span> 120
+net.ipv4.netfilter.ip_conntrack_tcp_timeout_close_wait <span class="token operator">=</span> 60
+net.ipv4.netfilter.ip_conntrack_tcp_timeout_fin_wait <span class="token operator">=</span> 120<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>已经追踪到并记录下的连接</strong><ul>
+<li>文件：<code>/proc/net/nf_conntrack</code></li>
+<li>连接追踪模板(<code>nf_conntrack</code>)</li>
+<li>长时间不访问就会被自动清除掉保存的记录</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> <span class="token function">cat</span> /proc/net/nf_conntrack
+ipv4    2 tcp      6 430977 ESTABLISHED src<span class="token operator">=</span>192.168.31.19 dst<span class="token operator">=</span>199.239.182.169 sport<span class="token operator">=</span>58206 dport<span class="token operator">=</span>80 src<span class="token operator">=</span>199.239.182.169 dst<span class="token operator">=</span>192.168.31.19 sport<span class="token operator">=</span>80 dport<span class="token operator">=</span>58206 <span class="token punctuation">[</span>ASSURED<span class="token punctuation">]</span> mark<span class="token operator">=</span>0 secmark<span class="token operator">=</span>0 use<span class="token operator">=</span>2
+ipv4    2 udp      17 13 src<span class="token operator">=</span>192.168.31.19 dst<span class="token operator">=</span>192.168.31.1 sport<span class="token operator">=</span>35887 dport<span class="token operator">=</span>53 src<span class="token operator">=</span>192.168.31.1 dst<span class="token operator">=</span>192.168.31.19 sport<span class="token operator">=</span>53 dport<span class="token operator">=</span>35887 mark<span class="token operator">=</span>0 secmark<span class="token operator">=</span>0 use<span class="token operator">=</span>2
+ipv4    2 udp      17 28 src<span class="token operator">=</span>192.168.31.19 dst<span class="token operator">=</span>192.168.31.1 sport<span class="token operator">=</span>54972 dport<span class="token operator">=</span>53 src<span class="token operator">=</span>192.168.31.1 dst<span class="token operator">=</span>192.168.31.19 sport<span class="token operator">=</span>53 dport<span class="token operator">=</span>54972 mark<span class="token operator">=</span>0 secmark<span class="token operator">=</span>0 use<span class="token operator">=</span>2
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>不同协议或连接类型追踪的时长</strong><ul>
+<li>目录：<code>/proc/sys/net/netfilter/</code></li>
+<li>定义，如<code>ssh</code>、<code>http</code>、<code>ftp</code>等协议的连接追踪时长</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> <span class="token function">ls</span> /proc/sys/net/netfilter/
+nf_conntrack_acct                  nf_conntrack_generic_timeout  nf_conntrack_tcp_max_retrans          nf_conntrack_tcp_timeout_syn_recv
+nf_conntrack_buckets              nf_conntrack_icmp_timeout    nf_conntrack_tcp_timeout_close        nf_conntrack_tcp_timeout_syn_sentnf_log
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<blockquote>
+<p><strong>state 扩展根据连接追踪机制检查连接的状态，启用连接追踪功能，十分消耗资源且会降低请求速率。对于高负载的服务器开启此功能需要慎重，像使用<code>LVS</code>的服务器需要将数值调大。</strong></p>
+</blockquote>
+<ul>
+<li><strong>通用格式</strong><ul>
+<li><code>[!] --state STATE1,STATE2,...</code></li>
+</ul>
+</li>
+<li><strong>可追踪的连接状态</strong><ul>
+<li><code>NEW</code>：新发出的请求；连接追踪模板中不存此连接相关的信息条目，因此将其识别为第一次发出的请求</li>
+<li><code>ESTABLISHED</code>：NEW 状态之后，连接追踪模板中为其建立的条目失效之前期间内所进行的通信的状态</li>
+<li><code>RELATED</code>：相关的连接，如 ftp 协议的命令连接与数据连接之间的关系</li>
+<li><code>INVALIED</code>：无法识别的连接</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 如果默认策略都是REJECT的话，放行需要INPUT和OUTPUT双向进行，这里默认策略都是REJECT</span>
+<span class="token comment" spellcheck="true"># 对目标地址为172.16.100.100且端口为22、80的请求，如果INPUT状态是新建或者建立之后的通信给与放行</span>
+$ <span class="token function">sudo</span> iptables -A INPUT -d 172.16.100.100 -p tcp -m multiport \
+    --dports 22,80 -m state --state NEW,ESTABLISHED -j ACCEPT
+
+<span class="token comment" spellcheck="true"># 如果本地不需要访问外部服务的话，就不需要放行OUTPUT为新建的请求了</span>
+$ <span class="token function">sudo</span> iptables -A OUTPUT -s 172.16.100.100 -p tcp -m multiport \
+    --sports 22,80 -m state --state ESTABLISHED -j ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="4-4-高级示例"><a href="#4-4-高级示例" class="headerlink" title="4.4 高级示例"></a>4.4 高级示例</h3><ul>
+<li><strong>[问题 1]：如何开放 ICMP 服务？</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 如果默认策略都是REJECT的话，放行需要INPUT和OUTPUT双向进行，这里默认策略都是REJECT</span>
+$ <span class="token function">sudo</span> iptables -A INPUT 172.16.100.9 -p icmp --icmp-type 8 \
+     -m state --state NEW,ESTABLISHED -j ACCEPT
+
+<span class="token comment" spellcheck="true"># 自己不允许ping别人的情况下，只开放别人ping自己请求</span>
+$ <span class="token function">sudo</span> iptables -A OUTPUT 172.16.100.9 -p icmp --icmp-type 0 \
+    -m state --state ESTABLISHED -j ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将上面的多条策略合并为一条，即提高效率有可以增强安全性</span>
+$ <span class="token function">sudo</span> iptables -I INPUT -m state --state ESTABLISHED -j ACCEPT
+$ <span class="token function">sudo</span> iptables -I INPUT 2 -d 172.16.100.9 -p tcp -m multiport \
+    --dports 22,80 -m state --state NEW -j ACCEPT
+$ <span class="token function">sudo</span> iptables -A INPUT 172.16.100.9 -p icmp --icmp-type 8 -m state --state NEW -j ACCEPT
+$ <span class="token function">sudo</span> iptabels -I OUTPUT -m state --state ESTABLISHED -j ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[问题 2]：如何放行本机对自身 WEB 服务的访问？</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 这里默认策略都是REJECT，所有需要双向放行</span>
+$ <span class="token function">sudo</span> iptables -I INPUT -d LocalIP -i lo0 -j ACCEPT
+$ <span class="token function">sudo</span> iptables -I OUTPUT -s LocalIP -i lo0 -j ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[问题 3]：如何开放主动模式的 ftp 服务？</strong>（反弹式木马）</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># (1) 装载ftp追踪时的专用的模块</span>
+$ <span class="token function">sudo</span> modprobe nf_conntrack_ftp
+
+<span class="token comment" spellcheck="true"># (2) 这里默认策略都是REJECT，所有需要双向放行</span>
+$ <span class="token function">sudo</span> iptables -A INPUT -d LocalIP -p tcp --dport 22 -m state --state NEW,ESTABLISHED -j ACCEPT
+$ <span class="token function">sudo</span> iptables -A OUTPUT -s LocalIP -p tcp --sport 22 -m state --state ESTABLISHED -j ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 如果同时开放web服务器，只需将22改为80端口，可以将二者合并为一</span>
+$ <span class="token function">sudo</span> iptables -A INPUT -d 192.168.31.19 -p tcp \
+    -m multiport --dports 22,80 -m state --state NEW,ESTABLISHED -j ACCEPT
+$ <span class="token function">sudo</span> iptables -A OUTPUT -s 192.168.31.19 -p tcp \
+    -m multiport --sports 22,80 -m state --state ESTABLISHED -j ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[问题 4]：如何开放被动模式的 ftp 服务？</strong><ul>
+<li>需要单独加载对应的<code>nf_conntrack_ftp</code>内核模块</li>
+<li>如果想要自动加载，可以配置<code>/etc/sysconfig/iptables-config</code>文件</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># (1) 装载ftp追踪时的专用的模块</span>
+$ <span class="token function">sudo</span> modprobe nf_conntrack_ftp
+
+<span class="token comment" spellcheck="true"># (2) 放行请求报文</span>
+<span class="token comment" spellcheck="true"># 命令连接放行：NEW, ESTABLISHED</span>
+<span class="token comment" spellcheck="true"># 数据连接放行：RELATED, ESTABLISHED</span>
+$ <span class="token function">sudo</span> iptables -A INPUT -d LocalIP -p tcp --dport 21 -m state --state NEW,ESTABLISHED -j ACCEPT
+$ <span class="token function">sudo</span> iptables -A INPUT -d LocalIP -p tcp -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+<span class="token comment" spellcheck="true"># (3) 放行响应报文</span>
+<span class="token comment" spellcheck="true"># 只放行：ESTABLISEHD</span>
+$ <span class="token function">sudo</span> iptables -A OUTPUT -s LocalIP -p tcp -m state --state ESTABLISHED -j ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="5-保存及重载规则"><a href="#5-保存及重载规则" class="headerlink" title="5. 保存及重载规则"></a>5. 保存及重载规则</h2><blockquote>
+<p><strong>关于<code>firewalld</code>可以参考：</strong><a href="http://www.ibm.com/developerworks/cn/linux/1507_caojh/index.html" target="_blank" rel="noopener">http://www.ibm.com/developerworks/cn/linux/1507_caojh/index.html</a></p>
+</blockquote>
+<ul>
+<li><strong>保存规则至指定文件</strong><ul>
+<li><code>iptables-save &gt; /PATH/TO/SOMEFILE</code></li>
+<li>默认文件为<code>/etc/sysconfig/iptables</code></li>
+</ul>
+</li>
+<li><strong>从指定文件重载规则</strong><ul>
+<li><code>iptables-restore &lt; /PATH/FROM/SOMEFILE</code></li>
+<li>默认文件为<code>/etc/sysconfig/iptables</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="5-1-CentOS6"><a href="#5-1-CentOS6" class="headerlink" title="5.1 CentOS6"></a>5.1 CentOS6</h3><ul>
+<li>使用<code>CentOS 6: man iptables</code>命令查看文档</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 保存，以下方式等同</span>
+$ <span class="token function">sudo</span> <span class="token function">service</span> iptables save
+$ <span class="token function">sudo</span> iptables-save <span class="token operator">></span> /etc/sysconfig/iptables
+
+<span class="token comment" spellcheck="true"># 重载，以下方式等同</span>
+$ <span class="token function">sudo</span> <span class="token function">service</span> iptables restart
+$ <span class="token function">sudo</span> iptables-restore <span class="token operator">&lt;</span> /etc/sysconfig/iptables
+
+<span class="token comment" spellcheck="true"># iptables工具</span>
+/etc/sysconfig/iptables         <span class="token comment" spellcheck="true"># 二进制程序</span>
+/etc/sysconfig/iptables-config  <span class="token comment" spellcheck="true"># 配置文件，可以指定启动加载模块等功能</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="5-2-CentOS7"><a href="#5-2-CentOS7" class="headerlink" title="5.2 CentOS7"></a>5.2 CentOS7</h3><ul>
+<li>使用<code>CentOS 7: man iptables-extensions</code>命令查看文档</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 引入了新的iptables前端管理服务工具：firewalld</span>
+$ <span class="token function">sudo</span> firewalld-cmd    <span class="token comment" spellcheck="true"># 命令行程序</span>
+$ <span class="token function">sudo</span> firewalld-config  <span class="token comment" spellcheck="true"># 图形化程序</span>
+
+<span class="token comment" spellcheck="true"># 为了保持统一在CentOS7上使用iptables的话，需要禁用fredwalld服务</span>
+$ <span class="token function">sudo</span> systemctl disable firewalld.service
+$ <span class="token function">sudo</span> systemctl stop firewalld.service
+
+<span class="token comment" spellcheck="true"># 不支持通过systemctl命令启动iptables，需要自己写unit文件</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Escape</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://escapelife.github.io/posts/94813c3c.html">https://escapelife.github.io/posts/94813c3c.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Escape</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Linux/">
+                                    <span class="chip bg-color">Linux</span>
+                                </a>
+                            
+                                <a href="/tags/Iptables/">
+                                    <span class="chip bg-color">Iptables</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/posts/39bc1a0b.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/linux-learn-iptables-tool-40.jpg" class="responsive-img" alt="Linux安全之iptables黑白名单">
+                        
+                        <span class="card-title">Linux安全之iptables黑白名单</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2018-02-24
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                    <a href="/tags/Iptables/">
+                        <span class="chip bg-color">Iptables</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/posts/bf81d0d.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/2018-travel-chengdu.jpg" class="responsive-img" alt="成都高铁游记">
+                        
+                        <span class="card-title">成都高铁游记</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2018-02-14
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Travel游山玩水/" class="post-category">
+                                    Travel游山玩水
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Travel/">
+                        <span class="chip bg-color">Travel</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('3'),
+            headingSelector: 'h2, h3, h4, h5'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4, h5').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="764454432"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='list'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">2017</span>
+            <a href="/about" target="_blank">Escape</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">699.3k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2017";
+                    var startMonth = "2";
+                    var startDate = "14";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/EscapeLife" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wenpanhappy@126.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/search.xml", 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

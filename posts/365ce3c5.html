@@ -1,0 +1,2084 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Linux下的抓包工具Tcpdump, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Linux下的抓包工具Tcpdump | Escape</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Escape</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Escape</div>
+        <div class="logo-desc">
+            
+            听摇滚,但不偏颇;也挺古典,但不安逸
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/EscapeLife" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/EscapeLife" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/tcpdump.png')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Linux下的抓包工具Tcpdump</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Linux/">
+                                <span class="chip bg-color">Linux</span>
+                            </a>
+                        
+                            <a href="/tags/Command/">
+                                <span class="chip bg-color">Command</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                Linux运维之路
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2017-10-23
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2020-07-17
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    8.4k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    37 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <blockquote>
+<p><strong>纸上得来终觉浅，绝知此事要躬行。</strong></p>
+</blockquote>
+<p><code>tcpdump</code> 就是根据使用者的定义对网络上的数据包进行截获的包分析工具。<code>tcpdump</code> 可以将网络中传送的数据包的“头”完全截获下来提供分析。它支持针对网络层、协议、主机、网络或端口的过滤，并提供 <code>and</code>、<code>or</code>、<code>not</code> 等逻辑语句来帮助你去掉无用的信息。</p>
+<p><img src="../images/tcpdump.png" alt="Linux下的抓包工具Tcpdump"></p>
+<hr>
+<h2 id="1-基本语法"><a href="#1-基本语法" class="headerlink" title="1. 基本语法"></a>1. 基本语法</h2><blockquote>
+<p><strong>主要介绍一下使用 tcpdump 工具时经常会使用到的参数！</strong></p>
+</blockquote>
+<p><strong>过滤表达式</strong>可以给 <code>tcpdump</code> 传送过滤表达式来起到网络包过滤的作用，而且可以支持传入单个或多个过滤表达式。当你传入的过滤表达式含有 <code>shell</code> 通配符时，别忘使用单引号把表达式括起来，以防 <code>shell</code> 自作主张的把含有通配符的表达式先进行了解释和通配。我们可以使用 <code>man pcap-filter</code> 命令来查看帮助信息，你会发现，过滤表达式大体可以分成三种过滤条件，类型、方向和协议，这三种条件的搭配组合就构成。</p>
+<p><strong>[1] 过滤主机</strong></p>
+<ul>
+<li>抓取所有经过 eth1，目的或源地址是 192.168.1.1 的网络数据<ul>
+<li><code>tcpdump -i eth1 host 192.168.1.1</code></li>
+</ul>
+</li>
+<li>指定源地址<ul>
+<li><code>tcpdump -i eth1 src host 192.168.1.1</code></li>
+</ul>
+</li>
+<li>指定目的地址<ul>
+<li><code>tcpdump -i eth1 dst host 192.168.1.1</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>[2] 过滤端口</strong></p>
+<ul>
+<li>抓取所有经过 eth1，目的或源端口是 25 的网络数据<ul>
+<li><code>tcpdump -i eth1 port 25</code></li>
+</ul>
+</li>
+<li>指定源端口<ul>
+<li><code>tcpdump -i eth1 src port 25</code></li>
+</ul>
+</li>
+<li>指定目的端口<ul>
+<li><code>tcpdump -i eth1 dst port 25</code></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 只查目标机器端口是53或80的网络包</span>
+dst port 53
+dst port 53
+
+<span class="token comment" spellcheck="true"># tcpdump还支持如下的类型</span>
+host：指定主机名或IP地址
+例如host roclinux.cn或host 202.112.18.34
+net ：指定网络段
+例如arp net 128.3或dst net 128.3
+portrange：指定端口区域
+例如src or dst portrange 6000-6008
+如果我们没有设置过滤类型，那么默认是host
+
+<span class="token comment" spellcheck="true"># tcpdump -i eth0 -c 3 'dst port 53 or dst port 53'</span>
+tcpdump: verbose output suppressed, use -v or -vv <span class="token keyword">for</span> full protocol decode
+listening on eth0, link-type EN10MB <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>, capture size 65535 bytes
+13:29:04.530130 IP 114.255.192.96.29832 <span class="token operator">&amp;</span>gt<span class="token punctuation">;</span> 116.255.245.206.http: Flags <span class="token punctuation">[</span>S<span class="token punctuation">]</span>, <span class="token function">seq</span> 3169042560, win 5840, options <span class="token punctuation">[</span>mss 1460,sackOK,TS val 2949111416 ecr 0<span class="token punctuation">]</span>, length 0
+13:29:04.530660 IP 116.255.245.206.43211 <span class="token operator">&amp;</span>gt<span class="token punctuation">;</span> ns.sc.cninfo.net.domain: 40188+ PTR? 206.245.255.116.in-addr.arpa. <span class="token punctuation">(</span>46<span class="token punctuation">)</span>
+13:29:04.548589 IP 114.255.192.96.29832 <span class="token operator">&amp;</span>gt<span class="token punctuation">;</span> 116.255.245.206.http: Flags <span class="token punctuation">[</span>.<span class="token punctuation">]</span>, ack 3709396068, win 5840, options <span class="token punctuation">[</span>nop,nop,TS val 2949111475 ecr 1601243970<span class="token punctuation">]</span>, length 0
+3 packets captured
+10 packets received by filter
+0 packets dropped by kernel<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>[3] 网络过滤</strong></p>
+<ul>
+<li><code>tcpdump -i eth1 net 192.168</code></li>
+<li><code>tcpdump -i eth1 src net 192.168</code></li>
+<li><code>tcpdump -i eth1 dst net 192.168</code></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 想查看这个源机器和那个目的机器之间的网络包</span>
+设置src-source和dst-destination就好了，tcpdump还支持使用and和or来进行搭配组合呢！
+如果没有设置的话，默认是src or dst。
+
+<span class="token comment" spellcheck="true"># tcpdump -i eth0 'dst 8.8.8.8'</span>
+tcpdump: verbose output suppressed, use -v or -vv <span class="token keyword">for</span> full protocol decode
+listening on eth0, link-type EN10MB <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>, capture size 65535 bytes
+13:21:23.281978 IP 116.255.245.206 <span class="token operator">&amp;</span>gt<span class="token punctuation">;</span> google-public-dns-a.google.com: ICMP <span class="token keyword">echo</span> request, <span class="token function">id</span> 23081, <span class="token function">seq</span> 1, length 64
+13:21:24.286663 IP 116.255.245.206 <span class="token operator">&amp;</span>gt<span class="token punctuation">;</span> google-public-dns-a.google.com: ICMP <span class="token keyword">echo</span> request, <span class="token function">id</span> 23081, <span class="token function">seq</span> 2, length 64
+13:21:25.288612 IP 116.255.245.206 <span class="token operator">&amp;</span>gt<span class="token punctuation">;</span> google-public-dns-a.google.com: ICMP <span class="token keyword">echo</span> request, <span class="token function">id</span> 23081, <span class="token function">seq</span> 3, length 64
+^C
+3 packets captured
+5 packets received by filter
+0 packets dropped by kernel<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>[4] 协议过滤</strong></p>
+<ul>
+<li><code>tcpdump -i eth1 arp</code></li>
+<li><code>tcpdump -i eth1 ip</code></li>
+<li><code>tcpdump -i eth1 tcp</code></li>
+<li><code>tcpdump -i eth1 udp</code></li>
+<li><code>tcpdump -i eth1 icmp</code></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 只想抓UDP的包，不被TCP的包打扰</span>
+可以把udp改为ether、ip、ip6、arp、tcp、rarp等等
+
+<span class="token comment" spellcheck="true"># 为啥这些协议里没有应用层协议呢？</span>
+其实理由很简单，应用层协议非基础类网络协议，经常会新增或淘汰。
+tcpdump不会深入到应用层部分去智能解析，所以你看到的tcpdump支持的protocol都是应用层以下的。
+
+<span class="token comment" spellcheck="true"># tcpdump -i eth0 -c 10 'udp'</span>
+tcpdump: verbose output suppressed, use -v or -vv <span class="token keyword">for</span> full protocol decode
+listening on eth0, link-type EN10MB <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>, capture size 65535 bytes
+11:25:20.801612 IP 116.255.245.48.54808 <span class="token operator">&amp;</span>gt<span class="token punctuation">;</span> 229.111.112.12.csd-mgmt-port: UDP, length 4
+11:25:20.802120 IP 116.255.245.206.54313 <span class="token operator">&amp;</span>gt<span class="token punctuation">;</span> ns.sc.cninfo.net.domain: 5256+ PTR? 12.112.111.229.in-addr.arpa. <span class="token punctuation">(</span>45<span class="token punctuation">)</span>
+11:25:21.145126 IP ns.sc.cninfo.net.domain <span class="token operator">&amp;</span>gt<span class="token punctuation">;</span> 116.255.245.206.54313: 5256 NXDomain 0/0/0 <span class="token punctuation">(</span>45<span class="token punctuation">)</span>
+11:25:21.145315 IP 116.255.245.206.46658 <span class="token operator">&amp;</span>gt<span class="token punctuation">;</span> ns.sc.cninfo.net.domain: 15551+ PTR? 48.245.255.116.in-addr.arpa. <span class="token punctuation">(</span>45<span class="token punctuation">)</span>
+11:25:21.153966 IP 116.255.245.43.62220 <span class="token operator">&amp;</span>gt<span class="token punctuation">;</span> 229.111.112.12.csd-mgmt-port: UDP, length 4
+11:25:21.180135 IP 116.255.245.61.hsrp <span class="token operator">&amp;</span>gt<span class="token punctuation">;</span> all-routers.mcast.net.hsrp: HSRPv0-hello 20: state<span class="token operator">=</span>active group<span class="token operator">=</span>21 addr<span class="token operator">=</span>116.255.245.33
+11:25:21.231151 IP ns.sc.cninfo.net.domain <span class="token operator">&amp;</span>gt<span class="token punctuation">;</span> 116.255.245.206.46658: 15551 NXDomain 0/0/0 <span class="token punctuation">(</span>45<span class="token punctuation">)</span>
+7 packets captured
+8 packets received by filter
+0 packets dropped by kernel<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>[5] 常用表达式</strong></p>
+<ul>
+<li><p>非</p>
+<ul>
+<li><code>!</code> or <code>not</code></li>
+</ul>
+</li>
+<li><p>且</p>
+<ul>
+<li><code>&amp;&amp;</code> or <code>and</code></li>
+</ul>
+</li>
+<li><p>或</p>
+<ul>
+<li><code>||</code> or <code>or</code></li>
+</ul>
+</li>
+<li><p>抓取所有经过 eth1，目的地址是 192.168.1.254 或 192.168.1.200 端口是 80 的 TCP 数据</p>
+<ul>
+<li><code>tcpdump -i eth1 '((tcp) and (port 80) and ((dst host 192.168.1.254) or (dst host 192.168.1.200)))'</code></li>
+</ul>
+</li>
+<li><p>抓取所有经过 eth1，目标 MAC 地址是 00:01:02:03:04:05 的 ICMP 数据</p>
+<ul>
+<li><code>tcpdump -i eth1 '((icmp) and ((ether dst host 00:01:02:03:04:05)))'</code></li>
+</ul>
+</li>
+<li><p>抓取所有经过 eth1，目的网络是 192.168，但目的主机不是 192.168.1.200 的 TCP 数据</p>
+<ul>
+<li><code>tcpdump -i eth1 '((tcp) and ((dst net 192.168) and (not dst host 192.168.1.200)))'</code></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># tcpdump -i eth0 -nn -X 'port 53' -c 1</span>
+tcpdump: verbose output suppressed, use -v or -vv <span class="token keyword">for</span> full protocol decode
+listening on eth0, link-type EN10MB <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>, capture size 65535 bytes
+19:48:33.285838 IP 116.255.245.206.47940 <span class="token operator">&amp;</span>gt<span class="token punctuation">;</span> 8.8.8.8.53: 22768+ A? www.baidu.com. <span class="token punctuation">(</span>31<span class="token punctuation">)</span>
+0x0000: 4500 003b c341 0000 4011 3c93 74ff f5ce E<span class="token punctuation">..</span><span class="token punctuation">;</span>.A<span class="token punctuation">..</span>@.<span class="token operator">&amp;</span>lt<span class="token punctuation">;</span>.t<span class="token punctuation">..</span>.
+0x0010: 0808 0808 bb44 0035 0027 b457 58f0 0100 <span class="token punctuation">..</span><span class="token punctuation">..</span>.D.5.'.WX<span class="token punctuation">..</span>.
+0x0020: 0001 0000 0000 0000 0377 7777 0562 6169 <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.www.bai
+0x0030: 6475 0363 6f6d 0000 0100 01 du.com<span class="token punctuation">..</span><span class="token punctuation">..</span>.
+1 packets captured
+1 packets received by filter
+0 packets dropped by kernel<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="2-协议包头"><a href="#2-协议包头" class="headerlink" title="2. 协议包头"></a>2. 协议包头</h2><blockquote>
+<p><strong>介绍常见的，协议的包头定义格式！</strong></p>
+</blockquote>
+<ul>
+<li><strong>IP 数据报格式</strong></li>
+</ul>
+<p><img src="../images/tcpdump-1.png" alt="Linux下的抓包工具Tcpdump"></p>
+<ul>
+<li><strong>以太网帧格式</strong></li>
+</ul>
+<p><img src="../images/tcpdump-2.png" alt="Linux下的抓包工具Tcpdump"></p>
+<ul>
+<li><strong>TCP 头格式</strong></li>
+</ul>
+<p><img src="../images/tcpdump-3.png" alt="Linux下的抓包工具Tcpdump"></p>
+<ul>
+<li><strong>UDP 头格式</strong></li>
+</ul>
+<p><img src="../images/tcpdump-4.png" alt="Linux下的抓包工具Tcpdump"></p>
+<ul>
+<li><strong>HTTP 协议格式</strong></li>
+</ul>
+<p><img src="../images/tcpdump-5.png" alt="Linux下的抓包工具Tcpdump"></p>
+<p><img src="../images/tcpdump-6.png" alt="Linux下的抓包工具Tcpdump"></p>
+<hr>
+<h2 id="3-包头过滤"><a href="#3-包头过滤" class="headerlink" title="3. 包头过滤"></a>3. 包头过滤</h2><blockquote>
+<p><strong>主要介绍 TCP 和 UDP 协议包头的各个字段的对应含义以及抓取方式！</strong></p>
+</blockquote>
+<p>首先了解如何从包头过滤信息</p>
+<pre class="line-numbers language-bash"><code class="language-bash">proto<span class="token punctuation">[</span>x:y<span class="token punctuation">]</span>          <span class="token keyword">:</span> 过滤从x字节开始的y字节数。比如ip<span class="token punctuation">[</span>2:2<span class="token punctuation">]</span>过滤出3、4字节（第一字节从0开始排）
+proto<span class="token punctuation">[</span>x:y<span class="token punctuation">]</span> <span class="token operator">&amp;</span> z <span class="token operator">=</span> 0  <span class="token keyword">:</span> proto<span class="token punctuation">[</span>x:y<span class="token punctuation">]</span>和z的与操作为0
+proto<span class="token punctuation">[</span>x:y<span class="token punctuation">]</span> <span class="token operator">&amp;</span> z <span class="token operator">!=</span>0  <span class="token keyword">:</span> proto<span class="token punctuation">[</span>x:y<span class="token punctuation">]</span>和z的与操作不为0
+proto<span class="token punctuation">[</span>x:y<span class="token punctuation">]</span> <span class="token operator">&amp;</span> z <span class="token operator">=</span> z  <span class="token keyword">:</span> proto<span class="token punctuation">[</span>x:y<span class="token punctuation">]</span>和z的与操作为z
+proto<span class="token punctuation">[</span>x:y<span class="token punctuation">]</span> <span class="token operator">=</span> z      <span class="token keyword">:</span> proto<span class="token punctuation">[</span>x:y<span class="token punctuation">]</span>等于z
+操作符 <span class="token keyword">:</span> <span class="token operator">></span>, <span class="token operator">&lt;</span>, <span class="token operator">>=</span>, <span class="token operator">&lt;=</span>, <span class="token operator">=</span>, <span class="token operator">!=</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong><code>IP</code>头</strong> ==&gt; 只针对<code>IPv4</code></p>
+<pre class="line-numbers language-bash"><code class="language-bash"> 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ <span class="token operator">|</span>Version<span class="token operator">|</span>  IHL  <span class="token operator">|</span>Type of Service<span class="token operator">|</span>          Total Length         <span class="token operator">|</span>
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ <span class="token operator">|</span>         Identification        <span class="token operator">|</span>Flags<span class="token operator">|</span>      Fragment Offset    <span class="token operator">|</span>
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ <span class="token operator">|</span>  Time to Live <span class="token operator">|</span>    Protocol   <span class="token operator">|</span>         Header Checksum       <span class="token operator">|</span>
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ <span class="token operator">|</span>                       Source Address                          <span class="token operator">|</span>
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ <span class="token operator">|</span>                    Destination Address                        <span class="token operator">|</span>
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ <span class="token operator">|</span>                    Options                    <span class="token operator">|</span>    Padding    <span class="token operator">|</span> <span class="token operator">&lt;</span>-- optional
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ <span class="token operator">|</span>                            DATA <span class="token punctuation">..</span>.                           <span class="token operator">|</span>
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong><code>IP</code>选项设置了吗？</strong></p>
+<ul>
+<li>一般的<code>IP</code>头是<strong>20 字节</strong>，但 IP 头有选项设置，不能直接从偏移 21 字节处读取数据。IP 头有个长度字段可以知道头长度是否大于 20 字节。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"> +-+-+-+-+-+-+-+-+
+ <span class="token operator">|</span>Version<span class="token operator">|</span>  IHL  <span class="token operator">|</span>
+ +-+-+-+-+-+-+-+-+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><p>通常第一个字节的二进制值是：<code>01000101</code>，分成两个部分</p>
+<ul>
+<li><code>0100</code> = 4 表示 IP 版本， <code>0101</code> = 5 表示 IP 头 32 bit 的块数<ul>
+<li>4 x 5 = 20 bytes</li>
+<li>5 x 32 bits = 160 bits</li>
+<li>160 bits / 2 = <code>20 bytes</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>如果<strong>第一字节第二部分的值大于 5</strong>，那么表示头有<strong>IP 选项</strong>，下面介绍两种过滤方法</p>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">方法一 <span class="token operator">==</span><span class="token operator">></span> 比较法
+<span class="token comment" spellcheck="true"># 比较第一字节的值是否大于`01000101`，这可以判断IPv4带IP选项的数据和IPv6的数据。</span>
+<span class="token comment" spellcheck="true"># `01000101`十进制等于`69`，计算方法如下所示</span>
+<span class="token comment" spellcheck="true"># 如果设置了IP选项，那么第一字节是01000110（十进制70）</span>
+<span class="token comment" spellcheck="true"># 过滤规则：`tcpdump -i eth1 'ip[0] > 69'`，IPv6的数据也会匹配</span>
+
+0 <span class="token keyword">:</span> 0  \
+1 <span class="token keyword">:</span> 2^6 <span class="token operator">=</span> 64 \ 第一部分 <span class="token punctuation">(</span>IP版本<span class="token punctuation">)</span>
+0 <span class="token keyword">:</span> 0   /
+0 <span class="token keyword">:</span> 0  /
+-
+0 <span class="token keyword">:</span> 0  \
+1 <span class="token keyword">:</span> 2^2 <span class="token operator">=</span> 4  \ 第二部分 <span class="token punctuation">(</span>头长度<span class="token punctuation">)</span>
+0 <span class="token keyword">:</span> 0   /
+1 <span class="token keyword">:</span> 2^0 <span class="token operator">=</span> 1 /
+64 + 4 + 1 <span class="token operator">=</span> 69<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash">方法二 <span class="token operator">==</span><span class="token operator">></span> 位操作
+<span class="token comment" spellcheck="true"># 正确的过滤方法</span>
+<span class="token comment" spellcheck="true"># (1)tcpdump -i eth1 'ip[0] &amp; 15 > 5'</span>
+<span class="token comment" spellcheck="true"># (2)tcpdump -i eth1 'ip[0] &amp; 0x0f > 5'</span>
+
+0100 0101 <span class="token keyword">:</span> 第一字节的二进制
+0000 1111 <span class="token keyword">:</span> 与操作
+<span class="token operator">&lt;=</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span>
+0000 0101 <span class="token keyword">:</span> 结果<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>分片标记</strong></p>
+<ul>
+<li>当发送端的<code>MTU</code>大于到目的路径链路上的<code>MTU</code>时就会被<code>分片</code>，权威的请参考《TCP/IP 详解》</li>
+<li><code>Fragment Offset</code>字段只有在分片的时候才使用</li>
+<li>要抓<code>Flags</code>中带<code>DF</code>位标记的不分片的包，第七字节的值应该是：<code>01000000 = 64</code></li>
+<li><code>tcpdump -i eth1 'ip[6] = 64'</code>，从<code>0</code>开始编号</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">分片信息在IP头的第七和第八字节
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ <span class="token operator">|</span>Flags<span class="token operator">|</span>      Fragment Offset    <span class="token operator">|</span>
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+Bit 0: 保留，必须是0
+Bit 1: <span class="token punctuation">(</span>DF<span class="token punctuation">)</span> 0 <span class="token operator">=</span> 可能分片, 1 <span class="token operator">=</span> 不分片
+Bit 2: <span class="token punctuation">(</span>MF<span class="token punctuation">)</span> 0 <span class="token operator">=</span> 最后的分片, 1 <span class="token operator">=</span> 还有分片<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>抓分片包</strong></p>
+<ul>
+<li>匹配<code>MF</code>分片包，第七字节的值应该是：<code>00100000 = 32</code><ul>
+<li><code>tcpdump -i eth1 'ip[6] = 32'</code></li>
+</ul>
+</li>
+<li>最后分片包的开始 3 位是 0，但是有<code>Fragment Offset</code>字段</li>
+<li><strong>匹配分片</strong>和<strong>最后分片</strong><ul>
+<li><code>tcpdump -i eth1 '((ip[6:2] &gt; 0) and (not ip[6] = 64))'</code></li>
+</ul>
+</li>
+<li>测试分片可以用如下命令<ul>
+<li><code>ping -M want -s 3000 192.168.1.1</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>匹配小 TTL</strong></p>
+<ul>
+<li><code>TTL</code>字段在第九字节，并且正好是完整的<strong>一个字节</strong>，TTL 最大值是<code>255</code>，二进制为<code>11111111</code>。<ul>
+<li>可以用下面的命令验证一下<ul>
+<li><code>ping -M want -s 3000 -t 256 192.168.1.200</code></li>
+<li><code>ping: ttl 256 out of range</code></li>
+</ul>
+</li>
+<li>在网关可以用下面的命令看看网络中谁在使用<code>traceroute</code><ul>
+<li><code>tcpdump -i eth1 'ip[8] &lt; 5'</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"> +-+-+-+-+-+-+-+-+
+ <span class="token operator">|</span>  Time to Live <span class="token operator">|</span>
+ +-+-+-+-+-+-+-+-+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p><strong>抓大于 X 字节的包</strong></p>
+<ul>
+<li>大于 600 字节<ul>
+<li><code>tcpdump -i eth1 'ip[2:2] &gt; 600'</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>更多的 IP 过滤</strong></p>
+<p>首先还是需要知道 TCP 基本结构，再次推荐《TCP/IP 详解》，卷一就够看的了</p>
+<ul>
+<li><strong>TCP 头</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"> 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ <span class="token operator">|</span>          Source Port          <span class="token operator">|</span>       Destination Port        <span class="token operator">|</span>
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ <span class="token operator">|</span>                        Sequence Number                        <span class="token operator">|</span>
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ <span class="token operator">|</span>                    Acknowledgment Number                      <span class="token operator">|</span>
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ <span class="token operator">|</span>  Data <span class="token operator">|</span>       <span class="token operator">|</span>C<span class="token operator">|</span>E<span class="token operator">|</span>U<span class="token operator">|</span>A<span class="token operator">|</span>P<span class="token operator">|</span>R<span class="token operator">|</span>S<span class="token operator">|</span>F<span class="token operator">|</span>                               <span class="token operator">|</span>
+ <span class="token operator">|</span> Offset<span class="token operator">|</span>  Res. <span class="token operator">|</span>W<span class="token operator">|</span>C<span class="token operator">|</span>R<span class="token operator">|</span>C<span class="token operator">|</span>S<span class="token operator">|</span>S<span class="token operator">|</span>Y<span class="token operator">|</span>I<span class="token operator">|</span>            Window             <span class="token operator">|</span>
+ <span class="token operator">|</span>       <span class="token operator">|</span>       <span class="token operator">|</span>R<span class="token operator">|</span>E<span class="token operator">|</span>G<span class="token operator">|</span>K<span class="token operator">|</span>H<span class="token operator">|</span>T<span class="token operator">|</span>N<span class="token operator">|</span>N<span class="token operator">|</span>                               <span class="token operator">|</span>
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ <span class="token operator">|</span>           Checksum            <span class="token operator">|</span>         Urgent Pointer        <span class="token operator">|</span>
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ <span class="token operator">|</span>                    Options                    <span class="token operator">|</span>    Padding    <span class="token operator">|</span>
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ <span class="token operator">|</span>                             data                              <span class="token operator">|</span>
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><p>抓取源端口大于 1024 的 TCP 数据包</p>
+<ul>
+<li><code>tcpdump -i eth1 'tcp[0:2] &gt; 1024'</code></li>
+</ul>
+</li>
+<li><p>匹配<code>TCP</code>数据包的特殊标记</p>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">TCP标记定义在TCP头的第十四个字节
+ +-+-+-+-+-+-+-+-+
+ <span class="token operator">|</span>C<span class="token operator">|</span>E<span class="token operator">|</span>U<span class="token operator">|</span>A<span class="token operator">|</span>P<span class="token operator">|</span>R<span class="token operator">|</span>S<span class="token operator">|</span>F<span class="token operator">|</span>
+ <span class="token operator">|</span>W<span class="token operator">|</span>C<span class="token operator">|</span>R<span class="token operator">|</span>C<span class="token operator">|</span>S<span class="token operator">|</span>S<span class="token operator">|</span>Y<span class="token operator">|</span>I<span class="token operator">|</span>
+ <span class="token operator">|</span>R<span class="token operator">|</span>E<span class="token operator">|</span>G<span class="token operator">|</span>K<span class="token operator">|</span>H<span class="token operator">|</span>T<span class="token operator">|</span>N<span class="token operator">|</span>N<span class="token operator">|</span>
+ +-+-+-+-+-+-+-+-+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>TCP 三次握手</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">源发送SYN
+目标回答SYN, ACK
+源发送ACK
+
+没女朋友的童鞋要学习一下：
+    1. MM，你的手有空吗？--
+    2. 有空，你呢？\~~
+    3. 我也有空 *_*
+
+失败的loser是酱紫的：
+    1. MM，这是你掉的板砖吗？<span class="token punctuation">(</span>SYN<span class="token punctuation">)</span> ￣▽￣
+    2. 不是，找拍啊？<span class="token punctuation">(</span>RST-ACK<span class="token punctuation">)</span> ˋ﹏ˊ<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><p><strong>只抓 SYN 包，第十四字节是二进制的 00000010，也就是十进制的 2</strong></p>
+<ul>
+<li><code>tcpdump -i eth1 'tcp[13] = 2'</code></li>
+</ul>
+</li>
+<li><p><strong>抓 SYN, ACK （00010010 or 18）</strong></p>
+<ul>
+<li><code>tcpdump -i eth1 'tcp[13] = 18'</code></li>
+</ul>
+</li>
+<li><p><strong>抓 SYN 或者 SYN-ACK</strong></p>
+<ul>
+<li><code>tcpdump -i eth1 'tcp[13] &amp; 2 = 2'</code></li>
+<li>用到了位操作，就是不管 ACK 位是啥。</li>
+</ul>
+</li>
+<li><p><strong>抓 PSH-ACK</strong></p>
+<ul>
+<li><code>tcpdump -i eth1 'tcp[13] = 24'</code></li>
+</ul>
+</li>
+<li><p><strong>抓所有包含 FIN 标记的包（FIN 通常和 ACK 一起，表示幽会完了，回见）</strong></p>
+<ul>
+<li><code>tcpdump -i eth1 'tcp[13] &amp; 1 = 1'</code></li>
+</ul>
+</li>
+<li><p><strong>抓 RST（勾搭没成功，伟大的 greatwall 对她认为有敏感信息的连接发 RST 包，典型的棒打鸳鸯）</strong></p>
+<ul>
+<li><code>tcpdump -i eth1 'tcp[13] &amp; 4 = 4'</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>TCP 各种状态的标记</strong></p>
+<p><img src="../images/tcpdump1.png" alt="Linux下的抓包工具Tcpdump"></p>
+<p><strong>补充知识</strong></p>
+<ul>
+<li><p>这里提供了部分常用的字段偏移名字</p>
+<ul>
+<li><code>icmptype</code> (ICMP 类型字段)</li>
+<li><code>icmpcode</code> (ICMP 符号字段)</li>
+<li><code>tcpflags</code> (TCP 标记字段)</li>
+</ul>
+</li>
+<li><p><code>ICMP</code>类型值有：</p>
+<ul>
+<li>icmp-echoreply</li>
+<li>icmp-unreach</li>
+<li>icmp-sourcequench</li>
+<li>icmp-redirect</li>
+<li>icmp-echo</li>
+<li>icmp-routeradvert</li>
+<li>icmp-routersolicit</li>
+<li>icmp-timxceed</li>
+<li>icmp-paramprob</li>
+<li>icmp-tstamp</li>
+<li>icmp-tstampreply</li>
+<li>icmp-ireq</li>
+<li>icmp-ireqreply</li>
+<li>icmp-maskreq</li>
+<li>icmp-maskreply</li>
+</ul>
+</li>
+<li><p><code>TCP</code>标记值</p>
+<ul>
+<li>tcp-fin</li>
+<li>tcp-syn</li>
+<li>tcp-rst</li>
+<li>tcp-push</li>
+<li>tcp-push</li>
+<li>tcp-ack</li>
+<li>tcp-urg</li>
+</ul>
+</li>
+<li><p><strong>按照 TCP 标记位抓包</strong></p>
+<ul>
+<li>只抓 SYN 包<ul>
+<li><code>tcpdump -i eth1 'tcp[tcpflags] = tcp-syn'</code></li>
+</ul>
+</li>
+<li>抓 SYN, ACK<ul>
+<li><code>tcpdump -i eth1 'tcp[tcpflags] &amp; tcp-syn != 0 and tcp[tcpflags] &amp; tcp-ack != 0'</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>抓 SMTP 数据</strong></p>
+<ul>
+<li><code>tcpdump -i eth1 '((port 25) and (tcp[(tcp[12]&gt;&gt;2):4] = 0x4d41494c))'</code></li>
+<li>抓取数据区开始为”MAIL”的包，”MAIL”的十六进制为 0x4d41494c。</li>
+</ul>
+</li>
+<li><p><strong>抓 HTTP GET 数据</strong></p>
+<ul>
+<li><code>tcpdump -i eth1 'tcp[(tcp[12]&gt;&gt;2):4] = 0x47455420'</code></li>
+<li>“GET “的十六进制是 47455420</li>
+</ul>
+</li>
+<li><p><strong>抓 SSH 返回</strong></p>
+<ul>
+<li><code>tcpdump -i eth1 'tcp[(tcp[12]&gt;&gt;2):4] = 0x5353482D'</code></li>
+<li>“SSH-“的十六进制是 0x5353482D</li>
+</ul>
+</li>
+<li><p><strong>抓老版本的 SSH 返回信息，如”SSH-1.99..”</strong></p>
+<ul>
+<li><code>tcpdump -i eth1 '(tcp[(tcp[12]&gt;&gt;2):4] = 0x5353482D) and (tcp[((tcp[12]&gt;&gt;2)+4):2] = 0x312E)'</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="4-详细注解"><a href="#4-详细注解" class="headerlink" title="4. 详细注解"></a>4. 详细注解</h2><blockquote>
+<p><strong>分析对应协议头部的对应位置展示！</strong></p>
+</blockquote>
+<p>如果是为了查看数据内容，建议用<strong><code>tcpdump -s 0 -w filename</code></strong>把数据包都保存下来，然后用<code>wireshark</code>的<code>Follow TCP Stream/Follow UDP Stream</code>来查看整个会话的内容。</p>
+<p><code>-s 0</code>是抓取完整数据包，否则默认只抓 68 字节。另外，用<code>tcpflow</code>也可以方便的获取<strong>TCP 会话内容</strong>，支持<code>tcpdump</code>的各种表达式。</p>
+<p><strong>UDP 头</strong></p>
+<ul>
+<li>抓 DNS 请求数据<ul>
+<li><code>tcpdump -i eth1 udp dst port 53</code></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">  0      7 8     15 16    23 24    31
+ +--------+--------+--------+--------+
+ <span class="token operator">|</span>     Source      <span class="token operator">|</span>   Destination   <span class="token operator">|</span>
+ <span class="token operator">|</span>      Port       <span class="token operator">|</span>      Port       <span class="token operator">|</span>
+ +--------+--------+--------+--------+
+ <span class="token operator">|</span>                 <span class="token operator">|</span>                 <span class="token operator">|</span>
+ <span class="token operator">|</span>     Length      <span class="token operator">|</span>    Checksum     <span class="token operator">|</span>
+ +--------+--------+--------+--------+
+ <span class="token operator">|</span>                                   <span class="token operator">|</span>
+ <span class="token operator">|</span>              DATA <span class="token punctuation">..</span>.             <span class="token operator">|</span>
+ +-----------------------------------+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>其他选项</strong></p>
+<p><code>-c</code>参数对于运维人员来说也比较常用，因为流量比较大的服务器，靠人工<code>CTRL+C</code>还是抓的太多，甚至导致服务器宕机，于是可以用<code>-c</code>参数指定抓多少个包。</p>
+<ul>
+<li>上面的命令计算抓 10000 个 SYN 包花费多少时间，可以判断访问量大概是多少<ul>
+<li><code>time tcpdump -nn -i eth0 'tcp[tcpflags] = tcp-syn' -c 10000 &gt; /dev/null</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="5-常用选项"><a href="#5-常用选项" class="headerlink" title="5. 常用选项"></a>5. 常用选项</h2><blockquote>
+<p><strong>详细介绍几乎所有 Tcpdump 工具的使用参数和功能特点！</strong></p>
+</blockquote>
+<ul>
+<li><strong>【<code>-i</code>选项】- 指明网卡设备</strong><ul>
+<li>是<code>interface</code>的含义，是指我们有义务告诉<code>tcpdump</code>希望他去监听哪一个网卡。</li>
+<li>这个选项，在我们一台服务器有多块网卡时很有必要。</li>
+</ul>
+</li>
+<li><strong>【<code>-nn</code>选项】- 端口不转换</strong><ul>
+<li>意思是说当<code>tcpdump</code>遇到协议号或端口号时，不要将这些号码转换成对应的协议名称或端口名称。</li>
+<li>比如，众所周知<code>21</code>端口是<code>FTP</code>端口，我们希望显示 21，而非<code>tcpdump</code>自作聪明的将它显示成<code>FTP</code>。</li>
+</ul>
+</li>
+<li><strong>【<code>-X</code>选项】- 显示原始数据</strong><ul>
+<li>告诉<code>tcpdump</code>命令，需要把协议头和包内容都原原本本的显示出来。（tcpdump 会以<code>16进制</code>和<code>ASCII</code>的形式显示），这在进行协议分析时是绝对的利器。</li>
+</ul>
+</li>
+<li><strong>【<code>-c</code>选项】- 抓取数据数量</strong><ul>
+<li>是<code>count</code>的含义，这设置了我们希望<code>tcpdump</code>帮我们抓几个包。</li>
+<li>设置的是 1，所以<code>tcpdump</code>不会帮我再多抓那怕一个包回来。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<ul>
+<li><strong>【<code>-t</code>选项】- 输出时不打印时间戳</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># tcpdump -i eth0 -c 1</span>
+tcpdump: verbose output suppressed, use -v or -vv <span class="token keyword">for</span> full protocol decode
+listening on eth0, link-type EN10MB <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>, capture size 65535 bytes
+10:37:21.843233 IP 172.16.242.168.37490 <span class="token operator">></span> 180.97.33.108.https: Flags <span class="token punctuation">[</span>.<span class="token punctuation">]</span>, ack 689150289, win 16616, length 0
+1 packets captured
+466 packets received by filter
+435 packets dropped by kernel
+
+<span class="token comment" spellcheck="true"># tcpdump -i eth0 -c 1 -t</span>
+tcpdump: verbose output suppressed, use -v or -vv <span class="token keyword">for</span> full protocol decode
+listening on eth0, link-type EN10MB <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>, capture size 65535 bytes
+IP 172.16.242.168.49653 <span class="token operator">></span> 172.16.242.2.domain: 13085+ A? safebrowsing.google.com. <span class="token punctuation">(</span>41<span class="token punctuation">)</span>
+1 packets captured
+144 packets received by filter
+113 packets dropped by kernel<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<ul>
+<li><strong>【<code>-v</code>选项】- 输出更详细的信息</strong><ul>
+<li>加了<code>-v</code>选项之后，在原有输出的基础之上，你还会看到<code>tos</code>值、<code>ttl</code>值、<code>id</code>值、<code>len</code>总长度、<code>checknum</code>校验值等。</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># tcpdump -i eth0 -c 1</span>
+tcpdump: verbose output suppressed, use -v or -vv <span class="token keyword">for</span> full protocol decode
+listening on eth0, link-type EN10MB <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>, capture size 65535 bytes
+10:39:37.165046 IP 172.16.242.168.52751 <span class="token operator">></span> 117.34.37.33.https: Flags <span class="token punctuation">[</span>P.<span class="token punctuation">]</span>, <span class="token function">seq</span> 442060690:442060731, ack 2316077603, win 17688, length 41
+1 packets captured
+151 packets received by filter
+120 packets dropped by kernel
+
+<span class="token comment" spellcheck="true"># tcpdump -i eth0 -c 1 -v</span>
+tcpdump: listening on eth0, link-type EN10MB <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>, capture size 65535 bytes
+10:40:13.260016 IP <span class="token punctuation">(</span>tos 0x0, ttl 64, <span class="token function">id</span> 9853, offset 0, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto TCP <span class="token punctuation">(</span>6<span class="token punctuation">)</span>, length 40<span class="token punctuation">)</span>
+    172.16.242.168.37502 <span class="token operator">></span> 180.97.33.108.https: Flags <span class="token punctuation">[</span>.<span class="token punctuation">]</span>, <span class="token function">cksum</span> 0x4fca <span class="token punctuation">(</span>correct<span class="token punctuation">)</span>, ack 156783245, win 16616, length 0
+1 packets captured
+6 packets received by filter
+0 packets dropped by kernel<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<ul>
+<li><strong>【<code>-F</code>选项】- 指定过滤表达式所在的文件</strong><ul>
+<li>还记得我们在第一招中所提到的命令么，我帮助大家回忆一下：<ul>
+<li><code>tcpdump -i eth0 -nn -X 'port 53' -c 1</code></li>
+</ul>
+</li>
+<li>这里面的<code>'port 53'</code>便叫做<strong>过滤表达式</strong>，用于设置我们抓包的条件的，只有满足过滤条件的网络包，才会被抓过来。当这个过滤条件非常<strong>复杂</strong>，或者我们需要将一个过滤条件固化下来复用的时候，就会想到把它存到一个<strong>文本文件</strong>中。此时，<code>-F</code>选项就会派上用场。</li>
+<li>我们建立了一个<code>filter.txt</code>文本文件来存储过滤表达式，然后通过<code>-F</code>来指定<code>filter.txt</code>，这样<code>tcpdump</code>就会心知肚明地读取<code>filter.txt</code>中的内容作为过滤条件。</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># cat filter.txt</span>
+port 53
+
+<span class="token comment" spellcheck="true"># tcpdump -i eth0 -c 1 -t -F filter.txt</span>
+tcpdump: verbose output suppressed, use -v or -vv <span class="token keyword">for</span> full protocol decode
+listening on eth0, link-type EN10MB <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>, capture size 65535 bytes
+IP 116.255.245.206.54357 <span class="token operator">&amp;</span>gt<span class="token punctuation">;</span> ns.sc.cninfo.net.domain: 36720+ A? www.baidu.com. <span class="token punctuation">(</span>31<span class="token punctuation">)</span>
+1 packets captured
+6 packets received by filter
+0 packets dropped by kernel<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<ul>
+<li><strong>【<code>-w</code>选项】- 将流量保存到文件中</strong><ul>
+<li>通过下面的例子可以看到，通过<code>-w</code>选项将流量都存储在了<code>flowdata</code>文件中了。大家是否有兴趣<code>less</code>下<code>flowdata</code>，看看里面都是什么东东？悲剧，原来都是<code>二进制格式</code>的，无法直接通过文本方式查看。</li>
+<li><code>tcpdump</code>的<code>-w</code>方式是把<code>raw packets</code>（原始网络包）直接存储到文件中了，也就是存储的都是结构体形式，而非是分析之后的文本格式的信息，因此大家是无法直接通过<code>less</code>命令查看的。那么，怎么查看呢？大家想必也想到了，就是用<code>-r</code>选项。</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># tcpdump -i eth0 -w flowdata</span>
+tcpdump: listening on eth0, link-type EN10MB <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>, capture size 65535 bytes
+^C327 packets captured
+327 packets received by filter
+0 packets dropped by kernel<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># less flowdata</span>
+<span class="token string">"flowdata"</span> may be a binary file. See it anyway?<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<ul>
+<li><strong>【<code>-r</code>选项】- 读取 raw packets 文件</strong><ul>
+<li>其实上面的命令就是在不知不觉中进行了<strong>流量回放</strong>，你会发现网络包被<strong>抓</strong>的速度都按照历史进行了回放，真像一个时光机 ！</li>
+<li>由于是按<code>raw packets</code>来存储的，所以你完全可以使用<code>-e</code>、<code>-l</code>和<code>过滤表达式</code>来对输出信息进行控制，十分方便。</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># tcpdump -r flowdata</span>
+reading from <span class="token function">file</span> flowdata, link-type EN10MB <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>
+10:45:23.455758 IP 172.16.242.168.40058 <span class="token operator">></span> 117.34.37.32.https: Flags <span class="token punctuation">[</span>P.<span class="token punctuation">]</span>, <span class="token function">seq</span> 2287886069:2287886114, ack 956870133, win 65535, length 45
+10:45:23.456117 IP 117.34.37.32.https <span class="token operator">></span> 172.16.242.168.40058: Flags <span class="token punctuation">[</span>.<span class="token punctuation">]</span>, ack 45, win 64240, length 0
+10:45:23.456565 IP 172.16.242.168.40058 <span class="token operator">></span> 117.34.37.32.https: Flags <span class="token punctuation">[</span>P.<span class="token punctuation">]</span>, <span class="token function">seq</span> 45:76, ack 1, win 65535, length 31
+10:45:23.456721 IP 117.34.37.32.https <span class="token operator">></span> 172.16.242.168.40058: Flags <span class="token punctuation">[</span>.<span class="token punctuation">]</span>, ack 76, win 64240, length 0
+10:45:23.456900 IP 172.16.242.168.40058 <span class="token operator">></span> 117.34.37.32.https: Flags <span class="token punctuation">[</span>F.<span class="token punctuation">]</span>, <span class="token function">seq</span> 76, ack 1, win 65535, length 0
+10:45:23.457045 IP 117.34.37.32.https <span class="token operator">></span> 172.16.242.168.40058: Flags <span class="token punctuation">[</span>.<span class="token punctuation">]</span>, ack 77, win 64239, length 0
+10:45:23.467109 IP 117.34.37.32.https <span class="token operator">></span> 172.16.242.168.40058: Flags <span class="token punctuation">[</span>FP.<span class="token punctuation">]</span>, <span class="token function">seq</span> 1, ack 77, win 64239, length 0
+10:45:23.467143 IP 172.16.242.168.40058 <span class="token operator">></span> 117.34.37.32.https: Flags <span class="token punctuation">[</span>.<span class="token punctuation">]</span>, ack 2, win 52724, length 0
+10:45:26.407157 IP 172.16.242.168.48750 <span class="token operator">></span> 172.16.242.2.domain: 14588+ A? www.baidu.com. <span class="token punctuation">(</span>31<span class="token punctuation">)</span>
+10:45:26.407495 IP 172.16.242.168.48750 <span class="token operator">></span> 172.16.242.2.domain: 60890+ AAAA? www.baidu.com. <span class="token punctuation">(</span>31<span class="token punctuation">)</span>
+10:45:26.408853 IP 172.16.242.168.46443 <span class="token operator">></span> 172.16.242.2.domain: 21719+ A? www.baidu.com. <span class="token punctuation">(</span>31<span class="token punctuation">)</span>
+10:45:26.411392 IP 172.16.242.168.52147 <span class="token operator">></span> 172.16.242.2.domain: 55202+ A? ss1.bdstatic.com. <span class="token punctuation">(</span>34<span class="token punctuation">)</span>
+10:45:26.411578 IP 172.16.242.168.52147 <span class="token operator">></span> 172.16.242.2.domain: 65317+ AAAA? ss1.bdstatic.com. <span class="token punctuation">(</span>34<span class="token punctuation">)</span>
+10:45:26.417304 IP 172.16.242.2.domain <span class="token operator">></span> 172.16.242.168.48750: 60890 1/1/0 CNAME www.a.shifen.com. <span class="token punctuation">(</span>115<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<ul>
+<li><strong>【<code>-e</code>选项】- 增加以太网帧头部信息输出</strong><ul>
+<li>在刚才加<code>-e</code>选项的输出中，会发现有<code>oui Unknown</code>的字样，这<code>oui</code>是什么东东呢？</li>
+<li><code>OUI</code>，即<code>Organizationally unique identifier</code>，是<strong>组织唯一标识符</strong>。在任何一块网卡（<code>NIC</code>）中烧录的<code>6</code>字节<code>MAC地址</code>中，前 3 个字节体现了 OUI，其表明了 NIC 的制造组织。通常情况下，该标识符是唯一的。</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># tcpdump -i eth0 -c 1</span>
+tcpdump: verbose output suppressed, use -v or -vv <span class="token keyword">for</span> full protocol decode
+listening on eth0, link-type EN10MB <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>, capture size 65535 bytes
+10:20:51.886750 IP 172.16.242.168.46570 <span class="token operator">></span> 172.16.242.2.domain: 603+ A? wiki.centos.org. <span class="token punctuation">(</span>33<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># tcpdump -i eth0 -c 1 -e</span>
+tcpdump: verbose output suppressed, use -v or -vv <span class="token keyword">for</span> full protocol decode
+listening on eth0, link-type EN10MB <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>, capture size 65535 bytes
+10:21:10.790558 00:0c:29:4a:40:c3 <span class="token punctuation">(</span>oui Unknown<span class="token punctuation">)</span> <span class="token operator">></span> 00:50:56:f7:3f:ff <span class="token punctuation">(</span>oui Unknown<span class="token punctuation">)</span>, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length 1095: 172.16.242.168.37312 <span class="token operator">></span> 180.97.33.108.https: Flags <span class="token punctuation">[</span>P.<span class="token punctuation">]</span>, <span class="token function">seq</span> 2109242280:2109243321, ack 2118171162, win 63000, length 1041<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>如果还是看不懂，说明你忘记了<strong>以太网协议的头格式</strong>，我再这里补充下，帮大家回忆回忆。</li>
+</ul>
+<pre class="line-numbers language-cpp"><code class="language-cpp"><span class="token keyword">struct</span> sniff_ethernet <span class="token punctuation">{</span>
+<span class="token comment" spellcheck="true">/* 目的主机的地址 */</span>
+u_char ether_dhost<span class="token punctuation">[</span>ETHER_ADDR_LEN<span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">/* 源主机的地址 */</span>
+u_char ether_shost<span class="token punctuation">[</span>ETHER_ADDR_LEN<span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">/* IP? ARP? RARP? etc */</span>
+u_short ether_type<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<ul>
+<li><strong>【<code>-l</code>选项】- 使得输出变为行缓冲</strong><ul>
+<li>选项<code>-l</code>的作用就是将<code>tcpdump</code>的输出变为<strong>行缓冲</strong>方式，这样可以确保<code>tcpdump</code>遇到的内容一旦是换行符即将缓冲的内容输出到标准输出，以便于利用管道或重定向方式来进行后续处理。</li>
+<li>众所周知，<code>Linux/UNIX</code>的标准<code>I/O</code>提供了<strong>全缓冲</strong>、<strong>行缓冲</strong>和<strong>无缓冲</strong>三种缓冲方式。标准错误是不带缓冲的，终端设备常为行缓冲，而其他情况默认都是全缓冲的。</li>
+<li>大家在使用<code>tcpdump</code>时，有时会有这样的需求：对于 tcpdump 输出的内容，提取每一行的第一个域，即<strong>时间域</strong>，并输出出来，为后续统计所用，这种场景下，我们就需要使用到<code>-l</code>来将默认的全缓冲变为行缓冲了。</li>
+<li>如果不加<code>-l</code>选项，那么只有全缓冲区满，才会输出一次，这样不仅会导致输出是间隔不顺畅的，而且当你<code>ctrl-c</code>时，很可能会断到一行的半截，损坏统计数据的完整性。</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># tcpdump -i eth0 -l |awk '{print $1}'</span>
+tcpdump: verbose output suppressed, use -v or -vv <span class="token keyword">for</span> full protocol decode
+listening on eth0, link-type EN10MB <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>, capture size 65535 bytes
+22:56:57.571680
+22:56:57.572103
+22:56:57.599515
+22:56:57.706286
+22:56:57.888108
+22:56:57.888296
+22:56:57.973546
+22:56:57.973768
+22:56:57.975660
+22:56:58.019052
+22:56:58.019318
+^C146 packets captured
+161 packets received by filter
+0 packets dropped by kernel<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="6-实例演示"><a href="#6-实例演示" class="headerlink" title="6. 实例演示"></a>6. 实例演示</h2><blockquote>
+<p><strong>展示一下使用的使用方式，以备即时即用！</strong></p>
+</blockquote>
+<p>这个 ftp、ftp-data 到底对应哪个端口？除了 ftp/ftp-data，还有哪些服务名称我可以直接用呢？在 Linux 系统中，/etc/services 这个文件里面，就存储着所有知名服务和传输层端口的对应关系。这个对应关系是由 IANA 组织（互联网数字分配机构）来全权负责的，你可以到这个链接互联网数字分配机构通过 Web 方式查到。如果你直接把/etc/services 里的 ftp 对应的端口值从 21 改为了 8888，那么 tcpdump 就会去抓端口含有 8888 的网络包了。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 抓取通过eth0网卡且来源是wsescape.com服务器</span>
+tcpdump -i eth0 <span class="token string">'host wsescape.com'</span>
+
+<span class="token comment" spellcheck="true"># 抓取通过eth0网卡且wsescape.com和baidu.com和google.com之间通讯的网络包</span>
+tcpdump -i eth0 <span class="token string">'host wsescape.com and (baidu.com or google.com)'</span>
+
+<span class="token comment" spellcheck="true"># 抓取使用ftp端口和ftp数据端口的网络包</span>
+tcpdump <span class="token string">'port ftp or ftp-data'</span>
+
+<span class="token comment" spellcheck="true"># 抓取wsescape.com和baidu.com之间建立TCP三次握手中第一个网络包</span>
+<span class="token comment" spellcheck="true"># 即带有SYN标记位的网络包，另外，目的主机不能是qiyi.com</span>
+tcpdump <span class="token string">'tcp[tcpflags] &amp; tcp-syn != 0 and not dst host qiyi.com'</span>
+
+<span class="token comment" spellcheck="true"># 打印IP包长超过576字节的网络包</span>
+tcpdump <span class="token string">'ip[2:2] > 576'</span>
+
+<span class="token comment" spellcheck="true"># 打印广播包或多播包，同时数据链路层不是通过以太网媒介进行的</span>
+tcpdump <span class="token string">'ether[0] &amp; 1 = 0 and ip[16] >= 224'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><p><strong>ip[0] &amp; 0xf0 != 5</strong></p>
+<ul>
+<li>IP 协议的第 0-4 位表示 IP 版本号，可以是 IPv4（值为 0100）或者 IPv6（0110）。IP 协议的第 5-8 位表示首部长度，单位是 4 字节，如果首部长度为默认的 20 字节(4 * 5)的话，此值应为 5，即 0101。ip[0]则是取这两个域的合体。0xf 中的 0x 表示十六进制，f0 是十六进制数，转换成 8 位的二进制数是 0000 1111。而 5 是一个十进制数，它转换成 8 位二进制数为 0000 0101。有了上面这些分析很清楚的知道，语句中!=的左侧部分就是提取 IP 包首部长度域，如果首部长度不等于 5，就满足过滤条件。言下之意也就是说，要求 IP 包的首部中含有可选字段。</li>
+</ul>
+</li>
+<li><p><strong>ip[0] &amp; 0x0f == 4</strong></p>
+<ul>
+<li>经过上述的例子很清楚的知道，这样例子是想判断 IP 版本号是否为 IPv4。大家可能已经有所体会，在写过滤表达式时，你需要把协议格式完全背在脑子里，才能把表达式写对。可这对大多数人来说，可能有些困难。为了让 tcpdump 工具更人性化一些，有一些常用的偏移量，可以通过一些名称来代替。比如 icmptype 表示 ICMP 协议的类型域、icmpcode 表示 ICMP 的 code 域，tcpflags 则表示 TCP 协议的标志字段域。如果一个过滤表达式有多个过滤条件，那么就需要使用逻辑符了，其中，!或 not 都可以表示否定，&amp;&amp;与 and 都可以表示与，而||与 or 都可以表示或。</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 分析下面这三个语句来加深记忆</span>
+tcpdump <span class="token string">'tcp[tcpflags] &amp; tcp-syn != 0 and not dst host qiyi.com'</span>
+tcpdump <span class="token string">'ip[2:2] > 576'</span>
+tcpdump <span class="token string">'ether[0] &amp; 1 = 0 and ip[16] >= 224'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="7-独门秘籍"><a href="#7-独门秘籍" class="headerlink" title="7. 独门秘籍"></a>7. 独门秘籍</h2><blockquote>
+<p><strong>独门秘籍，非你莫属！</strong></p>
+</blockquote>
+<ul>
+<li>使用-A 选项，则 tcpdump 只会显示 ASCII 形式的数据包内容，不会再以十六进制形式显示</li>
+<li>使用-XX 选项，则 tcpdump 会从以太网部分就开始显示网络包内容，而不是仅从网络层协议开始显示</li>
+<li>使用-D 选项，则 tcpdump 会列出所有可以选择的抓包对象</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># tcpdump -D</span>
+1.eth0
+2.any <span class="token punctuation">(</span>Pseudo-device that captures on all interfaces<span class="token punctuation">)</span>
+3.lo<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>如果想查看哪些 ICMP 包中“目标不可达、主机不可达”的包，请使用这样的过滤表达式 icmp[0:2]==0x0301</li>
+<li>要提取 TCP 协议的 SYN、ACK、FIN 标识字段，请使用这样的过滤表达式</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># SYN</span>
+tcp<span class="token punctuation">[</span>tcpflags<span class="token punctuation">]</span> <span class="token operator">&amp;</span> tcp-syn
+
+<span class="token comment" spellcheck="true"># ACK</span>
+tcp<span class="token punctuation">[</span>tcpflags<span class="token punctuation">]</span> <span class="token operator">&amp;</span> tcp-ack
+
+<span class="token comment" spellcheck="true"># FIN</span>
+tcp<span class="token punctuation">[</span>tcpflags<span class="token punctuation">]</span> <span class="token operator">&amp;</span> tcp-fin<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>要提取 TCP 协议里的 SYN-ACK 数据包，不但可以使用上面的方法，也可以直接使用最本质的方法 tcp[13]==18</li>
+<li>如果要抓取一个区间内的端口，可以使用 portrange 语法：<code>tcpdump -i eth0 -nn 'portrange 52-55' -c 1 -XX</code></li>
+</ul>
+<hr>
+<h2 id="8-输出分析"><a href="#8-输出分析" class="headerlink" title="8. 输出分析"></a>8. 输出分析</h2><blockquote>
+<p><strong>分析 Tcpdump 到底输入了些什么内容！</strong></p>
+</blockquote>
+<ul>
+<li>现在，我们对于开头抓取的包进行彻底的剖析，来深入理解其内容。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># tcpdump -i eth0 -nn -X 'port 53' -c 1</span>
+tcpdump: verbose output suppressed, use -v or -vv <span class="token keyword">for</span> full protocol decode
+listening on eth0, link-type EN10MB <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>, capture size 65535 bytes
+19:48:33.285838 IP 116.255.245.206.47940 <span class="token operator">&amp;</span>gt<span class="token punctuation">;</span> 8.8.8.8.53: 22768+ A? www.baidu.com. <span class="token punctuation">(</span>31<span class="token punctuation">)</span>
+0x0000: 4500 003b c341 0000 4011 3c93 74ff f5ce E<span class="token punctuation">..</span><span class="token punctuation">;</span>.A<span class="token punctuation">..</span>@.<span class="token operator">&amp;</span>lt<span class="token punctuation">;</span>.t<span class="token punctuation">..</span>.
+0x0010: 0808 0808 bb44 0035 0027 b457 58f0 0100 <span class="token punctuation">..</span><span class="token punctuation">..</span>.D.5.'.WX<span class="token punctuation">..</span>.
+0x0020: 0001 0000 0000 0000 0377 7777 0562 6169 <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.www.bai
+0x0030: 6475 0363 6f6d 0000 0100 01 du.com<span class="token punctuation">..</span><span class="token punctuation">..</span>.
+1 packets captured
+1 packets received by filter
+0 packets dropped by kernel<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>【第 1 行】</strong><ul>
+<li>这一行，简单易懂，就是说你的命令里没有用到-v 和-vv，如果希望看到更全的输出内容，可以使用这两个选项。如果你有兴趣，可以试试，看看加上-vv 后，到底输出内容里会多些什么。</li>
+</ul>
+</li>
+<li><strong>【第 2 行】</strong><ul>
+<li>这一句表示我们监听的是通过 eth0 这个 NIC 设备的网络包，且它的链路层是基于以太网的，要抓的包大小限制是 65535 字节。包大小限制值可以通过-s 选项来设置，如果你要追求高性能，建议把这个值调低，这样可以有效避免在大流量情况下的丢包现象。</li>
+</ul>
+</li>
+<li><strong>【第 3 行】</strong><ul>
+<li><code>19:48:33.285838</code> =&gt; 分别对应着这个包被抓到的时、分、秒、微妙</li>
+<li><code>IP</code> =&gt; 表示这个包在网络层是 IP 包</li>
+<li><code>116.255.245.206.47940</code> =&gt; 表示这个包的源 IP 为 116.255.245.206，源端口为 47940。</li>
+<li><code>&gt;</code> =&gt; 这个大于号表示数据包的传输方向</li>
+<li><code>8.8.8.8.53</code> =&gt; 表示这个包要发向的目的端 IP 是 8.8.8.8，目标端口为 53，也就是我们熟知的 DNS 服务端口</li>
+<li><code>22768+ A? www.baidu.com. (31)</code> =&gt; 这是 DNS 协议的内容，即请求 <a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a> 的 A 纪录</li>
+</ul>
+</li>
+<li><strong>【第 4/5/6/7 行】</strong><ul>
+<li>接下来便是 IP 包的内容了，是除去了以太网之后剩下的内容，其中左侧部分是十六进制内容，右侧部分是相应的 ASCII 码内容。</li>
+</ul>
+</li>
+</ul>
+<p>–</p>
+<ul>
+<li><strong>IP 协议的首部分析</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">0x0000: 4500 003b c341 0000 4011 3c93 74ff f5ce E<span class="token punctuation">..</span><span class="token punctuation">;</span>.A<span class="token punctuation">..</span>@.<span class="token operator">&lt;</span>.t<span class="token punctuation">..</span>.
+0x0010: 0808 0808 bb44 0035 0027 b457 58f0 0100 <span class="token punctuation">..</span><span class="token punctuation">..</span>.D.5.'.WX<span class="token punctuation">..</span>.
+0x0020: 0001 0000 0000 0000 0377 7777 0562 6169 <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.www.bai
+0x0030: 6475 0363 6f6d 0000 0100 01             du.com<span class="token punctuation">..</span><span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p>最外层是 IP 数据包，最开始的 1 字节（8bit）中，前 4bit 表示 IP 的版本，此处为 4，表示这是一个 IPv4 版本的 IP 包<br>后 4bit 表示这 IP 包的首部长度，此处的数字是 5，由于单位是 4 字节，因此可以计算得出这个 IP 包的首部长度是固定的 20 字节</p>
+<pre class="line-numbers language-bash"><code class="language-bash">0x     bite
+45 <span class="token operator">==</span><span class="token operator">></span> 0100 0101<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>在 IP 版本和首部长度之后，接下来的 1 字节（8bit）是 00<br>这是 IP 协议的服务类型域（TOS），由于已经很少使用，因此此处被置为 00</p>
+<pre class="line-numbers language-bash"><code class="language-bash">0x     bite
+00 <span class="token operator">==</span><span class="token operator">></span> 0000 0000<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>后面的 2 字节（16bit）是 003b，表示整个 IP 包的总长度（首部长度+数据长度），单位是字节<br>因此可以知道这个 IP 包的总长度是 59 字节（0x3b 需要转换为十进制）</p>
+<pre class="line-numbers language-bash"><code class="language-bash">0x       十进制
+003b <span class="token operator">==</span><span class="token operator">></span> 59<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>再向下的 2 字节（16bit）是标识域<br>如果 IP 包的大小超过了数据链路层的 MTU 限制，就需要对 IP 包进行分拆，此时就要用这个域来表示哪些包在分拆前是同一组的<br>此处的标识域值为 0xc341</p>
+<pre class="line-numbers language-bash"><code class="language-bash">0x       十进制
+c341 <span class="token operator">==</span><span class="token operator">></span> 49985<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>再继续向向下看，便是 3bit 的标志位<br>最高位为保留位，中间一位为 DF（don’t fragment），最低位为 MF（more fragments）<br>可以看到这三位是用来控制 IP 拆包后的组装所用，由于此包没有拆包，因此这三位都被置为 0</p>
+<pre class="line-numbers language-bash"><code class="language-bash">0x      bite
+<span class="token string">'0'</span> <span class="token operator">==</span><span class="token operator">></span> 000<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>与上面的标志位配合的是紧接着的 13bit 的片偏移，但由于本包没有拆包，因此此域也无用，因此为 0</p>
+<pre class="line-numbers language-bash"><code class="language-bash">0x      bite
+000 <span class="token operator">==</span><span class="token operator">></span> 0 0000 0000 0000<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>紧接着是 8bit 的 TTL（Time To Live，即生存周期），此包的值为 0x40，换算成十进制是 64<br>这表明这个网络包，如果经过了超过 64 个中间路由节点，则认为目的地不可达，中间路由器会将此包抛弃掉</p>
+<pre class="line-numbers language-bash"><code class="language-bash">0x     十进制
+40 <span class="token operator">==</span><span class="token operator">></span> 64<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>继续的 8bit 为协议域，用于指代上一层协议类型<br>此处的值为 0x11，对应十进制的 17，而 17 是 UDP 协议的代号，因此可以知道这个网络包所用的传输层协议是 UDP，而非 TCP<br>TCP 的协议号是 6，ICMP 的协议号是 1</p>
+<pre class="line-numbers language-bash"><code class="language-bash">0x     十进制
+11 <span class="token operator">==</span><span class="token operator">></span> 17<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>接下来的 2 个字节表示 IP 首部校验和，此处计算出来的结果是 3c93</p>
+<pre class="line-numbers language-bash"><code class="language-bash">0x     十进制
+3c93 <span class="token operator">==</span><span class="token operator">></span> 15507<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>再往下就是大家非常熟悉的 4 字节的 IP 源地址，即 74 ff f5 ce，转换成 IP 地址则为 116.255.245.206</p>
+<pre class="line-numbers language-bash"><code class="language-bash">0x            十进制
+74ff f5ce <span class="token operator">==</span><span class="token operator">></span> 116.255.245.206<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>再下面的 4 字节则为 IP 目的地址，即 08 08 08 08，转换成 IP 地址则为 8.8.8.8，这是著名的 Google-DNS 服务器地址<br>至此，网络层 IP 协议的首部 20 字节已经分析完了，再向下我们即将进入传输层 UDP 协议的包分析阶段。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">0x            十进制
+0808 0808 <span class="token operator">==</span><span class="token operator">></span> 8.8.8.8<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<ul>
+<li><strong>UDP 首部解析</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">0x0000: 4500 003b c341 0000 4011 3c93 74ff f5ce E<span class="token punctuation">..</span><span class="token punctuation">;</span>.A<span class="token punctuation">..</span>@.<span class="token operator">&lt;</span>.t<span class="token punctuation">..</span>.
+0x0010: 0808 0808 bb44 0035 0027 b457 58f0 0100 <span class="token punctuation">..</span><span class="token punctuation">..</span>.D.5.'.WX<span class="token punctuation">..</span>.
+0x0020: 0001 0000 0000 0000 0377 7777 0562 6169 <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.www.bai
+0x0030: 6475 0363 6f6d 0000 0100 01             du.com<span class="token punctuation">..</span><span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p>相对于 TCP 包来说，UDP 包的首部还是比较简单的，总共只有 8 个字节，是 UDP 首部部分。UDP 首部的前 2 个字节为源端口，此处为 bb 44，即 47940，而接下来的 2 字节为目的端口，值为 00 35，即 53（DNS 服务）。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">0x       十进制
+bb44 <span class="token operator">==</span><span class="token operator">></span> 47940
+0035 <span class="token operator">==</span><span class="token operator">></span> 53<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>而接下来的 2 字节则表示 UDP 包的总长度（报头+数据部分）<br>此处的值为 00 27，这算成十进制则为 39<br>表示此 UDP 包的总长度为 39 字节，减去首部的 8 字节外，还有 31 字节来存储真正要传输的数据</p>
+<pre class="line-numbers language-bash"><code class="language-bash">0x       十进制
+0027 <span class="token operator">==</span><span class="token operator">></span> 39<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>而 UDP 首部的最后两个字节则是校验和部分，此处的值为 0xb457</p>
+<pre class="line-numbers language-bash"><code class="language-bash">0x       十进制
+b457 <span class="token operator">==</span><span class="token operator">></span> 46167<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<ul>
+<li><strong>数据分析</strong></li>
+</ul>
+<p>再向下的部分，则是应用层协议的内容（本例中是 DNS 协议）了<br>如果你有兴趣，可以继续了解下 DNS 协议、HTTP 协议、FTP 协议等众多的应用层协议<br>这非常有利于大家在学习协议、追查网络问题时，透过现象看本质</p>
+<pre class="line-numbers language-bash"><code class="language-bash">0x0000: 4500 003b c341 0000 4011 3c93 74ff f5ce E<span class="token punctuation">..</span><span class="token punctuation">;</span>.A<span class="token punctuation">..</span>@.<span class="token operator">&lt;</span>.t<span class="token punctuation">..</span>.
+0x0010: 0808 0808 bb44 0035 0027 b457 58f0 0100 <span class="token punctuation">..</span><span class="token punctuation">..</span>.D.5.'.WX<span class="token punctuation">..</span>.
+0x0020: 0001 0000 0000 0000 0377 7777 0562 6169 <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.www.bai
+0x0030: 6475 0363 6f6d 0000 0100 01             du.com<span class="token punctuation">..</span><span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="9-参考资料"><a href="#9-参考资料" class="headerlink" title="9. 参考资料"></a>9. 参考资料</h2><blockquote>
+<p><strong>送人玫瑰，手有余香！</strong></p>
+</blockquote>
+<p><a href="http://roclinux.cn/?p=2474" target="_blank" rel="noopener"><strong>Linux 大棚</strong></a> &gt; <a href="https://www.wains.be/pub/networking/tcpdump_advanced_filters.txt" target="_blank" rel="noopener"><strong>tcpdump advanced filters</strong></a></p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Escape</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://escapelife.github.io/posts/365ce3c5.html">https://escapelife.github.io/posts/365ce3c5.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Escape</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Linux/">
+                                    <span class="chip bg-color">Linux</span>
+                                </a>
+                            
+                                <a href="/tags/Command/">
+                                    <span class="chip bg-color">Command</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/posts/aeb47128.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/crontab.png" class="responsive-img" alt="Linux任务计划与周期性执行">
+                        
+                        <span class="card-title">Linux任务计划与周期性执行</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2017-11-03
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/posts/a5925bc.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/come-on-boy.jpg" class="responsive-img" alt="加油，少年!">
+                        
+                        <span class="card-title">加油，少年!</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2017-10-18
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Wen文所未闻/" class="post-category">
+                                    Wen文所未闻
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Essays/">
+                        <span class="chip bg-color">Essays</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('3'),
+            headingSelector: 'h2, h3, h4, h5'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4, h5').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="764454432"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='list'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">2017</span>
+            <a href="/about" target="_blank">Escape</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">699.3k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2017";
+                    var startMonth = "2";
+                    var startDate = "14";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/EscapeLife" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wenpanhappy@126.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/search.xml", 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

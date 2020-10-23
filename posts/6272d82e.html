@@ -1,0 +1,1633 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Linux安全之iptables的target, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Linux安全之iptables的target | Escape</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Escape</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Escape</div>
+        <div class="logo-desc">
+            
+            听摇滚,但不偏颇;也挺古典,但不安逸
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/EscapeLife" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/EscapeLife" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/linux-learn-iptables-tool-70.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Linux安全之iptables的target</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Linux/">
+                                <span class="chip bg-color">Linux</span>
+                            </a>
+                        
+                            <a href="/tags/Iptables/">
+                                <span class="chip bg-color">Iptables</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                Linux运维之路
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2018-03-15
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2020-07-22
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    3.8k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    15 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <blockquote>
+<p><strong>纸上得来终觉浅，绝知此事要躬行。</strong></p>
+</blockquote>
+<p><code>iptables</code> 是运行在用户空间的应用软件，通过控制 <code>Linux</code> 内核 <code>netfilter</code> 模块，来管理网络数据包的处理和转发。在大部分 <code>Linux</code> 发行版中，可以通过手册页 或 <code>man iptables</code> 获取用户手册。通常 <code>iptables</code> 需要内核模块支持才能运行，此处相应的内核模块通常是 <code>Xtables</code>。</p>
+<p><img src="../images/linux-learn-iptables-tool-70.jpg" alt="Linux安全之iptables的target动作"></p>
+<hr>
+<blockquote>
+<p><strong>注释：更多 IPTABLES 命令的帮助，请查看<a href="https://linux.die.net/man/8/iptables" target="_blank" rel="noopener">官方文档</a> !</strong></p>
+</blockquote>
+<p><img src="../images/linux-learn-iptables-tool-71.png" alt="Linux安全之iptables的target动作"></p>
+<p>我们在 <code>iptables</code> 中使用 <code>target</code> 动作，需要使用 <code>-j</code> 来指定动作，如 <code>ACCEPT</code>、 <code>DROP</code>、 <code>REJECT</code>等。</p>
+<table>
+<thead>
+<tr>
+<th>常用的动作</th>
+<th>动作含义解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ACCEPT</code></td>
+<td>允许数据包通过</td>
+</tr>
+<tr>
+<td><code>DROP</code></td>
+<td>直接丢弃数据包，不给任何回应信息，客户端会感觉请求泥牛入海，直到过了超时时间才会有反应</td>
+</tr>
+<tr>
+<td><code>REJECT</code></td>
+<td>拒绝数据包通过，必要时会给数据发送端一个响应的信息，客户端刚请求就会收到拒绝的信息</td>
+</tr>
+<tr>
+<td><code>SNAT</code></td>
+<td>源地址转换，解决内网用户用同一个公网地址上网的问题</td>
+</tr>
+<tr>
+<td><code>DNAT</code></td>
+<td>目标地址转换，请求响应时需要</td>
+</tr>
+<tr>
+<td><code>MASQUERADE</code></td>
+<td>是 SNAT 的一种特殊形式，适用于动态的、临时会变的 <code>IP</code> 上</td>
+</tr>
+<tr>
+<td><code>REDIRECT</code></td>
+<td>在本机做端口映射</td>
+</tr>
+<tr>
+<td><code>LOG</code></td>
+<td>在/var/log/messages 文件中记录日志信息，然后将数据包传递给下一条规则，也就是说除了记录以外不对数据包做任何其他操作，仍然让下一条规则去匹配</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="1-基本动作"><a href="#1-基本动作" class="headerlink" title="1. 基本动作"></a>1. 基本动作</h2><h3 id="1-1-REJECT-动作"><a href="#1-1-REJECT-动作" class="headerlink" title="1.1 REJECT 动作"></a>1.1 REJECT 动作</h3><ul>
+<li><strong>常用选项</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>动作</th>
+<th>常用选项</th>
+<th>设置提示信息（当对方被拒绝时会提示对方为什么被拒绝）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>REJECT</code></td>
+<td><code>--reject-with</code></td>
+<td><code>icmp-port-unreachable</code> ==&gt; 端口不可达(默认)</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><code>icmp-host-unreachable</code> ==&gt; 主机不可达</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><code>icmp-net-unreachable</code></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><code>icmp-proto-unreachable</code></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><code>icmp-net-prohibited</code></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><code>icmp-host-prohibited</code></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><code>icmp-admin-prohibited</code></td>
+</tr>
+</tbody></table>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将拒绝报文的提示默认为目标端口不可达</span>
+$ <span class="token function">sudo</span> iptables -t filter -A INPUT -j REJECT
+
+<span class="token comment" spellcheck="true"># 将拒绝报文的提示设置为目标主机不可达</span>
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT 2 -j REJECT --reject-with icmp-host-unreachable<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="1-2-LOG-动作"><a href="#1-2-LOG-动作" class="headerlink" title="1.2 LOG 动作"></a>1.2 LOG 动作</h3><ul>
+<li><strong>LOG 动作使用</strong></li>
+</ul>
+<p>使用<strong>LOG 动作</strong>，可以将符合条件的报文的相关信息记录到日志中，但当前报文具体是被接受，还是被拒绝，都由后面的规则控制。换句话说，<strong>LOG 动作</strong>只负责记录匹配到的报文的相关信息，不负责对报文的其他处理，如果想要对报文进行进一步的处理，可以在之后设置具体规则进行进一步的处理。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将发往22号端口的报文相关信息记录在日志中</span>
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp --dport 22 -j LOG
+
+<span class="token comment" spellcheck="true"># 查看日志记录</span>
+$ <span class="token function">sudo</span> <span class="token function">tail</span> -f /var/log/messages<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>但是上例中使用的匹配条件过于宽泛，所以匹配到的报文数量将会非常之多，记录到的信息也不利于分析。所以在使用 <code>LOG</code> 动作时，匹配条件应该尽量写的精确一些，这样冗余的日志信息就会变少，日后分析日志时信息可用程度更高。</p>
+<p>上述规则表示所有发往 <code>22</code> 号端口的 <code>tcp</code> 报文都符合条件，所以都会被记录到日志中，查看 <code>/var/log/messages</code> 即可看到对应报文的相关信息。当然，我们有可以将相关信息记录在指定的文件中，以防止 <code>iptables</code> 的相关信息与其他日志信息相混淆。需要修改 <code>/etc/rsyslog.conf</code> 或者 <code>/etc/syslog.conf</code> 文件，在 <code>rsyslog</code> 配置文件中添加如下配置即可。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报文的相关信息将会被记录到指定文件</span>
+$ <span class="token function">sudo</span> vim /etc/rsyslog.conf
+kern.warning /var/log/iptables.log
+
+<span class="token comment" spellcheck="true"># 重启rsyslog或者syslogd服务</span>
+$ <span class="token function">sudo</span> <span class="token function">service</span> rsyslog restart<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<ul>
+<li><strong>常用选项</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>动作</th>
+<th>常用选项</th>
+<th>指定记录日志的日志级别</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>LOG</code></td>
+<td><code>--log-level</code></td>
+<td><code>emerg</code></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><code>alert</code></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><code>crit</code></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><code>error</code></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><code>warning</code></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><code>notice</code></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><code>info</code></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><code>debug</code></td>
+</tr>
+</tbody></table>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp --dport 22 \
+    -m state --state NEW -j LOG --log-level error<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<table>
+<thead>
+<tr>
+<th>动作</th>
+<th>常用选项</th>
+<th>给记录到的相关信息添加标签之类的信息</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>LOG</code></td>
+<td><code>--log-prefix</code></td>
+<td>以便区分各种记录到的报文信息，方便在分析时进行过滤，字符不能超过 29 个</td>
+</tr>
+</tbody></table>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp --dport 22 \
+    -m state --state NEW -j LOG --log-prefix <span class="token string">"nginx-web-log"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="1-3-MASQUERADE-动作"><a href="#1-3-MASQUERADE-动作" class="headerlink" title="1.3 MASQUERADE 动作"></a>1.3 MASQUERADE 动作</h3><p><strong><code>MASQUERADE</code> 动作</strong>是一个与 <code>SNAT</code> 类似的动作。</p>
+<ul>
+<li>在<strong>CentOS6</strong>中，<strong>MASQUERADE</strong>规则只能存在于<strong>POSTROUTING</strong>链</li>
+<li>在<strong>CentOS7</strong>中，<strong>MASQUERADE</strong>规则只能存在于<strong>POSTROUTING</strong>链与<strong>INPUT</strong>链</li>
+</ul>
+<p>当我们拨号网上时，每次分配的 <code>IP</code> 地址往往不同，不会长期分给我们一个固定的 <code>IP</code> 地址。如果这时，我们想要让内网主机共享公网 <code>IP</code> 上网，就会很麻烦。因为每次 <code>IP</code> 地址发生变化以后，我们都要重新配置 <code>SNAT</code> 规则，这样显示不是很人性化。</p>
+<p>我们通过 <code>MASQUERADE</code> 即可解决这个问题，<code>MASQUERADE</code> 会动态的将源地址转换为可用的 <code>IP</code> 地址，其实与 <code>SNAT</code> 实现的功能完全一致，都是修改源地址，只不过 <code>SNAT</code> 需要指明将报文的源地址改为哪个 <code>IP</code>，而 <code>MASQUERADE</code> 则不用指定明确的 <code>IP</code>，会动态的将报文的源地址修改为指定网卡上可用的 <code>IP</code> 地址。</p>
+<p>下述中，我们指定通过外网网卡出去的报文在经过 <code>POSTROUTING</code> 链时，会自动将报文的源地址修改为外网网卡上可用的 <code>IP</code> 地址，这时，即使外网网卡中的公网 <code>IP</code> 地址发生了改变，也能够正常的、动态的将内部主机的报文的源 <code>IP</code> 映射为对应的公网 <code>IP</code>。</p>
+<p>可以把 <code>MASQUERADE</code> 理解为动态的、自动化的 <code>SNAT</code>，如果没有动态 <code>SNAT</code> 的需求，没有必要使用 <code>MASQUERADE</code>，因为 <code>SNAT</code> 更加高效。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> iptables -t nat -I POSTROUTING -s 10.1.0.0/16 -o eno13344625 -j MASQUERADE<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<hr>
+<h3 id="1-4-REDIRECT-动作"><a href="#1-4-REDIRECT-动作" class="headerlink" title="1.4 REDIRECT 动作"></a>1.4 REDIRECT 动作</h3><p>使用<strong>REDIRECT 动作</strong>可以在本机上进行<strong>端口映射</strong>。</p>
+<ul>
+<li><strong>REDIRECT 规则只能定义在 PREROUTING 链或者 OUTPUT 链中</strong></li>
+</ul>
+<p>经过下述规则映射后，当别的机器访问本机的 <code>80</code> 端口时，报文会被重定向到本机的 <code>8080</code> 端口上。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将本机的80端口映射到本机的8080端口上</span>
+$ <span class="token function">sudo</span> iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="2-扩展动作"><a href="#2-扩展动作" class="headerlink" title="2. 扩展动作"></a>2. 扩展动作</h2><blockquote>
+<p><strong><code>NAT</code></strong>，即网络地址转换 (<code>Network Address Translation</code>)。<code>NAT</code>说白了就是修改报文的<code>IP</code>地址，通常会被集成到路由器、防火墙、或独立的<code>NAT</code>设备中。</p>
+</blockquote>
+<ul>
+<li><strong>SNAT 技术</strong></li>
+<li><strong>DNAT 技术</strong></li>
+</ul>
+<h3 id="2-1-NAT-技术"><a href="#2-1-NAT-技术" class="headerlink" title="2.1 NAT 技术"></a>2.1 NAT 技术</h3><p><strong>【场景 1】隐藏网络内部主机（SNAT）</strong>（内网访问外网）</p>
+<ul>
+<li><strong>场景 1 中，前半段使用了 <code>SNAT</code>，后半段使用了 <code>DNAT</code>。</strong></li>
+</ul>
+<p>当网络内部的主机向网络外部主机发送报文时，报文会经过防火墙或路由器，将报文的<strong>源 IP</strong>修改为防火墙或者路由器的 <code>IP</code> 地址。当其他网络中的主机收到这些报文时，显示的<strong>源 <code>IP</code> 地址则是路由器或者防火墙</strong>的，这样就起到隐藏网络内部主机 <code>IP</code> 的作用。</p>
+<p>当网络内部主机的报文经过路由器时，路由器会维护一张<strong>NAT 表</strong>，表中记录了报文来自于哪个内部主机的哪个进程（内部主机 IP+端口），当报文经过路由器时，路由器会将报文的内部主机源 <code>IP</code> 替换为路由器的 <code>IP</code> 地址，把源端口也映射为某个端口，<code>NAT</code> 表会把这种对应关系记录下来。</p>
+<p><img src="../images/linux-learn-iptables-tool-72.png" alt="Linux安全之iptables的target动作"></p>
+<p>于是，外部主机收到报文时，源 <code>IP</code> 与源端口显示的都是路由的 <code>IP</code> 与端口，当外部网络中的主机进行回应时，外部主机将响应报文发送给路由器，路由器根据刚才<strong>NAT 表</strong>中的映射记录，将响应报文中的目标 <code>IP</code> 与目标端口再改为内部主机的 <code>IP</code> 与端口号，然后再将响应报文发送给内部网络中的主机。整个过程中，外部主机都不知道内部主机的 <code>IP</code> 地址，内部主机还能与外部主机通讯，于是起到了隐藏网络内主机 <code>IP</code> 的作用。</p>
+<p><img src="../images/linux-learn-iptables-tool-73.png" alt="Linux安全之iptables的target动作"></p>
+<p>上述整个过程中，就用到了 <code>NAT</code> 功能，准确的说是用到了<strong>NAPT 功能</strong>。<code>NAPT</code> 是 <code>NAT</code> 的一种，说白了就是<strong>映射报文 <code>IP</code> 地址的同时还会映射其端口号</strong>，就像刚才描述的过程一样。</p>
+<ul>
+<li><strong>NAT</strong><ul>
+<li><strong>SNAT</strong>：内部网络发送报文时，报文的源 <code>IP</code> 会被修改，也就是<strong>源地址转换</strong></li>
+<li><strong>DNAT</strong>：外部网络响应报文时，响应报文的目标 <code>IP</code> 会再次被修改，也就是<strong>目标地址转换</strong></li>
+</ul>
+</li>
+<li><strong>PAT</strong><ul>
+<li><strong>SNAT</strong>：内部网络发送报文时，报文的源 PORT 会被修改，也就是<strong>源端口转换</strong></li>
+<li><strong>DNAT</strong>：外部网络响应报文时，响应报文的目标 PORT 会再次被修改，也就是<strong>目标端口转换</strong></li>
+</ul>
+</li>
+</ul>
+<p><code>SNAT</code> 不仅能够隐藏网内的主机 <code>IP</code>，还能够共享公网 <code>IP</code>，这在 <code>IPV4</code> 地址较为紧张的今天，是非常有用的。</p>
+<hr>
+<p><strong>【场景 2】内部主机对外提供服务（DNAT）</strong>（外网访问内网）</p>
+<ul>
+<li><strong>场景 2 中，前半段使用了 <code>DNAT</code>，后半段使用了 <code>SNAT</code>。</strong></li>
+</ul>
+<p>公司有自己的局域网，网络中有两台主机作为服务器，主机 1 提供 <code>web</code> 服务，主机 2 提供数据库服务，但是这两台服务器在局域网中使用私有 <code>IP</code> 地址，只能被局域网内的主机访问，互联网无法访问到这两台服务器，整个公司只有一个可用的公网 <code>IP</code> 地址。</p>
+<p><img src="../images/linux-learn-iptables-tool-74.png" alt="Linux安全之iptables的target动作"></p>
+<p>我们可以将这个公网 <code>IP</code> 配置到公司的某台主机或路由器上，然后对外宣称这个 <code>IP</code> 地址对外提供<strong>web 服务</strong>与<strong>数据库服务</strong>，于是互联网主机将请求报文发送给这公网 <code>IP</code> 地址。当路由器收到报文后，将报文的目标地址改为对应的私网地址。</p>
+<ul>
+<li>如果报文的目标 <code>IP</code> 与端口号为：<strong>公网 IP+80 端口</strong><ul>
+<li>我们就将报文的目标地址与端口改为 ==&gt; <strong>主机 1 的私网 IP+80 端口</strong></li>
+</ul>
+</li>
+<li>如果报文的目标 <code>IP</code> 与端口号为：<strong>公网 IP+3306 端口</strong><ul>
+<li>我们就将报文的目标地址与端口改为 ==&gt; <strong>主机 2 的私网 IP+3306 端口</strong></li>
+</ul>
+</li>
+</ul>
+<p>当私网中的主机回应对应请求报文时，再将<strong>回应报文的源地址从私网 IP+端口号映射为公网 IP+端口号</strong>，再由路由器或公网主机发送给互联网中的主机。</p>
+<p>其实，不管是 <code>SNAT</code> 还是 <code>DNAT</code>，都起到了隐藏内部主机 <code>IP</code> 的作用。</p>
+<hr>
+<h3 id="2-2-实验环境"><a href="#2-2-实验环境" class="headerlink" title="2.2 实验环境"></a>2.2 实验环境</h3><ul>
+<li>主机 <code>B</code> 有两块网卡分别配置私网 <code>IP</code> 与公网 <code>IP</code></li>
+<li>主机 <code>C</code> 与主机 <code>D</code> 的<strong>网关</strong>都指向主机 <code>B</code> 的私网 <code>IP</code></li>
+</ul>
+<p><img src="../images/linux-learn-iptables-tool-75.png" alt="Linux安全之iptables的target动作"></p>
+<hr>
+<h3 id="2-3-SNAT-动作"><a href="#2-3-SNAT-动作" class="headerlink" title="2.3 SNAT 动作"></a>2.3 SNAT 动作</h3><ul>
+<li>在<strong>CentOS6</strong>中，<strong>SNAT</strong>规则只能存在于<strong>POSTROUTING</strong>链</li>
+<li>在<strong>CentOS7</strong>中，<strong>SNAT</strong>规则只能存在于<strong>POSTROUTING</strong>链与<strong>INPUT</strong>链</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>动作</th>
+<th>常用选项</th>
+<th>选项解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>SNAT</code></td>
+<td><code>--to-source</code></td>
+<td>指定路由器修改之后源地址</td>
+</tr>
+</tbody></table>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 开启Linux主机的核心转发功能</span>
+$ <span class="token function">sudo</span> <span class="token keyword">echo</span> 1 <span class="token operator">></span> /proc/sys/net/ipv4/ip_forward
+
+<span class="token comment" spellcheck="true"># 将10.1.0.0/16网段的主机通过路由器转发出去，源地址改为了路由器的外网地址</span>
+$ <span class="token function">sudo</span> iptables -t nat -I POSTROUTING -s 10.1.0.0/16 -p tcp \
+    -j SNAT --to-source 192.168.1.146<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-4-DNAT-动作"><a href="#2-4-DNAT-动作" class="headerlink" title="2.4 DNAT 动作"></a>2.4 DNAT 动作</h3><ul>
+<li><strong>DNAT</strong>规则只配置在<strong>PREROUTING</strong>链与<strong>OUTPUT</strong>链</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>动作</th>
+<th>常用选项</th>
+<th>选项解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>DNAT</code></td>
+<td><code>--to-destination</code></td>
+<td>指定路由器修改之后目的地址</td>
+</tr>
+</tbody></table>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 开启Linux主机的核心转发功能</span>
+$ <span class="token function">sudo</span> <span class="token keyword">echo</span> 1 <span class="token operator">></span> /proc/sys/net/ipv4/ip_forward
+
+<span class="token comment" spellcheck="true"># 外部网络访问内部主机的远程连接功能，需要配置DNAT</span>
+$ <span class="token function">sudo</span> iptables -t nat -I PREROUTING -d 192.168.1.146 -p tcp \
+    --dport 3389 -j DNAT --to-destination 10.1.0.6:3389
+
+<span class="token comment" spellcheck="true"># 还需要配置相应的SNAT规则</span>
+$ <span class="token function">sudo</span> iptables -t nat -I POSTROUTING -s 10.1.0.0/16 -p tcp \
+    -j SNAT --to-source 192.168.1.146<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="3-实例演示"><a href="#3-实例演示" class="headerlink" title="3. 实例演示"></a>3. 实例演示</h2><h3 id="3-1-网络地址转发"><a href="#3-1-网络地址转发" class="headerlink" title="3.1 网络地址转发"></a>3.1 网络地址转发</h3><blockquote>
+<p>需要内网访问互联网：<strong>[1] NAT Server</strong>（网络层+传输层），<strong>[2] 代理服务器</strong>（应用层）。</p>
+</blockquote>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 转换过程，内网访问互联网，使用tcpdump进行抓包进行验证</span>
+Client<span class="token punctuation">(</span>192.168.20.2<span class="token punctuation">)</span> <span class="token operator">==</span><span class="token operator">></span> <span class="token punctuation">(</span>192.168.20.1<span class="token punctuation">)</span>Nat Server<span class="token punctuation">(</span>172.16.100.9<span class="token punctuation">)</span> <span class="token operator">==</span><span class="token operator">></span> Server<span class="token punctuation">(</span>172.16.100.6<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>转发主机</strong>（路由器或者 NAT 设备）</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># CentOS6，打开核心转发功能</span>
+$ <span class="token function">sudo</span> <span class="token keyword">echo</span> 1 <span class="token operator">></span> /proc/sys/net/ipv4/ip_forward
+
+<span class="token comment" spellcheck="true"># CentOS7，打开核心转发功能</span>
+$ <span class="token function">sudo</span> <span class="token keyword">echo</span> <span class="token string">"net_ipv4_ip_forward = 1"</span> <span class="token operator">></span> /etc/sysctl.d/99-sysctl.conf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 编辑虚拟机，再添加一块网卡，自定义为VMnet2网络适配器</span>
+
+<span class="token comment" spellcheck="true"># 两块网卡</span>
+eno16777739: 172.16.100.9
+eno33554992: 192.168.20.1
+
+<span class="token comment" spellcheck="true"># 添加的网卡配置 [二选一配置]</span>
+$ <span class="token function">sudo</span> <span class="token function">ifconfig</span> eno33554992 192.168.20.1/24 up
+IP addr add 192.168.20.1/24 dev eno33554992<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 在forward链中进行网络防火墙规则设定</span>
+
+<span class="token comment" spellcheck="true"># 只配置web服务</span>
+$ <span class="token function">sudo</span> iptables -F
+$ <span class="token function">sudo</span> iptables -P FORWARD DROP
+$ <span class="token function">sudo</span> iptables -A FORWARD -d 192.168.20.2 -p tcp --dport 80 -j ACCEPT
+$ <span class="token function">sudo</span> iptables -A FORWARD -s 192.168.20.2 -p tcp --sport 80 -j ACCEPT
+
+<span class="token comment" spellcheck="true"># 配置ssh/web服务</span>
+$ <span class="token function">sudo</span> iptables -F
+$ <span class="token function">sudo</span> iptables -A FORWARD -m state --state ESTABLISHED -j ACCEPT
+$ <span class="token function">sudo</span> iptables -A FORWARD -d 192.168.20.2 -p tcp -m multiport \
+    --dports 22,80 -m state --state NEW -j ACCEPT
+
+<span class="token comment" spellcheck="true"># 配置ssh/web/ftp服务</span>
+$ <span class="token function">sudo</span> iptables -F
+$ <span class="token function">sudo</span> modprobe nf_conntrack_ftp
+$ <span class="token function">sudo</span> iptables -R FORWARD 1 -m state --state ESTABLEISHEN,RELATED -j ACCEPT
+$ <span class="token function">sudo</span> iptables -R FORWARD 2 -m -d 192.168.20.2 -p tcp -m multiport \
+    --dports 21,22,80 -m state --state NEW -j ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>外网主机</strong>（外网网关需要指定为转发主机的<code>172.16.100.9</code>地址）</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 单个主机单网卡，172.16.100.6</span>
+$ <span class="token function">sudo</span> <span class="token function">ifconfig</span> eth0 172.16.100.6/16 up
+$ <span class="token function">sudo</span> route add -net 192.168.20.0/24 gw 172.16.100.9<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>内网主机</strong>（内网网关需要指定为转发主机的<code>192.168.20.1</code>地址）</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 单个主机单网卡，网卡连接VMnet2网络适配器，192.168.20.2</span>
+$ <span class="token function">sudo</span> <span class="token function">ifconfig</span> eth0 192.168.20.2/24 up
+$ <span class="token function">sudo</span> route add default gw 192.168.20.1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-2-源地址转换"><a href="#3-2-源地址转换" class="headerlink" title="3.2 源地址转换"></a>3.2 源地址转换</h3><ul>
+<li><strong>模板</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 目的主机不是当前网络的主机进行转发  ExtIP=FIP  请求报文过程  nat表中保存链接追踪</span>
+$ <span class="token function">sudo</span> iptables -t nat -A POSTROUTING -s LocalNET <span class="token operator">!</span> \
+    -d LocalNet -j SNAT --to-source ExtIP
+$ <span class="token function">sudo</span> iptables -t nat -A POSTROUTING -s LocalNET <span class="token operator">!</span> -d LocalNet -j MASQUERADE<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>实例</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> iptables -t nat -A POSTROUTING -s 192.168.20.0/24 <span class="token operator">!</span> \
+    -d 192.168.20.0/24 -j SNAT --to-source 172.16.100.9
+
+<span class="token comment" spellcheck="true"># 拨号上网的话ExtIP是随机的，使用MASQUERADE可以地址伪装</span>
+$ <span class="token function">sudo</span> iptables -t nat -A POSTROUTING -s 192.168.20.0/24 <span class="token operator">!</span> \
+    -d 192.168.20.0/24 -j SNAT --to-source MASQUERADE<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-3-目标地址转换"><a href="#3-3-目标地址转换" class="headerlink" title="3.3 目标地址转换"></a>3.3 目标地址转换</h3><ul>
+<li><strong>模板</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 负载均衡iptables早起支持  IPVS基于十种方式实现负载均衡=LVS</span>
+<span class="token comment" spellcheck="true"># 内网中的主机映射到公网中，让公网可以访问内网主机  响应报文过程  nat表中保存链接追踪</span>
+$ <span class="token function">sudo</span> iptables -t nat -A PREROUTING -d ExtIP -p tcp<span class="token operator">|</span>udp \
+    --dport PORT -j DNAT --to-destination InterSeverIP<span class="token punctuation">[</span>:PORT<span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>实例</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> iptables -t nat -A PREROUTING -d 172.16.100.9 -p tcp \
+    --dport 80 -j DNAT --to-destination 192.168.20.2:8080
+
+$ <span class="token function">sudo</span> iptables -t nat -A PREROUTING -d 172.16.100.9 -p tcp \
+    --dport 20 -j DNAT --to-destination 192.168.20.2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Escape</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://escapelife.github.io/posts/6272d82e.html">https://escapelife.github.io/posts/6272d82e.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Escape</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Linux/">
+                                    <span class="chip bg-color">Linux</span>
+                                </a>
+                            
+                                <a href="/tags/Iptables/">
+                                    <span class="chip bg-color">Iptables</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/posts/ff46f9a5.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/linux-learn-iptables-tool-80.jpg" class="responsive-img" alt="Linux安全之iptables高级特性">
+                        
+                        <span class="card-title">Linux安全之iptables高级特性</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2018-03-21
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                    <a href="/tags/Iptables/">
+                        <span class="chip bg-color">Iptables</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/posts/3783c75c.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/linux-learn-iptables-tool-60.jpg" class="responsive-img" alt="Linux安全之网络防火墙">
+                        
+                        <span class="card-title">Linux安全之网络防火墙</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2018-03-10
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                    <a href="/tags/Iptables/">
+                        <span class="chip bg-color">Iptables</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('3'),
+            headingSelector: 'h2, h3, h4, h5'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4, h5').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="764454432"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='list'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">2017</span>
+            <a href="/about" target="_blank">Escape</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">699.3k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2017";
+                    var startMonth = "2";
+                    var startDate = "14";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/EscapeLife" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wenpanhappy@126.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/search.xml", 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

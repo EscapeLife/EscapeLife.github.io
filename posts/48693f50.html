@@ -1,0 +1,1941 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Linux安全之SSL协议, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Linux安全之SSL协议 | Escape</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Escape</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Escape</div>
+        <div class="logo-desc">
+            
+            听摇滚,但不偏颇;也挺古典,但不安逸
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/EscapeLife" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/EscapeLife" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/linux-learn-ssh-proc.png')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Linux安全之SSL协议</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Linux/">
+                                <span class="chip bg-color">Linux</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                Linux运维之路
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2017-12-15
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2020-07-17
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    4k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    18 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <blockquote>
+<p><strong>纸上得来终觉浅，绝知此事要躬行。</strong></p>
+</blockquote>
+<p><strong>SSL</strong>(<code>Secure Sockets Layer</code> 安全套接字协议)，及其继任者传输层安全(<code>Transport Layer Security</code>，<code>TLS</code>)是为网络通信提供安全及数据完整性的一种安全协议。<code>TLS</code> 与 <code>SSL</code> 在传输层与应用层之间对网络连接进行加密。</p>
+<p><img src="../images/linux-learn-ssh-proc.png" alt="Linux安全之SSL协议"></p>
+<hr>
+<h2 id="1-密码学基础"><a href="#1-密码学基础" class="headerlink" title="1. 密码学基础"></a>1. 密码学基础</h2><p><strong>密码算法和协议</strong></p>
+<ul>
+<li>对称加密</li>
+<li>公钥加密</li>
+<li>单向加密</li>
+<li>认证协议</li>
+</ul>
+<hr>
+<h3 id="1-1-对称加密"><a href="#1-1-对称加密" class="headerlink" title="1.1 对称加密"></a>1.1 对称加密</h3><blockquote>
+<p><strong>对称加密</strong>：加密和解密使用同一个密钥</p>
+</blockquote>
+<p><strong>常见算法</strong></p>
+<ul>
+<li><code>DES</code></li>
+<li><code>3DES</code></li>
+<li><code>AES</code></li>
+<li><code>Blowfish</code></li>
+<li><code>Twofish</code></li>
+<li><code>IDEA</code></li>
+<li><code>RC6</code></li>
+<li><code>CAST5</code></li>
+</ul>
+<p><strong>特性</strong></p>
+<ul>
+<li>加密、解密使用同一个密钥</li>
+<li>将原始数据分割成固定大小的块，逐个进行加密</li>
+</ul>
+<p><strong>缺陷</strong></p>
+<ul>
+<li>密钥过多</li>
+<li>密钥分发</li>
+</ul>
+<hr>
+<h3 id="1-2-公钥加密"><a href="#1-2-公钥加密" class="headerlink" title="1.2 公钥加密"></a>1.2 公钥加密</h3><blockquote>
+<p><strong>公钥加密</strong>：密钥是成对儿出现</p>
+</blockquote>
+<p><strong>常见算法</strong></p>
+<ul>
+<li><code>RSA</code></li>
+<li><code>DSA</code></li>
+<li><code>ELGamal</code></li>
+</ul>
+<p><strong>加密介绍</strong></p>
+<ul>
+<li>公钥<ul>
+<li><code>pubkey</code></li>
+<li>公开给所有人</li>
+</ul>
+</li>
+<li>私钥<ul>
+<li><code>secret key</code></li>
+<li>自己留存，必须保证其私密性</li>
+</ul>
+</li>
+<li>特点<ul>
+<li>用公钥加密的数据，只能使用与之配对儿的私钥解密，反之亦然</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="1-3-单向加密"><a href="#1-3-单向加密" class="headerlink" title="1.3 单向加密"></a>1.3 单向加密</h3><blockquote>
+<p><strong>单向加密</strong>：只能解密，不能解密，提取数据指纹</p>
+</blockquote>
+<p><strong>算法</strong></p>
+<ul>
+<li><code>md5</code>: <code>128bits</code></li>
+<li><code>sha1</code>: <code>160bits</code></li>
+<li><code>sha224</code></li>
+<li><code>sha256</code></li>
+<li><code>sha384</code></li>
+<li><code>sha512</code></li>
+</ul>
+<p><strong>特性</strong></p>
+<ul>
+<li>定长输出</li>
+<li>雪崩效应</li>
+</ul>
+<p><strong>功能</strong></p>
+<ul>
+<li>完整性</li>
+</ul>
+<hr>
+<h3 id="1-4-PKI-和-SSL"><a href="#1-4-PKI-和-SSL" class="headerlink" title="1.4 PKI 和 SSL"></a>1.4 PKI 和 SSL</h3><blockquote>
+<p><strong>PKI</strong>是<code>Public Key Infrastructure</code>首字母的一个缩写，表示公钥基础设施，主要是用于认证的。</p>
+<ul>
+<li><code>X.509</code>定义了证书的结构以及认证协议标准</li>
+<li>现在我们使用的为<code>ssl</code>的第三版</li>
+</ul>
+</blockquote>
+<p><strong>PKI 中的相关角色</strong></p>
+<ul>
+<li>签证机构：<code>CA</code></li>
+<li>注册机构：<code>RA</code></li>
+<li>证书吊销列表：<code>CRL</code></li>
+<li>证书存取库</li>
+</ul>
+<p><strong>X.509</strong></p>
+<ul>
+<li>版本号</li>
+<li>序列号</li>
+<li>签名算法<code>ID</code></li>
+<li>发行者名称</li>
+<li>有效期限</li>
+<li>主体名称</li>
+<li>主体公钥</li>
+<li>发行者惟一标识</li>
+<li>主体的惟一标识</li>
+<li>扩展</li>
+<li>发行者签名</li>
+</ul>
+<p><strong>SSL 版本</strong></p>
+<ul>
+<li><strong><code>SSL</code></strong>：<code>Secure Socket Layer</code></li>
+<li><strong><code>TLS</code></strong>：<code>Transport Layer Security</code><ul>
+<li><code>SSL</code></li>
+<li><code>TLS</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>SSL 的分层设计</strong></p>
+<ul>
+<li>最低层：<ul>
+<li>基础算法原语的实现</li>
+<li><code>aes</code>, <code>rsa</code>, <code>md5</code></li>
+</ul>
+</li>
+<li>向上一层<ul>
+<li>各种算法的实现</li>
+</ul>
+</li>
+<li>再向上一层<ul>
+<li>组合算法实现的半成品</li>
+</ul>
+</li>
+<li>用各种组件拼装而成的种种成品密码学协议/软件<ul>
+<li><code>tls</code>, <code>ssh</code></li>
+</ul>
+</li>
+</ul>
+<p><img src="../images/linux-learn-ssh-proc-1.png" alt="Linux安全之SSL协议"></p>
+<hr>
+<h2 id="2-OpenSSL"><a href="#2-OpenSSL" class="headerlink" title="2. OpenSSL"></a>2. OpenSSL</h2><blockquote>
+<p><strong><code>OpenSSL</code></strong>是一个强大的安全套接字层密码库，囊括主要的密码算法、常用的密钥和证书封装管理功能及<code>SSL</code>协议，并提供丰富的应用程序供测试或其它目的使用。</p>
+<ul>
+<li><code>OpenSSL</code>功能强大，可以进行加解密</li>
+<li><code>OpenSSL</code>也可以进行<code>PKI</code>的认证机制</li>
+</ul>
+</blockquote>
+<p><strong>OpenSSL 有两种运行模式</strong></p>
+<ul>
+<li>交互模式<ul>
+<li>直接输入<code>openssl</code>回车进入交互模式</li>
+</ul>
+</li>
+<li>批处理模式<ul>
+<li>输入带命令选项的<code>openssl</code>进入批处理模式</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-1-openssl-的三个组件"><a href="#2-1-openssl-的三个组件" class="headerlink" title="2.1 openssl 的三个组件"></a>2.1 openssl 的三个组件</h3><ul>
+<li><code>openssl</code><ul>
+<li>多用途的命令行工具</li>
+</ul>
+</li>
+<li><code>libcrypto</code><ul>
+<li>公共加密库，实现了各种各样的加密算法</li>
+</ul>
+</li>
+<li><code>libssl</code><ul>
+<li>也是一个库，实现了<code>ssl</code>及<code>tls</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-2-PKI-中的相关角色"><a href="#2-2-PKI-中的相关角色" class="headerlink" title="2.2 PKI 中的相关角色"></a>2.2 PKI 中的相关角色</h3><ul>
+<li>签证机构：<code>CA</code></li>
+<li>注册机构：<code>RA</code></li>
+<li>证书吊销列表：<code>CRL</code></li>
+<li>证书存取库</li>
+</ul>
+<hr>
+<h3 id="2-3-证书申请及签署步骤"><a href="#2-3-证书申请及签署步骤" class="headerlink" title="2.3 证书申请及签署步骤"></a>2.3 证书申请及签署步骤</h3><ul>
+<li>（1）生成申请请求，需要输出相关信息</li>
+<li>（2）<code>RA</code>核验</li>
+<li>（3）<code>CA</code>签署</li>
+<li>（4）获取证书</li>
+</ul>
+<hr>
+<h3 id="2-4-创建私有-CA-的方法"><a href="#2-4-创建私有-CA-的方法" class="headerlink" title="2.4 创建私有 CA 的方法"></a>2.4 创建私有 CA 的方法</h3><p><strong>实现工具</strong></p>
+<ul>
+<li>创建私有<code>CA</code>的专业开源工具<code>OpenCA</code></li>
+<li>创建私有<code>CA</code>的简要实现工具<code>OpenSSL</code>，这里选择后者</li>
+</ul>
+<p><strong>配置文件</strong></p>
+<ul>
+<li>这里以<code>CentOS6</code>中进行配置</li>
+<li><code>openssl</code>的配置文件：<code>/etc/pki/tls/openssl.cnf</code></li>
+</ul>
+<p><strong>创建私有 CA 的步骤</strong></p>
+<ul>
+<li><strong>(1) 创建所需要的文件</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 服务器上配置</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cd /etc/pki/CA</span>
+<span class="token punctuation">[</span>root@localhost CA<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ls</span>
+certs  crl  newcerts  private
+
+<span class="token punctuation">[</span>root@localhost CA<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># touch index.txt; echo 01 > serial</span>
+<span class="token punctuation">[</span>root@localhost CA<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ls</span>
+certs  crl  index.txt  newcerts  private  serial<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>(2) CA 自签证书</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 服务器上配置</span>
+<span class="token comment" spellcheck="true"># ()表示在子SHELL中运行，不会影响父SHELL的环境，这里生成秘钥对</span>
+<span class="token comment" spellcheck="true"># -new: 生成新证书签署请求</span>
+<span class="token comment" spellcheck="true"># -x509: 专用于CA生成自签证书</span>
+<span class="token comment" spellcheck="true"># -key: 生成请求时用到的私钥文件</span>
+<span class="token comment" spellcheck="true"># -days n: 证书的有效期限</span>
+<span class="token comment" spellcheck="true"># -out /PATH/TO/SOMECERTFILE: 证书的保存路径</span>
+
+<span class="token comment" spellcheck="true"># 创建私钥文件</span>
+<span class="token punctuation">[</span>root@localhost CA<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># (umask 077; openssl genrsa -out /etc/pki/CA/private/cakey.pem 2048)</span>
+Generating RSA private key, 2048 bit long modulus
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>+++
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.+++
+e is 65537 <span class="token punctuation">(</span>0x10001<span class="token punctuation">)</span>
+
+<span class="token punctuation">[</span>root@localhost CA<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ls -l private/</span>
+总用量 4
+-rw-------. 1 root root 1679 6月  26 11:35 cakey.pem
+
+<span class="token comment" spellcheck="true"># 生成CA自签证书，只有CA才可以自签署</span>
+<span class="token comment" spellcheck="true"># 注意这里的Common Name必须和放置CA的主机名一致</span>
+<span class="token punctuation">[</span>root@localhost CA<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># openssl req -new -x509 -key private/cakey.pem -days 7300 -out cacert.pem</span>
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter <span class="token string">'.'</span>, the field will be left blank.
+-----
+Country Name <span class="token punctuation">(</span>2 letter code<span class="token punctuation">)</span> <span class="token punctuation">[</span>XX<span class="token punctuation">]</span>:CN
+State or Province Name <span class="token punctuation">(</span>full name<span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>:Beijing
+Locality Name <span class="token punctuation">(</span>eg, city<span class="token punctuation">)</span> <span class="token punctuation">[</span>Default City<span class="token punctuation">]</span>:Beijing
+Organization Name <span class="token punctuation">(</span>eg, company<span class="token punctuation">)</span> <span class="token punctuation">[</span>Default Company Ltd<span class="token punctuation">]</span>:wsescape
+Organizational Unit Name <span class="token punctuation">(</span>eg, section<span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>:Ops
+Common Name <span class="token punctuation">(</span>eg, your name or your server is hostname<span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>:ca.wsescape.com
+Email Address <span class="token punctuation">[</span><span class="token punctuation">]</span>:caadmin@wsecape.com
+
+<span class="token punctuation">[</span>root@localhost CA<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ls</span>
+cacert.pem  certs  crl  index.txt  newcerts  private  serial<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>(3) 给应用发证书</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># (a) 用到证书的主机生成证书请求</span>
+
+<span class="token comment" spellcheck="true"># 客户端上配置</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cd /etc/httpd/</span>
+<span class="token punctuation">[</span>root@localhost httpd<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># mkdir ssl; cd ssl</span>
+
+<span class="token comment" spellcheck="true"># 生成httpd的私钥文件httpd.key</span>
+<span class="token punctuation">[</span>root@localhost ssl<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># (umask 077; openssl genrsa -out /etc/httpd/ssl/httpd.key 2048)</span>
+
+<span class="token comment" spellcheck="true"># 用httpd.key的私钥文件生成一个公钥文件httpd.csr</span>
+<span class="token comment" spellcheck="true"># 这里填写的数据和服务器中的信息需要一致才可能够使用</span>
+<span class="token punctuation">[</span>root@localhost ssl<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># openssl req -new -key /etc/httpd/ssl/httpd.key -days 365 -out /etc/httpd/ssl/httpd.csr</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># (b) 把请求文件传输给CA</span>
+
+<span class="token comment" spellcheck="true"># 客户端上配置</span>
+<span class="token comment" spellcheck="true"># 172.16.100.6为服务器CA地址</span>
+<span class="token punctuation">[</span>root@localhost ssl<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp httpd.csr root@172.16.100.6:/tmp/</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># (c) CA签署证书，并将证书发还给请求者</span>
+
+<span class="token comment" spellcheck="true"># 服务器上配置</span>
+<span class="token comment" spellcheck="true"># 172.16.100.9为客户端配置</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># openssl ca -in /tmp/httpd.csr -out /etc/pki/CA/certs/httpd.crt -days 365</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp /tmp/httpd.csr root@172.16.100.9:/etc/httpd/ssl/</span>
+
+<span class="token comment" spellcheck="true"># 查看证书中的信息</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># openssl x509 -in /PATH/FROM/CERT_FILE -noout -text|-subject|-serial</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>(4) 吊销证书</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># (a) 客户端获取要吊销的证书的serial</span>
+openssl x509 -in /PATH/FROM/CERT_FILE -noout -serial -subject
+
+<span class="token comment" spellcheck="true"># (b) CA端执行以下步骤</span>
+<span class="token comment" spellcheck="true"># 先根据客户提交的serial与subject信息，对比检验是否与index.txt文件中的信息一致</span>
+<span class="token comment" spellcheck="true"># 吊销证书</span>
+openssl ca -revoke /etc/pki/CA/newcerts/SERIAL.pem
+
+<span class="token comment" spellcheck="true"># (c) 生成吊销证书的编号(第一次吊销一个证书)</span>
+<span class="token keyword">echo</span> 01 <span class="token operator">></span> /etc/pki/CA/crlnumber
+
+<span class="token comment" spellcheck="true"># (d) 更新证书吊销列表</span>
+openssl ca -gencrl -out thisca.crl
+
+<span class="token comment" spellcheck="true"># 查看crl文件</span>
+openssl crl -in /PATH/FROM/CRL_FILE.crl -noout -text<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-5-PKI-的配置文件"><a href="#2-5-PKI-的配置文件" class="headerlink" title="2.5 PKI 的配置文件"></a>2.5 PKI 的配置文件</h3><pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat /etc/pki/tls/openssl.cnf</span>
+<span class="token punctuation">..</span>.
+<span class="token comment" spellcheck="true">####################################################################</span>
+<span class="token punctuation">[</span> ca <span class="token punctuation">]</span>
+default_ca <span class="token operator">=</span> CA_default     <span class="token comment" spellcheck="true"># The default ca section</span>
+<span class="token comment" spellcheck="true">####################################################################</span>
+
+<span class="token punctuation">[</span> CA_default <span class="token punctuation">]</span>
+<span class="token function">dir</span> <span class="token operator">=</span> /etc/pki/CA     <span class="token comment" spellcheck="true"># Where everything is kept</span>
+certs <span class="token operator">=</span> <span class="token variable">$dir</span>/certs    <span class="token comment" spellcheck="true"># Where the issued certs are kept</span>
+crl_dir <span class="token operator">=</span> <span class="token variable">$dir</span>/crl    <span class="token comment" spellcheck="true"># Where the issued crl are kept</span>
+database <span class="token operator">=</span> <span class="token variable">$dir</span>/index.txt  <span class="token comment" spellcheck="true"># database index file.</span>
+<span class="token comment" spellcheck="true">#unique_subject = no       # Set to 'no' to allow creation of</span>
+                           <span class="token comment" spellcheck="true"># several ctificates with same subject.</span>
+
+new_certs_dir <span class="token operator">=</span> <span class="token variable">$dir</span>/newcerts   <span class="token comment" spellcheck="true"># default place for new certs.</span>
+certificate <span class="token operator">=</span> <span class="token variable">$dir</span>/cacert.pem   <span class="token comment" spellcheck="true"># The CA certificate</span>
+serial <span class="token operator">=</span> <span class="token variable">$dir</span>/serial            <span class="token comment" spellcheck="true"># The current serial number</span>
+crlnumber <span class="token operator">=</span> <span class="token variable">$dir</span>/crlnumber      <span class="token comment" spellcheck="true"># the current crl number</span>
+                                <span class="token comment" spellcheck="true"># must be commented out to leave a V1 CRL</span>
+crl <span class="token operator">=</span> <span class="token variable">$dir</span>/crl.pem   <span class="token comment" spellcheck="true"># The current CRL</span>
+private_key <span class="token operator">=</span> <span class="token variable">$dir</span>/private/cakey.pem<span class="token comment" spellcheck="true"># The private key</span>
+RANDFILE <span class="token operator">=</span> <span class="token variable">$dir</span>/private/.rand  <span class="token comment" spellcheck="true"># private random number file</span>
+x509_extensions <span class="token operator">=</span> usr_cert     <span class="token comment" spellcheck="true"># The extentions to add to the cert</span>
+
+<span class="token comment" spellcheck="true"># Comment out the following two lines for the "traditional"</span>
+<span class="token comment" spellcheck="true"># (and highly broken) format.</span>
+name_opt <span class="token operator">=</span> ca_default   <span class="token comment" spellcheck="true"># Subject Name options</span>
+cert_opt <span class="token operator">=</span> ca_default   <span class="token comment" spellcheck="true"># Certificate field options</span>
+
+<span class="token comment" spellcheck="true"># Extension copying option: use with caution.</span>
+<span class="token comment" spellcheck="true"># copy_extensions = copy</span>
+<span class="token comment" spellcheck="true"># Extensions to add to a CRL. Note: Netscape communicator chokes on V2 CRLs</span>
+<span class="token comment" spellcheck="true"># so this is commented out by default to leave a V1 CRL.</span>
+<span class="token comment" spellcheck="true"># crlnumber must also be commented out to leave a V1 CRL.</span>
+<span class="token comment" spellcheck="true"># crl_extensions = crl_ext</span>
+default_days <span class="token operator">=</span> 365      <span class="token comment" spellcheck="true"># how long to certify for</span>
+default_crl_days <span class="token operator">=</span> 30   <span class="token comment" spellcheck="true"># how long before next CRL</span>
+default_md <span class="token operator">=</span> default    <span class="token comment" spellcheck="true"># use public key default MD</span>
+preserve <span class="token operator">=</span> no           <span class="token comment" spellcheck="true"># keep passed DN ordering</span>
+<span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="3-OpenSSL-命令"><a href="#3-OpenSSL-命令" class="headerlink" title="3. OpenSSL 命令"></a>3. OpenSSL 命令</h2><p><strong>分为三类</strong></p>
+<ul>
+<li>标准命令</li>
+<li>消息摘要命令</li>
+<li>加密命令</li>
+</ul>
+<hr>
+<h3 id="3-1-对称加密"><a href="#3-1-对称加密" class="headerlink" title="3.1 对称加密"></a>3.1 对称加密</h3><p><strong>要点</strong></p>
+<ul>
+<li>工具：<code>openssl</code> <code>enc</code>, <code>gpg</code></li>
+<li>算法：<code>3des</code>, <code>aes</code>, <code>blowfish</code>, <code>twofish</code></li>
+</ul>
+<p><strong><code>enc</code>命令</strong></p>
+<ul>
+<li><code>enc</code>是<code>openssl</code>的一个子命令，可以用来实现对称加密</li>
+<li><code>-e</code>加密</li>
+<li><code>-d</code>解密</li>
+<li><code>-salt</code>表示添加杂质进去</li>
+<li><code>-in</code>需要加密或者解密的文件</li>
+<li><code>-out</code>需要输出的文件文件名称</li>
+<li>这里的加密算法可以自己指定</li>
+</ul>
+<p><strong>使用方式</strong></p>
+<ul>
+<li>帮助信息<ul>
+<li><code>man enc</code></li>
+</ul>
+</li>
+<li>加密<ul>
+<li><code>openssl enc -e -des3 -a -salt -in fstab -out fstab.ciphertext</code></li>
+</ul>
+</li>
+<li>解密<ul>
+<li><code>openssl enc -d -des3 -a -salt -in fstab.ciphertext -out fstab</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>实例展示</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost tset<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat mima</span>
+I love you
+
+<span class="token punctuation">[</span>root@localhost tset<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># openssl enc -e -des3 -a -salt -in mima -out jiami</span>
+enter des-ede3-cbc encryption password:
+Verifying - enter des-ede3-cbc encryption password:
+
+<span class="token punctuation">[</span>root@localhost tset<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat jiami</span>
+U2FsdGVkX1+OK5GvMnyeZpST9ncIuIXU9zM+FzdKJmM<span class="token operator">=</span>
+
+<span class="token punctuation">[</span>root@localhost tset<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># openssl enc -d -des3 -a -salt -in jiami -out jiemi</span>
+enter des-ede3-cbc decryption password:
+
+<span class="token punctuation">[</span>root@localhost tset<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat jiemi</span>
+I love you<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-2-单向加密"><a href="#3-2-单向加密" class="headerlink" title="3.2 单向加密"></a>3.2 单向加密</h3><p><strong>工具</strong></p>
+<ul>
+<li><code>md5sum</code></li>
+<li><code>sha1sum</code></li>
+<li><code>sha224sum</code></li>
+<li><code>sha256sum</code></li>
+<li><code>openssl dgst</code></li>
+</ul>
+<p><strong><code>dgst</code>命令</strong></p>
+<ul>
+<li><strong>要点</strong><ul>
+<li><code>dgst</code>命令是<code>openssl</code>的一个子命令，可以用来实现单向加密</li>
+</ul>
+</li>
+<li><strong>帮助</strong><ul>
+<li><code>man dgst</code></li>
+</ul>
+</li>
+<li><strong>格式</strong><ul>
+<li><code>openssl dgst -md5 /PATH/TO/SOMEFILE</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>实战演示</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 这里可以指定-out保存到文件中</span>
+<span class="token punctuation">[</span>root@localhost tset<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># openssl dgst -md5 mima</span>
+MD5<span class="token punctuation">(</span>mima<span class="token punctuation">)</span><span class="token operator">=</span> ffa9b546d36ae095e2a4252a4981a942<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-3-单向加密的用途"><a href="#3-3-单向加密的用途" class="headerlink" title="3.3 单向加密的用途"></a>3.3 单向加密的用途</h3><blockquote>
+<p><strong>单向加密</strong>可以实现下面三种方式的用途</p>
+</blockquote>
+<p><strong>（1）MAC 算法</strong></p>
+<p><strong>特点</strong></p>
+<ul>
+<li><code>Message Authentication Code</code></li>
+<li>单向加密的一种延伸应用，用于实现在网络通信中保证所传输的数据的完整性</li>
+</ul>
+<p><strong>机制</strong></p>
+<ul>
+<li><code>CBC-MAC</code></li>
+<li><code>HMAC</code>：使用<code>md5</code>或<code>sha1</code>算法</li>
+<li>在集群中用于各节点之间认证的加密机制</li>
+</ul>
+<p><strong>（2）生成用户密码</strong></p>
+<p><strong>特点</strong></p>
+<ul>
+<li>使用<code>openssl</code>的子命令<code>passwd</code>实现</li>
+<li>这里加<code>-salt</code>的加密密码就是<code>Linux</code>下给用户设置密码的机制相同</li>
+</ul>
+<p><strong>使用</strong></p>
+<ul>
+<li><strong>帮助</strong><ul>
+<li><code>man sslpasswd</code></li>
+</ul>
+</li>
+<li><strong>格式</strong><ul>
+<li><code>openssl passwd -1 -salt SALT</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>实战演示</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># -1表示MD5</span>
+<span class="token punctuation">[</span>root@localhost tset<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># openssl passwd -1 -salt 123456</span>
+Password:
+<span class="token variable">$1</span><span class="token variable">$123456</span><span class="token variable">$I</span>.fsDBpqtKp/xeL5gqYrz/<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>（3）生成随机数</strong></p>
+<p><strong>使用</strong></p>
+<ul>
+<li><strong>帮助</strong><ul>
+<li><code>man sslrand</code></li>
+</ul>
+</li>
+<li><strong>格式</strong><ul>
+<li><code>openssl rand [-base64|-hex] NUM</code><ul>
+<li><code>-base64</code>表示<code>-base64</code>编码</li>
+<li><code>-hex</code>表示<code>16</code>进制编码</li>
+<li><code>NUM:</code> 表示输出的字节数，除以<code>2</code>就可以当密码啦</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>实战演示</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost tset<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># openssl rand -base64 6</span>
+vZ8Qj7n1
+
+<span class="token punctuation">[</span>root@localhost tset<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># openssl rand -base64 6</span>
+3Wh8exeQ
+
+<span class="token punctuation">[</span>root@localhost tset<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># openssl rand -hex 6</span>
+a1c269b8b1fd
+
+<span class="token punctuation">[</span>root@localhost tset<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># openssl rand -hex 6</span>
+58d677343fb7<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-4-公钥加密"><a href="#3-4-公钥加密" class="headerlink" title="3.4 公钥加密"></a>3.4 公钥加密</h3><blockquote>
+<p><strong>公钥加密</strong>可以实现下面三种方式的用途</p>
+</blockquote>
+<p><strong>（1）加密和解密</strong></p>
+<ul>
+<li>算法<ul>
+<li><code>RSA</code></li>
+<li><code>ELGamal</code></li>
+</ul>
+</li>
+<li>工具<ul>
+<li><code>gpg</code></li>
+<li><code>openssl rsautl</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>（2）数字签名</strong></p>
+<ul>
+<li>算法<ul>
+<li><code>RSA</code></li>
+<li><code>DSA</code></li>
+<li><code>ELGamal</code></li>
+</ul>
+</li>
+<li>工具<ul>
+<li>一般没有必要自己生成</li>
+</ul>
+</li>
+</ul>
+<p><strong>（3）密钥交换</strong></p>
+<ul>
+<li>算法<ul>
+<li><code>dh</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>随机数生成器</strong></p>
+<ul>
+<li><code>/dev/random</code><ul>
+<li>仅从熵池返回随机数</li>
+<li>随机数用尽，阻塞</li>
+</ul>
+</li>
+<li><code>/dev/urandom</code><ul>
+<li>从熵池返回随机数</li>
+<li>随机数用尽，会利用软件生成伪随机数</li>
+<li>非阻塞</li>
+</ul>
+</li>
+</ul>
+<p><strong>实战演示</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 生成密钥对儿，依赖于随机数生成器，需要修改生成的文件权限</span>
+openssl genrsa -out /PATH/TO/PRIVATEKEY.FILE NUM_BITS
+
+<span class="token comment" spellcheck="true"># 提取出公钥</span>
+openssl rsa -in /PATH/FROM/PRIVATEKEY.FILE -pubout<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 生成密钥对儿</span>
+<span class="token punctuation">[</span>root@localhost tset<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># openssl genrsa -out rsakey.private 2048</span>
+Generating RSA private key, 2048 bit long modulus
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>+++
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.+++
+e is 65537 <span class="token punctuation">(</span>0x10001<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 需要修改生成的文件权限</span>
+<span class="token comment" spellcheck="true"># 这里的括号表示在子SHELL中运行，由于在子shell中运行，所以本地的umask不会该表</span>
+<span class="token punctuation">[</span>root@localhost tset<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># (umask 077; openssl genrsa -out rsakey.private 2048)</span>
+Generating RSA private key, 2048 bit long modulus
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>+++
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.+++
+e is 65537 <span class="token punctuation">(</span>0x10001<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 提取出公钥</span>
+<span class="token punctuation">[</span>root@localhost tset<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># openssl rsa -in rsakey.private -pubout</span>
+writing RSA key
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqHk7QIMJ2b1w79YnH+2D
+5RSbRAG6SlFcoDCSbJkXoSewV59QqSxDD4Ctk3oYB5c/TxsbJV+F+2Y31KFgqdZz
+qzaBP+u8cKTmGXiMaOgybrlU/1Jx3+QGiQrLLsh73H/VC5//ymJBApRgeO4C+AWP
+9Eytfn9cer5Ch0XdTsBjYgxV8BO1BrJCfqckdVmxhaIWzaJbPzqulM+sxLN6MNQN
+eAclRMJCp+Sa8dx2amfpCKJS6RstdDh+jg6ryY6sbCAQwIQECBRGhODw1tWwatN4
+mYd4RvQlMwovgef1Aaoh3Q/ZfFycF6o/Gx54VHoQmXdWfSM+JXX6MDvr/GPaBnxv
+QQIDAQAB
+-----END PUBLIC KEY-----<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-5-openssl-的命令帮助"><a href="#3-5-openssl-的命令帮助" class="headerlink" title="3.5 openssl 的命令帮助"></a>3.5 openssl 的命令帮助</h3><pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># openssl的命令帮助</span>
+
+<span class="token comment" spellcheck="true"># 标准命令</span>
+Standard commands
+asn1parse      ca             ciphers        crl            crl2pkcs7
+dgst           dh             dhparam        dsa            dsaparam
+ec             ecparam        enc            engine         errstr
+gendh          gendsa         genrsa         nseq           ocsp
+<span class="token function">passwd</span>         pkcs12         pkcs7          pkcs8          prime
+rand           req            rsa            rsautl         s_client
+s_server       s_time         sess_id        smime          speed
+spkac          verify         version        x509
+
+<span class="token comment" spellcheck="true"># 做信息摘要时候使用的算法，是做单向加密的</span>
+Message Digest commands <span class="token punctuation">(</span>see the dgst <span class="token function">command</span> <span class="token keyword">for</span> <span class="token function">more</span> details<span class="token punctuation">)</span>
+md2            md4            md5            mdc2           rmd160
+sha            sha1
+
+<span class="token comment" spellcheck="true"># 支持的算法</span>
+Cipher commands <span class="token punctuation">(</span>see the enc <span class="token function">command</span> <span class="token keyword">for</span> <span class="token function">more</span> details<span class="token punctuation">)</span>
+aes-128-cbc    aes-128-ecb    aes-192-cbc    aes-192-ecb    aes-256-cbc
+aes-256-ecb    base64         bf             bf-cbc         bf-cfb
+bf-ecb         bf-ofb         cast           cast-cbc       cast5-cbc
+cast5-cfb      cast5-ecb      cast5-ofb      des            des-cbc
+des-cfb        des-ecb        des-ede        des-ede-cbc    des-ede-cfb
+des-ede-ofb    des-ede3       des-ede3-cbc   des-ede3-cfb   des-ede3-ofb
+des-ofb        des3           desx           rc2            rc2-40-cbc
+rc2-64-cbc     rc2-cbc        rc2-cfb        rc2-ecb        rc2-ofb
+rc4            rc4-40         rc5            rc5-cbc        rc5-cfb
+rc5-ecb        rc5-ofb        seed           seed-cbc       seed-cfb
+seed-ecb       seed-ofb<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-6-openssl-应用实例"><a href="#3-6-openssl-应用实例" class="headerlink" title="3.6 openssl 应用实例"></a>3.6 openssl 应用实例</h3><ul>
+<li><strong>（1）消息摘要算法应用例子</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 用SHA1算法计算文件file.txt的哈西值，输出到stdout</span>
+openssl dgst -sha1 file.txt
+
+<span class="token comment" spellcheck="true"># 用SHA1算法计算文件file.txt的哈西值,输出到文件digest.txt</span>
+openssl sha1 -out digest.txt file.txt
+
+<span class="token comment" spellcheck="true"># 用DSS1(SHA1)算法为文件file.txt签名,输出到文件dsasign.bin</span>
+<span class="token comment" spellcheck="true"># 签名的private key必须为DSA算法产生的，保存在文件dsakey.pem中</span>
+openssl dgst -dss1 -sign dsakey.pem -out dsasign.bin file.txt
+
+<span class="token comment" spellcheck="true"># 用dss1算法验证file.txt的数字签名dsasign.bin，</span>
+<span class="token comment" spellcheck="true"># 验证的private key为DSA算法产生的文件dsakey.pem</span>
+openssl dgst -dss1 -prverify dsakey.pem -signature dsasign.bin file.txt
+
+<span class="token comment" spellcheck="true"># 用sha1算法为文件file.txt签名,输出到文件rsasign.bin</span>
+<span class="token comment" spellcheck="true"># 签名的private key为RSA算法产生的文件rsaprivate.pem</span>
+openssl sha1 -sign rsaprivate.pem -out rsasign.bin file.txt
+
+<span class="token comment" spellcheck="true"># 用sha1算法验证file.txt的数字签名rsasign.bin，</span>
+<span class="token comment" spellcheck="true"># 验证的public key为RSA算法生成的rsapublic.pem</span>
+openssl sha1 -verify rsapublic.pem -signature rsasign.bin file.txt<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>（2）对称加密应用例子</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 对称加密应用例子</span>
+<span class="token comment" spellcheck="true"># 用DES3算法的CBC模式加密文件plaintext.doc，</span>
+<span class="token comment" spellcheck="true"># 加密结果输出到文件ciphertext.bin</span>
+openssl enc -des3 -salt -in plaintext.doc -out ciphertext.bin
+
+<span class="token comment" spellcheck="true"># 用DES3算法的OFB模式解密文件ciphertext.bin，</span>
+<span class="token comment" spellcheck="true"># 提供的口令为trousers，输出到文件plaintext.doc</span>
+<span class="token comment" spellcheck="true"># 注意：因为模式不同，该命令不能对以上的文件进行解密</span>
+openssl enc -des-ede3-ofb -d -in ciphertext.bin -out plaintext.doc -pass pass:trousers
+
+<span class="token comment" spellcheck="true"># 用Blowfish的CFB模式加密plaintext.doc，口令从环境变量PASSWORD中取</span>
+<span class="token comment" spellcheck="true"># 输出到文件ciphertext.bin</span>
+openssl bf-cfb -salt -in plaintext.doc -out ciphertext.bin -pass env:PASSWORD
+
+<span class="token comment" spellcheck="true"># 给文件ciphertext.bin用base64编码，输出到文件base64.txt</span>
+openssl base64 -in ciphertext.bin -out base64.txt
+
+<span class="token comment" spellcheck="true"># 用RC5算法的CBC模式加密文件plaintext.doc</span>
+<span class="token comment" spellcheck="true"># 输出到文件ciphertext.bin，</span>
+<span class="token comment" spellcheck="true"># salt、key和初始化向量(iv)在命令行指定</span>
+openssl rc5 -in plaintext.doc -out ciphertext.bin -S C62CB1D49F158ADC -iv E9EDACA1BD7090C6 -K 89D4B1678D604FAA3DBFFD030A314B29<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>（3）Diffie-Hellman 应用例子</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用生成因子2和随机的1024-bit的素数产生D0ffie-Hellman参数</span>
+<span class="token comment" spellcheck="true"># 输出保存到文件dhparam.pem</span>
+openssl dhparam -out dhparam.pem -2 1024
+
+<span class="token comment" spellcheck="true"># 从dhparam.pem中读取Diffie-Hell参数，以C代码的形式</span>
+<span class="token comment" spellcheck="true"># 输出到stdout</span>
+openssl dhparam -in dhparam.pem -noout -C<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>（4）DSA 应用例子应用例子</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 生成1024位DSA参数集，并输出到文件dsaparam.pem</span>
+openssl dsaparam -out dsaparam.pem 1024
+
+<span class="token comment" spellcheck="true"># 使用参数文件dsaparam.pem生成DSA私钥匙，</span>
+<span class="token comment" spellcheck="true"># 采用3DES加密后输出到文件dsaprivatekey.pem</span>
+openssl gendsa -out dsaprivatekey.pem -des3 dsaparam.pem
+
+<span class="token comment" spellcheck="true"># 使用私钥匙dsaprivatekey.pem生成公钥匙，</span>
+<span class="token comment" spellcheck="true"># 输出到dsapublickey.pem</span>
+openssl dsa -in dsaprivatekey.pem -pubout -out dsapublickey.pem
+
+<span class="token comment" spellcheck="true"># 从dsaprivatekey.pem中读取私钥匙，解密并输入新口令进行加密，</span>
+<span class="token comment" spellcheck="true"># 然后写回文件dsaprivatekey.pem</span>
+openssl dsa -in dsaprivatekey.pem -out dsaprivatekey.pem -des3 -passin<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>（5）RSA 应用例子</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 产生1024位RSA私匙，用3DES加密它，口令为trousers，</span>
+<span class="token comment" spellcheck="true"># 输出到文件rsaprivatekey.pem</span>
+openssl genrsa -out rsaprivatekey.pem -passout pass:trousers -des3 1024
+
+<span class="token comment" spellcheck="true"># 从文件rsaprivatekey.pem读取私匙，用口令trousers解密，</span>
+<span class="token comment" spellcheck="true"># 生成的公钥匙输出到文件rsapublickey.pem</span>
+openssl rsa -in rsaprivatekey.pem -passin pass:trousers -pubout -out rsapubckey.pem
+
+<span class="token comment" spellcheck="true"># 用公钥匙rsapublickey.pem加密文件plain.txt，</span>
+<span class="token comment" spellcheck="true"># 输出到文件cipher.txt</span>
+openssl rsautl -encrypt -pubin -inkey rsapublickey.pem -in plain.txt -out cipher.txt
+
+<span class="token comment" spellcheck="true"># 使用私钥匙rsaprivatekey.pem解密密文cipher.txt，</span>
+<span class="token comment" spellcheck="true"># 输出到文件plain.txt</span>
+openssl rsautl -decrypt -inkey rsaprivatekey.pem -in cipher.txt -out plain.txt
+
+<span class="token comment" spellcheck="true"># 用私钥匙rsaprivatekey.pem给文件plain.txt签名，</span>
+<span class="token comment" spellcheck="true"># 输出到文件signature.bin</span>
+openssl rsautl -sign -inkey rsaprivatekey.pem -in plain.txt -out signature.bin
+
+<span class="token comment" spellcheck="true"># 用公钥匙rsapublickey.pem验证签名signature.bin，</span>
+<span class="token comment" spellcheck="true"># 输出到文件plain.txt</span>
+openssl rsautl -verify -pubin -inkey rsapublickey.pem -in signature.bin -out plain
+
+<span class="token comment" spellcheck="true"># 从X.509证书文件cert.pem中获取公钥匙，</span>
+<span class="token comment" spellcheck="true"># 用3DES加密mail.txt</span>
+<span class="token comment" spellcheck="true"># 输出到文件mail.enc</span>
+openssl smime -encrypt -in mail.txt -des3 -out mail.enc cert.pem
+
+<span class="token comment" spellcheck="true"># 从X.509证书文件cert.pem中获取接收人的公钥匙，</span>
+<span class="token comment" spellcheck="true"># 用私钥匙key.pem解密S/MIME消息mail.enc，</span>
+<span class="token comment" spellcheck="true"># 结果输出到文件mail.txt</span>
+openssl smime -decrypt -in mail.enc -recip cert.pem -inkey key.pem -out mail.txt
+
+<span class="token comment" spellcheck="true"># cert.pem为X.509证书文件，用私匙key,pem为mail.txt签名，</span>
+<span class="token comment" spellcheck="true"># 证书被包含在S/MIME消息中，输出到文件mail.sgn</span>
+openssl smime -sign -in mail.txt -signer cert.pem -inkey key.pem -out mail.sgn
+
+<span class="token comment" spellcheck="true"># 验证S/MIME消息mail.sgn，输出到文件mail.txt</span>
+<span class="token comment" spellcheck="true"># 签名者的证书应该作为S/MIME消息的一部分包含在mail.sgn中</span>
+openssl smime -verify -in mail.sgn -out mail.txt<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Escape</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://escapelife.github.io/posts/48693f50.html">https://escapelife.github.io/posts/48693f50.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Escape</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Linux/">
+                                    <span class="chip bg-color">Linux</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/posts/c5aea51c.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/linux-learn-ssh-base.jpg" class="responsive-img" alt="Linux安全之SSL基础">
+                        
+                        <span class="card-title">Linux安全之SSL基础</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2017-12-23
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/posts/b615ede7.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/root.png" class="responsive-img" alt="CentOS系统修改ROOT密码">
+                        
+                        <span class="card-title">CentOS系统修改ROOT密码</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2017-12-05
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('3'),
+            headingSelector: 'h2, h3, h4, h5'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4, h5').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="764454432"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='list'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">2017</span>
+            <a href="/about" target="_blank">Escape</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">699.3k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2017";
+                    var startMonth = "2";
+                    var startDate = "14";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/EscapeLife" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wenpanhappy@126.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/search.xml", 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

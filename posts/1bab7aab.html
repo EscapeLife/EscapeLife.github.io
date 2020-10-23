@@ -1,0 +1,1905 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="使用rsync来实现实时同步, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>使用rsync来实现实时同步 | Escape</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Escape</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Escape</div>
+        <div class="logo-desc">
+            
+            听摇滚,但不偏颇;也挺古典,但不安逸
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/EscapeLife" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/EscapeLife" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/rsync-remote-backup-server.png')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">使用rsync来实现实时同步</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Linux/">
+                                <span class="chip bg-color">Linux</span>
+                            </a>
+                        
+                            <a href="/tags/Tools/">
+                                <span class="chip bg-color">Tools</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                Linux运维之路
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2018-12-23
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2020-03-06
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    5.6k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    23 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <blockquote>
+<p><strong>俗话说一个好汉三个帮，rsync 也是需要帮手才能更好的工作。</strong></p>
+</blockquote>
+<p><img src="../images/rsync-remote-backup-server.png" alt="使用rsync来实现实时同步"></p>
+<hr>
+<h2 id="1-两款工具对比"><a href="#1-两款工具对比" class="headerlink" title="1. 两款工具对比"></a>1. 两款工具对比</h2><blockquote>
+<p><strong>没有对比，就没有伤害！</strong></p>
+</blockquote>
+<p><code>Rsync</code> 是一个开源的快速备份工具，可以在不同主机之间镜像同步整个目录树，支持增量备份、保持链接和权限、采用优化的同步算法、传输前执行压缩，因此非常适用于异地备份、镜像服务器等应用。</p>
+<p><img src="../images/rsync-remote-backup-server-1.png" alt="使用rsync来实现实时同步"></p>
+<ul>
+<li><strong>[1] inotify</strong></li>
+</ul>
+<p><code>inotify</code> 是一个 <code>Linux</code> 特性，它异步监控文件系统操作，比如读取、写入和创建。利用这个内核接口，第三方软件就可以监控文件系统下文件的各种变化情况，而 <code>inotify-tools</code> 正是实施这样监控的软件。</p>
+<p><code>inotify</code> 反应非常灵敏，用法非常简单，并且比 <code>cron</code> 任务的繁忙轮询高效得多。将 <code>rsync</code> 工具与 <code>inotify</code> 机制相结合，可以实现实时同步，只要原始位置发生变化，就立即启动增量备份操作，否则处于静默等待状态，这样避免了按固定周期备份时存在的延时性、周期过密性等问题。</p>
+<p><img src="../images/rsync-remote-backup-server-2.png" alt="使用rsync来实现实时同步"></p>
+<ul>
+<li><strong>[2] sersync</strong></li>
+</ul>
+<p>国人周洋在金山公司也开发了类似的实时同步软件 <code>sersync</code>，该软件实际上就是在 <code>inotify</code> 软件基础上进行开发的，功能要更加强大些 ，多了定时重传机制，过滤机制了提供接口做 <code>CDN</code>，支持多线程橾作。</p>
+<p><code>sersync</code> 项目利用 <code>inotify</code> 与 <code>rsync</code> 技术实现对服务器数据实时同步的解决方案，其中 <code>inotify</code> 用于监控 <code>sersync</code> 所在服务器上文件系统的时间变化。<code>rsync</code> 是目前广泛使用的本地及异地数据同步工具，其优点是只对变化的目录数据操作，甚至是一个文件不同的部分进行同步，所以其优势大大超过使用挂接文件系统或 <code>scp</code> 等方式进行镜像同步。</p>
+<p><img src="../images/rsync-remote-backup-server-3.png" alt="使用rsync来实现实时同步"></p>
+<ul>
+<li><strong>[3] 同步方式</strong></li>
+</ul>
+<p><strong>单向同步:</strong> 如果仅需单向同步，只需要在服务端启动 <code>rsyncd</code> 服务，客户端无需启动服务，可直接执行 <code>rsync</code> 命令。<br><strong>双向同步:</strong> 如需双向同步，则需要在两台服务器启动 <code>rsyncd</code> 服务，两台服务器互为 <code>C/S</code> 关系。</p>
+<ul>
+<li><strong>[4] 使用总结</strong></li>
+</ul>
+<p><code>inotify-tools</code> 只能记录下被监听的目录发生了变化(包括增加、删除、修改)，并没有把具体是哪个文件或者哪个目录发生了变化记录下来。而 <code>sersync</code> 可以记录下被监听目录中发生变化的(包括增加、删除、修改)具体某一个文件或某一个目录的名字。</p>
+<p>当同步的目录数据量不大时，建议使用<code>rsync+inotify-tools</code>模式。当数据量很大(几百 G 甚至 1T 以上)文件很多时，建议使用 <code>rsync+sersync</code> 模式。</p>
+<hr>
+<h2 id="2-inotify-工具介绍"><a href="#2-inotify-工具介绍" class="headerlink" title="2. inotify 工具介绍"></a>2. inotify 工具介绍</h2><blockquote>
+<p><strong>工具官方地址: <a href="https://github.com/rvoicilas/inotify-tools" target="_blank" rel="noopener">https://github.com/rvoicilas/inotify-tools</a></strong></p>
+</blockquote>
+<p><code>Inotify</code> 是一种文件变化通知机制，<code>Linux</code> 内核从 <code>2.6.13</code> 开始引入。在 <code>BSD</code> 和 <code>Mac OS</code> 系统中比较有名的是 <code>kqueue</code>，它可以高效地实时跟踪 <code>Linux</code> 文件系统的变化。近些年来，以 <code>fsnotify</code> 作为后端，几乎所有的主流 <code>Linux</code> 发行版都支持 <code>Inotify</code> 机制。如何知道你的 <code>Linux</code> 内核是否支持 <code>Inotify</code> 机制呢？很简单，执行下面这条命令。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">grep</span> INOTIFY_USER /boot/config-<span class="token variable"><span class="token variable">$(</span><span class="token function">uname</span> -r<span class="token variable">)</span></span>
+CONFIG_INOTIFY_USER<span class="token operator">=</span>y<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><code>inotify-tools</code> 提供了一系列的命令行工具，这些工具可以用来监控文件系统的事件，除了要求内核支持 <code>inotify</code> 外不依赖于其他。<code>inotify-tools</code> 提供两种工具，第一个命令是 <code>inotifywait</code>，它是用来监控文件或目录的变化；第二个命令是 <code>inotifywatch</code>，它是用来统计文件系统访问的次数。</p>
+<p><img src="../images/rsync-remote-backup-server-4.png" alt="使用rsync来实现实时同步"></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># inotifywait</span>
+<span class="token comment" spellcheck="true"># 实时监控/home的所有事件</span>
+$ inotifywait -rm /home
+
+<span class="token comment" spellcheck="true"># inotifywatch</span>
+<span class="token comment" spellcheck="true"># 统计/home文件系统的事件</span>
+$ inotifywatch -v -e access -e modify -t 60 -r /home<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[1] inotifywait</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 语法格式</span>
+inotifywait <span class="token punctuation">[</span>-hcmrq<span class="token punctuation">]</span> <span class="token punctuation">[</span>-e <span class="token punctuation">]</span> <span class="token punctuation">[</span>-t <span class="token punctuation">]</span> <span class="token punctuation">[</span>–format <span class="token punctuation">]</span> <span class="token punctuation">[</span>–timefmt <span class="token punctuation">]</span> <span class="token punctuation">[</span> … <span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<table>
+<thead>
+<tr>
+<th>排序</th>
+<th>命令参数</th>
+<th>解释说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><code>-r</code></td>
+<td>监视一个目录下的所有子目录</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>-m</code></td>
+<td>接收到一个事情而不退出，无限期地执行；默认的行为是接收到一个事情后立即退出</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>-e</code></td>
+<td>指定监视的事件</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>-s</code></td>
+<td>输出错误信息到系统日志</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>-q</code></td>
+<td>设置之后不显示输出的详细信息</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>–exclude</code></td>
+<td>正则匹配需要排除的文件，大小写敏感</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>–excludei</code></td>
+<td>正则匹配需要排除的文件，忽略大小写</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>-t</code>/<code>timeout</code></td>
+<td>设置超时时间，如果为 0 则表示无限期地执行下去</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>–timefmt</code></td>
+<td>指定时间格式，用于–format 选项中的%T 格式</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>–format</code></td>
+<td>指定事件监听输出格式；<code>%w</code>/<code>%f</code>/<code>%e</code>/<code>%T</code></td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>–csv</code></td>
+<td>输出 csv 格式</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>-d</code>/<code>–daemon</code></td>
+<td>已后台方式运行服务；需要指定–outfile 把事情输出到一个文件</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>-o</code>/<code>–outfile</code></td>
+<td>输出事件到一个文件而不是标准输出</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>@</code></td>
+<td>排除不需要监视的文件，可以是相对路径，也可以是绝对路径</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>[2] inotifywatch</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 语法格式</span>
+inotifywatch <span class="token punctuation">[</span>-hvzrqf<span class="token punctuation">]</span> <span class="token punctuation">[</span>-e <span class="token punctuation">]</span> <span class="token punctuation">[</span>-t <span class="token punctuation">]</span> <span class="token punctuation">[</span>-a <span class="token punctuation">]</span> <span class="token punctuation">[</span>-d <span class="token punctuation">]</span> <span class="token punctuation">[</span> … <span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<table>
+<thead>
+<tr>
+<th>排序</th>
+<th>命令参数</th>
+<th>解释说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><code>-r</code></td>
+<td>监视一个目录下的所有子目录</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>-e</code></td>
+<td>指定监视的事件</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>-t</code></td>
+<td>设置超时时间，如果为 0 则表示无限期地执行下去</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>–exclude</code></td>
+<td>正则匹配需要排除的文件，大小写敏感</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>–excludei</code></td>
+<td>正则匹配需要排除的文件，忽略大小写</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>–fromfile</code></td>
+<td>从文件读取需要监视的文件或排除的文件，一个文件一行，排除的文件以@开头</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>@</code></td>
+<td>排除不需要监视的文件，可以是相对路径，也可以是绝对路径</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>-z</code>/<code>–zero</code></td>
+<td>输出表格的行和列，即使元素为空</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>-a</code>/<code>–ascending</code></td>
+<td>以指定事件升序排列</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>-d</code>/<code>–descending</code></td>
+<td>以指定事件降序排列</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>[3] 可监听事件</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>排序</th>
+<th>可监听事件</th>
+<th>解释说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><code>access</code></td>
+<td>文件读取</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>modify</code></td>
+<td>文件更改</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>attrib</code></td>
+<td>文件属性更改，如权限，时间戳等</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>close_write</code></td>
+<td>以可写模式打开的文件被关闭，不代表此文件一定已经写入数据</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>close_nowrite</code></td>
+<td>以只读模式打开的文件被关闭</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>close</code></td>
+<td>文件被关闭，不管它是如何打开的</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>open</code></td>
+<td>文件打开</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>moved_to</code></td>
+<td>一个文件或目录移动到监听的目录，即使是在同一目录内移动，此事件也触发</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>moved_from</code></td>
+<td>一个文件或目录移出监听的目录，即使是在同一目录内移动，此事件也触发</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>move</code></td>
+<td>包括<code>moved_to</code>和<code>moved_from</code></td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>move_self</code></td>
+<td>文件或目录被移除，之后不再监听此文件或目录</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>create</code></td>
+<td>文件或目录创建</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>delete</code></td>
+<td>文件或目录删除</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>delete_self</code></td>
+<td>文件或目录移除，之后不再监听此文件或目录</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>unmount</code></td>
+<td>文件系统取消挂载，之后不再监听此文件系统</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="3-rsync-inotify-tools"><a href="#3-rsync-inotify-tools" class="headerlink" title="3. rsync+inotify-tools"></a>3. rsync+inotify-tools</h2><blockquote>
+<p><strong>值的注意的是，inotify-tools 工具至今还在持续有人维护，可以方式使用。</strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] 调整 inotify 内核参数</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 文件末尾添加以下参数</span>
+$ <span class="token function">sudo</span> vim /etc/sysctl.conf
+fs.inotify.max_queued_events <span class="token operator">=</span> 16384    <span class="token comment" spellcheck="true"># 监控事件队列;</span>
+    <span class="token comment" spellcheck="true"># 表示调用inotify_init时分配给instance中可排队的</span>
+    <span class="token comment" spellcheck="true"># event的数目的最大值，超出这个值的事件被丢弃，但会</span>
+    <span class="token comment" spellcheck="true"># 触发IN_Q_OVERFLOW事件</span>
+fs.inotify.max_user_instances <span class="token operator">=</span> 128     <span class="token comment" spellcheck="true"># 最多监控实例数;</span>
+    <span class="token comment" spellcheck="true"># 表示每一个真实用户ID可创建的instatnces的数量上限</span>
+fs.inotify.max_user_watches <span class="token operator">=</span> 524288    <span class="token comment" spellcheck="true"># 每个实例最多监控目录数;</span>
+    <span class="token comment" spellcheck="true"># 表示每个instatnces可监控的最大目录数量，如果监控</span>
+    <span class="token comment" spellcheck="true"># 的文件数目巨大，需要根据情况，适当增加此值的大小</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 永久生效方式</span>
+
+<span class="token comment" spellcheck="true"># Debian, RedHat</span>
+$ <span class="token keyword">echo</span> fs.inotify.max_user_watches<span class="token operator">=</span>524288 <span class="token operator">|</span> \
+    <span class="token function">sudo</span> <span class="token function">tee</span> -a /etc/sysctl.conf <span class="token operator">&amp;&amp;</span> \
+    <span class="token function">sudo</span> sysctl -p
+
+<span class="token comment" spellcheck="true"># ArchLinux</span>
+$ <span class="token keyword">echo</span> fs.inotify.max_user_watches<span class="token operator">=</span>524288 <span class="token operator">|</span> \
+    <span class="token function">sudo</span> <span class="token function">tee</span> /etc/sysctl.d/40-max-user-watches.conf <span class="token operator">&amp;&amp;</span> \
+    <span class="token function">sudo</span> sysctl --system<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 也可以从proc中获取对应参数信息</span>
+$ ll /proc/sys/fs/inotify
+-rw-r--r-- 1 root root 0 Dec 17 15:05 max_queued_events
+-rw-r--r-- 1 root root 0 Dec 17 15:05 max_user_instances
+-rw-r--r-- 1 root root 0 Dec 17 15:05 max_user_watches<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 通过man手册查到inotify的详细说明</span>
+$ <span class="token function">man</span> 7 inotify
+/proc/sys/fs/inotify/max_queued_events
+    The  value  <span class="token keyword">in</span> this <span class="token function">file</span> is used when an application calls
+    inotify_init<span class="token punctuation">(</span>2<span class="token punctuation">)</span> to <span class="token keyword">set</span> an upper limit  on  the  number  of
+    events  that  can  be  queued to the corresponding inotify
+    instance.  Events <span class="token keyword">in</span> excess of this limit are dropped, but
+    an IN_Q_OVERFLOW event is always generated.
+
+/proc/sys/fs/inotify/max_user_instances
+    This  specifies  an  upper  limit on the number of inotify
+    instances that can be created per real user ID.
+
+/proc/sys/fs/inotify/max_user_watches
+    This specifies an upper limit on  the  number  of  watches
+    that can be created per real user ID.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 安装 inotify-tools 工具</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 安装编译器</span>
+$ yum -y <span class="token function">install</span> gcc gcc-c++
+
+<span class="token comment" spellcheck="true"># 安装工具 - 直接安装</span>
+$ yum <span class="token function">install</span> -y inotify-tools
+
+<span class="token comment" spellcheck="true"># 安装工具 - 手动编译</span>
+<span class="token comment" spellcheck="true"># https://github.com/rvoicilas/inotify-tools/</span>
+$ <span class="token function">tar</span> xvfz inotify-tools-3.20.1.tar.gz
+$ <span class="token function">cd</span> inotify-tools-3.20.1
+$ ./configure <span class="token operator">&amp;&amp;</span> <span class="token function">make</span> <span class="token operator">&amp;&amp;</span> <span class="token function">make</span> <span class="token function">install</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 使用 inotifywait 命令进行监控测试</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 实时监控修改、创建、移动、删除操作</span>
+<span class="token comment" spellcheck="true"># 递归整个目录: -r</span>
+<span class="token comment" spellcheck="true"># 持续的进行监控: -m</span>
+<span class="token comment" spellcheck="true"># 指定监控的事件: -e</span>
+$ inotifywait -mrq -e modify,create,move,delete /var/www/html
+/var/www/html  CREATE  abc.txt
+/var/www/html  MODIFY  abc.txt
+/var/www/html  DELETE  abc.txt<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] 编写触发式上行同步脚本</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># [版本一]</span>
+<span class="token comment" spellcheck="true"># 已循环形式触发同步操作，且每次都是全量同步</span>
+<span class="token comment" spellcheck="true"># 相当于有10个文件发生变化就触发10次全量同步，还不如死循环</span>
+
+INOTIFY_CMD<span class="token operator">=</span><span class="token string">"inotifywait -mrq --format '%Xe %w%f' -e modify,create,attrib,move,delete /var/www/html/"</span>
+RSYNC_CMD<span class="token operator">=</span><span class="token string">"rsync -azH --delete --password-file=/etc/rsync.password /var/www/html/ escape@192.168.31.191::aptbackup"</span>
+
+<span class="token variable">${INOTIFY_CMD}</span> <span class="token operator">|</span> <span class="token keyword">while</span> <span class="token function">read</span> DIRECTORY EVENT FILE<span class="token punctuation">;</span> <span class="token keyword">do</span>
+    <span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token variable"><span class="token variable">$(</span>pgrep <span class="token function">rsync</span> <span class="token operator">|</span> <span class="token function">wc</span> -l<span class="token variable">)</span></span> -le 0 <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+        <span class="token variable">${RSYNC_CMD}</span>
+    <span class="token keyword">fi</span>
+<span class="token keyword">done</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># [版本二]</span>
+<span class="token comment" spellcheck="true"># 虽然利用到了inotofy的特点，只同步改变的文件</span>
+<span class="token comment" spellcheck="true"># 但是并没有进行操作行为更加细致的区分，执行不同的处理</span>
+
+REMOTE_IP<span class="token operator">=</span><span class="token string">"192.168.31.191"</span>
+REMOTE_USER<span class="token operator">=</span><span class="token string">"escape"</span>
+PASSWORD<span class="token operator">=</span><span class="token string">"/etc/rsync.password"</span>
+INOTIFY_DIR<span class="token operator">=</span><span class="token string">"/var/www/html/"</span>
+INOTIFY_CMD<span class="token operator">=</span><span class="token string">"inotifywait -mrq -e modify,create,attrib,move,delete <span class="token variable">${INOTIFY_DIR}</span>"</span>
+
+<span class="token variable">${INOTIFY_CMD}</span> <span class="token operator">|</span> <span class="token keyword">while</span> <span class="token function">read</span> DIRECTORY EVENT FILE<span class="token punctuation">;</span> <span class="token keyword">do</span>
+    <span class="token keyword">if</span> <span class="token punctuation">[</span> -f <span class="token variable">${FILE}</span> <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+        <span class="token function">rsync</span> -azH --password-file<span class="token operator">=</span><span class="token variable">${PASSWORD}</span> <span class="token variable">${DIRECTORY}</span>/<span class="token variable">${FILE}</span> <span class="token variable">${REMOTE_USER}</span>@<span class="token variable">${REMOTE_IP}</span>::backup
+    <span class="token keyword">else</span>
+        <span class="token function">rsync</span> -azH --delete --password-file<span class="token operator">=</span><span class="token variable">${PASSWORD}</span> <span class="token variable">${DIRECTORY}</span>/<span class="token variable">${FILE}</span> <span class="token variable">${REMOTE_USER}</span>@<span class="token variable">${REMOTE_IP}</span>::backup
+    <span class="token keyword">fi</span>
+<span class="token keyword">done</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># [版本三]</span>
+<span class="token comment" spellcheck="true"># 基本可以再生产中使用了</span>
+
+remote_user<span class="token operator">=</span><span class="token string">"root"</span>
+remote_ip<span class="token operator">=</span><span class="token string">"192.168.31.191"</span>
+remote_model<span class="token operator">=</span><span class="token string">"backup"</span>
+rsync_passwd_file<span class="token operator">=</span><span class="token string">"/etc/rsyncd.passwd"</span>
+inotify_dir<span class="token operator">=</span><span class="token string">"/var/www/html"</span>
+inotify_cmd<span class="token operator">=</span><span class="token string">"inotifywait -mrq --format '%Xe:::%w%f' -e modify,create,delete,attrib,close_write,move <span class="token variable">${inotify_dir}</span>"</span>
+
+<span class="token comment" spellcheck="true"># 把监控到有发生更改的文件路径列表循环</span>
+<span class="token variable">${inotify_cmd}</span> <span class="token operator">|</span> <span class="token keyword">while</span> <span class="token function">read</span> inotify_info<span class="token punctuation">;</span> <span class="token keyword">do</span>
+    <span class="token comment" spellcheck="true"># 事件类型和文件路径</span>
+    EVENT<span class="token operator">=</span><span class="token punctuation">$(</span>echo <span class="token variable">${inotify_info}</span> <span class="token operator">|</span> <span class="token function">awk</span> -F<span class="token string">':::'</span> <span class="token string">'{print <span class="token variable">$1</span>}'</span><span class="token punctuation">)</span>
+    FILES<span class="token operator">=</span><span class="token punctuation">$(</span>echo <span class="token variable">${inotify_info}</span> <span class="token operator">|</span> <span class="token function">awk</span> -F<span class="token string">':::'</span> <span class="token string">'{print <span class="token variable">$2</span>}'</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># 增加、修改、写入完成、移动进事件</span>
+    <span class="token keyword">if</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token variable">$EVENT</span> <span class="token operator">=</span>~ <span class="token string">'CREATE'</span> <span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">||</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token variable">$EVENT</span> <span class="token operator">=</span>~ <span class="token string">'MODIFY'</span> <span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">||</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token variable">$EVENT</span> <span class="token operator">=</span>~ <span class="token string">'CLOSE_WRITE'</span> <span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">||</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token variable">$EVENT</span> <span class="token operator">=</span>~ <span class="token string">'MOVED_TO'</span> <span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+        <span class="token keyword">echo</span> <span class="token string">'CREATE or MODIFY or CLOSE_WRITE or MOVED_TO'</span>
+        <span class="token function">rsync</span> -avzcR --password-file<span class="token operator">=</span><span class="token variable">${rsync_passwd_file}</span> <span class="token variable">${FILES}</span> <span class="token variable">${remote_user}</span>@<span class="token variable">${remote_ip}</span>::<span class="token variable">${remote_model}</span>
+    <span class="token keyword">fi</span>
+
+    <span class="token comment" spellcheck="true"># 删除、移动出事件</span>
+    <span class="token keyword">if</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token variable">$EVENT</span> <span class="token operator">=</span>~ <span class="token string">'DELETE'</span> <span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">||</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token variable">$EVENT</span> <span class="token operator">=</span>~ <span class="token string">'MOVED_FROM'</span> <span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+        <span class="token keyword">echo</span> <span class="token string">'DELETE or MOVED_FROM'</span>
+        <span class="token function">rsync</span> -avzR --delete --password-file<span class="token operator">=</span><span class="token variable">${rsync_passwd_file}</span> <span class="token variable">${FILES}</span> <span class="token variable">${remote_user}</span>@<span class="token variable">${remote_ip}</span>::<span class="token variable">${remote_model}</span>
+    <span class="token keyword">fi</span>
+
+    <span class="token comment" spellcheck="true"># 修改属性事件</span>
+    <span class="token comment" spellcheck="true"># 如果修改属性的是目录则不同步，因为同步目录会发生递归扫描</span>
+    <span class="token keyword">if</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token variable">$EVENT</span> <span class="token operator">=</span>~ <span class="token string">'ATTRIB'</span> <span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+        <span class="token keyword">echo</span> <span class="token string">'ATTRIB'</span>
+        <span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token operator">!</span> -d <span class="token string">"<span class="token variable">$INO_FILE</span>"</span> <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+            <span class="token function">rsync</span> -avzcR --password-file<span class="token operator">=</span><span class="token variable">${rsync_passwd_file}</span> <span class="token variable">${FILES}</span> <span class="token variable">${remote_user}</span>@<span class="token variable">${remote_ip}</span>::<span class="token variable">${remote_model}</span>
+        <span class="token keyword">fi</span>
+    <span class="token keyword">fi</span>
+<span class="token keyword">done</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] 定时进行全量同步</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 因为inotify只在启动时会监控目录，没有启动期间的文件发生更改</span>
+<span class="token comment" spellcheck="true"># 所以我们每2个小时做1次全量同步，防止各种意外遗漏，保证目录一致</span>
+$ <span class="token function">crontab</span> -e
+* */2 --- <span class="token function">rsync</span> -avz --password-file<span class="token operator">=</span>/etc/rsync.passwd \
+    /www/var/html root@192.168.31.191::backup<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="4-sersync-工具介绍"><a href="#4-sersync-工具介绍" class="headerlink" title="4. sersync 工具介绍"></a>4. sersync 工具介绍</h2><blockquote>
+<p><strong>官方项目地址: <a href="https://code.google.com/archive/p/sersync" target="_blank" rel="noopener">https://code.google.com/archive/p/sersync</a></strong></p>
+</blockquote>
+<p><code>sersync</code> 项目利用 <code>inotify</code> 与 <code>rsync</code> 技术实现对服务器数据实时同步的解决方案，其中 <code>inotify</code> 用于监控所在服务器上文件系统的时间变化，<code>rsync</code> 是目前广泛使用的本地及异地数据同步工具，其优点是只对变化的目录数据操作。</p>
+<p>目前使用的比较多的同步程序版本是 <code>inotify-tools</code>，另外一个是 <code>google</code> 开源项目 <code>Openduckbill</code> (依赖于 <code>inotify-tools</code> 工具)，这两个都是基于脚本语言编写的，其设计思路同样是采用 <code>inotify</code> 与 <code>rsync</code> 命令。该项目的优点有以下优点，这是国人研发的呦。</p>
+<ul>
+<li><strong>[1] 工具特点</strong></li>
+</ul>
+<ol>
+<li>使用 <code>C++</code> 编写，对于 <code>Linux</code> 系统文件产生的临时文件和重复的文件操作会进行过滤，再结合了 <code>rsync</code> 同步的时候，会减少运行时消耗的本地及网络资源，因此速度会更快；</li>
+<li>相比较上面两个项目，<code>sersync</code> 配置起来很简单，其中 <code>bin</code> 目录下是已经编译好的二进制文件，配合 <code>bin</code> 目录下的 <code>xml</code> 文件直接使用即可；</li>
+<li>使用多线程进行同步(即可以并发同步多个不同文件)，尤其在同步较大文件时，能够保证多个服务器实时保持同步状态；</li>
+<li><code>sersync</code> 自带出错处理机制，通过失败队列对出错的文件重新同步，如果仍旧失败，则每 <code>10</code> 个小时对同步失败的文件再重新同步；</li>
+<li><code>sersync</code> 自带 <code>crontab</code> 功能，只需在 <code>xml</code> 配置文件中开启，即可按预先的配置，隔一段时间整体同步一次；</li>
+<li><code>sersync</code> 自带 <code>socket</code> 与 <code>http</code> 的协议拓展，可以满足有特殊需求的公司二次开发；</li>
+</ol>
+<p><img src="../images/rsync-remote-backup-server-5.png" alt="使用rsync来实现实时同步"></p>
+<ul>
+<li><strong>[2] 设计要点</strong></li>
+</ul>
+<ol>
+<li><p><strong>线程组线程</strong>是等待线程对立的守护线程，当事件队列中有数据产生的时候，线程组守护线程就会逐个唤醒同步线程，当队列中 <code>inotify</code> 事件较多的时候，同步线程就会被全部唤醒一起工作。这样设计的目的是能够同时处理多个 <code>inotify</code> 事件，从而提升服务器的并发同步能力。之所以称之为线程组线程，是因为每个线程在工作的时候，会根据服务器上新写入文件的数量建立子线程，子线程可以保证所有的文件与各个服务器同时同步，当要同步的文件较大的时候，这样的设计可以保证各个远程服务器可以同时获得要同步的文件。</p>
+</li>
+<li><p><strong>服务器线程</strong>的作用有三个(保证主服务器和从服务器数据一致且实时)：第一就是，处理同步失败的文件，将这些文件再次同步，对于再次同步失败的文件会生成 <code>rsync_fail_log.sh</code> 脚本，记录失败的事件。第二就是，同时每个 <code>10</code> 小时执行脚本一次，同时清空脚本。第三就是，还有就是 <code>crontab</code> 功能，可以每隔一定事件，将所有路径整体同步一次。</p>
+</li>
+<li><p><strong>过滤队列</strong>的建立是为了过滤短时间内产生的重复的 <code>inotify</code> 信息，例如在删除文件夹的时候，<code>inotify</code> 就会同时产生删除文件夹里的文件与删除文件夹的事件，通过过滤队列，当删除文件夹时间产生的时候，会将之前加入队列的删除文件的事件全部过滤掉，这样只产生一条删除文件夹事件，从而减轻了同步的负担。同时对于修改文件的操作的时候，会产生临时文件的重复操作。</p>
+</li>
+</ol>
+<ul>
+<li><strong>[3] sersync 同步参数说明</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>排序</th>
+<th>Sersync 参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><strong><code>-r</code></strong></td>
+<td>作用是在开启实时监控之前对主服务器目录与远程目标机目录进行一次整体同步；如果需要将 sersync 运行前，主服务器目录下已经存在的所有文件或目录全部同步到远端，则需要指定-r 参数运行 sersync，将本地与远程整体同步一次；如果设置了过滤器，即在 xml 配置文件中 filter 为 true，则暂时不能使用-r 参数进行整体同步</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong><code>–o confxml.xml</code></strong></td>
+<td>不指定-o 参数时，sersync 可执行文件目录下的默认配置文件 confxml.xml；如果需要使用其他的配置文件，可以使用-o 参数指定其他配置文件，通过-o 参数，我们可以指定多个不同的配置文件，从而实现 sersync 多进行多实例的数据同步</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong><code>–n number</code></strong></td>
+<td>该参数为指定默认的线程池的线程总数；如果不指定，默认启用线程池数量为 10 个</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong><code>-d</code></strong></td>
+<td>该参数为后台启动服务，在通常情况下，使用-r 参数对本地到远程整体同步一遍后，在后台运行此参数启动守护进程实时同步，在第一次整体同步时，-d 和-r 参数经常会联合使用</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong><code>-m pluginName</code></strong></td>
+<td>该参数为不进行同步，只运行插件；例如 sersync –m command，则在监控到时间后，不对远程目标服务器进行同步，而是直接运行 command 插件</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="5-rsync-sersync"><a href="#5-rsync-sersync" class="headerlink" title="5. rsync+sersync"></a>5. rsync+sersync</h2><blockquote>
+<p>在同步主服务器上开启 <code>sersync</code> 服务，<code>sersync</code> 负责监控配置路径中的文件系统事件变化，然后调用 <code>rsync</code> 命令把更新的文件同步到目标服务器。</p>
+<ul>
+<li><a href="https://www.kancloud.cn/curder/linux/78148" target="_blank" rel="noopener">Sersync 项目简介与框架设计</a></li>
+<li><strong>已经没有人维护了，请谨慎使用哈！</strong></li>
+</ul>
+</blockquote>
+<ul>
+<li><strong>[1] 备份服务器开启 rsyncd 服务</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> vim /etc/rsyncd/rsyncd.conf
+<span class="token comment" spellcheck="true"># 主配置参数，适用于所有模块使用</span>
+uid <span class="token operator">=</span> root
+gid <span class="token operator">=</span> root
+use <span class="token function">chroot</span> <span class="token operator">=</span> no
+<span class="token function">read</span> only <span class="token operator">=</span> <span class="token boolean">false</span>
+hosts allow<span class="token operator">=</span>192.168.31.100/24
+hosts deny<span class="token operator">=</span>*
+ignore errors
+max connections <span class="token operator">=</span> 200
+pid <span class="token function">file</span> <span class="token operator">=</span> /var/run/rsyncd.pid
+lock <span class="token function">file</span> <span class="token operator">=</span> /var/run/rsync.lock
+motd <span class="token function">file</span> <span class="token operator">=</span> /etc/rsyncd/rsyncd.motd
+auth <span class="token function">users</span> <span class="token operator">=</span> escape
+secrets <span class="token function">file</span> <span class="token operator">=</span> /etc/rsyncd/rsyncd.password
+log <span class="token function">file</span> <span class="token operator">=</span> /var/log/rsync.log
+transfer logging <span class="token operator">=</span> <span class="token function">yes</span>
+log <span class="token function">format</span> <span class="token operator">=</span> %t %a %m %f %b
+syslog facility <span class="token operator">=</span> local3
+<span class="token function">timeout</span> <span class="token operator">=</span> 300
+
+<span class="token comment" spellcheck="true"># 设置自定义模块，目录必须事先存在</span>
+<span class="token punctuation">[</span>blog<span class="token punctuation">]</span>
+comment <span class="token operator">=</span> this is my blog
+path <span class="token operator">=</span> /var/www/html/blog<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 备份服务器开启配置权限认证</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 设置同步密码，每行一个可以添加多个</span>
+$ <span class="token function">sudo</span> <span class="token keyword">echo</span> <span class="token string">"escape:123456"</span> <span class="token operator">></span> /etc/rsyncd/rsyncd.password
+
+<span class="token comment" spellcheck="true"># 必须设置600的权限</span>
+$ <span class="token function">sudo</span> <span class="token function">chmod</span> 600 /etc/rsyncd/rsyncd.password<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 备份服务器开启 rsync 守护进程</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 已守护进程的方式启动服务</span>
+$ <span class="token function">sudo</span> <span class="token function">rsync</span> --daemon --config<span class="token operator">=</span>/etc/rsyncd/rsyncd.conf
+
+<span class="token comment" spellcheck="true"># 查看服务</span>
+$ <span class="token function">sudo</span> <span class="token function">ps</span> -ef<span class="token operator">|</span><span class="token function">grep</span> <span class="token function">rsync</span>
+root    153    0  0 15:05 ?    00:00:00 <span class="token function">rsync</span> --daemon
+root    155    12  0 15:05 pts/1    00:00:00 <span class="token function">grep</span> --color<span class="token operator">=</span>auto <span class="token function">rsync</span>
+
+$ <span class="token function">sudo</span> <span class="token function">netstat</span> -tunpl<span class="token operator">|</span><span class="token function">grep</span> :873
+tcp     0    0 0.0.0.0:873    0.0.0.0:-  LISTEN    153/rsync
+tcp6    0    0 :::873         :::-       LISTEN    153/rsync<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 配置开机自启动，当然也可以协程脚本</span>
+$ <span class="token function">sudo</span> <span class="token function">pkill</span> <span class="token function">rsync</span>
+
+<span class="token comment" spellcheck="true"># 其实安装rsync之后会在/etc/init.d/目录下生成一个配置脚本</span>
+$ <span class="token function">sudo</span> <span class="token keyword">echo</span> <span class="token string">"/usr/bin/rsync --daemon --config=/etc/rsyncd/rsyncd.conf"</span> <span class="token operator">>></span> /etc/rc.local<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] 同步服务器配置相关权限</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 设置同步密码和权限</span>
+$ <span class="token function">sudo</span> <span class="token keyword">echo</span> <span class="token string">'123456'</span> <span class="token operator">></span> /etc/rsync.password
+$ <span class="token function">sudo</span> <span class="token function">chmod</span> 600 /etc/rsync.password
+
+<span class="token comment" spellcheck="true"># 测试是否可同步</span>
+$ <span class="token function">sudo</span> <span class="token function">rsync</span> -avzP --password-file<span class="token operator">=</span>/etc/rsync.password /home/root/escape escape@172.17.0.2::blog<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] 同步服务下载 sersync 工具</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 下载sersync的可执行文件版本</span>
+https://code.google.com/archive/p/sersync/downloads
+
+<span class="token comment" spellcheck="true"># 下载并解压，感觉已经不更新了，2011年的</span>
+$ <span class="token function">sudo</span> <span class="token function">wget</span> https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/sersync/sersync2.5.4_64bit_binary_stable_final.tar.gz
+
+<span class="token comment" spellcheck="true"># 规范sersync目录结构，非必须</span>
+$ <span class="token function">sudo</span> <span class="token function">mkdir</span> -pv /usr/local/sersync/bin
+$ <span class="token function">sudo</span> <span class="token function">mkdir</span> -pv /usr/local/sersync/conf
+$ <span class="token function">sudo</span> <span class="token function">mkdir</span> -pv /usr/local/sersync/logs
+$ <span class="token function">sudo</span> <span class="token function">cp</span> -r GNU-Linux-x86/sersync2 /usr/local/sersync/bin
+$ <span class="token function">sudo</span> <span class="token function">cp</span> -r GNU-Linux-x86/confxml.xml /usr/local/sersync/conf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[6] 设置 sersync 的配置文件</strong></li>
+</ul>
+<pre class="line-numbers language-xml"><code class="language-xml"><span class="token prolog">&lt;?xml version="1.0" encoding="ISO-8859-1"?></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span> <span class="token attr-name">version</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>2.5<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+    <span class="token comment" spellcheck="true">&lt;!-- IP地址和端口号是针对插件的保留字段，对于同步功能没有任何作用，默认保留即可 --></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>host</span> <span class="token attr-name">hostip</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>localhost<span class="token punctuation">"</span></span> <span class="token attr-name">port</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>8008<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>host</span><span class="token punctuation">></span></span>
+    <span class="token comment" spellcheck="true">&lt;!-- 调试模式的开关 --></span>
+    <span class="token comment" spellcheck="true">&lt;!-- 开启debug模式会在sersync正在运行的控制台，打印inotify时间与rsync的同步命令 --></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>debug</span> <span class="token attr-name">start</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>false<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+    <span class="token comment" spellcheck="true">&lt;!-- xfs文件系统的开关 --></span>
+    <span class="token comment" spellcheck="true">&lt;!-- 对于xfs文件系统的用户，需要将这个选项开启 --></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>fileSystem</span> <span class="token attr-name">xfs</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>false<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+    <span class="token comment" spellcheck="true">&lt;!-- filter文件过滤功能 --></span>
+    <span class="token comment" spellcheck="true">&lt;!-- 将start设置为true后开启过滤功能，在exclude标签中填写正则表达式 --></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>filter</span> <span class="token attr-name">start</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>false<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>exclude</span> <span class="token attr-name">expression</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>(.*)\.svn<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>exclude</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>exclude</span> <span class="token attr-name">expression</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>(.*)\.gz<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>exclude</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>exclude</span> <span class="token attr-name">expression</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>^info/*<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>exclude</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>exclude</span> <span class="token attr-name">expression</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>^static/*<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>exclude</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>filter</span><span class="token punctuation">></span></span>
+    <span class="token comment" spellcheck="true">&lt;!-- inotify监控参数设定 --></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>inotify</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>delete</span> <span class="token attr-name">start</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>true<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>createFolder</span> <span class="token attr-name">start</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>true<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>createFile</span> <span class="token attr-name">start</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>false<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>closeWrite</span> <span class="token attr-name">start</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>true<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>moveFrom</span> <span class="token attr-name">start</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>true<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>moveTo</span> <span class="token attr-name">start</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>true<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>attrib</span> <span class="token attr-name">start</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>false<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>modify</span> <span class="token attr-name">start</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>false<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>inotify</span><span class="token punctuation">></span></span>
+
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>sersync</span><span class="token punctuation">></span></span>
+        <span class="token comment" spellcheck="true">&lt;!--本地文件监控与远程同步设置--></span>
+        <span class="token comment" spellcheck="true">&lt;!--如果存在多个目录，可以添加多段进行配置--></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>localpath</span> <span class="token attr-name">watch</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>/home/root/escape<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+            <span class="token comment" spellcheck="true">&lt;!--定义要同步的服务器IP和模块名(例如上述的blog等)--></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>remote</span> <span class="token attr-name">ip</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>192.168.31.100<span class="token punctuation">"</span></span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>blog<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+            <span class="token comment" spellcheck="true">&lt;!--&lt;remote ip="192.168.8.39" name="tongbu"/>--></span>
+            <span class="token comment" spellcheck="true">&lt;!--&lt;remote ip="192.168.8.40" name="tongbu"/>--></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>localpath</span><span class="token punctuation">></span></span>
+        <span class="token comment" spellcheck="true">&lt;!-- rsync相关参数设置 --></span>
+        <span class="token comment" spellcheck="true">&lt;!-- 配置使用rsync同步时候的命令 --></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rsync</span><span class="token punctuation">></span></span>
+            <span class="token comment" spellcheck="true">&lt;!-- 可以自定义rsync的同步参数，默认是-artuz --></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>commonParams</span> <span class="token attr-name">params</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>-avzP<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+            <span class="token comment" spellcheck="true">&lt;!-- 设置为true的时候，使用rsync的认证模式传送 --></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>auth</span> <span class="token attr-name">start</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>false<span class="token punctuation">"</span></span> <span class="token attr-name">users</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>root<span class="token punctuation">"</span></span> <span class="token attr-name">passwordfile</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>/etc/rsync.password<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+            <span class="token comment" spellcheck="true">&lt;!-- 默认端口 port=874 --></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>userDefinedPort</span> <span class="token attr-name">start</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>false<span class="token punctuation">"</span></span> <span class="token attr-name">port</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>874<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+            <span class="token comment" spellcheck="true">&lt;!-- 默认超时时间 timeout=100 --></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>timeout</span> <span class="token attr-name">start</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>false<span class="token punctuation">"</span></span> <span class="token attr-name">time</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>100<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ssh</span> <span class="token attr-name">start</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>false<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rsync</span><span class="token punctuation">></span></span>
+        <span class="token comment" spellcheck="true">&lt;!-- 失败日志脚本配置 --></span>
+        <span class="token comment" spellcheck="true">&lt;!-- 默认情况下每60mins执行一次 --></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>failLog</span> <span class="token attr-name">path</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>/usr/local/sersync/logs/rsync_fail_log.sh<span class="token punctuation">"</span></span> <span class="token attr-name">timeToExecute</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>60<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+        <span class="token comment" spellcheck="true">&lt;!--crontab定期整体同步功能  默认时间为600mins--></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>crontab</span> <span class="token attr-name">start</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>false<span class="token punctuation">"</span></span> <span class="token attr-name">schedule</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>600<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>crontabfilter</span> <span class="token attr-name">start</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>false<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>exclude</span> <span class="token attr-name">expression</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>*.php<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>exclude</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>exclude</span> <span class="token attr-name">expression</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>info/*<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>exclude</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>crontabfilter</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>crontab</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>plugin</span> <span class="token attr-name">start</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>false<span class="token punctuation">"</span></span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>command<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>sersync</span><span class="token punctuation">></span></span>
+
+    <span class="token comment" spellcheck="true">&lt;!-- 插件设置 --></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>plugin</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>command<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+        <span class="token comment" spellcheck="true">&lt;!--prefix /opt/tongbu/mmm.sh suffix--></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>param</span> <span class="token attr-name">prefix</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>/bin/sh<span class="token punctuation">"</span></span> <span class="token attr-name">suffix</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span><span class="token punctuation">"</span></span> <span class="token attr-name">ignoreError</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>true<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>filter</span> <span class="token attr-name">start</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>false<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>include</span> <span class="token attr-name">expression</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>(.*)\.php<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>include</span> <span class="token attr-name">expression</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>(.*)\.sh<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>filter</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>plugin</span><span class="token punctuation">></span></span>
+
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>plugin</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>socket<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>localpath</span> <span class="token attr-name">watch</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>/opt/tongbu<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>deshost</span> <span class="token attr-name">ip</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>192.168.138.20<span class="token punctuation">"</span></span> <span class="token attr-name">port</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>8009<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>localpath</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>plugin</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>plugin</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>refreshCDN<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>localpath</span> <span class="token attr-name">watch</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>/data0/htdocs/cms.xoyo.com/site/<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>cdninfo</span> <span class="token attr-name">domainname</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>ccms.chinacache.com<span class="token punctuation">"</span></span> <span class="token attr-name">port</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>80<span class="token punctuation">"</span></span> <span class="token attr-name">username</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>xxxx<span class="token punctuation">"</span></span> <span class="token attr-name">passwd</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>xxxx<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>sendurl</span> <span class="token attr-name">base</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>http://pic.xoyo.com/cms<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>regexurl</span> <span class="token attr-name">regex</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>false<span class="token punctuation">"</span></span> <span class="token attr-name">match</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>cms.xoyo.com/site([/a-zA-Z0-9]*).xoyo.com/images<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>localpath</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>plugin</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[7] 开启 sersync 守护进程同步数据</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 配置sersync环境变量</span>
+$ <span class="token function">sudo</span> <span class="token keyword">echo</span> <span class="token string">'export PATH=/usr/local/sersync/bin:<span class="token variable">$PATH</span>'</span> <span class="token operator">>></span> /etc/profile
+$ <span class="token function">sudo</span> <span class="token function">source</span> /etc/profile
+
+<span class="token comment" spellcheck="true"># 启动sersync命令</span>
+$ <span class="token function">sudo</span> sersync2 -r -d -o /usr/local/sersync/conf/confxml.xml
+
+<span class="token comment" spellcheck="true"># 多实例的情况下仅第一个模块的路径能同步，其他模块下面的路径不能同步</span>
+<span class="token comment" spellcheck="true"># 因此需要在/usr/local/sersync/conf目录下复制多个配置文件一同启动</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Escape</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://escapelife.github.io/posts/1bab7aab.html">https://escapelife.github.io/posts/1bab7aab.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Escape</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Linux/">
+                                    <span class="chip bg-color">Linux</span>
+                                </a>
+                            
+                                <a href="/tags/Tools/">
+                                    <span class="chip bg-color">Tools</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/posts/f351b0af.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/gitlab-idea-for-working-50.png" class="responsive-img" alt="Git的工作流程">
+                        
+                        <span class="card-title">Git的工作流程</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2018-12-24
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Git学习笔记/" class="post-category">
+                                    Git学习笔记
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Git/">
+                        <span class="chip bg-color">Git</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/posts/d6395dd2.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/rsync-transfer-file.png" class="responsive-img" alt="搭建rsync服务来同步配置">
+                        
+                        <span class="card-title">搭建rsync服务来同步配置</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2018-12-16
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('3'),
+            headingSelector: 'h2, h3, h4, h5'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4, h5').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="764454432"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='list'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">2017</span>
+            <a href="/about" target="_blank">Escape</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">699.3k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2017";
+                    var startMonth = "2";
+                    var startDate = "14";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/EscapeLife" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wenpanhappy@126.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/search.xml", 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

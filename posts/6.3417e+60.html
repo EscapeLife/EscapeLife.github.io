@@ -1,0 +1,1783 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Celery任务队列高级用法, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Celery任务队列高级用法 | Escape</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Escape</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Escape</div>
+        <div class="logo-desc">
+            
+            听摇滚,但不偏颇;也挺古典,但不安逸
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/EscapeLife" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/EscapeLife" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/amqs-celery-9.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Celery任务队列高级用法</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Python/">
+                                <span class="chip bg-color">Python</span>
+                            </a>
+                        
+                            <a href="/tags/Module/">
+                                <span class="chip bg-color">Module</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Python成长之途/" class="post-category">
+                                Python成长之途
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2019-06-24
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2020-04-17
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    3.2k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    14 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <blockquote>
+<p><strong>对于普通的任务来说可能无法满足我们的任务需求，所以还需要了解一些进阶用法，Celery 提供了诸多调度方式，例如任务编排、根据任务状态执行不同的操作、重试机制等。</strong></p>
+</blockquote>
+<p><img src="../images/amqs-celery-9.jpg" alt="任务队列Celery高级用法"></p>
+<p>[TOC]</p>
+<hr>
+<h2 id="1-相关组件介绍"><a href="#1-相关组件介绍" class="headerlink" title="1. 相关组件介绍"></a>1. 相关组件介绍</h2><blockquote>
+<p><strong>了解 Celery 相关的生态环境</strong></p>
+</blockquote>
+<p><code>Celery</code> 通过消息机制进行通信，通常使用中间人 <code>Broker</code> 为客户端和 <code>Worker</code> 调节。启动一个任务，客户端向消息队列发送一条消息，然后中间人 <code>Broker</code> 将消息传递给一个 <code>Worker</code>，最后由 <code>Worker</code> 进行执行分配的任务。可以有多个 <code>Broker</code> 和 <code>Worker</code>，用来提高 <code>Celery</code> 的高可用性以及横向扩展能力。<code>Celery</code> 是用 <code>Python</code> 编写的，但协议可以用任何语言实现，如 <code>Node.js</code> 语言的 <code>node-celery</code> 项目。</p>
+<ul>
+<li><strong>支持的中间人</strong><ul>
+<li>RabbitMQ</li>
+<li>Redis</li>
+<li>Amazon SQS</li>
+</ul>
+</li>
+</ul>
+<p><img src="../images/amqs-celery-13.png" alt="任务队列Celery高级用法"></p>
+<ul>
+<li><p><strong>支持的结果存储</strong></p>
+<ul>
+<li>AMQP、Redis</li>
+<li>Memcached</li>
+<li>SQLAlchemy、Django ORM</li>
+<li>Apache Cassandra、Elasticsearch</li>
+</ul>
+</li>
+<li><p><strong>支持的并发</strong></p>
+<ul>
+<li>prefork (multiprocessing)</li>
+<li>Eventlet、gevent</li>
+<li>solo (single threaded)</li>
+</ul>
+</li>
+<li><p><strong>支持的序列化</strong></p>
+<ul>
+<li>pickle、json、yaml、msgpack</li>
+<li>zlib、bzip2 compression</li>
+<li>Cryptographic message signing</li>
+</ul>
+</li>
+</ul>
+<p><img src="../images/amqs-celery-12.jpg" alt="任务队列Celery高级用法"></p>
+<ul>
+<li><strong>支持的框架集成</strong><ul>
+<li>Flask - 不需要</li>
+<li>Tornado - tornado-celery</li>
+<li>Pyramid - pyramid_celery</li>
+<li>web2py - web2py-celery</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-简单使用方式"><a href="#2-简单使用方式" class="headerlink" title="2. 简单使用方式"></a>2. 简单使用方式</h2><blockquote>
+<p><strong>主要的用途就是，帮助你快速上手和使用！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[简单使用]</strong> 我们将所有的内容都保存到一个文件中，而针对于大型项目而已，可能就需要创建独立的模块和配置文件了。<ul>
+<li>安装环境依赖和启动基础服务</li>
+<li>编写 app 程序</li>
+<li>启动 Worker 服务并调用任务</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用docker运行MQ服务</span>
+$ docker run -d -p 5462:5462 rabbitmq
+
+<span class="token comment" spellcheck="true"># 使用docker运行Redis服务</span>
+$ docker run -d -p 6379:6379 redis
+
+<span class="token comment" spellcheck="true"># 使用pip安装依赖</span>
+$ pip <span class="token function">install</span> celery<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 最简单的Demo示例(tasks.py)</span>
+<span class="token keyword">from</span> celery <span class="token keyword">import</span> Celery
+
+app <span class="token operator">=</span> Celery<span class="token punctuation">(</span><span class="token string">'hello'</span><span class="token punctuation">,</span> broker<span class="token operator">=</span><span class="token string">'amqp://guest@localhost//'</span><span class="token punctuation">)</span>
+
+@app<span class="token punctuation">.</span>task
+<span class="token keyword">def</span> <span class="token function">add</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> x <span class="token operator">+</span> y<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 启动celery进程</span>
+$ celery worker -A hello --loglevel<span class="token operator">=</span>info
+
+<span class="token comment" spellcheck="true"># 调用任务</span>
+<span class="token comment" spellcheck="true"># 需要我们创建的实例任务并通过delay()进行调用</span>
+$ python
+<span class="token operator">>></span><span class="token operator">></span> from hello.tasks <span class="token function">import</span> add
+<span class="token operator">>></span><span class="token operator">></span> add.delay<span class="token punctuation">(</span>4, 4<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[后端存储]</strong> 如果需要保存任务状态，Celery 需要在某处存储任务的状态信息，其中内置了一些后端存储方案。通过配置文件中的 <code>backend</code> 参数，来指定后端存储方案。在已经配置后端存储的情况下，重新执行任务调用，可以保存对应的消息状态。<ul>
+<li><strong>ORM</strong>(<code>SQLAlchemy/Django</code>)</li>
+<li><strong>Memcached</strong></li>
+<li><strong>Redis</strong></li>
+<li><strong>RPC</strong>(<code>RabbitMQ/AMQP</code>)</li>
+<li>自定义的后端结果存储中间件</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># RPC</span>
+app <span class="token operator">=</span> Celery<span class="token punctuation">(</span><span class="token string">'hello'</span>, backend<span class="token operator">=</span><span class="token string">'rpc://'</span>, broker<span class="token operator">=</span><span class="token string">'pyamqp://'</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># Redis</span>
+app <span class="token operator">=</span> Celery<span class="token punctuation">(</span><span class="token string">'hello'</span>, backend<span class="token operator">=</span><span class="token string">'redis://localhost'</span>, broker<span class="token operator">=</span><span class="token string">'pyamqp://'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 调用任务</span>
+<span class="token comment" spellcheck="true"># 需要我们创建的实例任务并通过delay()进行调用</span>
+$ python
+<span class="token operator">>></span><span class="token operator">></span> from hello.tasks <span class="token function">import</span> add
+<span class="token operator">>></span><span class="token operator">></span> result <span class="token operator">=</span> add.delay<span class="token punctuation">(</span>4, 4<span class="token punctuation">)</span>
+<span class="token operator">>></span><span class="token operator">></span> result.ready<span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># 检测是否已经处理完毕</span>
+False
+<span class="token operator">>></span><span class="token operator">></span> result.get<span class="token punctuation">(</span>timeout<span class="token operator">=</span>1<span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># 设置超时时间</span>
+8
+<span class="token operator">>></span><span class="token operator">></span> result.get<span class="token punctuation">(</span>propagate<span class="token operator">=</span>False<span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># 是否再次引发异常</span>
+<span class="token operator">>></span><span class="token operator">></span> result.traceback  <span class="token comment" spellcheck="true"># 任务出现异常进行回溯</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[相关配置]</strong> 大多数情况下，使用默认的配置就可以满足，当然也可以根据我们的实际需求按需配置。针对大型的项目，建议使用专用配置模块进行配置，将所有的配置项集中化配置。</li>
+</ul>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># [配置项] 通过upate进行配置</span>
+<span class="token comment" spellcheck="true"># 程序启动时导入的模块列表，便于Worker执行相应的任务</span>
+<span class="token keyword">from</span> celery <span class="token keyword">import</span> Celery
+
+app <span class="token operator">=</span> Celery<span class="token punctuation">(</span><span class="token string">'hello'</span><span class="token punctuation">,</span>
+             backend<span class="token operator">=</span><span class="token string">'redis://localhost'</span><span class="token punctuation">,</span>
+             broker<span class="token operator">=</span><span class="token string">'pyamqp://'</span><span class="token punctuation">,</span>
+             include<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'hello.tasks'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+app<span class="token punctuation">.</span>conf<span class="token punctuation">.</span>update<span class="token punctuation">(</span>
+    task_serializer<span class="token operator">=</span><span class="token string">'json'</span><span class="token punctuation">,</span>  <span class="token comment" spellcheck="true"># 设置任务输出格式</span>
+    accept_content<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'json'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>  <span class="token comment" spellcheck="true"># 忽略其他内容</span>
+    result_serializer<span class="token operator">=</span><span class="token string">'json'</span><span class="token punctuation">,</span>  <span class="token comment" spellcheck="true"># 设置结果输出格式</span>
+    timezone<span class="token operator">=</span><span class="token string">'Europe/Oslo'</span><span class="token punctuation">,</span>  <span class="token comment" spellcheck="true"># 时区</span>
+    enable_utc<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span>  <span class="token comment" spellcheck="true"># 启用UTC时钟</span>
+    task_routes<span class="token operator">=</span><span class="token punctuation">{</span>  <span class="token comment" spellcheck="true"># 设置任务专用队列</span>
+        <span class="token string">'hello.tasks.add'</span><span class="token punctuation">:</span> <span class="token string">'low-priority'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    task_annotations <span class="token operator">=</span> <span class="token punctuation">{</span>  <span class="token comment" spellcheck="true"># 任务进行限速</span>
+        <span class="token string">'hello.tasks.add'</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">'rate_limit'</span><span class="token punctuation">:</span> <span class="token string">'10/m'</span><span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
+    app<span class="token punctuation">.</span>start<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># $ celery worker -A hello -Q hello</span>
+<span class="token comment" spellcheck="true"># >>> from hello.tasks import add</span>
+<span class="token comment" spellcheck="true"># >>> add.apply_async((2, 2), queue='hello')</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># [配置模块] 加载配置模块</span>
+app<span class="token punctuation">.</span>config_from_object<span class="token punctuation">(</span><span class="token string">'celery_config'</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># celery_config.py</span>
+broker_url <span class="token operator">=</span> <span class="token string">'pyamqp://'</span>
+result_backend <span class="token operator">=</span> <span class="token string">'rpc://'</span>
+
+task_serializer <span class="token operator">=</span> <span class="token string">'json'</span>
+result_serializer <span class="token operator">=</span> <span class="token string">'json'</span>
+accept_content <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'json'</span><span class="token punctuation">]</span>
+timezone <span class="token operator">=</span> <span class="token string">'Europe/Oslo'</span>
+enable_utc <span class="token operator">=</span> <span class="token boolean">True</span>
+
+task_routes <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">'hello.tasks.add'</span><span class="token punctuation">:</span> <span class="token string">'low-priority'</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+
+task_annotations <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">'hello.tasks.add'</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">'rate_limit'</span><span class="token punctuation">:</span> <span class="token string">'10/m'</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[远程控制]</strong> 对应运行中的队列任务，我们可以通过对应的命令进行监控。<ul>
+<li><a href="https://www.celerycn.io/yong-hu-zhi-nan/ren-wu-tasks/ren-wu-qing-qiu-task-request" target="_blank" rel="noopener">任务请求：Task Request</a></li>
+<li><a href="https://www.celerycn.io/yong-hu-zhi-nan/tiao-yong-ren-wu-calling-tasks" target="_blank" rel="noopener">调用任务：Calling Tasks</a></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># inspect</span>
+$ celery -A proj inspect --help
+
+<span class="token comment" spellcheck="true"># control</span>
+$ celery -A proj control --help
+
+<span class="token comment" spellcheck="true"># event</span>
+$ celery -A proj events --help
+
+<span class="token comment" spellcheck="true"># status</span>
+$ celery -A proj status --help<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<hr>
+<h2 id="3-进阶-定时任务"><a href="#3-进阶-定时任务" class="headerlink" title="3. 进阶 - 定时任务"></a>3. 进阶 - 定时任务</h2><pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Celery的提供的定时任务主要靠schedules来完成</span>
+<span class="token comment" spellcheck="true"># 通过beat组件周期性的将任务发送给woker进行执行</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># period_task.py</span>
+<span class="token comment" spellcheck="true"># 新建period_task.py文件并添加任务到配置文件中</span>
+
+<span class="token keyword">from</span> learn_celery <span class="token keyword">import</span> app
+<span class="token keyword">from</span> celery<span class="token punctuation">.</span>schedules <span class="token keyword">import</span> crontab
+
+@app<span class="token punctuation">.</span>task
+<span class="token keyword">def</span> <span class="token function">add</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>x<span class="token operator">+</span>y<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> x<span class="token operator">+</span>y
+
+@app<span class="token punctuation">.</span>task
+<span class="token keyword">def</span> <span class="token function">say_hello</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> f<span class="token string">'hello {name}'</span>
+
+@app<span class="token punctuation">.</span>on_after_configure<span class="token punctuation">.</span>connect
+<span class="token keyword">def</span> <span class="token function">setup_periodic_tasks</span><span class="token punctuation">(</span>sender<span class="token punctuation">,</span> <span class="token operator">**</span>kwargs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token comment" spellcheck="true"># 每10秒执行add任务</span>
+    sender<span class="token punctuation">.</span>add_periodic_task<span class="token punctuation">(</span><span class="token number">10.0</span><span class="token punctuation">,</span> add<span class="token punctuation">.</span>s<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">,</span> name<span class="token operator">=</span><span class="token string">'1+3='</span><span class="token punctuation">)</span>
+    sender<span class="token punctuation">.</span>add_periodic_task<span class="token punctuation">(</span>
+        <span class="token comment" spellcheck="true"># 每周一下午四点五十六执行say_hello任务</span>
+        crontab<span class="token punctuation">(</span>hour<span class="token operator">=</span><span class="token number">16</span><span class="token punctuation">,</span> minute<span class="token operator">=</span><span class="token number">56</span><span class="token punctuation">,</span> day_of_week<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        say_hello<span class="token punctuation">.</span>s<span class="token punctuation">(</span><span class="token string">'escape'</span><span class="token punctuation">)</span><span class="token punctuation">,</span> name<span class="token operator">=</span><span class="token string">'say_hello'</span>
+    <span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># config.py</span>
+
+BROKER_URL <span class="token operator">=</span> <span class="token string">'redis://:scriber@127.0.0.1:6379/0'</span> <span class="token comment" spellcheck="true"># Broker配置</span>
+CELERY_RESULT_BACKEND <span class="token operator">=</span> <span class="token string">'redis://:scriber@127.0.0.1:6379/0'</span> <span class="token comment" spellcheck="true"># BACKEND配置</span>
+CELERY_RESULT_SERIALIZER <span class="token operator">=</span> <span class="token string">'json'</span> <span class="token comment" spellcheck="true"># 结果序列化方案</span>
+CELERY_TASK_RESULT_EXPIRES <span class="token operator">=</span> <span class="token number">60</span> <span class="token operator">*</span> <span class="token number">60</span> <span class="token operator">*</span> <span class="token number">24</span> <span class="token comment" spellcheck="true"># 任务过期时间</span>
+CELERY_TIMEZONE<span class="token operator">=</span><span class="token string">'Asia/Shanghai'</span> <span class="token comment" spellcheck="true"># 时区配置</span>
+CELERY_IMPORTS <span class="token operator">=</span> <span class="token punctuation">(</span>              <span class="token comment" spellcheck="true"># 指定导入的任务模块</span>
+    <span class="token string">'learn_celery.tasks'</span><span class="token punctuation">,</span>       <span class="token comment" spellcheck="true"># 普通任务</span>
+    <span class="token string">'learn_celery.period_task'</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true"># 定时任务</span>
+<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 启动worker和beat之后观察worker日志</span>
+<span class="token comment" spellcheck="true"># 会发现定时任务会自动往队列中添加，之后被对应worker消费掉</span>
+
+<span class="token comment" spellcheck="true"># 启动worker</span>
+$ celery worker -A learn_celery.tasks -l debug
+
+<span class="token comment" spellcheck="true"># 启动beat</span>
+$ celery beat -A learn_celery.period_task -l debug<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># config.py</span>
+<span class="token comment" spellcheck="true"># 还可以通过配置文件方式指定定时和计划任务</span>
+
+from learn_celery <span class="token function">import</span> app
+from celery.schedules <span class="token function">import</span> <span class="token function">crontab</span>
+
+BROKER_URL <span class="token operator">=</span> <span class="token string">'redis://:scriber@127.0.0.1:6379/0'</span> <span class="token comment" spellcheck="true"># Broker配置</span>
+CELERY_RESULT_BACKEND <span class="token operator">=</span> <span class="token string">'redis://:scriber@127.0.0.1:6379/0'</span> <span class="token comment" spellcheck="true"># BACKEND配置</span>
+CELERY_RESULT_SERIALIZER <span class="token operator">=</span> <span class="token string">'json'</span> <span class="token comment" spellcheck="true"># 结果序列化方案</span>
+CELERY_TASK_RESULT_EXPIRES <span class="token operator">=</span> 60 * 60 * 24 <span class="token comment" spellcheck="true"># 任务过期时间</span>
+CELERY_TIMEZONE<span class="token operator">=</span><span class="token string">'Asia/Shanghai'</span> <span class="token comment" spellcheck="true"># 时区配置</span>
+CELERY_IMPORTS <span class="token operator">=</span> <span class="token punctuation">(</span>              <span class="token comment" spellcheck="true"># 指定导入的任务模块</span>
+    <span class="token string">'learn_celery.tasks'</span>,       <span class="token comment" spellcheck="true"># 普通任务</span>
+    <span class="token string">'learn_celery.period_task'</span>, <span class="token comment" spellcheck="true"># 定时任务</span>
+<span class="token punctuation">)</span>
+
+app.conf.beat_schedule <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">'period_add_task'</span><span class="token keyword">:</span> <span class="token punctuation">{</span> <span class="token comment" spellcheck="true"># 添加计划任务</span>
+        <span class="token string">'task'</span><span class="token keyword">:</span> <span class="token string">'learn_celery.period_task.add'</span>, <span class="token comment" spellcheck="true"># 任务路径</span>
+        <span class="token string">'schedule'</span><span class="token keyword">:</span> crontab<span class="token punctuation">(</span>hour<span class="token operator">=</span>18, minute<span class="token operator">=</span>16, day_of_week<span class="token operator">=</span>1<span class="token punctuation">)</span>, <span class="token comment" spellcheck="true"># 执行周期</span>
+        <span class="token string">'args'</span><span class="token keyword">:</span> <span class="token punctuation">(</span>3, 4<span class="token punctuation">)</span>, <span class="token comment" spellcheck="true"># 传入参数</span>
+    <span class="token punctuation">}</span>,
+    <span class="token string">'say_hello'</span><span class="token keyword">:</span> <span class="token punctuation">{</span> <span class="token comment" spellcheck="true"># 添加计划任务</span>
+        <span class="token string">'task'</span><span class="token keyword">:</span> <span class="token string">'learn_celery.period_task.say_hello'</span>, <span class="token comment" spellcheck="true"># 任务路径</span>
+        <span class="token string">'schedule'</span><span class="token keyword">:</span> 10.0, <span class="token comment" spellcheck="true"># 执行周期</span>
+        <span class="token string">'args'</span><span class="token keyword">:</span> <span class="token punctuation">(</span><span class="token string">'escape'</span>,<span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 传入参数</span>
+    <span class="token punctuation">}</span>,
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># period_task.py</span>
+<span class="token comment" spellcheck="true"># 此时的period_task.py只需要注册到woker中就行了</span>
+
+from project <span class="token function">import</span> app
+
+@app.task
+def add<span class="token punctuation">(</span>x,y<span class="token punctuation">)</span>:
+    print<span class="token punctuation">(</span>x+y<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> x+y
+
+@app.task
+def say_hello<span class="token punctuation">(</span>name<span class="token punctuation">)</span>:
+    <span class="token keyword">return</span> f<span class="token string">'hello {name}'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="4-进阶-任务绑定"><a href="#4-进阶-任务绑定" class="headerlink" title="4. 进阶 - 任务绑定"></a>4. 进阶 - 任务绑定</h2><pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Celery可通过任务绑定到实例获取到任务的上下文</span>
+<span class="token comment" spellcheck="true"># 这样我们可以在任务运行时候获取到任务的状态，记录相关日志等</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># period_task.py</span>
+<span class="token comment" spellcheck="true"># 通过bind参数将任务绑定，self指任务的上下文</span>
+<span class="token comment" spellcheck="true"># 通过self获取任务状态，同时在任务出错时进行任务重试</span>
+
+<span class="token keyword">from</span> learn_celery <span class="token keyword">import</span> app
+<span class="token keyword">from</span> celery<span class="token punctuation">.</span>utils<span class="token punctuation">.</span>log <span class="token keyword">import</span> get_task_logger
+
+logger <span class="token operator">=</span> get_task_logger<span class="token punctuation">(</span>__name__<span class="token punctuation">)</span>
+
+@app<span class="token punctuation">.</span>task<span class="token punctuation">(</span>bind<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 绑定任务</span>
+<span class="token keyword">def</span> <span class="token function">add</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> x<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    logger<span class="token punctuation">.</span>info<span class="token punctuation">(</span>self<span class="token punctuation">.</span>request<span class="token punctuation">.</span>__dict__<span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 打印日志</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        a<span class="token operator">=</span><span class="token punctuation">[</span><span class="token punctuation">]</span>
+        a<span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token number">1</span>
+    <span class="token keyword">except</span> Exception <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+        <span class="token comment" spellcheck="true"># 出错每5秒尝试一次，总共尝试3次</span>
+        <span class="token keyword">raise</span> self<span class="token punctuation">.</span>retry<span class="token punctuation">(</span>exc<span class="token operator">=</span>e<span class="token punctuation">,</span> countdown<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">,</span> max_retries<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> x<span class="token operator">+</span>y<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="../images/amqs-celery-5.png" alt="任务队列Celery快速入门"></p>
+<hr>
+<h2 id="5-进阶-内置钩子函数"><a href="#5-进阶-内置钩子函数" class="headerlink" title="5. 进阶 - 内置钩子函数"></a>5. 进阶 - 内置钩子函数</h2><pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Celery在执行任务时候，提供了钩子方法用于在任务执行完成时候进行对应的操作</span>
+<span class="token comment" spellcheck="true"># 在Task源码中提供了很多状态钩子函数如:</span>
+<span class="token comment" spellcheck="true">#   on_success(成功后执行)</span>
+<span class="token comment" spellcheck="true">#   on_failure(失败时候执行)</span>
+<span class="token comment" spellcheck="true">#   on_retry(任务重试时候执行)</span>
+<span class="token comment" spellcheck="true">#   after_return(任务返回时候执行)</span>
+<span class="token comment" spellcheck="true"># 在进程中使用是我们只需要重写这些方法，完成相应的操作即可</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># period_task.py</span>
+<span class="token comment" spellcheck="true"># 在以下示例中，我们继续修改period_task.py文件</span>
+<span class="token comment" spellcheck="true"># 分别定义三个任务来演示任务失败、重试、任务成功后执行的操作</span>
+
+<span class="token keyword">from</span> learn_celery <span class="token keyword">import</span> app
+<span class="token keyword">from</span> celery<span class="token punctuation">.</span>utils<span class="token punctuation">.</span>log <span class="token keyword">import</span> get_task_logger
+<span class="token keyword">from</span> celery <span class="token keyword">import</span> Task
+
+logger <span class="token operator">=</span> get_task_logger<span class="token punctuation">(</span>__name__<span class="token punctuation">)</span>
+
+<span class="token keyword">class</span> <span class="token class-name">demotask</span><span class="token punctuation">(</span>Task<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token comment" spellcheck="true"># 任务成功执行</span>
+    <span class="token keyword">def</span> <span class="token function">on_success</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> retval<span class="token punctuation">,</span> task_id<span class="token punctuation">,</span> <span class="token operator">*</span>args<span class="token punctuation">,</span> <span class="token operator">**</span>kwargs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        logger<span class="token punctuation">.</span>info<span class="token punctuation">(</span>f<span class="token string">'task id:{task_id}, arg:{args}, successful!'</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># 任务失败执行</span>
+    <span class="token keyword">def</span> <span class="token function">on_failure</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> exc<span class="token punctuation">,</span> task_id<span class="token punctuation">,</span> <span class="token operator">*</span>args<span class="token punctuation">,</span> <span class="token operator">**</span>kwargs<span class="token punctuation">,</span> einfo<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        logger<span class="token punctuation">.</span>info<span class="token punctuation">(</span>f<span class="token string">'task id:{task_id}, arg:{args}, failed! erros:{exc}'</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># 任务重试执行</span>
+    <span class="token keyword">def</span> <span class="token function">on_retry</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> exc<span class="token punctuation">,</span> task_id<span class="token punctuation">,</span> <span class="token operator">*</span>args<span class="token punctuation">,</span> <span class="token operator">**</span>kwargs<span class="token punctuation">,</span> einfo<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        logger<span class="token punctuation">.</span>info<span class="token punctuation">(</span>f<span class="token string">'task id:{task_id}, arg:{args}, retry! einfo:{exc}'</span><span class="token punctuation">)</span>
+
+@app<span class="token punctuation">.</span>task<span class="token punctuation">(</span>base<span class="token operator">=</span>demotask<span class="token punctuation">,</span> bind<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">add</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> x<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        a<span class="token operator">=</span><span class="token punctuation">[</span><span class="token punctuation">]</span>
+        a<span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token number">1</span>
+    <span class="token keyword">except</span> Exception <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+        <span class="token comment" spellcheck="true"># 出错每5秒尝试一次，总共尝试1次</span>
+        <span class="token keyword">raise</span> self<span class="token punctuation">.</span>retry<span class="token punctuation">(</span>exc<span class="token operator">=</span>e<span class="token punctuation">,</span> countdown<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">,</span> max_retries<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> x<span class="token operator">+</span>y
+
+@app<span class="token punctuation">.</span>task<span class="token punctuation">(</span>base<span class="token operator">=</span>demotask<span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">say_hello</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    a<span class="token operator">=</span><span class="token punctuation">[</span><span class="token punctuation">]</span>
+    a<span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token number">1</span>
+    <span class="token keyword">return</span> f<span class="token string">'hello {name}'</span>
+
+@app<span class="token punctuation">.</span>task<span class="token punctuation">(</span>base<span class="token operator">=</span>demotask<span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">sum</span><span class="token punctuation">(</span>a<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> f<span class="token string">'a+b={a+b}'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># config.py</span>
+
+<span class="token keyword">from</span> learn_celery <span class="token keyword">import</span> app
+<span class="token keyword">from</span> celery<span class="token punctuation">.</span>schedules <span class="token keyword">import</span> crontab
+
+BROKER_URL <span class="token operator">=</span> <span class="token string">'redis://:scriber@127.0.0.1:6379/0'</span> <span class="token comment" spellcheck="true"># Broker配置</span>
+CELERY_RESULT_BACKEND <span class="token operator">=</span> <span class="token string">'redis://:scriber@127.0.0.1:6379/0'</span> <span class="token comment" spellcheck="true"># BACKEND配置</span>
+CELERY_RESULT_SERIALIZER <span class="token operator">=</span> <span class="token string">'json'</span> <span class="token comment" spellcheck="true"># 结果序列化方案</span>
+CELERY_TASK_RESULT_EXPIRES <span class="token operator">=</span> <span class="token number">60</span> <span class="token operator">*</span> <span class="token number">60</span> <span class="token operator">*</span> <span class="token number">24</span> <span class="token comment" spellcheck="true"># 任务过期时间</span>
+CELERY_TIMEZONE<span class="token operator">=</span><span class="token string">'Asia/Shanghai'</span> <span class="token comment" spellcheck="true"># 时区配置</span>
+CELERY_IMPORTS <span class="token operator">=</span> <span class="token punctuation">(</span>              <span class="token comment" spellcheck="true"># 指定导入的任务模块</span>
+    <span class="token string">'learn_celery.tasks'</span><span class="token punctuation">,</span>       <span class="token comment" spellcheck="true"># 普通任务</span>
+    <span class="token string">'learn_celery.period_task'</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true"># 定时任务</span>
+<span class="token punctuation">)</span>
+
+app<span class="token punctuation">.</span>conf<span class="token punctuation">.</span>beat_schedule <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">'add'</span><span class="token punctuation">:</span> <span class="token punctuation">{</span> <span class="token comment" spellcheck="true"># 每10秒执行</span>
+        <span class="token string">'task'</span><span class="token punctuation">:</span> <span class="token string">'learn_celery.period_task.add'</span><span class="token punctuation">,</span>
+        <span class="token string">'schedule'</span><span class="token punctuation">:</span> <span class="token number">10.0</span><span class="token punctuation">,</span>
+        <span class="token string">'args'</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">12</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">'say_hello'</span><span class="token punctuation">:</span> <span class="token punctuation">{</span> <span class="token comment" spellcheck="true"># 每10秒执行</span>
+        <span class="token string">'task'</span><span class="token punctuation">:</span> <span class="token string">'learn_celery.period_task.say_hello'</span><span class="token punctuation">,</span>
+        <span class="token string">'schedule'</span><span class="token punctuation">:</span> <span class="token number">10.0</span><span class="token punctuation">,</span>
+        <span class="token string">'args'</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token string">'escape'</span><span class="token punctuation">,</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">'sum'</span><span class="token punctuation">:</span> <span class="token punctuation">{</span> <span class="token comment" spellcheck="true"># 每10秒执行</span>
+        <span class="token string">'task'</span><span class="token punctuation">:</span> <span class="token string">'learn_celery.period_task.sum'</span><span class="token punctuation">,</span>
+        <span class="token string">'schedule'</span><span class="token punctuation">:</span> <span class="token number">10.0</span><span class="token punctuation">,</span>
+        <span class="token string">'args'</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="../images/amqs-celery-6.png" alt="任务队列Celery快速入门"></p>
+<hr>
+<h2 id="6-进阶-任务编排"><a href="#6-进阶-任务编排" class="headerlink" title="6. 进阶 - 任务编排"></a>6. 进阶 - 任务编排</h2><pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 在很多情况下，一个任务需要由多个子任务或者一个任务需要很多步骤才能完成</span>
+<span class="token comment" spellcheck="true"># Celery同样也能实现这样的任务，完成这类型的任务通过以下模块完成</span>
+<span class="token comment" spellcheck="true">#   group: 并行调度任务</span>
+<span class="token comment" spellcheck="true">#   chain: 链式任务调度</span>
+<span class="token comment" spellcheck="true">#   chord: 类似group但分header和body2个部分;header可以是一个group任务，执行完成后调用body的任务</span>
+<span class="token comment" spellcheck="true">#   map: 映射调度，通过输入多个入参来多次调度同一个任务</span>
+<span class="token comment" spellcheck="true">#   starmap: 类似map，入参类似＊args</span>
+<span class="token comment" spellcheck="true">#   chunks: 将任务按照一定数量进行分组</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># tasks.py</span>
+
+<span class="token keyword">from</span> learn_celery <span class="token keyword">import</span> app
+
+@app<span class="token punctuation">.</span>task
+<span class="token keyword">def</span> <span class="token function">add</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> x<span class="token operator">+</span>y
+
+@app<span class="token punctuation">.</span>task
+<span class="token keyword">def</span> <span class="token function">mul</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> x<span class="token operator">*</span>y
+
+@app<span class="token punctuation">.</span>task
+<span class="token keyword">def</span> <span class="token function">sum</span><span class="token punctuation">(</span>data_list<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    res<span class="token operator">=</span><span class="token number">0</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> data_list<span class="token punctuation">:</span>
+        res<span class="token operator">+=</span>i
+    <span class="token keyword">return</span> res<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># consumer.py</span>
+<span class="token comment" spellcheck="true"># group: 组任务</span>
+<span class="token comment" spellcheck="true"># 组内每个任务并行执行</span>
+
+<span class="token keyword">from</span> celery <span class="token keyword">import</span> group
+<span class="token keyword">from</span> learn_celery<span class="token punctuation">.</span>tasks <span class="token keyword">import</span> add
+
+<span class="token comment" spellcheck="true"># 任务 [1+2, 1+2]</span>
+res <span class="token operator">=</span> group<span class="token punctuation">(</span>add<span class="token punctuation">.</span>s<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">,</span> add<span class="token punctuation">.</span>s<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> res<span class="token punctuation">.</span>ready<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">'res:{res.get()}'</span><span class="token punctuation">)</span>
+        <span class="token keyword">break</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="../images/amqs-celery-7.png" alt="任务队列Celery快速入门"></p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># consumer.py</span>
+<span class="token comment" spellcheck="true"># chain: 链式任务</span>
+<span class="token comment" spellcheck="true"># 链式任务中，默认上一个任务的返回结果作为参数传递给子任务</span>
+
+<span class="token keyword">from</span> celery <span class="token keyword">import</span> group
+<span class="token keyword">from</span> learn_celery<span class="token punctuation">.</span>tasks <span class="token keyword">import</span> add<span class="token punctuation">,</span> mul<span class="token punctuation">,</span> sum
+
+<span class="token comment" spellcheck="true"># 任务((1+2)+3)*3</span>
+res <span class="token operator">=</span> chain<span class="token punctuation">(</span>add<span class="token punctuation">.</span>s<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">,</span> add<span class="token punctuation">.</span>s<span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">,</span> mul<span class="token punctuation">.</span>s<span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> res<span class="token punctuation">.</span>ready<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">'res:{res.get()}'</span><span class="token punctuation">)</span>
+        <span class="token keyword">break</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># consumer.py</span>
+<span class="token comment" spellcheck="true"># chord：任务分割</span>
+<span class="token comment" spellcheck="true"># 分为header和body两部分</span>
+<span class="token comment" spellcheck="true"># hearder任务执行完在执行body，其中hearder返回结果作为参数传递给body</span>
+
+<span class="token keyword">from</span> celery <span class="token keyword">import</span> group
+<span class="token keyword">from</span> learn_celery<span class="token punctuation">.</span>tasks <span class="token keyword">import</span> add<span class="token punctuation">,</span> mul<span class="token punctuation">,</span> sum
+
+<span class="token comment" spellcheck="true"># 任务(1+2)+(3*4)</span>
+res <span class="token operator">=</span> chord<span class="token punctuation">(</span>header<span class="token operator">=</span><span class="token punctuation">[</span>add<span class="token punctuation">.</span>s<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">,</span> mul<span class="token punctuation">.</span>s<span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">,</span> body<span class="token operator">=</span>sum<span class="token punctuation">.</span>s<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> res<span class="token punctuation">.</span>ready<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'res:{}'</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>res<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">break</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># consumer.py</span>
+<span class="token comment" spellcheck="true"># chunks：任务分组</span>
+<span class="token comment" spellcheck="true"># 按照任务的个数分组</span>
+
+<span class="token keyword">from</span> learn_celery<span class="token punctuation">.</span>tasks <span class="token keyword">import</span> add<span class="token punctuation">,</span> mul<span class="token punctuation">,</span> sum
+
+<span class="token comment" spellcheck="true"># 4代表每组的任务的个数</span>
+res <span class="token operator">=</span> add<span class="token punctuation">.</span>chunks<span class="token punctuation">(</span>zip<span class="token punctuation">(</span>range<span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">,</span> range<span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> res<span class="token punctuation">.</span>ready<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'res:{}'</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>res<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">break</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="../images/amqs-celery-8.png" alt="任务队列Celery快速入门"></p>
+<hr>
+<h2 id="7-异步调用原理"><a href="#7-异步调用原理" class="headerlink" title="7. 异步调用原理"></a>7. 异步调用原理</h2><blockquote>
+<p><strong>主要解释 delay 和 apply_async 的使用方法和区别</strong></p>
+</blockquote>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 对于delay和apply_async都可以用来进行任务的调度</span>
+<span class="token comment" spellcheck="true"># 本质上是delay对apply_async进行了再一次封装或者可以说是快捷方式</span>
+<span class="token comment" spellcheck="true"># 两者都返回AsyncResult对象，以下是两个方法源码</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># --------------------------------------------</span>
+<span class="token comment" spellcheck="true"># delay源码</span>
+<span class="token comment" spellcheck="true"># --------------------------------------------</span>
+<span class="token keyword">def</span> <span class="token function">delay</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> <span class="token operator">*</span>args<span class="token punctuation">,</span> <span class="token operator">**</span>kwargs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token triple-quoted-string string">"""Star argument version of :meth:`apply_async`.
+
+        Does not support the extra options enabled by :meth:`apply_async`.
+
+        Arguments:
+            *args (Any): Positional arguments passed on to the task.
+            **kwargs (Any): Keyword arguments passed on to the task.
+        Returns:
+            celery.result.AsyncResult: Future promise.
+        """</span>
+        <span class="token keyword">return</span> self<span class="token punctuation">.</span>apply_async<span class="token punctuation">(</span>args<span class="token punctuation">,</span> kwargs<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># --------------------------------------------</span>
+<span class="token comment" spellcheck="true"># apply_async源码</span>
+<span class="token comment" spellcheck="true"># --------------------------------------------</span>
+<span class="token keyword">def</span> <span class="token function">apply_async</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> args<span class="token operator">=</span>None<span class="token punctuation">,</span> kwargs<span class="token operator">=</span>None<span class="token punctuation">,</span> task_id<span class="token operator">=</span>None<span class="token punctuation">,</span> producer<span class="token operator">=</span>None<span class="token punctuation">,</span>
+                    link<span class="token operator">=</span>None<span class="token punctuation">,</span> link_error<span class="token operator">=</span>None<span class="token punctuation">,</span> shadow<span class="token operator">=</span>None<span class="token punctuation">,</span> <span class="token operator">**</span>options<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> self<span class="token punctuation">.</span>typing<span class="token punctuation">:</span>
+            <span class="token keyword">try</span><span class="token punctuation">:</span>
+                check_arguments <span class="token operator">=</span> self<span class="token punctuation">.</span>__header__
+            <span class="token keyword">except</span> AttributeError<span class="token punctuation">:</span>  <span class="token comment" spellcheck="true"># pragma: no cover</span>
+                <span class="token keyword">pass</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                check_arguments<span class="token punctuation">(</span><span class="token operator">*</span><span class="token punctuation">(</span>args <span class="token operator">or</span> <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">**</span><span class="token punctuation">(</span>kwargs <span class="token operator">or</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+        app <span class="token operator">=</span> self<span class="token punctuation">.</span>_get_app<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> app<span class="token punctuation">.</span>conf<span class="token punctuation">.</span>task_always_eager<span class="token punctuation">:</span>
+            <span class="token keyword">with</span> denied_join_result<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">return</span> self<span class="token punctuation">.</span>apply<span class="token punctuation">(</span>args<span class="token punctuation">,</span> kwargs<span class="token punctuation">,</span> task_id<span class="token operator">=</span>task_id <span class="token operator">or</span> uuid<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                                  link<span class="token operator">=</span>link<span class="token punctuation">,</span> link_error<span class="token operator">=</span>link_error<span class="token punctuation">,</span> <span class="token operator">**</span>options<span class="token punctuation">)</span>
+
+        <span class="token keyword">if</span> self<span class="token punctuation">.</span>__v2_compat__<span class="token punctuation">:</span>
+            shadow <span class="token operator">=</span> shadow <span class="token operator">or</span> self<span class="token punctuation">.</span>shadow_name<span class="token punctuation">(</span>self<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> args<span class="token punctuation">,</span> kwargs<span class="token punctuation">,</span> options<span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            shadow <span class="token operator">=</span> shadow <span class="token operator">or</span> self<span class="token punctuation">.</span>shadow_name<span class="token punctuation">(</span>args<span class="token punctuation">,</span> kwargs<span class="token punctuation">,</span> options<span class="token punctuation">)</span>
+
+        preopts <span class="token operator">=</span> self<span class="token punctuation">.</span>_get_exec_options<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        options <span class="token operator">=</span> dict<span class="token punctuation">(</span>preopts<span class="token punctuation">,</span> <span class="token operator">**</span>options<span class="token punctuation">)</span> <span class="token keyword">if</span> options <span class="token keyword">else</span> preopts
+
+        options<span class="token punctuation">.</span>setdefault<span class="token punctuation">(</span><span class="token string">'ignore_result'</span><span class="token punctuation">,</span> self<span class="token punctuation">.</span>ignore_result<span class="token punctuation">)</span>
+
+        <span class="token keyword">return</span> app<span class="token punctuation">.</span>send_task<span class="token punctuation">(</span>
+            self<span class="token punctuation">.</span>name<span class="token punctuation">,</span> args<span class="token punctuation">,</span> kwargs<span class="token punctuation">,</span> task_id<span class="token operator">=</span>task_id<span class="token punctuation">,</span> producer<span class="token operator">=</span>producer<span class="token punctuation">,</span>
+            link<span class="token operator">=</span>link<span class="token punctuation">,</span> link_error<span class="token operator">=</span>link_error<span class="token punctuation">,</span> result_cls<span class="token operator">=</span>self<span class="token punctuation">.</span>AsyncResult<span class="token punctuation">,</span>
+            shadow<span class="token operator">=</span>shadow<span class="token punctuation">,</span> task_type<span class="token operator">=</span>self<span class="token punctuation">,</span>
+            <span class="token operator">**</span>options
+        <span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="8-使用注意事项"><a href="#8-使用注意事项" class="headerlink" title="8. 使用注意事项"></a>8. 使用注意事项</h2><blockquote>
+<p><a href="https://foofish.net/celery-toturial1.html" target="_blank" rel="noopener"><strong>Celery 快速入门</strong></a> &gt; <a href="https://www.cnblogs.com/wdliu/p/9517535.html" target="_blank" rel="noopener"><strong>分布式任务队列 Celery 入门与进阶</strong></a></p>
+</blockquote>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># -------------------------------------------------------------------</span>
+<span class="token comment" spellcheck="true"># 1.在celery中worker启动时，如果是root用户则需要设置环境变量</span>
+<span class="token comment" spellcheck="true"># -------------------------------------------------------------------</span>
+$ <span class="token function">export</span> C_FORCE_ROOT<span class="token operator">=</span><span class="token string">'true'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># -------------------------------------------------------------------</span>
+<span class="token comment" spellcheck="true"># 2.使用RabbitMQ或Redis作为Broker的话，生产环境永远不要使用关系型数据库</span>
+<span class="token comment" spellcheck="true"># 3.Celery4.x开始不再支持Windows平台，如果需要在Windows开发请使用3.x的版本</span>
+$ pip <span class="token function">install</span> celer<span class="token punctuation">[</span>redis<span class="token punctuation">]</span><span class="token operator">==</span>4.3.0
+$ pip <span class="token function">install</span> celery<span class="token punctuation">[</span>librabbitmq<span class="token punctuation">]</span>
+$ pip <span class="token function">install</span> celery<span class="token punctuation">[</span>librabbitmq,redis,auth,msgpack<span class="token punctuation">]</span>
+<span class="token comment" spellcheck="true"># -------------------------------------------------------------------</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 4.良好的配置操作</span>
+<span class="token comment" spellcheck="true"># 禁用预取任务是为了防止Broker分配任务不均导致多次重复执行</span>
+<span class="token comment" spellcheck="true"># 设置执行多少次任务之后进行销毁是为了防止卡死的出现和发生</span>
+worker_prefetch_multiplier<span class="token operator">=</span>0   <span class="token comment" spellcheck="true"># 禁用预取任务</span>
+worker_max_tasks_per_child<span class="token operator">=</span>50  <span class="token comment" spellcheck="true"># 每个worker执行50次任务即销毁</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># -------------------------------------------------------------------</span>
+<span class="token comment" spellcheck="true"># 5.不要使用复杂对象作为任务函数的参数</span>
+<span class="token comment" spellcheck="true"># -------------------------------------------------------------------</span>
+
+<span class="token comment" spellcheck="true"># Good</span>
+@app<span class="token punctuation">.</span>task
+<span class="token keyword">def</span> <span class="token function">my_task</span><span class="token punctuation">(</span>user_id<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    user <span class="token operator">=</span> User<span class="token punctuation">.</span>objects<span class="token punctuation">.</span>get<span class="token punctuation">(</span>id<span class="token operator">=</span>user_id<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>user<span class="token punctuation">.</span>name<span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+<span class="token comment" spellcheck="true"># Bad</span>
+@app<span class="token punctuation">.</span>task
+<span class="token keyword">def</span> <span class="token function">my_task</span><span class="token punctuation">(</span>user<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>user<span class="token punctuation">.</span>name<span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="9-相关参考链接"><a href="#9-相关参考链接" class="headerlink" title="9. 相关参考链接"></a>9. 相关参考链接</h2><blockquote>
+<p><strong>授人玫瑰，手有余香！</strong></p>
+</blockquote>
+<ul>
+<li><a href="https://www.celerycn.io/ru-men/celery-jian-jie" target="_blank" rel="noopener">Celery 中文手册</a></li>
+</ul>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Escape</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://escapelife.github.io/posts/6.3417e+60.html">https://escapelife.github.io/posts/6.3417e+60.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Escape</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Python/">
+                                    <span class="chip bg-color">Python</span>
+                                </a>
+                            
+                                <a href="/tags/Module/">
+                                    <span class="chip bg-color">Module</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/posts/df48f637.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/linux-goaccess-tool.jpg" class="responsive-img" alt="GoAccessWeb日志分析工具">
+                        
+                        <span class="card-title">GoAccessWeb日志分析工具</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2019-07-01
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Tools工具分享/" class="post-category">
+                                    Tools工具分享
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                    <a href="/tags/Tools/">
+                        <span class="chip bg-color">Tools</span>
+                    </a>
+                    
+                    <a href="/tags/Nginx/">
+                        <span class="chip bg-color">Nginx</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/posts/b47f1fcb.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/postgres-backup-restore.jpg" class="responsive-img" alt="Postgres数据库归档热备份">
+                        
+                        <span class="card-title">Postgres数据库归档热备份</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2019-06-22
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Postgres浅入浅出/" class="post-category">
+                                    Postgres浅入浅出
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Postgres/">
+                        <span class="chip bg-color">Postgres</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('3'),
+            headingSelector: 'h2, h3, h4, h5'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4, h5').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="764454432"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='list'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">2017</span>
+            <a href="/about" target="_blank">Escape</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">699.3k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2017";
+                    var startMonth = "2";
+                    var startDate = "14";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/EscapeLife" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wenpanhappy@126.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/search.xml", 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

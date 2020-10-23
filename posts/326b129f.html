@@ -1,0 +1,1825 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Linux安全之防火墙概述, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Linux安全之防火墙概述 | Escape</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Escape</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Escape</div>
+        <div class="logo-desc">
+            
+            听摇滚,但不偏颇;也挺古典,但不安逸
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/EscapeLife" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/EscapeLife" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/linux-learn-iptables-tool.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Linux安全之防火墙概述</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Linux/">
+                                <span class="chip bg-color">Linux</span>
+                            </a>
+                        
+                            <a href="/tags/Iptables/">
+                                <span class="chip bg-color">Iptables</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                Linux运维之路
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2018-02-02
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2020-07-21
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    6.8k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    25 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <blockquote>
+<p><strong>纸上得来终觉浅，绝知此事要躬行。</strong></p>
+</blockquote>
+<p><strong><a href="https://zh.wikipedia.org/zh-hans/Sudo" target="_blank" rel="noopener">iptables</a></strong>是运行在用户空间的应用软件，通过控制 <code>Linux</code> 内核 <code>netfilter</code> 模块，来管理网络数据包的处理和转发。在大部分 <code>Linux</code> 发行版中，可以通过手册页或 <code>man iptables</code> 获取用户手册。通常 <code>iptables</code> 需要内核模块支持才能运行，此处相应的内核模块通常是 <code>Xtables</code>。因此，<code>iptables</code> 操作需要超级用户权限，其可执行文件通常位于 <code>/sbin/iptables</code> 或 <code>/usr/sbin/iptables</code>。同时，需要说明的是，以上命令通常只用于处理 <code>IPv4</code> 数据包；而对于 <code>IPv6</code> 数据包，则使用类似的 <code>ip6tables</code> 命令。</p>
+<p>目前，<code>iptables</code> 支持内核 <code>2.4</code> 以上版本，旧版内核环境下则使用 <code>ipchains</code>（于 2.2 版内核）或 <code>ipwadm</code>（于 2.0 版内核）完成类似的功能。<code>2014</code> 年 <code>1</code> 月 <code>19</code> 日起发行的 <code>Linux</code> 内核 <code>3.13</code> 版则使用 <code>nftables</code> 取而代之，但仍然提供 <code>iptables</code> 命令做为兼容接口。</p>
+<p><img src="../images/linux-learn-iptables-tool.jpg" alt="Linux安全之防火墙概述"></p>
+<hr>
+<h2 id="1-防火墙管理工具"><a href="#1-防火墙管理工具" class="headerlink" title="1. 防火墙管理工具"></a>1. 防火墙管理工具</h2><blockquote>
+<p><strong>没有真正安全的防火墙，也没有绝对安全的技术！</strong></p>
+</blockquote>
+<p>保障数据的安全性是继保障数据的可用性之后最为重要的一项工作。防火墙作为公网与内网之间的保护屏障，在保障数据的安全性方面起着至关重要的作用。</p>
+<p>众所周知，相较于企业内网，外部的公网环境更加恶劣，罪恶丛生。在公网与企业内网之间充当保护屏障的<strong>防火墙</strong>，虽然有软件或硬件之分，但<strong>主要功能都是依据策略对穿越防火墙自身的流量进行过滤</strong>。防火墙策略可以基于流量的源目地址、端口号、协议、应用等信息来定制，然后防火墙使用预先定制的策略规则监控出入的流量，若流量与某一条策略规则相匹配，则执行相应的处理，反之则丢弃。这样一来，就可以保证仅有合法的流量在企业内网和外部公网之间流动了。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">IDS <span class="token punctuation">(</span>入侵检测系统<span class="token punctuation">)</span> --<span class="token operator">></span> FireWall <span class="token operator">==</span><span class="token operator">></span> IPS <span class="token punctuation">(</span>入侵防御系统<span class="token punctuation">)</span>
+    <span class="token operator">|</span>__ HIDS <span class="token punctuation">(</span>主机入侵检测系统<span class="token punctuation">)</span>
+    <span class="token operator">|</span>__ NIDS <span class="token punctuation">(</span>网络入侵检测系统<span class="token punctuation">)</span>
+    <span class="token operator">|</span>__ HoneyPot <span class="token punctuation">(</span>蜜罐系统<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="1-1-防火墙的分类"><a href="#1-1-防火墙的分类" class="headerlink" title="1.1 防火墙的分类"></a>1.1 防火墙的分类</h3><p><img src="../images/linux-learn-iptables-tool-1.png" alt="Linux安全之防火墙概述"></p>
+<ul>
+<li><p><strong>防火墙分类(逻辑上)</strong></p>
+<ul>
+<li><strong>主机防火墙</strong>：针对于单个主机进行防护</li>
+<li><strong>网络防火墙</strong>：往往处于网络入口或边缘，针对于网络入口进行防护，服务于防火墙背后的本地局域网</li>
+<li>网络防火墙和主机防火墙并不冲突，可以理解为，网络防火墙主外， 主机防火墙主内</li>
+</ul>
+</li>
+<li><p><strong>防火墙分类(物理上)</strong></p>
+<ul>
+<li><strong>硬件防火墙</strong>：在硬件和软件级别分别实现部分防火墙功能，性能高，成本高</li>
+<li><strong>软件防火墙</strong>：应用软件处理逻辑运行于通用硬件平台之上的防火墙，性能低，成本低</li>
+</ul>
+</li>
+<li><p><strong>防火墙分类(层次上)</strong></p>
+<ul>
+<li><strong>网络层防火墙</strong>：工作在 OSI 下面第三层</li>
+<li><strong>应用层防火墙</strong>：代理服务型防火墙，工作在 OSI 七层</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="1-2-防火墙的区别"><a href="#1-2-防火墙的区别" class="headerlink" title="1.2 防火墙的区别"></a>1.2 防火墙的区别</h3><p>在<code>RHEL 7</code>系统中，<code>firewalld</code>防火墙取代了<code>iptables</code>防火墙，但是还是可以使用<code>iptables</code>防火墙管理工具的。对于接触<code>Linux</code>系统比较早或学习过<code>RHEL 6</code>系统的人来说，当他们发现曾经掌握的知识在<code>RHEL 7</code>中不再适用，需要全新学习<code>firewalld</code>时，难免会有抵触心理。</p>
+<p>其实，<code>iptables</code>与<code>firewalld</code>都不是真正的防火墙，它们都<strong>只是用来定义防火墙策略的防火墙管理工具</strong>而已，或者说，它们只是一种服务。<code>iptables</code>服务会把配置好的防火墙策略交由<strong>内核层面的<code>netfilter</code>网络过滤器</strong>来处理，而<code>firewalld</code>服务则是把配置好的防火墙策略交由<strong>内核层面的<code>nftables</code>包过滤框架</strong>来处理。换句话说，当前在<code>Linux</code>系统中其实存在多个防火墙管理工具，旨在方便运维人员管理<code>Linux</code>系统中的防火墙策略，我们只需要配置妥当其中的一个就足够了。虽然这些工具各有优劣，但它们在防火墙策略的配置思路上是保持一致的。大家甚至可以不用完全掌握本章介绍的内容，只要在这多个防火墙管理工具中任选一款并将其学透，就足以满足日常的工作需求了。</p>
+<hr>
+<h2 id="2-iptables-工具"><a href="#2-iptables-工具" class="headerlink" title="2. iptables 工具"></a>2. iptables 工具</h2><blockquote>
+<p>在早期的<code>Linux</code>系统中，默认使用的是<code>iptables</code>防火墙管理服务来配置防火墙。尽管新型的<code>firewalld</code>防火墙管理服务已经被投入使用多年，但是大量的企业在生产环境中依然出于各种原因而继续使用<code>iptables</code>。那么在此处，我们就来聊聊<code>Linux</code>的<code>iptables</code>防火墙管理工具。</p>
+</blockquote>
+<ul>
+<li><strong>netfilter</strong>：网络过滤器框架，提供了钩子函数</li>
+<li><strong>iptables</strong>：规则管理工具，负责给钩子函数添加功能</li>
+</ul>
+<hr>
+<h3 id="2-1-工具简述"><a href="#2-1-工具简述" class="headerlink" title="2.1 工具简述"></a>2.1 工具简述</h3><p><code>iptables</code>其实不是真正的防火墙，可以把它理解成一个客户端代理。用户通过<code>iptables</code>这个代理，将用户的安全设定执行到对应的<strong>“安全框架”</strong>中，这个<strong>“安全框架”</strong>才是真正的防火墙，这个框架的名字叫<code>netfilter</code>。</p>
+<ul>
+<li><code>iptables</code>的工作方式<ul>
+<li><strong><code>netfilter</code></strong>：才是防火墙真正的安全框架，工作于内核空间</li>
+<li><strong><code>iptables</code></strong>：其实是一个命令行工具，工作于用户空间，用来操作安全框架的工具</li>
+</ul>
+</li>
+</ul>
+<p><code>netfilter/iptables</code>组成<code>Linux</code>平台下的包过滤防火墙，与大多数的<code>Linux</code>软件一样，这个包过滤防火墙是免费的，它可以代替昂贵的商业防火墙解决方案，完成封包过滤、封包重定向和网络地址转换等功能。</p>
+<ul>
+<li><code>iptables</code>具有如下功能<ul>
+<li>数据包内容修改</li>
+<li>网络地址转换(<code>NAT</code>)</li>
+<li>端口地址转换(<code>PAT</code>)</li>
+<li>数据包过滤的防火墙功能</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># CentOS6中使用service启动、停止、重启</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># service iptables start</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># service iptables stop</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># service iptables restart</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-2-工作方式"><a href="#2-2-工作方式" class="headerlink" title="2.2 工作方式"></a>2.2 工作方式</h3><p>当客户端访问服务器的<code>Web</code>服务时，客户端发送报文到服务器的网卡。由于数据包到达服务器后自下而上传递，必会经过位于内核层<code>TCP/IP</code>协议栈，所以客户端的信息会通过内核的<code>TCP</code>协议传输到用户空间中的<code>Web</code>服务中。当<code>Web</code>服务需要响应客户端请求时，<code>Web</code>服务发出的响应报文的目标终点则为客户端，这个时候，<code>Web</code>服务所监听的<code>Web</code>与端口反而变成了原点。所以，如果我们想要防火墙能够达到<strong>防火</strong>的目的，则需要在内核中设置关卡，所有进出的报文都要通过这些关卡，经过检查后，符合放行条件的才能放行，符合阻拦条件的则需要被阻止，于是，就出现了<code>input</code>关卡和<code>output</code>关卡，而这些关卡在<code>iptables</code>中不被称为<strong>关卡</strong>而被称为<strong>链</strong>。</p>
+<p><img src="../images/linux-learn-iptables-tool-3.png" alt="Linux安全之防火墙概述"></p>
+<p>其实我们上面描述的场景并不完善，因为客户端发来的报文访问的目标地址可能并不是本机，而是其他服务器，当本机的内核支持<code>IP_FORWARD</code>时，我们就可以将报文转发给其他服务器。</p>
+<p><img src="../images/linux-learn-iptables-tool-4.png" alt="Linux安全之防火墙概述"></p>
+<p>我们能够想象出某些常用场景中，报文的流向。</p>
+<ul>
+<li><strong>流入</strong>：<code>PREROUTING --&gt; INPUT</code></li>
+<li><strong>流出</strong>：<code>OUTPUT --&gt; POSTROUTING</code></li>
+<li><strong>转发</strong>：<code>PREROUTING --&gt; FORWARD --&gt; POSTROUTING</code></li>
+</ul>
+<hr>
+<h3 id="2-3-链的概念"><a href="#2-3-链的概念" class="headerlink" title="2.3 链的概念"></a>2.3 链的概念</h3><p>我们知道，<strong>防火墙的作用就在于对经过的报文匹配规则</strong>，然后执行对应的<strong>动作</strong>。所以，当报文经过这些链的时候，则必须匹配这个关卡上的规则，但是，这个链上可能不止有一条规则，而是有很多条规则。当每个经过这个<strong>链</strong>的报文，都要将这条链上的所有规则匹配一遍，如果有符合条件的<strong>规则</strong>，则执行规则对应的<strong>动作</strong>。</p>
+<p><img src="../images/linux-learn-iptables-tool-5.png" alt="Linux安全之防火墙概述"></p>
+<p>我们能够想象链的的作用范围。</p>
+<ul>
+<li><code>PREROUTING</code>：在进行路由选择前处理数据包</li>
+<li><code>INPUT</code>：处理流入的数据包</li>
+<li><code>OUTPUT</code>：处理流出的数据包</li>
+<li><code>FORWARD</code>：处理转发的数据包</li>
+<li><code>POSTROUTING</code>：在进行路由选择后处理数据包</li>
+</ul>
+<hr>
+<h3 id="2-4-表的概念"><a href="#2-4-表的概念" class="headerlink" title="2.4 表的概念"></a>2.4 表的概念</h3><p>我们把具有相同功能的规则的集合叫做<strong>表</strong>，所以说不同功能的规则可以放置在不同的表中进行管理，而<code>iptables</code>已经为我们定义了<code>4</code>种表。每种表对应了不同的功能，而我们定义的规则也都逃脱不了这<code>4</code>种功能的范围，所以必须先搞明白每种表的作用。</p>
+<ul>
+<li><p><strong><code>filter</code>表</strong></p>
+<ul>
+<li>负责防火墙过滤功能</li>
+<li>内核模块为<code>iptables_filter</code></li>
+</ul>
+</li>
+<li><p><strong><code>nat</code>表</strong></p>
+<ul>
+<li>负责网络地址转换功能</li>
+<li>内核模块为<code>iptable_nat</code></li>
+</ul>
+</li>
+<li><p><strong><code>mangle</code>表</strong></p>
+<ul>
+<li>负责拆解报文，做出修改，并重新封装的功能</li>
+<li>内核模块为<code>iptable_mangle</code></li>
+</ul>
+</li>
+<li><p><strong><code>raw</code>表</strong></p>
+<ul>
+<li>负责关闭<code>nat</code>表上启用的连接追踪机制</li>
+<li>在承载大量并发的服务器上，不建议使用连接追踪机制，因为很费内存资源</li>
+<li>内核模块为<code>iptable_raw</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-5-表链关系"><a href="#2-5-表链关系" class="headerlink" title="2.5 表链关系"></a>2.5 表链关系</h3><blockquote>
+<p><strong>传说中的四表五链，即将隆重登场!</strong></p>
+</blockquote>
+<p><img src="../images/linux-learn-iptables-tool-6.png" alt="Linux安全之防火墙概述"></p>
+<p><strong>功能的优先级次序</strong></p>
+<ul>
+<li><code>raw --&gt; mangle --&gt; nat --&gt; filter</code></li>
+</ul>
+<p><strong>表中的规则可以被哪些链使用</strong>（从表到链的对应关系）</p>
+<ul>
+<li><p><code>CentOS6</code>系统</p>
+<ul>
+<li><strong><code>raw</code>表</strong>：<code>PREROUTING</code>、<code>OUTPUT</code></li>
+<li><strong><code>mangle</code>表</strong>：<code>PREROUTING</code>、<code>INPUT</code>、<code>FORWARD</code>、<code>OUTPUT</code>、<code>POSTROUTING</code></li>
+<li><strong><code>nat</code>表</strong>：<code>PREROUTING</code>、<code>OUTPUT</code>、<code>POSTROUTING</code></li>
+<li><strong><code>filter</code>表</strong>：<code>INPUT</code>、<code>FORWARD</code>、<code>OUTPUT</code></li>
+</ul>
+</li>
+<li><p><code>CentOS7</code>系统</p>
+<ul>
+<li><strong><code>raw</code>表</strong>：<code>PREROUTING</code>、<code>OUTPUT</code></li>
+<li><strong><code>mangle</code>表</strong>：<code>PREROUTING</code>、<code>INPUT</code>、<code>FORWARD</code>、<code>OUTPUT</code>、<code>POSTROUTING</code></li>
+<li><strong><code>nat</code>表</strong>：<code>PREROUTING</code>、<code>INPUT</code>、<code>OUTPUT</code>、<code>POSTROUTING</code></li>
+<li><strong><code>filter</code>表</strong>：<code>INPUT</code>、<code>FORWARD</code>、<code>OUTPUT</code></li>
+</ul>
+</li>
+<li><p><code>CentOS7</code>系统中<code>nat</code>表还有<code>INPUT</code>链</p>
+</li>
+</ul>
+<p><strong>四表五链的注意事项</strong>（重要）</p>
+<ul>
+<li><p>规则：添加规则时的考量点</p>
+<ul>
+<li>(1) 要实现哪种功能：判断添加在哪张表上</li>
+<li>(2) 报文流经的路径：判断添加在哪个链上</li>
+</ul>
+</li>
+<li><p>链：链上规则的次序，即为检查的次序，因此隐含一定的法则</p>
+<ul>
+<li>(1) 同类规则(访问同一应用)，匹配范围小的放上面</li>
+<li>(2) 不同类规则(访问不同应用)，匹配到报文频率较大的放上面</li>
+<li>(3) 将那些可由一条规则描述的多个规则合并为一个</li>
+<li>(4) 设置默认策略</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-6-规则概念"><a href="#2-6-规则概念" class="headerlink" title="2.6 规则概念"></a>2.6 规则概念</h3><blockquote>
+<p><strong>规则：根据指定的匹配条件来尝试匹配每个流经此处的报文，一旦匹配成功，则由规则后面指定的处理动作进行处理</strong></p>
+</blockquote>
+<p><strong>匹配条件</strong></p>
+<ul>
+<li><p>基本匹配条件</p>
+<ul>
+<li>源地址 IP</li>
+<li>目标地址 IP</li>
+<li>传输协议</li>
+<li>服务类型</li>
+</ul>
+</li>
+<li><p>扩展匹配条件</p>
+<ul>
+<li>扩展匹配条件也是<code>netfilter</code>中的一部分，只是以模块的形式存在，需要依赖对应的扩展模块。</li>
+<li>如：源端口和目标端口</li>
+</ul>
+</li>
+</ul>
+<p><strong>处理动作</strong></p>
+<ul>
+<li>处理动作在<code>iptables</code>中被称为<code>target</code>，动作也可以分为基本动作和扩展动作。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>常用的动作</th>
+<th>动作含义解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ACCEPT</code></td>
+<td>允许数据包通过</td>
+</tr>
+<tr>
+<td><code>DROP</code></td>
+<td>直接丢弃数据包，不给任何回应信息，客户端会感觉请求泥牛入海，直到过了超时时间才会有反应</td>
+</tr>
+<tr>
+<td><code>REJECT</code></td>
+<td>拒绝数据包通过，必要时会给数据发送端一个响应的信息，客户端刚请求就会收到拒绝的信息</td>
+</tr>
+<tr>
+<td><code>SNAT</code></td>
+<td>源地址转换，解决内网用户用同一个公网地址上网的问题</td>
+</tr>
+<tr>
+<td><code>DNAT</code></td>
+<td>目标地址转换，请求响应时需要</td>
+</tr>
+<tr>
+<td><code>MASQUERADE</code></td>
+<td>是 SNAT 的一种特殊形式，适用于动态的、临时会变的 IP 上</td>
+</tr>
+<tr>
+<td><code>REDIRECT</code></td>
+<td>在本机做端口映射</td>
+</tr>
+<tr>
+<td><code>LOG</code></td>
+<td>在/var/log/messages 文件中记录日志信息，然后将数据包传递给下一条规则，也就是说除了记录以外不对数据包做任何其他操作，仍然让下一条规则去匹配</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="2-7-命令使用"><a href="#2-7-命令使用" class="headerlink" title="2.7 命令使用"></a>2.7 命令使用</h3><p><img src="../images/linux-learn-iptables-tool-2.png" alt="Linux安全之防火墙概述"></p>
+<hr>
+<h2 id="3-firewalld-工具"><a href="#3-firewalld-工具" class="headerlink" title="3. firewalld 工具"></a>3. firewalld 工具</h2><blockquote>
+<p><code>RHEL 7</code>系统中集成了多款防火墙管理工具，其中<strong><code>firewalld</code></strong>（Dynamic Firewall Manager of Linux systems，<code>Linux</code>系统的动态防火墙管理器）服务是<strong>默认的防火墙配置管理工具</strong>，它拥有基于<code>CLI</code>（命令行界面）和基于<code>GUI</code>（图形用户界面）的两种管理方式。</p>
+</blockquote>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># CentOS默认使用的防火墙应该是firewall，而不是iptables</span>
+<span class="token comment" spellcheck="true"># 如果需要使用的是iptables防火墙需要先关闭firewall，安装iptables</span>
+
+<span class="token comment" spellcheck="true"># 查看firewall的安装和启动状态</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># yum list installed firewalld iptables</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># systemctl list-unit-files firewalld.service iptables.service</span>
+
+<span class="token comment" spellcheck="true"># 关闭firewall并禁止开机启动</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># systemctl stop firewalld.service</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># systemctl disable firewalld.service</span>
+
+<span class="token comment" spellcheck="true"># 安装iptables防火墙并设置开启启动</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># yum install iptables-services</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># systemctl enable iptables.service</span>
+
+<span class="token comment" spellcheck="true"># 重启iptables工具</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># systemctl restart iptables.service</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-1-区域概念"><a href="#3-1-区域概念" class="headerlink" title="3.1 区域概念"></a>3.1 区域概念</h3><p>相较于传统的防火墙管理配置工具，<code>firewalld</code>支持动态更新技术并加入了区域（<code>zone</code>）概念。简单来说，区域就是<code>firewalld</code>预先准备了几套防火墙策略集合（策略模板），用户可以根据生产场景的不同而选择合适的策略集合，从而实现防火墙策略之间的快速切换。</p>
+<p>例如，我们有一台笔记本电脑，每天都要在办公室、咖啡厅和家里使用。按常理来讲，这三者的安全性按照由高到低的顺序来排列，应该是家庭、公司办公室、咖啡厅。当前，我们希望为这台笔记本电脑指定如下防火墙策略规则：在家中允许访问所有服务；在办公室内仅允许访问文件共享服务；在咖啡厅仅允许上网浏览。在以往，我们需要频繁地手动设置防火墙策略规则，而现在只需要预设好区域集合，然后只需轻点鼠标就可以自动切换了，从而极大地提升了防火墙策略的应用效率。</p>
+<ul>
+<li><strong><code>firewalld</code>中常用的区域名称及测了规则</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>区域</th>
+<th>默认规则策略</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>trusted</code></td>
+<td>允许所有的数据包</td>
+</tr>
+<tr>
+<td><code>home</code></td>
+<td>拒绝流入的流量，除非与流出的流量相关；而如果流量与 ssh、mdns、ipp-client、amba-client 与 dhcpv6-client 服务相关，则允许流量</td>
+</tr>
+<tr>
+<td><code>internal</code></td>
+<td>等同于 home 区域</td>
+</tr>
+<tr>
+<td><code>work</code></td>
+<td>拒绝流入的流量，除非与流出的流量数相关；而如果流量与 ssh、ipp-client 与 dhcpv6-client 服务相关，则允许流量</td>
+</tr>
+<tr>
+<td><code>public</code></td>
+<td>拒绝流入的流量，除非与流出的流量相关；而如果流量与 ssh、dhcpv6-client 服务相关，则允许流量</td>
+</tr>
+<tr>
+<td><code>external</code></td>
+<td>拒绝流入的流量，除非与流出的流量相关；而如果流量与 ssh 服务相关，则允许流量</td>
+</tr>
+<tr>
+<td><code>dmz</code></td>
+<td>拒绝流入的流量，除非与流出的流量相关；而如果流量与 ssh 服务相关，则允许流量</td>
+</tr>
+<tr>
+<td><code>block</code></td>
+<td>拒绝流入的流量，除非与流出的流量相关</td>
+</tr>
+<tr>
+<td><code>drop</code></td>
+<td>拒绝流入的流量，除非与流出的流量相关</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="3-2-终端管理工具"><a href="#3-2-终端管理工具" class="headerlink" title="3.2 终端管理工具"></a>3.2 终端管理工具</h3><blockquote>
+<p><strong><code>firewalld-cmd</code></strong>是<code>firewalld</code>防火墙配置管理工具的命令行界面(<code>CLI</code>)版本</p>
+<ul>
+<li>参数一般都是以<strong>“长格式”</strong>来提供</li>
+<li><code>RHEL 7</code>系统支持命令的参数补齐，用<code>Tab</code>键来补齐</li>
+</ul>
+</blockquote>
+<ul>
+<li><strong><code>firewalld-cmd</code>命令中使用的参数以及作用</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--get-default-zone</code></td>
+<td>查询默认的区域名称</td>
+</tr>
+<tr>
+<td><code>--set-default-zone=&lt;区域名称&gt;</code></td>
+<td>设置默认的区域，使其永久生效</td>
+</tr>
+<tr>
+<td><code>--get-zones</code></td>
+<td>显示可用的区域</td>
+</tr>
+<tr>
+<td><code>--get-services</code></td>
+<td>显示预先定义的服务</td>
+</tr>
+<tr>
+<td><code>--get-active-zones</code></td>
+<td>显示当前正在使用的区域与网卡名称</td>
+</tr>
+<tr>
+<td><code>--remove-source=</code></td>
+<td>将源自此 IP 或子网的流量导向指定的区域</td>
+</tr>
+<tr>
+<td><code>--remove-source=</code></td>
+<td>不再将源自此 IP 或子网的流量导向某个指定区域</td>
+</tr>
+<tr>
+<td><code>--add-interface=&lt;网卡名称&gt;</code></td>
+<td>将源自该网卡的所有流量都导向某个指定区域</td>
+</tr>
+<tr>
+<td><code>--change-interface=&lt;网卡名称&gt;</code></td>
+<td>将某个网卡与区域进行关联</td>
+</tr>
+<tr>
+<td><code>--list-all</code></td>
+<td>显示当前区域的网卡配置参数、资源、端口以及服务等信息</td>
+</tr>
+<tr>
+<td><code>--list-all-zones</code></td>
+<td>显示所有区域的网卡配置参数、资源、端口以及服务等信息</td>
+</tr>
+<tr>
+<td><code>--add-service=&lt;服务名&gt;</code></td>
+<td>设置默认区域允许该服务的流量</td>
+</tr>
+<tr>
+<td><code>--add-port=&lt;端口号/协议&gt;</code></td>
+<td>设置默认区域允许该端口的流量</td>
+</tr>
+<tr>
+<td><code>--remove-service=&lt;服务名&gt;</code></td>
+<td>设置默认区域不再允许该服务的流量</td>
+</tr>
+<tr>
+<td><code>--remove-port=&lt;端口号/协议&gt;</code></td>
+<td>设置默认区域不再允许该端口的流量</td>
+</tr>
+<tr>
+<td><code>--reload</code></td>
+<td>让“永久生效”的配置规则立即生效，并覆盖当前的配置规则</td>
+</tr>
+<tr>
+<td><code>--panic-on</code></td>
+<td>开启应急状况模式</td>
+</tr>
+<tr>
+<td><code>--panic-off</code></td>
+<td>关闭应急状况模式</td>
+</tr>
+</tbody></table>
+<p>与<code>Linux</code>系统中其他的防火墙策略配置工具一样，使用<code>firewalld</code>配置的防火墙策略默认为<strong>运行时模式</strong>（<code>Runtime</code>），又称为<strong>当前生效模式</strong>，而且随着系统的重启会失效。如果想让配置策略一直存在，就需要使用<strong>永久模式</strong>（<code>Permanent</code>）了，方法就是在用<code>firewall-cmd</code>命令正常设置防火墙策略时添加<code>--permanent</code>参数，这样配置的防火墙策略就可以永久生效了。</p>
+<p>但是，永久生效模式有一个“不近人情”的特点，就是使用它设置的策略只有在系统重启之后才能自动生效。如果想让配置的策略立即生效，需要手动执行<code>firewall-cmd --reload</code>命令。</p>
+<hr>
+<h3 id="3-3-实战演示"><a href="#3-3-实战演示" class="headerlink" title="3.3 实战演示"></a>3.3 实战演示</h3><blockquote>
+<p><strong>格式：</strong><code>firewall-cmd [--permanent] --zone=&lt;区域&gt; cmd子命令</code></p>
+</blockquote>
+<ul>
+<li>查看<code>firewalld</code>服务当前所使用的区域</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --get-default-zone</span>
+public<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li>查询<code>eno16777728</code>网卡在<code>firewalld</code>服务中的区域</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --get-zone-of-interface=eno16777728</span>
+public<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li>把<code>firewalld</code>服务中<code>eno16777728</code>网卡的默认区域修改为<code>external</code>，并在系统重启后生效</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 修改默认区域</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --permanent --zone=external --change-interface=eno16777728</span>
+success
+
+<span class="token comment" spellcheck="true"># 查看当前模式下的区域名称</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --get-zone-of-interface=eno16777728</span>
+public
+
+<span class="token comment" spellcheck="true"># 查看永久模式下的区域名称</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --permanent --get-zone-of-interface=eno16777728</span>
+external<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>把<code>firewalld</code>服务的当前默认区域设置为<code>public</code></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --set-default-zone=public</span>
+success
+
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --get-default-zone</span>
+public<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>启动/关闭<code>firewalld</code>防火墙服务的应急状况模式，阻断一切网络连接（当远程控制服务器时请慎用）</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --panic-on</span>
+success
+
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --panic-off</span>
+success<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>查询<code>public</code>区域是否允许请求<code>SSH</code>和<code>HTTPS</code>协议的流量</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --zone=public --query-service=ssh</span>
+<span class="token function">yes</span>
+
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --zone=public --query-service=https</span>
+no<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>把<code>firewalld</code>服务中请求<code>HTTPS</code>协议的流量设置为永久允许，并立即生效</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --zone=public --add-service=https</span>
+success
+
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --permanent --zone=public --add-service=https</span>
+success
+
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --reload</span>
+success<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>把<code>firewalld</code>服务中请求<code>HTTP</code>协议的流量设置为永久拒绝，并立即生效</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --permanent --zone=public --remove-service=http</span>
+success
+
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --reload</span>
+success<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>把在<code>firewalld</code>服务中访问<code>8080</code>和<code>8081</code>端口的流量策略设置为允许，但仅限当前生效</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --zone=public --add-port=8080-8081/tcp</span>
+success
+
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --zone=public --list-ports</span>
+8080-8081/tcp<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>把原本访问本机<code>888</code>端口的流量转发到<code>22</code>端口，要且求当前和长期均有效</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 流量转发命令格式</span>
+firewall-cmd --permanent --zone<span class="token operator">=</span><span class="token operator">&lt;</span>区域<span class="token operator">></span> --add-forward-port<span class="token operator">=</span>port<span class="token operator">=</span><span class="token operator">&lt;</span>源端口号<span class="token operator">></span>:proto<span class="token operator">=</span><span class="token operator">&lt;</span>协议<span class="token operator">></span>:toport<span class="token operator">=</span><span class="token operator">&lt;</span>目标端口号<span class="token operator">></span>:toaddr<span class="token operator">=</span><span class="token operator">&lt;</span>目标IP地址<span class="token operator">></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --permanent --zone=public --add-forward-port=port=888:proto=tcp:toport=22:toaddr=192.168.10.10</span>
+success
+
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --reload</span>
+success<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 在客户端使用ssh命令尝试访问192.168.10.10主机的888端口</span>
+<span class="token punctuation">[</span>root@client A ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ssh -p 888 192.168.10.10</span>
+The authenticity of host <span class="token string">'[192.168.10.10]:888 ([192.168.10.10]:888)'</span> can<span class="token string">'t be established.
+ECDSA key fingerprint is b8:25:88:89:5c:05:b6:dd:ef:76:63:ff:1a:54:02:1a.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '</span><span class="token punctuation">[</span>192.168.10.10<span class="token punctuation">]</span>:888<span class="token string">' (ECDSA) to the list of known hosts.
+root@192.168.10.10'</span>s password:此处输入远程root管理员的密码
+Last login: Sun Jul 19 21:43:48 2017 from 192.168.10.10<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>在<code>firewalld</code>服务中配置一条富规则，使其拒绝<code>192.168.10.0/24</code>网段的所有用户访问本机的<code>ssh</code>服务的<code>22</code>端口</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># firewalld中的富规则表示更细致、更详细的防火墙策略配置</span>
+<span class="token comment" spellcheck="true"># 它可以针对系统服务、端口号、源地址和目标地址等诸多信息进行更有正对性的策略配置</span>
+<span class="token comment" spellcheck="true"># 它的优先级在所有的防火墙策略中也是最高的</span>
+
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --permanent --zone=public --add-rich-rule="rule family="ipv4" source address="192.168.10.0/24" service name="ssh" reject"</span>
+success
+
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># firewall-cmd --reload</span>
+success
+
+<span class="token comment" spellcheck="true"># 在客户端使用ssh命令尝试访问192.168.10.10主机的ssh服务的22端口</span>
+<span class="token punctuation">[</span>root@client A ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ssh 192.168.10.10</span>
+Connecting to 192.168.10.10:22<span class="token punctuation">..</span>.
+Could not connect to <span class="token string">'192.168.10.10'</span> <span class="token punctuation">(</span>port 22<span class="token punctuation">)</span>: Connection failed.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-4-图形管理工具"><a href="#3-4-图形管理工具" class="headerlink" title="3.4 图形管理工具"></a>3.4 图形管理工具</h3><blockquote>
+<p>在各种版本的<code>Linux</code>系统中，<code>firewall-config</code>的图形化工具做的非常棒，推荐使用。</p>
+<ul>
+<li>它是<code>firewalld</code>防火墙配置管理工具的图形用户界面（<code>GUI</code>）版本，几乎可以实现所有以命令行来执行的操作</li>
+<li>毫不夸张的说，即使读者没有扎实的<code>Linux</code>命令基础，也完全可以通过它来妥善配置<code>RHEL 7</code>中的防火墙策略</li>
+</ul>
+</blockquote>
+<p><strong>图形界面具体功能</strong></p>
+<ul>
+<li>1：选择运行时(<code>Runtime</code>)模式或永久(<code>Permanent</code>)模式的配置</li>
+<li>2：可选的策略集合区域列表</li>
+<li>3：常用的系统服务列表</li>
+<li>4：当前正在使用的区域</li>
+<li>5：管理当前被选中区域中的服务</li>
+<li>6：管理当前被选中区域中的端口</li>
+<li>7：开启或关闭源地址转换协议(<code>SNAT</code>)技术</li>
+<li>8：设置端口转发策略</li>
+<li>9：控制请求<code>icmp</code>服务的流量</li>
+<li>10：管理防火墙的富规则</li>
+<li>11：管理网卡设备</li>
+<li>12：被选中区域的服务，若勾选了相应服务前面的复选框，则表示允许与之相关的流量</li>
+<li>13：<code>firewall-config</code>工具的运行状态</li>
+</ul>
+<p><img src="../images/linux-learn-iptables-tool-7.png" alt="Linux安全之防火墙概述"></p>
+<hr>
+<h3 id="3-5-实战演示"><a href="#3-5-实战演示" class="headerlink" title="3.5 实战演示"></a>3.5 实战演示</h3><blockquote>
+<p>在使用<code>firewall-config</code>工具配置完防火墙策略之后，无须进行二次确认，因为只要有修改内容，它就自动进行保存。</p>
+</blockquote>
+<p><strong>简单实例</strong></p>
+<ul>
+<li>我们先将当前区域中请求<code>http</code>服务的流量设置为允许，但仅限当前生效</li>
+</ul>
+<p><img src="../images/linux-learn-iptables-tool-8.png" alt="Linux安全之防火墙概述"></p>
+<ul>
+<li>尝试添加一条防火墙策略规则，使其放行访问<code>TCP</code>协议<code>8080～8088</code>端口的流量-<ul>
+<li>将其设置为永久生效，以达到系统重启后防火墙策略依然生效的目的-</li>
+<li>如下图界面配置完毕后，还需在 Options 菜单中单击 Reload Firewalld 命令，让配置的防火墙策略立即生效</li>
+</ul>
+</li>
+</ul>
+<p><img src="../images/linux-learn-iptables-tool-9.png" alt="Linux安全之防火墙概述"></p>
+<p><img src="../images/linux-learn-iptables-tool-10.png" alt="Linux安全之防火墙概述"></p>
+<p><strong>复杂实例</strong></p>
+<p>讲解<code>firewall-config</code>工具的功能时，曾经提到了<strong>源网络地址转换</strong>(<code>SNAT</code>)技术。<code>SNAT</code>是一种为了解决<code>IP</code>地址匮乏而设计的技术，它可以使得多个内网中的用户通过同一个外网<code>IP</code>接入<code>Internet</code>。该技术的应用非常广泛，甚至可以说我们每天都在使用，只不过没有察觉到罢了。</p>
+<ul>
+<li>网络中不使用<code>SNAT</code>技术</li>
+</ul>
+<p><img src="../images/linux-learn-iptables-tool-11.png" alt="Linux安全之防火墙概述"></p>
+<ul>
+<li>网络中使用<code>SNAT</code>技术</li>
+</ul>
+<p><img src="../images/linux-learn-iptables-tool-12.png" alt="Linux安全之防火墙概述"></p>
+<p>使用<code>iptables</code>命令实现<code>SNAT</code>技术是一件很麻烦的事情，但是在<code>firewall-config</code>中却是小菜一碟了。用户只需按照图进行配置，并选中<code>Masquerade zone</code>复选框，就自动开启了<code>SNAT</code>技术。</p>
+<p><img src="../images/linux-learn-iptables-tool-13.png" alt="Linux安全之防火墙概述"></p>
+<p>为了让大家直观查看不同工具在实现相同功能的区别，这里使用 firewall-config 工具重新演示了前面使用 firewalld-cmd 来配置防火墙策略规则，将本机 888 端口的流量转发到 22 端口，且要求当前和长期均有效。</p>
+<p><img src="../images/linux-learn-iptables-tool-14.png" alt="Linux安全之防火墙概述"></p>
+<p><img src="../images/linux-learn-iptables-tool-15.png" alt="Linux安全之防火墙概述"></p>
+<p>如果生产环境中的服务器有多块网卡在同时提供服务（这种情况很常见），则对内网和对外网提供服务的网卡要选择的防火墙策略区域也是不一样的。也就是说，可以把网卡与防火墙策略区域进行绑定，这样就可以使用不同的防火墙区域策略，对源自不同网卡的流量进行针对性的监控，效果会更好。</p>
+<p><img src="../images/linux-learn-iptables-tool-16.png" alt="Linux安全之防火墙概述"></p>
+<hr>
+<h2 id="4-书写规则经验总结"><a href="#4-书写规则经验总结" class="headerlink" title="4. 书写规则经验总结"></a>4. 书写规则经验总结</h2><p><strong>1、规则的顺序非常重要</strong></p>
+<ul>
+<li>如果报文已经被前面的规则匹配到，iptables 则会对报文执行对应的动作，通常是 ACCEPT 或者 REJECT，报文被放行或拒绝以后，即使后面的规则也能匹配到刚才放行或拒绝的报文，也没有机会再对报文执行相应的动作了（前面规则的动作为 LOG 时除外），所以，针对相同服务的规则，更严格的规则应该放在前面。</li>
+</ul>
+<p><strong>2、当规则中有多个匹配条件时，条件之间默认存在”与”的关系</strong></p>
+<ul>
+<li>如果一条规则中包含了多个匹配条件，那么报文必须同时满足这个规则中的所有匹配条件，报文才能被这条规则匹配到。</li>
+</ul>
+<p><strong>3、在不考虑 1 的情况下，应该将更容易被匹配到的规则放置在前面</strong></p>
+<ul>
+<li>比如，你写了两条规则，一条针对 sshd 服务，一条针对 web 服务。</li>
+<li>假设，一天之内，有 20000 个请求访问 web 服务，有 200 个请求访问 sshd 服务，</li>
+<li>那么，应该将针对 web 服务的规则放在前面，针对 sshd 的规则放在后面，因为访问 web 服务的请求频率更高。</li>
+<li>如果将 sshd 的规则放在前面，当报文是访问 web 服务时，sshd 的规则也要白白的验证一遍，由于访问 web 服务的频率更高，白白耗费的资源就更多。</li>
+<li>如果 web 服务的规则放在前面，由于访问 web 服务的频率更高，所以无用功会比较少。</li>
+<li>换句话说就是，在没有顺序要求的情况下，不同类别的规则，被匹配次数多的、匹配频率高的规则应该放在前面。</li>
+</ul>
+<p><strong>4、当 iptables 作为网络防火墙</strong></p>
+<ul>
+<li>当 iptables 所在主机作为网络防火墙时，在配置规则时，应着重考虑方向性，双向都要考虑，从外到内，从内到外。</li>
+</ul>
+<p><strong>5、配置 iptables 白名单</strong></p>
+<ul>
+<li>在配置 iptables 白名单时，往往会将链的默认策略设置为 ACCEPT，通过在链的最后设置 REJECT 规则实现白名单机制，而不是将链的默认策略设置为 DROP，如果将链的默认策略设置诶 DROP，当链中的规则被清空时，管理员的请求也将会被 DROP 掉。</li>
+</ul>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Escape</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://escapelife.github.io/posts/326b129f.html">https://escapelife.github.io/posts/326b129f.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Escape</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Linux/">
+                                    <span class="chip bg-color">Linux</span>
+                                </a>
+                            
+                                <a href="/tags/Iptables/">
+                                    <span class="chip bg-color">Iptables</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/posts/4674b7d.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/linux-learn-tcp-wrappers-tool.jpg" class="responsive-img" alt="Linux安全之TCP_Wrappers">
+                        
+                        <span class="card-title">Linux安全之TCP_Wrappers</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2018-02-05
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                    <a href="/tags/Iptables/">
+                        <span class="chip bg-color">Iptables</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/posts/74dcf4f9.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/linux-learn-su-and-sudo.jpg" class="responsive-img" alt="Linux安全之提权命令">
+                        
+                        <span class="card-title">Linux安全之提权命令</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2018-01-10
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                    <a href="/tags/Command/">
+                        <span class="chip bg-color">Command</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('3'),
+            headingSelector: 'h2, h3, h4, h5'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4, h5').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="764454432"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='list'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">2017</span>
+            <a href="/about" target="_blank">Escape</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">699.3k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2017";
+                    var startMonth = "2";
+                    var startDate = "14";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/EscapeLife" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wenpanhappy@126.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/search.xml", 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
