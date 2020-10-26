@@ -456,7 +456,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-03-06
+                    2020-10-26
                 </div>
                 
 
@@ -490,13 +490,11 @@
 </blockquote>
 <p><img src="/images/LVM.png" alt="Linux的LVM工具"></p>
 <hr>
-<blockquote>
 <p><strong>LVM</strong> 是(Logical Volume Manager)逻辑卷管理器的简写，又译为逻辑卷宗管理器、逻辑扇区管理器、逻辑磁盘管理器。是 Linux 核心所提供的逻辑卷管理功能。它在硬盘的硬盘分区之上，又创建了一个逻辑层以方便系统管理硬盘分区系统。</p>
-</blockquote>
 <ul>
-<li>很多大的公司一般是不会使用这个软件功能的，因为磁盘恢复比较困难，毕竟不是直接写数据到硬盘的，而是通过软件来模拟的。</li>
 <li>需要内核加载一个 dm(device mapper)的逻辑设备的模块</li>
 <li>在 CentOS6 中使用，而在 CentOS7 中，使用 btrfs 中的 B-tree 本来就支持子卷，无需使用逻辑卷。</li>
+<li>很多大的公司一般是不会使用这个软件功能的，因为磁盘恢复比较困难，毕竟不是直接写数据到硬盘的，而是通过软件来模拟的。</li>
 </ul>
 <hr>
 <h2 id="1-LVM-2-原理图解"><a href="#1-LVM-2-原理图解" class="headerlink" title="1. LVM-2 原理图解"></a>1. LVM-2 原理图解</h2><p><img src="/images/LVM1.png" alt="Linux的LVM工具"></p>
@@ -504,27 +502,39 @@
 <hr>
 <h2 id="2-命名规范及挂载"><a href="#2-命名规范及挂载" class="headerlink" title="2. 命名规范及挂载"></a>2. 命名规范及挂载</h2><p>创建完 LVM-2 之后，实际的 LVM-2 的创建名称为<code>/dev/dm-#</code>，而我们实际使用的<code>/dev/mapper/VG_NAME-LV_NAME</code>(例如：/dev/mapper/vol0-root)和<code>/dev/VG_NAME/LV_NAME</code>(例如：/dev/vol0/root)，就是对其实际指向的两个链接文件而已。</p>
 <p>文件系统挂的时候，挂载光盘或者硬盘设备的时候，其实都会生成对于的符号链接文件，将其指向实际设备路径。像光盘设备文件(<code>IDE: /dev/hdc</code> 和 <code>SATA: /dev/sr0</code>)，而连接文件，则有多种，以下举例说明：</p>
-<p>符号链接文件：</p>
+<p><strong>符号链接文件</strong></p>
 <ul>
 <li>/dev/cdrom</li>
 <li>/dev/cdrw</li>
 <li>/dev/dvd</li>
 <li>/dev/dvdrw</li>
 </ul>
-<p>以只读格式挂载光盘到/media/cdrom 上<br><code>mount -r /dev/cdrom /media/cdrom</code></p>
-<p>卸载<br><code>umount /dev/cdrom</code></p>
+<p><strong>以只读格式挂载光盘到 /media/cdrom 上</strong></p>
+<ul>
+<li><code>mount -r /dev/cdrom /media/cdrom</code></li>
+</ul>
+<p><strong>卸载</strong></p>
+<ul>
+<li><code>umount /dev/cdrom</code></li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 看见了沒有啊！这就是我们最重要的一步</span>
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ll /dev/vbirdvg/vbirdlv</span>
 lrwxrwxrwx 1 root root 27 Mar 11 16:49 /dev/vbirdvg/vbirdlv -<span class="token operator">></span> /dev/mapper/vbirdvg-vbirdlv<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="3-LVM-2-命令使用"><a href="#3-LVM-2-命令使用" class="headerlink" title="3. LVM-2 命令使用"></a>3. LVM-2 命令使用</h2><h3 id="3-1-pv-管理工具"><a href="#3-1-pv-管理工具" class="headerlink" title="3.1 pv 管理工具"></a>3.1 pv 管理工具</h3><h4 id="pvs命令"><a href="#pvs命令" class="headerlink" title="pvs命令"></a><code>pvs</code>命令</h4><p>使用 pvs 命令仅能得到物理卷 pv 的概要信息</p>
+<h2 id="3-LVM-2-命令使用"><a href="#3-LVM-2-命令使用" class="headerlink" title="3. LVM-2 命令使用"></a>3. LVM-2 命令使用</h2><h3 id="3-1-pv-管理工具"><a href="#3-1-pv-管理工具" class="headerlink" title="3.1 pv 管理工具"></a>3.1 pv 管理工具</h3><h4 id="pvs-命令"><a href="#pvs-命令" class="headerlink" title="pvs 命令"></a>pvs 命令</h4><p>使用 pvs 命令仅能得到物理卷 pv 的概要信息</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># pvs    #查看物理卷信息</span>
 PV         VG     Fmt   Attr  PSize    PFree
 /dev/sda2  vg_s1  lvm2  a--   465.27g     0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h4 id="pvdisplay命令"><a href="#pvdisplay命令" class="headerlink" title="pvdisplay命令"></a><code>pvdisplay</code>命令</h4><p>显示 pv 的详细信息</p>
+<h4 id="pvdisplay-命令"><a href="#pvdisplay-命令" class="headerlink" title="pvdisplay 命令"></a>pvdisplay 命令</h4><p>显示 pv 的详细信息</p>
 <ul>
-<li><code>-s</code><br>以短格式输出</li>
-<li><code>-m</code><br>显示 PE 到 LV 和 LE 的映射</li>
+<li><code>-s</code><ul>
+<li>以短格式输出</li>
+</ul>
+</li>
+<li><code>-m</code><ul>
+<li>显示 PE 到 LV 和 LE 的映射</li>
+</ul>
+</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># pvdisplay</span>
 <span class="token string">"/dev/hda6"</span> is a new physical volume of <span class="token string">"1.40 GB"</span>
@@ -538,11 +548,20 @@ Total PE              0          <span class="token comment" spellcheck="true">#
 Free PE               0          <span class="token comment" spellcheck="true">#沒被 LV 用掉的 PE</span>
 Allocated PE          0          <span class="token comment" spellcheck="true">#尚可分配出去的 PE 数量</span>
 PV UUID               Z13Jk5-RCls-UJ8B-HzDa-Gesn-atku-rf2biN<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h4 id="pvcreate命令"><a href="#pvcreate命令" class="headerlink" title="pvcreate命令"></a><code>pvcreate</code>命令</h4><p>创建物理卷，之后直接加设备</p>
+<h4 id="pvcreate-命令"><a href="#pvcreate-命令" class="headerlink" title="pvcreate 命令"></a>pvcreate 命令</h4><p>创建物理卷，之后直接加设备</p>
 <ul>
-<li><code>-f</code><br>强制创建物理卷，不需要用户确认</li>
-<li><code>-u</code><br>指定设备的 UUID</li>
-<li><code>-y</code><br>所有的问题都回答“yes”</li>
+<li><code>-f</code><ul>
+<li>强制创建物理卷，不需要用户确认</li>
+</ul>
+</li>
+<li><code>-u</code><ul>
+<li>指定设备的 UUID</li>
+</ul>
+</li>
+<li><code>-y</code><ul>
+<li>所有的问题都回答“yes”</li>
+</ul>
+</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将6-9分区转成pv,注意大括号的用途</span>
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># pvcreate /dev/hda{6,7,8,9}</span>
@@ -550,13 +569,28 @@ Physical volume <span class="token string">"/dev/hda6"</span> successfully creat
 Physical volume <span class="token string">"/dev/hda7"</span> successfully created
 Physical volume <span class="token string">"/dev/hda8"</span> successfully created
 Physical volume <span class="token string">"/dev/hda9"</span> successfully created<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h4 id="pvscan命令"><a href="#pvscan命令" class="headerlink" title="pvscan命令"></a><code>pvscan</code>命令</h4><p>pvscan 指令会扫描系统中连接的所有硬盘，列出找到的物理卷列表。</p>
+<h4 id="pvscan-命令"><a href="#pvscan-命令" class="headerlink" title="pvscan 命令"></a>pvscan 命令</h4><p>pvscan 指令会扫描系统中连接的所有硬盘，列出找到的物理卷列表。</p>
 <ul>
-<li><code>-d</code><br>调试模式</li>
-<li><code>-e</code><br>仅显示属于输出卷组的物理卷</li>
-<li><code>-n</code><br>仅显示不属于任何卷组的物理卷</li>
-<li><code>-s</code><br>短格式输出</li>
-<li><code>-u</code><br>显示 UUID</li>
+<li><code>-d</code><ul>
+<li>调试模式</li>
+</ul>
+</li>
+<li><code>-e</code><ul>
+<li>仅显示属于输出卷组的物理卷</li>
+</ul>
+</li>
+<li><code>-n</code><ul>
+<li>仅显示不属于任何卷组的物理卷</li>
+</ul>
+</li>
+<li><code>-s</code><ul>
+<li>短格式输出</li>
+</ul>
+</li>
+<li><code>-u</code><ul>
+<li>显示 UUID</li>
+</ul>
+</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 这就分別表示每个PV的资讯与系统所有PV的资讯</span>
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># pvscan</span>
@@ -565,10 +599,16 @@ PV /dev/hda7         lvm2 <span class="token punctuation">[</span>1.40 GB<span c
 PV /dev/hda8         lvm2 <span class="token punctuation">[</span>1.40 GB<span class="token punctuation">]</span>
 PV /dev/hda9         lvm2 <span class="token punctuation">[</span>1.40 GB<span class="token punctuation">]</span>
 Total: 4 <span class="token punctuation">[</span>5.61 GB<span class="token punctuation">]</span> / <span class="token keyword">in</span> use: 0 <span class="token punctuation">[</span>0   <span class="token punctuation">]</span> / <span class="token keyword">in</span> no VG: 4 <span class="token punctuation">[</span>5.61 GB<span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h4 id="pvck命令"><a href="#pvck命令" class="headerlink" title="pvck命令"></a><code>pvck</code>命令</h4><p>用来检测物理卷的 LVM 元数据的一致性</p>
+<h4 id="pvck-命令"><a href="#pvck-命令" class="headerlink" title="pvck 命令"></a>pvck 命令</h4><p>用来检测物理卷的 LVM 元数据的一致性</p>
 <ul>
-<li><code>-d</code><br>调试模式</li>
-<li><code>-v</code><br>详细信息模式</li>
+<li><code>-d</code><ul>
+<li>调试模式</li>
+</ul>
+</li>
+<li><code>-v</code><ul>
+<li>详细信息模式</li>
+</ul>
+</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用pvck命令检查物理卷/dev/sda2</span>
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># pvck -v /dev/sda2</span>
@@ -577,38 +617,58 @@ Found label on /dev/sda2, sector 1, type<span class="token operator">=</span>LVM
 Found text metadata area: offset<span class="token operator">=</span>4096, size<span class="token operator">=</span>1044480
 Found LVM2 metadata record at offset<span class="token operator">=</span>7168, size<span class="token operator">=</span>1536, offset2<span class="token operator">=</span>0 size2<span class="token operator">=</span>0
 Found LVM2 metadata record at offset<span class="token operator">=</span>5632, size<span class="token operator">=</span>1536, offset2<span class="token operator">=</span>0 size2<span class="token operator">=</span>0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h4 id="pvmove命令"><a href="#pvmove命令" class="headerlink" title="pvmove命令"></a><code>pvmove</code>命令</h4><p>搬移 PV 中的数据(只限于同一 VG 中)</p>
+<h4 id="pvmove-命令"><a href="#pvmove-命令" class="headerlink" title="pvmove 命令"></a>pvmove 命令</h4><p>搬移 PV 中的数据(只限于同一 VG 中)</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将VG中pv中hda5的内容搬移到hda6上</span>
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># pvmove /dev/hda5 /dev/hda6</span>
 <span class="token comment" spellcheck="true"># 也可以这样，lvm决定hda5的内容被复制到哪里</span>
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># pvmove /dev/hda5</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<h4 id="pvremove命令"><a href="#pvremove命令" class="headerlink" title="pvremove命令"></a><code>pvremove</code>命令</h4><p>用于删除一个存在的物理卷</p>
+<h4 id="pvremove-命令"><a href="#pvremove-命令" class="headerlink" title="pvremove 命令"></a>pvremove 命令</h4><p>用于删除一个存在的物理卷</p>
 <ul>
-<li><code>-d</code><br>调试模式</li>
-<li><code>-f</code><br>强制删除</li>
-<li><code>-y</code><br>对提问回答“yes”</li>
+<li><code>-d</code><ul>
+<li>调试模式</li>
+</ul>
+</li>
+<li><code>-f</code><ul>
+<li>强制删除</li>
+</ul>
+</li>
+<li><code>-y</code><ul>
+<li>对提问回答“yes”</li>
+</ul>
+</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># pvremove /dev/sdb2  #删除物理卷</span>
 Labels on physical volume <span class="token string">"/dev/sdb2"</span> successfully wiped<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<h4 id="pvchange命令"><a href="#pvchange命令" class="headerlink" title="pvchange命令"></a><code>pvchange</code>命令</h4><p>允许管理员改变物理卷的分配许可</p>
+<h4 id="pvchange-命令"><a href="#pvchange-命令" class="headerlink" title="pvchange 命令"></a>pvchange 命令</h4><p>允许管理员改变物理卷的分配许可</p>
 <ul>
-<li><code>-u</code><br>生成新的 UUID</li>
-<li><code>-x</code><br>是否允许分配 PE</li>
+<li><code>-u</code><ul>
+<li>生成新的 UUID</li>
+</ul>
+</li>
+<li><code>-x</code><ul>
+<li>是否允许分配 PE</li>
+</ul>
+</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 禁止分配指定物理卷上的PE</span>
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># pvchange -x n /dev/sdb1</span>
 Physical volume <span class="token string">"/dev/sdb1"</span> changed
 1 physical volume changed / 0 physical volumes not changed<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<p>###3.2 vg 管理工具</p>
-<h4 id="vgs命令"><a href="#vgs命令" class="headerlink" title="vgs命令"></a><code>vgs</code>命令</h4><p>显示有关卷组的信息，具体参数请使用<code>man</code>命令查看</p>
+<h3 id="3-2-vg-管理工具"><a href="#3-2-vg-管理工具" class="headerlink" title="3.2 vg 管理工具"></a>3.2 vg 管理工具</h3><h4 id="vgs-命令"><a href="#vgs-命令" class="headerlink" title="vgs 命令"></a>vgs 命令</h4><p>显示有关卷组的信息，具体参数请使用<code>man</code>命令查看</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># vgs    #查看逻辑卷组信息</span>
 VG    <span class="token comment" spellcheck="true">#PV #LV #SN Attr   VSize   VFree</span>
 vg_s1   1   3   0 wz--n- 465.27g    0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h4 id="vgdisplay命令"><a href="#vgdisplay命令" class="headerlink" title="vgdisplay命令"></a><code>vgdisplay</code>命令</h4><p>用于显示 LVM 卷组的元数据信息</p>
+<h4 id="vgdisplay-命令"><a href="#vgdisplay-命令" class="headerlink" title="vgdisplay 命令"></a>vgdisplay 命令</h4><p>用于显示 LVM 卷组的元数据信息</p>
 <ul>
-<li><code>-A</code><br>仅显示活动卷组的属性</li>
-<li><code>-s</code><br>使用短格式输出信息</li>
+<li><code>-A</code><ul>
+<li>仅显示活动卷组的属性</li>
+</ul>
+</li>
+<li><code>-s</code><ul>
+<li>使用短格式输出信息</li>
+</ul>
+</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 最后那三行指的就是 PE 能够使用的情況！由于尚未切出 LV，因此所有的 PE均可自由使用。</span>
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># vgdisplay</span>
@@ -632,62 +692,105 @@ vg_s1   1   3   0 wz--n- 465.27g    0<span aria-hidden="true" class="line-number
   Alloc PE / Size       0 / 0
   Free  PE / Size       267 / 4.17 GB
   VG UUID               4VU5Jr-gwOq-jkga-sUPx-vWPu-PmYm-dZH9EO<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h4 id="vgcreate命令"><a href="#vgcreate命令" class="headerlink" title="vgcreate命令"></a><code>vgcreate</code>命令</h4><p>用于创建 LVM 卷组</p>
+<h4 id="vgcreate-命令"><a href="#vgcreate-命令" class="headerlink" title="vgcreate 命令"></a>vgcreate 命令</h4><p>用于创建 LVM 卷组</p>
 <ul>
-<li><code>-l</code><br>卷组上允许创建的最大逻辑卷数</li>
-<li><code>-p</code><br>卷组中允许添加的最大物理卷数</li>
-<li><code>-s</code><br>卷组上的物理卷的 PE 大小</li>
+<li><code>-l</code><ul>
+<li>卷组上允许创建的最大逻辑卷数</li>
+</ul>
+</li>
+<li><code>-p</code><ul>
+<li>卷组中允许添加的最大物理卷数</li>
+</ul>
+</li>
+<li><code>-s</code><ul>
+<li>卷组上的物理卷的 PE 大小</li>
+</ul>
+</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将/dev/hda6-8 建立成为一个 VG，且指定 PE 为 16MB</span>
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># vgcreate -s 16M vbirdvg /dev/hda{6,7,8}</span>
 Volume group <span class="token string">"vbirdvg"</span> successfully created<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h4 id="vgscan命令"><a href="#vgscan命令" class="headerlink" title="vgscan命令"></a><code>vgscan</code>命令</h4><p>查找系统中存在的 LVM 卷组，并显示找到的卷组列表</p>
+<h4 id="vgscan-命令"><a href="#vgscan-命令" class="headerlink" title="vgscan 命令"></a>vgscan 命令</h4><p>查找系统中存在的 LVM 卷组，并显示找到的卷组列表</p>
 <ul>
-<li><code>-d</code><br>调试模式</li>
-<li><code>--ignorelockingfailure</code><br> 忽略锁定失败的错误</li>
+<li><code>-d</code><ul>
+<li>调试模式</li>
+</ul>
+</li>
+<li><code>--ignorelockingfailure</code><ul>
+<li>忽略锁定失败的错误</li>
+</ul>
+</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 确定存在这个vbirdvg的VG</span>
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># vgscan</span>
 Reading all physical volumes.  This may take a while<span class="token punctuation">..</span>.
 Found volume group <span class="token string">"vbirdvg"</span> using metadata <span class="token function">type</span> lvm2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<h4 id="vgremove命令"><a href="#vgremove命令" class="headerlink" title="vgremove命令"></a><code>vgremove</code>命令</h4><p>指令用户删除 LVM 卷组</p>
+<h4 id="vgremove-命令"><a href="#vgremove-命令" class="headerlink" title="vgremove 命令"></a>vgremove 命令</h4><p>指令用户删除 LVM 卷组</p>
 <ul>
-<li><code>-f</code><br>强制删除</li>
+<li><code>-f</code><ul>
+<li>强制删除</li>
+</ul>
+</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 删除卷组"vg1000"</span>
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># vgremove vg1000</span>
 Volume group <span class="token string">"vg1000"</span> successfully removed<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h4 id="vgextend命令"><a href="#vgextend命令" class="headerlink" title="vgextend命令"></a><code>vgextend</code>命令</h4><p>用于动态的扩展 LVM 卷组，它通过向卷组中添加物理卷来增加卷组的容量</p>
+<h4 id="vgextend-命令"><a href="#vgextend-命令" class="headerlink" title="vgextend 命令"></a>vgextend 命令</h4><p>用于动态的扩展 LVM 卷组，它通过向卷组中添加物理卷来增加卷组的容量</p>
 <ul>
-<li><code>-d</code><br>调试模式</li>
-<li><code>-t</code><br>仅测试</li>
+<li><code>-d</code><ul>
+<li>调试模式</li>
+</ul>
+</li>
+<li><code>-t</code><ul>
+<li>仅测试</li>
+</ul>
+</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将剩余的PV(/dev/hda9)分配给vbirdvg</span>
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># vgextend vbirdvg /dev/hda9</span>
 Volume group <span class="token string">"vbirdvg"</span> successfully extended<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h4 id="vgreduce命令"><a href="#vgreduce命令" class="headerlink" title="vgreduce命令"></a><code>vgreduce</code>命令</h4><p>通过删除 LVM 卷组中的物理卷来减少卷组容量，缩减事先需要先做<code>pvmove</code>，将设备移除方可移除 vg。</p>
+<h4 id="vgreduce-命令"><a href="#vgreduce-命令" class="headerlink" title="vgreduce 命令"></a>vgreduce 命令</h4><p>通过删除 LVM 卷组中的物理卷来减少卷组容量，缩减事先需要先做<code>pvmove</code>，将设备移除方可移除 vg。</p>
 <ul>
-<li><code>-a</code><br>如果命令行中没有指定要删除的物理卷，则删除所有的空物理卷</li>
-<li><code>--removemissing</code><br> 删除卷组中丢失的物理卷，使卷组恢复正常状态</li>
+<li><code>-a</code><ul>
+<li>如果命令行中没有指定要删除的物理卷，则删除所有的空物理卷</li>
+</ul>
+</li>
+<li><code>--removemissing</code><ul>
+<li>删除卷组中丢失的物理卷，使卷组恢复正常状态</li>
+</ul>
+</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将物理卷"/dev/sdb2"从卷组"vg2000"中删除</span>
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># vgreduce vg2000 /dev/sdb2</span>
 removed <span class="token string">"/dev/sdb2"</span> from volume group <span class="token string">"vg2000"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h4 id="vgchange命令"><a href="#vgchange命令" class="headerlink" title="vgchange命令"></a><code>vgchange</code>命令</h4><p>用于修改卷组的属性，经常被用来设置卷组是处于活动状态或者非活动状态</p>
+<h4 id="vgchange-命令"><a href="#vgchange-命令" class="headerlink" title="vgchange 命令"></a>vgchange 命令</h4><p>用于修改卷组的属性，经常被用来设置卷组是处于活动状态或者非活动状态</p>
 <ul>
-<li><code>-a</code><br>设置卷组的活动状态</li>
+<li><code>-a</code><ul>
+<li>设置卷组的活动状态</li>
+</ul>
+</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将卷组"vg1000"设置为活动状态</span>
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># vgchange -ay vg1000</span>
 logical volume<span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token keyword">in</span> volume group <span class="token string">"vg1000"</span> now active<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h4 id="vgconvert命令"><a href="#vgconvert命令" class="headerlink" title="vgconvert命令"></a><code>vgconvert</code>命令</h4><p>用于转换指定 LVM 卷组的元数据格式，通常将“LVM1”格式的卷组转换为“LVM2”格式。转换卷组元数据前必须保证卷组处于非活动状态，否则无法完成转换操作。</p>
-<p>格式：<code>vgconvert(选项)(参数)</code><br>选项:<br><code>-M</code> 要转换的卷组格式<br>参数:<br><code>卷组</code> 指定要转换格式的卷组</p>
+<h4 id="vgconvert-命令"><a href="#vgconvert-命令" class="headerlink" title="vgconvert 命令"></a>vgconvert 命令</h4><p>用于转换指定 LVM 卷组的元数据格式，通常将“LVM1”格式的卷组转换为“LVM2”格式。转换卷组元数据前必须保证卷组处于非活动状态，否则无法完成转换操作。</p>
+<p><strong>格式:</strong></p>
+<ul>
+<li><code>vgconvert(选项)(参数)</code></li>
+</ul>
+<p><strong>选项:</strong></p>
+<ul>
+<li><code>-M</code> 要转换的卷组格式</li>
+</ul>
+<p><strong>参数:</strong></p>
+<ul>
+<li><code>卷组</code> 指定要转换格式的卷组</li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 转换卷组为"LVM2"格式</span>
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># vgconvert -M2 vg1000</span>
 Volume group vg1000 successfully converted<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
-<p>###3.3 lv 管理工具</p>
-<h4 id="lvdisplay命令"><a href="#lvdisplay命令" class="headerlink" title="lvdisplay命令"></a><code>lvdisplay</code>命令</h4><p>显示 LVM 逻辑卷空间大小、读写状态和快照信息等属性</p>
+<h3 id="3-3-lv-管理工具"><a href="#3-3-lv-管理工具" class="headerlink" title="3.3 lv 管理工具"></a>3.3 lv 管理工具</h3><h4 id="lvdisplay-命令"><a href="#lvdisplay-命令" class="headerlink" title="lvdisplay 命令"></a>lvdisplay 命令</h4><p>显示 LVM 逻辑卷空间大小、读写状态和快照信息等属性</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@www ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># lvdisplay</span>
   --- Logical volume ---
   LV Name                /dev/vbirdvg/vbirdlv  <span class="token comment" spellcheck="true">#LV逻辑卷的名字</span>
@@ -703,69 +806,141 @@ Volume group vg1000 successfully converted<span aria-hidden="true" class="line-n
   Read ahead sectors     auto
   - currently <span class="token keyword">set</span> to     256
   Block device           253:0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h4 id="lvscan命令"><a href="#lvscan命令" class="headerlink" title="lvscan命令"></a><code>lvscan</code>命令</h4><p>用于扫描当前系统中存在的所有的 LVM 逻辑卷</p>
+<h4 id="lvscan-命令"><a href="#lvscan-命令" class="headerlink" title="lvscan 命令"></a>lvscan 命令</h4><p>用于扫描当前系统中存在的所有的 LVM 逻辑卷</p>
 <ul>
-<li><code>-b</code><br>显示逻辑卷的主设备号和次设备号</li>
+<li><code>-b</code><ul>
+<li>显示逻辑卷的主设备号和次设备号</li>
 </ul>
-<h4 id="lvresize命令"><a href="#lvresize命令" class="headerlink" title="lvresize命令"></a><code>lvresize</code>命令</h4><p>用于调整 LVM 逻辑卷的空间大小，可以增大空间和缩小空间</p>
+</li>
+</ul>
+<h4 id="lvresize-命令"><a href="#lvresize-命令" class="headerlink" title="lvresize 命令"></a>lvresize 命令</h4><p>用于调整 LVM 逻辑卷的空间大小，可以增大空间和缩小空间</p>
 <ul>
-<li><code>-L</code><br>指定逻辑卷的大小，单位为“kKmMgGtT”字节</li>
-<li><code>-l</code><br>指定逻辑卷的大小（LE 数）</li>
+<li><code>-L</code><ul>
+<li>指定逻辑卷的大小，单位为“kKmMgGtT”字节</li>
+</ul>
+</li>
+<li><code>-l</code><ul>
+<li>指定逻辑卷的大小（LE 数）</li>
+</ul>
+</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 利用lvresize的功能來增加LV</span>
 <span class="token punctuation">[</span>root@www ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># lvresize -l +179 /dev/vbirdvg/vbirdlv</span>
 Extending logical volume vbirdlv to 8.36 GB
 Logical volume vbirdlv successfully resized<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<h4 id="lvcreate命令"><a href="#lvcreate命令" class="headerlink" title="lvcreate命令"></a><code>lvcreate</code>命令</h4><p>用于创建 LVM 的逻辑卷</p>
+<h4 id="lvcreate-命令"><a href="#lvcreate-命令" class="headerlink" title="lvcreate 命令"></a>lvcreate 命令</h4><p>用于创建 LVM 的逻辑卷</p>
 <ul>
-<li><code>-L</code><br>指定逻辑卷的大小，单位为“kKmMgGtT”字节</li>
-<li><code>-l</code><br>指定逻辑卷的大小（LE 数）</li>
-<li><code>-n</code><br>后面跟逻辑卷名</li>
+<li><code>-L</code><ul>
+<li>指定逻辑卷的大小，单位为“kKmMgGtT”字节</li>
+</ul>
+</li>
+<li><code>-l</code><ul>
+<li>指定逻辑卷的大小（LE 数）</li>
+</ul>
+</li>
+<li><code>-n</code><ul>
+<li>后面跟逻辑卷名</li>
+</ul>
+</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true">## 将整个vbirdvg通通分配給vbirdlv，要注意PE共有356个</span>
 <span class="token punctuation">[</span>root@www ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># lvcreate -l 356 -n vbirdlv vbirdvg</span>
 Logical volume <span class="token string">"vbirdlv"</span> created<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h4 id="lvremove命令"><a href="#lvremove命令" class="headerlink" title="lvremove命令"></a><code>lvremove</code>命令</h4><p>用于删除指定 LVM 逻辑卷</p>
+<h4 id="lvremove-命令"><a href="#lvremove-命令" class="headerlink" title="lvremove 命令"></a>lvremove 命令</h4><p>用于删除指定 LVM 逻辑卷</p>
 <ul>
-<li><code>-f</code><br>强制删除</li>
+<li><code>-f</code><ul>
+<li>强制删除</li>
 </ul>
-<h4 id="lvextend命令"><a href="#lvextend命令" class="headerlink" title="lvextend命令"></a><code>lvextend</code>命令</h4><p>用于在线扩展逻辑卷的空间大小，而不中断应用程序对逻辑卷的访问</p>
+</li>
+</ul>
+<h4 id="lvextend-命令"><a href="#lvextend-命令" class="headerlink" title="lvextend 命令"></a>lvextend 命令</h4><p>用于在线扩展逻辑卷的空间大小，而不中断应用程序对逻辑卷的访问</p>
 <ul>
-<li><code>-L</code><br>指定逻辑卷的大小，单位为“kKmMgGtT”字节</li>
-<li><code>-l</code><br>指定逻辑卷的大小（LE 数）</li>
+<li><code>-L</code><ul>
+<li>指定逻辑卷的大小，单位为“kKmMgGtT”字节</li>
 </ul>
-<h4 id="lvreduce命令"><a href="#lvreduce命令" class="headerlink" title="lvreduce命令"></a><code>lvreduce</code>命令</h4><p>用于减少 LVM 逻辑卷占用的空间大小</p>
+</li>
+<li><code>-l</code><ul>
+<li>指定逻辑卷的大小（LE 数）</li>
+</ul>
+</li>
+</ul>
+<h4 id="lvreduce-命令"><a href="#lvreduce-命令" class="headerlink" title="lvreduce 命令"></a>lvreduce 命令</h4><p>用于减少 LVM 逻辑卷占用的空间大小</p>
 <ul>
-<li><code>-L</code><br>指定逻辑卷的大小，单位为“kKmMgGtT”字节</li>
-<li><code>-l</code><br>指定逻辑卷的大小（LE 数）</li>
+<li><code>-L</code><ul>
+<li>指定逻辑卷的大小，单位为“kKmMgGtT”字节</li>
+</ul>
+</li>
+<li><code>-l</code><ul>
+<li>指定逻辑卷的大小（LE 数）</li>
+</ul>
+</li>
 </ul>
 <hr>
-<p>###3.4 扩展逻辑卷</p>
-<p><code>lvextend -L [+]#[mMgGtT] /dev/VG_NAME/LV_NAME</code><br><code>resize2fs /dev/VG_NAME/LV_NAME</code></p>
-<p><strong>Note:</strong> <code>resize2fs</code>命令是 ext 系列文件系统的专用大小调整工具，可以扩大可以缩小原 ext 分区，也就是为什么我们在扩大或者缩小分区的时候，需要使用这个命令的原因。</p>
+<h3 id="3-4-扩展逻辑卷"><a href="#3-4-扩展逻辑卷" class="headerlink" title="3.4 扩展逻辑卷"></a>3.4 扩展逻辑卷</h3><p><code>resize2fs</code>命令是 ext 系列文件系统的专用大小调整工具，可以扩大可以缩小原 ext 分区，也就是为什么我们在扩大或者缩小分区的时候，需要使用这个命令的原因。</p>
+<ul>
+<li><code>lvextend -L [+]#[mMgGtT] /dev/VG_NAME/LV_NAME</code></li>
+<li><code>resize2fs /dev/VG_NAME/LV_NAME</code></li>
+</ul>
 <hr>
-<p>###3.5 缩减逻辑卷</p>
-<p><code>umount /dev/VG_NAME/LV_NAME</code><br><code>e2fsck -f /dev/VG_NAME/LV_NAME</code><br><code>resize2fs /dev/VG_NAME/LV_NAME #[mMgGtT]</code><br><code>lvreduce -L [-]#[mMgGtT] /dev/VG_NAME/LV_NAME</code><br><code>mount dev/VG_NAME/LV_NAME DIR</code></p>
-<p><strong>Note:</strong> <code>resize2fs</code>命令是 ext 系列文件系统的专用大小调整工具，可以扩大可以缩小原 ext 分区，也就是为什么我们在扩大或者缩小分区的时候，需要使用这个命令的原因。而<code>e2fsck</code>用来检测或者修复 ext 文件系统的正确性。</p>
+<h3 id="3-5-缩减逻辑卷"><a href="#3-5-缩减逻辑卷" class="headerlink" title="3.5 缩减逻辑卷"></a>3.5 缩减逻辑卷</h3><p><code>resize2fs</code>命令是 ext 系列文件系统的专用大小调整工具，可以扩大可以缩小原 ext 分区，也就是为什么我们在扩大或者缩小分区的时候，需要使用这个命令的原因。而<code>e2fsck</code>用来检测或者修复 ext 文件系统的正确性。</p>
+<ul>
+<li><code>umount /dev/VG_NAME/LV_NAME</code></li>
+<li><code>e2fsck -f /dev/VG_NAME/LV_NAME</code></li>
+<li><code>resize2fs /dev/VG_NAME/LV_NAME #[mMgGtT]</code></li>
+<li><code>lvreduce -L [-]#[mMgGtT] /dev/VG_NAME/LV_NAME</code></li>
+<li><code>mount dev/VG_NAME/LV_NAME DIR</code></li>
+</ul>
 <hr>
-<p>###3.6 快照：snapshot</p>
-<p><code>lvcreate -L #[mMgGtT] -p r -s -n snapshot_lv_name original_lv_name</code></p>
+<h3 id="3-6-快照：snapshot"><a href="#3-6-快照：snapshot" class="headerlink" title="3.6 快照：snapshot"></a>3.6 快照：snapshot</h3><p><code>lvcreate -L #[mMgGtT] -p r -s -n snapshot_lv_name original_lv_name</code></p>
 <hr>
-<h2 id="4-dd命令介绍"><a href="#4-dd命令介绍" class="headerlink" title="4. dd命令介绍"></a>4. <code>dd</code>命令介绍</h2><p>转换和拷贝文件</p>
-<p><strong>格式：</strong><br><code>dd [OPERAND]...</code></p>
-<p><code>dd if=/PATH/FROM/SRC of=/PATH/TO/DEST bs=# block count=#</code></p>
+<h2 id="4-dd-命令介绍"><a href="#4-dd-命令介绍" class="headerlink" title="4. dd 命令介绍"></a>4. dd 命令介绍</h2><p>转换和拷贝文件</p>
+<p><strong>格式：</strong></p>
+<ul>
+<li><code>dd [OPERAND]...</code></li>
+<li><code>dd if=/PATH/FROM/SRC of=/PATH/TO/DEST bs=# block count=#</code></li>
+</ul>
 <p><strong>参数选项：</strong></p>
 <ul>
-<li><strong><code>if=file</code></strong><br>从 file 中读而不是标准输入</li>
-<li><strong><code>of=file</code></strong><br>写到 file 里去而不是标准输出。除非指定 conv=notrunc ，否则， dd 将把 file 截为 O 字节（或由 seek= 选项指定的大小）</li>
-<li><code>ibs=bytes</code><br>一次读 bytes 字节。默认是 512。</li>
-<li><code>obs=bytes</code><br>一次写 bytes 字节。默认是 512。</li>
-<li><strong><code>bs=bytes</code></strong><br>一次读和写 bytes 字节。这将覆盖 ibs 和 obs 设定的值（并且，设定 bs 不等于同时将 ibs 和 obs 设为同一个值，至少在 只使用 sync, noerror 或 notrunc 转换时是这样的。因为 bs 规定，每个输入块都应作为单独 的数据块拷贝到输出，而不把较短的块组合到一起）。</li>
-<li><code>cbs=bytes</code><br>为 block 转换和 unblock 转换指定转换块的大小。</li>
-<li><code>skip=blocks</code><br>在拷贝之前，跳过输入文件的前 blocks 块，每块大小为 ibs-byte 字节。</li>
-<li><code>seek=blocks</code><br>在拷贝之前，跳过输出文件的前 blocks 块，每块大小为 obs-byte 字节。</li>
-<li><strong><code>count=blocks</code></strong><br>只拷贝输入文件的前 blocks 块（每块的大小为 ibs-byte 字节），而不是全部内容，直到文件末尾。</li>
-<li><code>conv=转换[,转换]...</code><br>将文件按 转换 参数指定的方式转换（在 lq,rq 两边没有空格），这里的转化格式可以在帮助信息中查找相关的参数。</li>
+<li><strong><code>if=file</code></strong><ul>
+<li>从 file 中读而不是标准输入</li>
+</ul>
+</li>
+<li><strong><code>of=file</code></strong><ul>
+<li>写到 file 里去而不是标准输出。除非指定 conv=notrunc ，否则， dd 将把 file 截为 O 字节（或由 seek= 选项指定的大小）</li>
+</ul>
+</li>
+<li><code>ibs=bytes</code><ul>
+<li>一次读 bytes 字节。默认是 512。</li>
+</ul>
+</li>
+<li><code>obs=bytes</code><ul>
+<li>一次写 bytes 字节。默认是 512。</li>
+</ul>
+</li>
+<li><strong><code>bs=bytes</code></strong><ul>
+<li>一次读和写 bytes 字节。这将覆盖 ibs 和 obs 设定的值（并且，设定 bs 不等于同时将 ibs 和 obs 设为同一个值，至少在 只使用 sync, noerror 或 notrunc 转换时是这样的。因为 bs 规定，每个输入块都应作为单独 的数据块拷贝到输出，而不把较短的块组合到一起）。</li>
+</ul>
+</li>
+<li><code>cbs=bytes</code><ul>
+<li>为 block 转换和 unblock 转换指定转换块的大小。</li>
+</ul>
+</li>
+<li><code>skip=blocks</code><ul>
+<li>在拷贝之前，跳过输入文件的前 blocks 块，每块大小为 ibs-byte 字节。</li>
+</ul>
+</li>
+<li><code>seek=blocks</code><ul>
+<li>在拷贝之前，跳过输出文件的前 blocks 块，每块大小为 obs-byte 字节。</li>
+</ul>
+</li>
+<li><strong><code>count=blocks</code></strong><ul>
+<li>只拷贝输入文件的前 blocks 块（每块的大小为 ibs-byte 字节），而不是全部内容，直到文件末尾。</li>
+</ul>
+</li>
+<li><code>conv=转换[,转换]...</code><ul>
+<li>将文件按 转换 参数指定的方式转换（在 lq,rq 两边没有空格），这里的转化格式可以在帮助信息中查找相关的参数。</li>
+</ul>
+</li>
 </ul>
 <p><strong>实战演示：</strong></p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 磁盘拷贝</span>
@@ -797,10 +972,16 @@ Logical volume <span class="token string">"vbirdlv"</span> created<span aria-hid
 
 <span class="token comment" spellcheck="true"># 拷贝光盘数据到root文件夹下，并保存为cd.iso文件</span>
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># dd if=/dev/cdrom of=/root/cd.iso</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>*<em>Note: *</em>两个特殊设备</p>
+<p>*<em>Note: *</em> 两个特殊设备</p>
 <ul>
-<li><code>/dev/null</code><br>数据黑洞</li>
-<li><code>/dev/zero</code><br>吐零机</li>
+<li><code>/dev/null</code><ul>
+<li>数据黑洞</li>
+</ul>
+</li>
+<li><code>/dev/zero</code><ul>
+<li>吐零机</li>
+</ul>
+</li>
 </ul>
 <script>
         document.querySelectorAll('.github-emoji')
