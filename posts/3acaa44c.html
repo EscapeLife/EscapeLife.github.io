@@ -456,21 +456,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-10-26
+                    2020-10-27
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    500
+                    4.1k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    17 分
                 </div>
                 
 
@@ -498,7 +498,7 @@
 <p>在正确实施的情况下，内核对于用户是不可见的，它在自己的小世界(称为内核空间)中工作，并从中分配内存和跟踪所有内容的存储位置。用户所看到的内容则被称为用户空间。这些应用通过系统调用接口(<code>SCI</code>)与内核进行交互。</p>
 <p><img src="/images/linux-kernel-know.png" alt="Linux系统内核概述"></p>
 <hr>
-<h2 id="1-Linux-内核简介"><a href="#1-Linux-内核简介" class="headerlink" title="1. Linux 内核简介"></a>1. Linux 内核简介</h2><blockquote>
+<h2 id="1-内核简介"><a href="#1-内核简介" class="headerlink" title="1. 内核简介"></a>1. 内核简介</h2><blockquote>
 <p><strong>单内核体系设计、但充分借鉴了微内核设计体系的优点，为内核引入模块化机制。</strong></p>
 </blockquote>
 <p><code>Linux</code> 内核的重要组成部分，主要有以下几部分：</p>
@@ -521,6 +521,589 @@
 </ul>
 </li>
 </ul>
+<hr>
+<h2 id="2-内核模块"><a href="#2-内核模块" class="headerlink" title="2. 内核模块"></a>2. 内核模块</h2><h3 id="2-1-uname-命令"><a href="#2-1-uname-命令" class="headerlink" title="2.1 uname 命令"></a>2.1 uname 命令</h3><p><strong>使用格式</strong></p>
+<ul>
+<li><code>uname [OPTION]...</code></li>
+</ul>
+<p><strong>参数解释</strong></p>
+<ul>
+<li><code>-n</code> 显示节点名称</li>
+<li><code>-r</code> 显示<code>VERSION-RELEASE</code></li>
+<li><code>-s</code> 内核名称</li>
+<li><code>-v</code> 内核版本</li>
+<li><code>-n</code> 节点名</li>
+<li><code>-m</code> 硬件名称</li>
+<li><code>-i</code> 硬件平台</li>
+<li><code>-p</code> 处理器类型</li>
+<li><code>-o</code> 操作系统</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># uname -m</span>
+i686
+
+<span class="token comment" spellcheck="true"># uname -r</span>
+2.6.32-573.22.1.el6.i686
+
+<span class="token comment" spellcheck="true"># uname -a</span>
+Linux MyServer 2.6.32-573.22.1.el6.i686 <span class="token punctuation">..</span>. i686 i386 GNU/Linux<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-2-lsmod-命令"><a href="#2-2-lsmod-命令" class="headerlink" title="2.2 lsmod 命令"></a>2.2 lsmod 命令</h3><blockquote>
+<p><strong>显示由核心已经装载的内核模块</strong></p>
+</blockquote>
+<p><strong>命令定义</strong></p>
+<ul>
+<li>显示的内容来自于: <code>/proc/modules</code> 文件。</li>
+<li>使用 <code>lsmod</code> 命令时，常会采用类似 <code>lsmod | grep -i ext4</code> 这样的命令来查询系统是否加载了某些模块。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># cat /proc/modules</span>
+iptable_filter 2173 0 - Live 0xed9b2000
+ip_tables 9567 1 iptable_filter, Live 0xed9a9000
+ext3 203718 1 - Live 0xed962000
+jbd 65315 1 ext3, Live 0xed904000
+xenfs 4360 1 - Live 0xed8e6000
+ipv6 271097 14 - Live 0xed88e000
+xen_netfront 15871 0 - Live 0xed7d9000
+ext4 339812 2 - Live 0xed764000
+jbd2 75927 1 ext4, Live 0xed6d9000
+mbcache 6017 2 ext3,ext4, Live 0xed6b7000
+xen_blkfront 19209 5 - Live 0xed69f000
+dm_mirror 11969 0 - Live 0xed68d000
+dm_region_hash 9644 1 dm_mirror, Live 0xed67e000
+dm_log 8322 2 dm_mirror,dm_region_hash, Live 0xed672000
+dm_mod 84711 11 dm_mirror,dm_log, Live 0xed64e000<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># lsmod | grep ext4</span>
+ext4                  339812  2
+jbd2                   75927  1 ext4
+mbcache                 6017  2 ext3,ext4<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>字段含义</strong></p>
+<ul>
+<li>第 1 列：表示模块的名称</li>
+<li>第 2 列：表示模块的大小</li>
+<li>第 3 列：表示依赖模块的个数</li>
+<li>第 4 列：表示依赖模块的内容</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># lsmod</span>
+Module                  Size  Used by
+iptable_filter          2173  0
+ip_tables               9567  1 iptable_filter
+ext3                  203718  1
+jbd                    65315  1 ext3
+xenfs                   4360  1
+ipv6                  271097  14
+xen_netfront           15871  0
+ext4                  339812  2
+jbd2                   75927  1 ext4
+mbcache                 6017  2 ext3,ext4
+xen_blkfront           19209  5
+dm_mirror              11969  0
+dm_region_hash          9644  1 dm_mirror
+dm_log                  8322  2 dm_mirror,dm_region_hash
+dm_mod                 84711  11 dm_mirror,dm_log<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-3-modinfo-命令"><a href="#2-3-modinfo-命令" class="headerlink" title="2.3 modinfo 命令"></a>2.3 modinfo 命令</h3><blockquote>
+<p><strong>显示模块的详细描述信息</strong></p>
+</blockquote>
+<p><strong>命令定义</strong></p>
+<ul>
+<li><code>modinfo</code> 列出 <code>Linux</code> 内核中命令行指定的模块的信息。</li>
+<li><code>modinfo</code> 能够查询系统中未安装的模块信息。</li>
+<li>若模块名不是一个文件名，则会在 <code>/lib/modules/version</code> 目录中搜索，就像 <code>modprobe</code> 一样。</li>
+<li><code>modinfo</code> 默认情况下，为了便于阅读，以下面的格式列出模块的每个属性：<code>fieldname : value</code>。</li>
+</ul>
+<p><strong>语法</strong></p>
+<ul>
+<li><code>modinfo [选项] [ modulename|filename... ]</code></li>
+</ul>
+<p><strong>选项</strong></p>
+<ul>
+<li><code>-n</code> 只显示模块文件路径</li>
+<li><code>-p</code> 显示模块参数</li>
+<li><code>-a</code> author</li>
+<li><code>-d</code> description</li>
+<li><code>-l</code> license</li>
+<li><code>-0</code> 使用’\0’字符分隔 field 值，而不是一个新行，对脚本比较有用</li>
+</ul>
+<p><strong>实战演示</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># modinfo ext4</span>
+filename:       /lib/modules/2.6.32-573.22.1.el6.i686/kernel/fs/ext4/ext4.ko
+license:        GPL
+description:    Fourth Extended Filesystem
+author:         Remy Card, Stephen Tweedie, Andrew Morton, Andreas Dilger, Theodore and others
+srcversion:     CB1B990F5A758DFB0FB12F1
+depends:        mbcache,jbd2
+vermagic:       2.6.32-573.22.1.el6.i686 SMP mod_unload modversions 686
+
+<span class="token comment" spellcheck="true"># modinfo btrfs</span>
+filename:       /lib/modules/2.6.32-573.22.1.el6.i686/kernel/fs/btrfs/btrfs.ko
+license:        GPL
+alias:          devname:btrfs-control
+alias:          char-major-10-234
+srcversion:     B412C18B0F5BF7F1B3C941A
+depends:        libcrc32c,zlib_deflate,lzo_compress,lzo_decompress
+vermagic:       2.6.32-573.22.1.el6.i686 SMP mod_unload modversions 686<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-4-modprobe-命令"><a href="#2-4-modprobe-命令" class="headerlink" title="2.4 modprobe 命令"></a>2.4 modprobe 命令</h3><blockquote>
+<p><strong>装载或卸载内核模块</strong></p>
+</blockquote>
+<p><strong>命令定义</strong></p>
+<ul>
+<li>配置文件<ul>
+<li><code>/etc/modprobe.conf</code></li>
+<li><code>/etc/modprobe.d/*.conf</code></li>
+</ul>
+</li>
+<li>解决依赖<ul>
+<li><code>modprobe</code>需要一个最新的<code>modules.dep</code>文件，可以用<code>depmod</code>来生成</li>
+<li>该文件列出了每一个模块需要的其他模块，<code>modprobe</code>使用这个去自动添加或删除模块的依赖</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># modules.dep为解决依赖的配置文件，modules.dep.bin二进制文件运行</span>
+<span class="token comment" spellcheck="true"># ls /lib/modules/2.6.32-358.6.1.el6.i686/</span>
+build              modules.block    modules.ieee1394map  modules.ofmap     modules.symbols.bin  weak-updates
+extra              modules.ccwmap   modules.inputmap     modules.order     modules.usbmap
+kernel             modules.dep      modules.isapnpmap    modules.pcimap    <span class="token function">source</span>
+modules.alias      modules.dep.bin  modules.modesetting  modules.seriomap  updates
+modules.alias.bin  modules.drm      modules.networking   modules.symbols   vdso<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>语法</strong></p>
+<ul>
+<li><code>modprobe [ -c ]</code></li>
+<li><code>modprobe [ -l ] [ -t dirname ] [ wildcard ]</code></li>
+<li><code>modprobe [ -r ] [ -v ] [ -n ] [ -i ] [ modulename … ]</code></li>
+</ul>
+<p><strong>选项</strong></p>
+<ul>
+<li><code>-v</code><ul>
+<li>显示程序在干什么，通常在出问题的情况下，<code>modprobe</code> 才显示信息</li>
+</ul>
+</li>
+<li><code>-C</code><ul>
+<li>重载，默认配置文件(<code>/etc/modprobe.conf</code> 或 <code>/etc/modprobe.d</code>)</li>
+</ul>
+</li>
+<li><code>-c</code><ul>
+<li>输出配置文件并退出</li>
+</ul>
+</li>
+<li><code>-n</code><ul>
+<li>可以和 <code>-v</code> 选项一起使用，调试非常有用</li>
+</ul>
+</li>
+<li><code>-i</code><ul>
+<li>该选项会使得 <code>modprobe</code> 忽略配置文件中的，在命令行上输入的 <code>install</code> 和 <code>remove</code></li>
+</ul>
+</li>
+<li><code>-q</code><ul>
+<li>一般 <code>modprobe</code> 删除或插入一个模块时，若没有找到会提示错误。使用该选项，会忽略指定的模块，并不提示任何错误信息。</li>
+</ul>
+</li>
+<li><code>-r</code><ul>
+<li>该选项会导致 <code>modprobe</code> 去删除，而不是插入一个模块</li>
+<li>通常没有没有理由去删除内核模块，除非是一些有 <code>bug</code> 的模块</li>
+</ul>
+</li>
+<li><code>-f</code><ul>
+<li>使用该选项是比较危险的</li>
+<li>和同时使用 <code>–force-vermagic</code>，<code>–force-modversion</code> 一样</li>
+</ul>
+</li>
+<li><code>-l</code><ul>
+<li>列出所有模块</li>
+</ul>
+</li>
+<li><code>-a</code><ul>
+<li>插入所有命令行中的模块</li>
+</ul>
+</li>
+<li><code>-t</code><ul>
+<li>强制 <code>-l</code> 显示 <code>dirname</code> 中的模块</li>
+</ul>
+</li>
+<li><code>-s</code><ul>
+<li>错误信息写入 <code>syslog</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-5-depmod-命令"><a href="#2-5-depmod-命令" class="headerlink" title="2.5 depmod 命令"></a>2.5 depmod 命令</h3><blockquote>
+<p><strong>内核模块依赖关系文件及系统信息映射文件的生成工具</strong></p>
+</blockquote>
+<p><strong>语法</strong></p>
+<ul>
+<li><code>depmod [-adeisvV][-m &lt;文件&gt;][--help][模块名称]</code></li>
+</ul>
+<p><strong>参数</strong></p>
+<ul>
+<li><code>-a</code> 分析所有可用的模块</li>
+<li><code>-d</code> 执行排错模式</li>
+<li><code>-e</code> 输出无法参照的符号</li>
+<li><code>-i</code> 不检查符号表的版本</li>
+<li><code>-m&lt;文件&gt;</code> 使用指定的符号表文件</li>
+<li><code>-s</code> 在系统记录中记录错误</li>
+<li><code>-v</code> 执行时显示详细的信息</li>
+<li><code>-V</code> 显示版本信息</li>
+<li><code>--help</code> 显示帮助</li>
+</ul>
+<hr>
+<h3 id="2-6-insmod-和-rmmod-命令"><a href="#2-6-insmod-和-rmmod-命令" class="headerlink" title="2.6 insmod 和 rmmod 命令"></a>2.6 insmod 和 rmmod 命令</h3><blockquote>
+<p>装载或卸载内核模块</p>
+<ul>
+<li>不解决依赖关系，需要自己手动卸载</li>
+</ul>
+</blockquote>
+<p><strong><code>insmod</code>命令</strong></p>
+<ul>
+<li>向 <code>Linux</code> 内核中插入一个模块</li>
+<li><code>insmod</code> 是一个向内核插入模块的小程序</li>
+<li>大多数用户使用 <code>modprobe</code> 因为它比较智能化</li>
+<li><code>insmod [ filename ] [ module options... ]</code></li>
+</ul>
+<p><strong><code>rmmod</code>命令</strong></p>
+<ul>
+<li>命令解析<ul>
+<li>删除内核中的一模块</li>
+<li><code>rmmod</code> 是一个可以从内核中删除模块的小程序，大多数用户使用<code>modprobe -r</code>去删除模块</li>
+</ul>
+</li>
+<li>语法格式<ul>
+<li><code>rmmod [ modulename ]</code></li>
+</ul>
+</li>
+<li>参数选项<ul>
+<li><code>-f</code><ul>
+<li>除非编译内核时 <code>CONFIG_MODULE_FORCE_UNLOAD</code> 被设置该命令才有效果，否则没效果</li>
+<li>用该选项可以删除正在被使用的模块，设计为不能删除的模块，或者标记为 <code>unsafe</code> 的模块</li>
+</ul>
+</li>
+<li><code>-w</code><ul>
+<li><code>rmmod</code> 拒绝删除正在被使用的模块</li>
+<li>使用该选项后，指定的模块会被孤立起来，直到不被使用</li>
+</ul>
+</li>
+<li><code>-s</code><ul>
+<li>将错误信息写入 <code>syslog</code>，而不是标准错误(<code>stderr</code>)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-proc-目录"><a href="#3-proc-目录" class="headerlink" title="3. /proc 目录"></a>3. /proc 目录</h2><blockquote>
+<p><strong>内核把自己内部状态信息及统计信息，以及可配置参数通过 proc 伪文件系统加以输出。</strong></p>
+</blockquote>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># ls /proc/</span>
+1     1173  22     29855  35  47   60   973          filesystems  loadavg       scsi           version
+10    12    23     3      36  48   600  buddyinfo    fs           locks         self           vmallocinfo
+1071  13    232    30     37  49   61   bus          interrupts   mdstat        slabinfo       <span class="token function">vmstat</span>
+1082  14    234    31     38  5    62   cgroups      iomem        meminfo       softirqs       xen
+1085  15    24     31314  39  528  7    cmdline      ioports      misc          <span class="token function">stat</span>           zoneinfo
+11    16    25     317    4   531  739  cpuinfo      irq          modules       swaps
+1150  17    252    318    40  543  8    crypto       kallsyms     mounts        sys
+1162  18    253    32     41  56   808  devices      kcore        mtd           sysrq-trigger
+1163  19    26     320    42  566  830  diskstats    keys         net           sysvipc
+1165  1908  27     33     43  567  853  dma          key-users    pagetypeinfo  timer_list
+1167  2     28     330    44  57   9    driver       kmsg         partitions    timer_stats
+1169  20    29     334    45  59   94   execdomains  kpagecount   sched_debug   <span class="token function">tty</span>
+1171  21    29853  34     46  6    95   fb           kpageflags   schedstat     <span class="token function">uptime</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-1-sysctl-命令"><a href="#3-1-sysctl-命令" class="headerlink" title="3.1 sysctl 命令"></a>3.1 sysctl 命令</h3><p><strong>语法格式</strong></p>
+<ul>
+<li><code>sysctl(选项)(参数)</code></li>
+</ul>
+<p><strong>命令参数</strong></p>
+<ul>
+<li><code>-n</code> 打印值时不打印关键字</li>
+<li><code>-e</code> 忽略未知关键字错误</li>
+<li><code>-N</code> 仅打印名称</li>
+<li><code>-w</code> 当改变 <code>sysctl</code> 设置时使用此项</li>
+<li><code>-p</code> 从配置文件 <code>/etc/sysctl.conf</code> 加载内核参数设置</li>
+<li><code>-a</code> 打印当前所有可用的内核参数变量和值</li>
+<li><code>-A</code> 以表格方式打印当前所有可用的内核参数变量和值</li>
+</ul>
+<p><strong>默认配置文件</strong></p>
+<ul>
+<li><code>/etc/sysctl.conf</code></li>
+</ul>
+<p><strong>命令使用方式</strong></p>
+<ul>
+<li>(1) 设置某参数<ul>
+<li><code>sysctl -w parameter=VALUE</code></li>
+</ul>
+</li>
+<li>(2) 通过读取配置文件设置参数<ul>
+<li><code>sysctl -p [/path/to/conf_file]</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>参数说明</strong></p>
+<ul>
+<li>只读：输出信息</li>
+<li>可写：可接受用户指定“新值”来实现对内核某功能或特性的配置<code>/proc/sys</code></li>
+</ul>
+<p><strong>两种修改方式</strong></p>
+<ul>
+<li>(1) sysctl 命令用于查看或设定此目录中诸多参数<ul>
+<li><code>sysctl -w path.to.parameter=VALUE</code></li>
+<li><code>sysctl -w kernel.hostname=mail.magedu.com</code></li>
+</ul>
+</li>
+<li>(2) echo 命令通过重定向的方式也可以修改大多数参数的值<ul>
+<li><code>echo "VALUE" &gt; /proc/sys/path/to/parameter</code></li>
+<li><code>echo "www.magedu.com" &gt; /proc/sys/kernel/hostname</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>配置文件中常用的几个参数</strong></p>
+<ul>
+<li><code>net.ipv4.ip_forward</code></li>
+<li><code>/proc/sys/net/ipv4/ip_forward</code></li>
+<li><code>vm.drop_caches</code></li>
+<li><code>/proc/sys/vm/drop_caches</code></li>
+<li><code>kernel.hostname</code></li>
+<li><code>/proc/sys/kernel/hostname</code></li>
+</ul>
+<hr>
+<h3 id="3-2-修改配置文件"><a href="#3-2-修改配置文件" class="headerlink" title="3.2 修改配置文件"></a>3.2 修改配置文件</h3><pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># cat /etc/sysctl.conf</span>
+<span class="token comment" spellcheck="true"># Kernel sysctl configuration file for Red Hat Linux</span>
+
+<span class="token comment" spellcheck="true"># Controls IP packet forwarding</span>
+net.ipv4.ip_forward <span class="token operator">=</span> 0
+
+<span class="token comment" spellcheck="true"># Controls source route verification</span>
+net.ipv4.conf.default.rp_filter <span class="token operator">=</span> 1
+
+<span class="token comment" spellcheck="true"># Do not accept source routing</span>
+net.ipv4.conf.default.accept_source_route <span class="token operator">=</span> 0
+
+<span class="token comment" spellcheck="true"># Controls the System Request debugging functionality of the kernel</span>
+kernel.sysrq <span class="token operator">=</span> 0
+
+<span class="token comment" spellcheck="true"># Controls whether core dumps will append the PID to the core filename.</span>
+<span class="token comment" spellcheck="true"># Useful for debugging multi-threaded applications.</span>
+kernel.core_uses_pid <span class="token operator">=</span> 1
+
+<span class="token comment" spellcheck="true"># Controls the use of TCP syncookies</span>
+net.ipv4.tcp_syncookies <span class="token operator">=</span> 1
+
+<span class="token comment" spellcheck="true"># Disable netfilter on bridges.</span>
+net.bridge.bridge-nf-call-ip6tables <span class="token operator">=</span> 0
+net.bridge.bridge-nf-call-iptables <span class="token operator">=</span> 0
+net.bridge.bridge-nf-call-arptables <span class="token operator">=</span> 0
+
+<span class="token comment" spellcheck="true"># Controls the default maxmimum size of a mesage queue</span>
+kernel.msgmnb <span class="token operator">=</span> 65536
+
+<span class="token comment" spellcheck="true"># Controls the maximum size of a message, in bytes</span>
+kernel.msgmax <span class="token operator">=</span> 65536
+
+<span class="token comment" spellcheck="true"># Controls the maximum shared segment size, in bytes</span>
+kernel.shmmax <span class="token operator">=</span> 4294967295
+
+<span class="token comment" spellcheck="true"># Controls the maximum number of shared memory segments, in pages</span>
+kernel.shmall <span class="token operator">=</span> 268435456
+<span class="token comment" spellcheck="true"># Auto-enabled by xs-tools:install.sh</span>
+net.ipv4.conf.all.arp_notify <span class="token operator">=</span> 1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-3-实战演示"><a href="#3-3-实战演示" class="headerlink" title="3.3 实战演示"></a>3.3 实战演示</h3><pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看所有可读变量</span>
+sysctl -a
+
+<span class="token comment" spellcheck="true"># 修改对应参数</span>
+sysctl -w kernel.sysrq<span class="token operator">=</span>0
+sysctl -w kernel.core_uses_pid<span class="token operator">=</span>1
+sysctl -w net.ipv4.conf.default.accept_redirects<span class="token operator">=</span>0
+
+<span class="token comment" spellcheck="true"># 如果希望屏蔽别人 ping 你的主机，配置文件修改</span>
+net.ipv4.icmp_echo_ignore_all <span class="token operator">=</span> 1
+
+<span class="token comment" spellcheck="true"># 编辑完成后，请执行以下命令使变动立即生效</span>
+/sbin/sysctl -p
+/sbin/sysctl -w net.ipv4.route.flush<span class="token operator">=</span>1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="4-sys-目录"><a href="#4-sys-目录" class="headerlink" title="4. /sys 目录"></a>4. /sys 目录</h2><blockquote>
+<p><strong>sysfs 伪文件系统，输出内核识别出的各硬件设备的相关属性信息，也有内核对硬件特性的设定信息。有些参数是可以修改的，用于调整硬件工作特性。</strong></p>
+</blockquote>
+<h3 id="4-1-udev"><a href="#4-1-udev" class="headerlink" title="4.1 udev"></a>4.1 udev</h3><ul>
+<li><code>udev</code> 是运行用户空间程序。</li>
+<li><code>udev</code> 通 <code>/sys/</code> 路径下输出的信息动态为各设备创建所需要设备文件。</li>
+<li><code>udev</code> 是 <code>Linux</code> 内核的设备管理器，它取代了 <code>udevadmin</code> 和  <code>hotplug</code>，负责管理  <code>/dev</code> 中的设备节点。</li>
+<li><code>udev</code> 也处理所有用户空间发生的硬件添加、删除事件，以及某些特定设备所需的固件加载。</li>
+<li><code>udev</code> 为设备创建设备文件时，会读取其事先定义好的规则文件，一般在 <code>/etc/udev/rules.d</code> 及 <code>/usr/lib/udev/rules.d</code> 目录下。</li>
+</ul>
+<blockquote>
+<p><strong>点击这里查看 ==&gt;</strong> <a href="https://wiki.archlinux.org/index.php/Udev_%28%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87%29" target="_blank" rel="noopener">Arch Wiki udev</a></p>
+</blockquote>
+<hr>
+<h3 id="4-2-ramdisk-文件的制作"><a href="#4-2-ramdisk-文件的制作" class="headerlink" title="4.2 ramdisk 文件的制作"></a>4.2 ramdisk 文件的制作</h3><p><strong>方法一</strong></p>
+<ul>
+<li><code>mkinitrd</code> 命令</li>
+<li>为当前正在使用的内核重新制作 <code>ramdisk</code> 文件</li>
+<li><code>mkinitrd /boot/initramfs-$(uname -r).img $(uname -r)</code></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 移动ramdisk文件到/root目录下</span>
+<span class="token function">mv</span> /boot/initramfs-2.6.32<span class="token punctuation">..</span>.img /root
+
+<span class="token comment" spellcheck="true"># 为当前正在使用的内核重新制作ramdisk文件</span>
+mkinitrd /boot/initramfs-<span class="token variable"><span class="token variable">$(</span><span class="token function">uname</span> -r<span class="token variable">)</span></span>.img <span class="token variable"><span class="token variable">$(</span><span class="token function">uname</span> -r<span class="token variable">)</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>方法二</strong></p>
+<ul>
+<li><code>dracut</code> 命令</li>
+<li>为当前正在使用的内核重新制作 <code>ramdisk</code> 文件</li>
+<li><code>dracut /boot/initramfs-$(uname -r).img $(uname -r)</code></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 移动ramdisk文件到/root目录下</span>
+<span class="token function">mv</span> /boot/initramfs-2.6.32<span class="token punctuation">..</span>.img /root
+
+<span class="token comment" spellcheck="true"># 为当前正在使用的内核重新制作ramdisk文件</span>
+dracut /boot/initramfs-<span class="token variable"><span class="token variable">$(</span><span class="token function">uname</span> -r<span class="token variable">)</span></span>.img <span class="token variable"><span class="token variable">$(</span><span class="token function">uname</span> -r<span class="token variable">)</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="4-3-查看-ramdisk"><a href="#4-3-查看-ramdisk" class="headerlink" title="4.3 查看 ramdisk"></a>4.3 查看 ramdisk</h3><pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用file命令查看ramdisk文件发现是以gz压缩存放的</span>
+<span class="token function">file</span> /boot/initramfs-2.6.32-504.el6.x86_64.img
+
+<span class="token comment" spellcheck="true"># 改名称，解压</span>
+<span class="token function">cd</span> /boot/
+<span class="token function">mv</span> initramfs-2.6.32-504.el6.x86_64.img initramfs-2.6.32-504.el6.x86_64.img.gz
+<span class="token function">gzip</span> -d initramfs-2.6.32-504.el6.x86_64.img.gz
+
+<span class="token comment" spellcheck="true"># 使用file命令查看发现是以cpio存放的文本文件</span>
+<span class="token function">file</span> initramfs-2.6.32-504.el6.x86_64.img
+
+<span class="token comment" spellcheck="true"># 解压这个文本文件</span>
+<span class="token comment" spellcheck="true"># 之后会在initrd目录下生成相应的文件，一个微型的/root</span>
+<span class="token function">mkdir</span> initrd
+<span class="token function">cd</span> initrd
+cpio -id <span class="token operator">&lt;</span> <span class="token punctuation">..</span>/initramfs-2.6.32-504.el6.x86_64.img
+
+<span class="token comment" spellcheck="true"># 这个时候就可以查看init脚本文件了</span>
+<span class="token function">cat</span> init
+
+<span class="token comment" spellcheck="true"># 在sbin文件中存放着相关的命令</span>
+<span class="token function">ls</span> sbin<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="5-编译内核"><a href="#5-编译内核" class="headerlink" title="5. 编译内核"></a>5. 编译内核</h2><h3 id="5-1-前提准备"><a href="#5-1-前提准备" class="headerlink" title="5.1 前提准备"></a>5.1 前提准备</h3><p><strong>(1) 准备好开发环境</strong></p>
+<ul>
+<li>包组(CentOS 6)</li>
+<li><code>Server Platform Development</code></li>
+<li><code>Development Tools</code></li>
+</ul>
+<p><strong>(2) 获取目标主机上硬件设备的相关信息</strong></p>
+<ul>
+<li>CPU<ul>
+<li><code>cat /proc/cpuinfo</code></li>
+<li><code>x86info -a</code></li>
+<li><code>lscpu</code></li>
+</ul>
+</li>
+<li>PCI 设备<ul>
+<li><code>lspci</code></li>
+<li><code>-v</code></li>
+<li><code>-vv</code></li>
+<li><code>lsusb</code></li>
+<li><code>-v</code></li>
+<li><code>-vv</code></li>
+<li><code>lsblk</code></li>
+</ul>
+</li>
+<li>了解全部硬件设备信息<ul>
+<li><code>hal-device</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>(3) 获取到目标主机系统功能的相关信息</strong></p>
+<p><strong>(4) 获取内核源代码包</strong></p>
+<ul>
+<li><code>www.kernel.org</code></li>
+</ul>
+<hr>
+<h3 id="5-2-简易安装内核"><a href="#5-2-简易安装内核" class="headerlink" title="5.2 简易安装内核"></a>5.2 简易安装内核</h3><p><strong>简易安装</strong></p>
+<ul>
+<li>获取当前系统的安装文件作为模块安装较为方便</li>
+<li>修改相应的参数即可</li>
+<li>只适用于当前特定的内核版本</li>
+<li>当前系统的安装文件在 <code>config-2.6.32-504.el6.x86_64</code></li>
+</ul>
+<p><strong>简单依据模板文件的制作内核</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 下载对应的Linux内核版本进行解压缩</span>
+<span class="token comment" spellcheck="true"># 会在/usr/src目录下创建debug、kernels和linux-3.10.67目录</span>
+<span class="token function">tar</span> xf linux-3.10.67.tar.xz -C /usr/src
+
+<span class="token comment" spellcheck="true"># 为了方便多内核共存，使用连接指向</span>
+<span class="token comment" spellcheck="true"># 会在当前目录下创建一个链接文件 linux -> linux-3.10.67</span>
+<span class="token function">cd</span> /usr/src
+<span class="token function">ln</span> -sv linux-3.10.67 linux
+
+<span class="token comment" spellcheck="true"># 创建模板</span>
+<span class="token function">cd</span> linux
+<span class="token comment" spellcheck="true"># 查看链接指向的文件内容</span>
+<span class="token function">ls</span>
+<span class="token comment" spellcheck="true"># 拷贝系统自带的模板文件</span>
+<span class="token function">cp</span> /boot/config-<span class="token variable"><span class="token variable">$(</span><span class="token function">uname</span> -r<span class="token variable">)</span></span> .config
+
+<span class="token comment" spellcheck="true"># 打开图形界面配置内核选项，选择添加、删除内核模块</span>
+<span class="token comment" spellcheck="true"># 添加的默认选项来自.config配置文件</span>
+<span class="token function">make</span> menuconfig
+
+<span class="token comment" spellcheck="true"># 使用screen来不中断安装</span>
+<span class="token function">screen</span>
+<span class="token comment" spellcheck="true"># 采用几个线程进行编译</span>
+<span class="token function">make</span> -j n
+
+<span class="token comment" spellcheck="true"># 安装内核</span>
+<span class="token function">make</span> modules_install
+<span class="token comment" spellcheck="true"># make install中将会安装内容</span>
+<span class="token comment" spellcheck="true"># 安装bzImage为/boot/vmlinuz-VERSION-RELEASE</span>
+<span class="token comment" spellcheck="true"># 生成initramfs文件</span>
+<span class="token comment" spellcheck="true"># 编辑grub的配置文件</span>
+<span class="token function">make</span> <span class="token function">install</span>
+
+<span class="token comment" spellcheck="true"># 重启系统，并测试使用新内核，不是默认启动内核</span>
+init 6<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="5-3-详解编译内核"><a href="#5-3-详解编译内核" class="headerlink" title="5.3 详解编译内核"></a>5.3 详解编译内核</h3><p><strong>(1) 配置内核选项</strong></p>
+<ul>
+<li>支持“<strong>更新</strong>”模式进行配置</li>
+<li>(a) <code>make config</code>：基于命令行以遍历的方式去配置内核中可配置的每个选项</li>
+<li>(b) <code>make menuconfig</code>：基于 <code>curses</code> 的文本窗口界面</li>
+<li>(c) <code>make gconfig</code>：基于 <code>GTK</code> 开发环境的窗口界面</li>
+<li>(d) <code>make xconfig</code>：基于 <code>Qt</code> 开发环境的窗口界面</li>
+<li>支持“<strong>全新配置</strong>”模式进行配置</li>
+<li>(a) <code>make defconfig</code>：基于内核为目标平台提供的“<strong>默认</strong>”配置进行配置</li>
+<li>(b) <code>make allnoconfig</code>: 所有选项均回答为”<code>no</code>“</li>
+</ul>
+<p><strong>(2) 编译</strong> - <code>make [-j #]</code></p>
+<ul>
+<li><strong>如何只编译内核中的一部分功能</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># (a)只编译某子目录中的相关代码</span>
+<span class="token function">cd</span> /usr/src/linux
+<span class="token function">make</span> dir/
+
+<span class="token comment" spellcheck="true"># (b)只编译一个特定的模块</span>
+<span class="token function">cd</span> /usr/src/linux
+<span class="token function">make</span> dir/file.ko
+
+<span class="token comment" spellcheck="true"># 例如：只为e1000编译驱动</span>
+<span class="token function">make</span> drivers/net/ethernet/intel/e1000/e1000.ko<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>如何交叉编译内核</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 编译的目标平台与当前平台不相同；</span>
+<span class="token function">make</span> ARCH<span class="token operator">=</span>arch_name
+
+<span class="token comment" spellcheck="true"># 要获取特定目标平台的使用帮助</span>
+<span class="token function">make</span> ARCH<span class="token operator">=</span>arch_name <span class="token function">help</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>如何在已经执行过编译操作的内核源码树做重新编译</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 事先清理操作</span>
+
+<span class="token comment" spellcheck="true"># 清理大多数编译生成的文件，但会保留config文件等</span>
+<span class="token function">make</span> clean
+
+<span class="token comment" spellcheck="true"># 清理所有编译生成的文件、config及某些备份文件</span>
+<span class="token function">make</span> mrproper
+
+<span class="token comment" spellcheck="true"># mrproper、patches以及编辑器备份文件</span>
+<span class="token function">make</span> distclean<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -778,7 +1361,7 @@
                 <a href="/posts/null.html">
                     <div class="card-image">
                         
-                        <img src="/images/ramdisk.png" class="responsive-img" alt="CentOS系统启动流程">
+                        <img src="/images/system-startup-process.png" class="responsive-img" alt="CentOS系统启动流程">
                         
                         <span class="card-title">CentOS系统启动流程</span>
                     </div>
@@ -922,7 +1505,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             tocSelector: '#toc-content',
             contentSelector: '#articleContent',
             headingsOffset: -($(window).height() * 0.4 - 45),
-            collapseDepth: Number('3'),
+            collapseDepth: Number('4'),
             headingSelector: 'h2, h3, h4, h5'
         });
 
@@ -1064,7 +1647,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">715.9k</span>&nbsp;字
+                class="white-color">725k</span>&nbsp;字
             
             
             
