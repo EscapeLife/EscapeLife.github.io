@@ -1,0 +1,1954 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Linux中Systemd工具的使用, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Linux中Systemd工具的使用 | Escape</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Escape</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Escape</div>
+        <div class="logo-desc">
+            
+            听摇滚,但不偏颇;也挺古典,但不安逸
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/EscapeLife" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/EscapeLife" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/linux-systemd-command.png')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Linux中Systemd工具的使用</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Linux/">
+                                <span class="chip bg-color">Linux</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                Linux运维之路
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2017-12-13
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2020-10-27
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    6.9k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    27 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <blockquote>
+<p><strong>纸上得来终觉浅，绝知此事要躬行。</strong></p>
+</blockquote>
+<p><img src="/images/linux-systemd-command.png" alt="Linux中Systemd工具的使用"></p>
+<hr>
+<h2 id="1-发展由来"><a href="#1-发展由来" class="headerlink" title="1. 发展由来"></a>1. 发展由来</h2><p>历史上，Linux 的启动一直采用<code>init</code>进程，如<code>sysvinit</code>和<code>UpStart</code>，下面的命令用来启动服务。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> /etc/init.d/apache2 start
+$ <span class="token function">service</span> apache2 start<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><strong><code>init</code>方法有两个缺点</strong></p>
+<ul>
+<li><strong>启动时间长</strong></li>
+<li><code>init</code>进程是串行启动，只有前一个进程启动完，才会启动下一个进程</li>
+<li><strong>启动脚本复杂</strong></li>
+<li><code>init</code>进程只是执行启动脚本，不管其他事情</li>
+<li>脚本需要自己处理各种情况，这往往使得脚本变得很长</li>
+</ul>
+<p><strong><code>Systemd</code></strong>  就是为了解决这些问题而诞生的。它的设计目标是，为系统的启动和管理提供一套完整的解决方案。</p>
+<p>使用了  <code>Systemd</code>，就不需要再用<code>init</code>了。<strong><code>Systemd</code>  取代了<code>initd</code></strong>，成为系统的第一个进程（<code>PID 等于 1</code>），其他进程都是它的子进程。</p>
+<p><code>Systemd</code>  的优点是功能强大，使用方便，缺点是体系庞大，非常复杂。事实上，现在还有很多人反对使用  <code>Systemd</code>，理由就是它过于复杂，与操作系统的其他部分强耦合，违反”<code>keep simple, keep stupid</code>“的 Unix 哲学。</p>
+<p><strong>下图为<code>Systemd</code>架构图</strong></p>
+<p><img src="/images/linux-systemd-command-1.png" alt="Linux中Systemd工具的使用"></p>
+<hr>
+<h2 id="2-特性说明"><a href="#2-特性说明" class="headerlink" title="2. 特性说明"></a>2. 特性说明</h2><p><strong>Systemd 新特性</strong></p>
+<ul>
+<li>系统引导时实现服务并行启动</li>
+<li>按需激活进程</li>
+<li>系统状态快照</li>
+<li>基于依赖关系定义服务控制逻辑</li>
+</ul>
+<p><strong>关键特性</strong></p>
+<ul>
+<li>基于<code>socket</code>的激活机制：<code>socket</code>与服务程序分离</li>
+<li>基于<code>bus</code>的激活机制</li>
+<li>基于<code>device</code>的激活机制</li>
+<li>基于<code>path</code>的激活机制</li>
+<li>系统快照：保存各<code>unit</code>的当前状态信息于持久存储设备中</li>
+<li>向后兼容<code>sysv init</code>脚本</li>
+</ul>
+<p><strong>不兼容</strong></p>
+<ul>
+<li><code>systemctl</code>命令固定不变</li>
+<li>非由<code>systemd</code>启动的服务，<code>systemctl</code>无法与之通信</li>
+</ul>
+<hr>
+<h2 id="3-系统管理"><a href="#3-系统管理" class="headerlink" title="3. 系统管理"></a>3. 系统管理</h2><blockquote>
+<p><strong><code>Systemd</code></strong>  并不是一个命令，而是一组命令，涉及到系统管理的方方面面。</p>
+</blockquote>
+<h3 id="3-1-systemctl-命令"><a href="#3-1-systemctl-命令" class="headerlink" title="3.1 systemctl 命令"></a>3.1 systemctl 命令</h3><p><code>systemctl</code> 是 <code>Systemd</code> 的主命令，用于管理系统。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 重启系统</span>
+$ <span class="token function">sudo</span> systemctl <span class="token function">reboot</span>
+
+<span class="token comment" spellcheck="true"># 关闭系统，切断电源</span>
+$ <span class="token function">sudo</span> systemctl poweroff
+
+<span class="token comment" spellcheck="true"># CPU停止工作</span>
+$ <span class="token function">sudo</span> systemctl halt
+
+<span class="token comment" spellcheck="true"># 暂停、挂起系统</span>
+$ <span class="token function">sudo</span> systemctl <span class="token function">suspend</span>
+
+<span class="token comment" spellcheck="true"># 让系统进入冬眠状态、快照</span>
+$ <span class="token function">sudo</span> systemctl hibernate
+
+<span class="token comment" spellcheck="true"># 让系统进入交互式休眠状态、快照并挂起</span>
+$ <span class="token function">sudo</span> systemctl hybrid-sleep
+
+<span class="token comment" spellcheck="true"># 启动进入救援状态（单用户状态）</span>
+$ <span class="token function">sudo</span> systemctl rescue<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-3-hostnamectl-命令"><a href="#3-3-hostnamectl-命令" class="headerlink" title="3.3 hostnamectl 命令"></a>3.3 hostnamectl 命令</h3><p><code>hostnamectl</code>命令用于查看当前主机的信息。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 显示当前主机的信息</span>
+$ hostnamectl
+
+<span class="token comment" spellcheck="true"># 设置主机名</span>
+$ <span class="token function">sudo</span> hostnamectl set-hostname rhel7<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-4-localectl-命令"><a href="#3-4-localectl-命令" class="headerlink" title="3.4 localectl 命令"></a>3.4 localectl 命令</h3><p><code>localectl</code>命令用于查看本地化设置。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看本地化设置</span>
+$ localectl
+
+<span class="token comment" spellcheck="true"># 设置本地化参数。</span>
+$ <span class="token function">sudo</span> localectl set-locale LANG<span class="token operator">=</span>en_GB.utf8
+$ <span class="token function">sudo</span> localectl set-keymap en_GB<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-5-timedatectl-命令"><a href="#3-5-timedatectl-命令" class="headerlink" title="3.5 timedatectl 命令"></a>3.5 timedatectl 命令</h3><p><code>timedatectl</code> 命令用于查看当前时区设置。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看当前时区设置</span>
+$ timedatectl
+
+<span class="token comment" spellcheck="true"># 显示所有可用的时区</span>
+$ timedatectl list-timezones
+
+<span class="token comment" spellcheck="true"># 设置当前时区</span>
+$ <span class="token function">sudo</span> timedatectl set-timezone America/New_York
+$ <span class="token function">sudo</span> timedatectl set-time YYYY-MM-DD
+$ <span class="token function">sudo</span> timedatectl set-time HH:MM:SS<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-6-loginctl-命令"><a href="#3-6-loginctl-命令" class="headerlink" title="3.6 loginctl 命令"></a>3.6 loginctl 命令</h3><p><code>loginctl</code> 命令用于查看当前登录的用户。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 列出当前session</span>
+$ loginctl list-sessions
+
+<span class="token comment" spellcheck="true"># 列出当前登录用户</span>
+$ loginctl list-users
+
+<span class="token comment" spellcheck="true"># 列出显示指定用户的信息</span>
+$ loginctl show-user ruanyf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="4-Unit-介绍"><a href="#4-Unit-介绍" class="headerlink" title="4. Unit 介绍"></a>4. Unit 介绍</h2><h3 id="4-1-Unit-的含义"><a href="#4-1-Unit-的含义" class="headerlink" title="4.1 Unit 的含义"></a>4.1 Unit 的含义</h3><blockquote>
+<p><strong>Systemd 可以管理所有系统资源，不同的资源统称为  <code>Unit</code>(单元)</strong></p>
+</blockquote>
+<p><strong>Unit 一共分成 12 种</strong></p>
+<ul>
+<li><code>Service</code> unit：系统服务</li>
+<li><code>Target</code> unit：多个 Unit 构成的一个组</li>
+<li><code>Device</code> Unit：硬件设备</li>
+<li><code>Mount</code> Unit：文件系统的挂载点</li>
+<li><code>Automount</code> Unit：自动挂载点</li>
+<li><code>Path</code> Unit：文件或路径</li>
+<li><code>Scope</code> Unit：不是由 Systemd 启动的外部进程</li>
+<li><code>Slice</code> Unit：进程组</li>
+<li><code>Snapshot</code> Unit：Systemd 快照，可以切回某个快照</li>
+<li><code>Socket</code> Unit：进程间通信的 socket</li>
+<li><code>Swap</code> Unit：swap 文件</li>
+<li><code>Timer</code> Unit：定时器</li>
+</ul>
+<p><strong><code>systemctl list-units</code>命令可以查看当前系统的所有  <code>Unit</code></strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 列出正在运行的 Unit</span>
+$ systemctl list-units
+
+<span class="token comment" spellcheck="true"># 列出所有Unit，包括没有找到配置文件的或者启动失败的</span>
+$ systemctl list-units --all
+
+<span class="token comment" spellcheck="true"># 列出所有没有运行的 Unit</span>
+$ systemctl list-units --all --state<span class="token operator">=</span>inactive
+
+<span class="token comment" spellcheck="true"># 列出所有加载失败的 Unit</span>
+$ systemctl list-units --failed
+
+<span class="token comment" spellcheck="true"># 列出所有正在运行的、类型为 service 的 Unit</span>
+$ systemctl list-units --type<span class="token operator">=</span>service<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="4-2-Unit-的状态"><a href="#4-2-Unit-的状态" class="headerlink" title="4.2 Unit 的状态"></a>4.2 Unit 的状态</h3><ul>
+<li><code>systemctl status</code>**命令用于查看系统状态和单个  <code>Unit</code>  的状态。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 显示系统状态</span>
+$ systemctl status
+
+<span class="token comment" spellcheck="true"># 显示单个 Unit 的状态</span>
+$ sysystemctl status bluetooth.service
+
+<span class="token comment" spellcheck="true"># 显示远程主机的某个 Unit 的状态</span>
+$ systemctl -H root@rhel7.example.com status httpd.service<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>除了<code>status</code>命令，<code>systemctl</code>还提供了三个查询状态的简单方法，主要供脚本内部的判断语句使用。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 显示某个 Unit 是否正在运行</span>
+$ systemctl is-active application.service
+
+<span class="token comment" spellcheck="true"># 显示某个 Unit 是否处于启动失败状态</span>
+$ systemctl is-failed application.service
+
+<span class="token comment" spellcheck="true"># 显示某个 Unit 服务是否建立了启动链接</span>
+$ systemctl is-enabled application.service<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="4-3-Unit-管理"><a href="#4-3-Unit-管理" class="headerlink" title="4.3 Unit 管理"></a>4.3 Unit 管理</h3><p>对于用户来说，最常用的是下面这些命令，用于<strong>启动和停止</strong> <code>Unit</code>（主要是  <code>service</code>）。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 立即启动一个服务</span>
+$ <span class="token function">sudo</span> systemctl start apache.service
+
+<span class="token comment" spellcheck="true"># 立即停止一个服务</span>
+$ <span class="token function">sudo</span> systemctl stop apache.service
+
+<span class="token comment" spellcheck="true"># 重启一个服务</span>
+$ <span class="token function">sudo</span> systemctl restart apache.service
+
+<span class="token comment" spellcheck="true"># 杀死一个服务的所有子进程</span>
+$ <span class="token function">sudo</span> systemctl <span class="token function">kill</span> apache.service
+
+<span class="token comment" spellcheck="true"># 重新加载一个服务的配置文件</span>
+$ <span class="token function">sudo</span> systemctl reload apache.service
+
+<span class="token comment" spellcheck="true"># 重载所有修改过的配置文件</span>
+$ <span class="token function">sudo</span> systemctl daemon-reload
+
+<span class="token comment" spellcheck="true"># 显示某个 Unit 的所有底层参数</span>
+$ systemctl show httpd.service
+
+<span class="token comment" spellcheck="true"># 显示某个 Unit 的指定属性的值</span>
+$ systemctl show -p CPUShares httpd.service
+
+<span class="token comment" spellcheck="true"># 设置某个 Unit 的指定属性</span>
+$ <span class="token function">sudo</span> systemctl set-property httpd.service CPUShares<span class="token operator">=</span>500<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="4-4-依赖关系"><a href="#4-4-依赖关系" class="headerlink" title="4.4 依赖关系"></a>4.4 依赖关系</h3><blockquote>
+<p><code>Unit</code>  之间存在依赖关系：<code>A</code>  依赖于  <code>B</code>，就意味着  <code>Systemd</code>  在启动  <code>A</code>  的时候，同时会去启动  <code>B</code></p>
+</blockquote>
+<p><strong><code>systemctl list-dependencies</code>命令列出一个 Unit 的所有依赖</strong></p>
+<ul>
+<li>上面命令的输出结果之中，有些依赖是  <strong><code>Target</code></strong>  类型（详见下文），默认不会展开显示</li>
+<li>如果要展开  <code>Target</code>，就需要使用<code>--all</code>参数</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ systemctl list-dependencies nginx.service
+$ systemctl list-dependencies --all nginx.service<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="5-Unit-配置文件"><a href="#5-Unit-配置文件" class="headerlink" title="5. Unit 配置文件"></a>5. Unit 配置文件</h2><h3 id="5-1-概述"><a href="#5-1-概述" class="headerlink" title="5.1 概述"></a>5.1 概述</h3><p>每一个  <code>Unit</code>  都有一个配置文件，告诉 Systemd 怎么启动这个  <code>Unit</code> 。</p>
+<p><code>Systemd</code>  默认从目录<code>/etc/systemd/system/</code>读取配置文件。但是，里面存放的大部分文件都是符号链接，指向目录<code>/usr/lib/systemd/system/</code>，真正的配置文件存放在那个目录。</p>
+<p><strong><code>systemctl enable</code>命令用于在上面两个目录之间，建立符号链接关系</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> systemctl <span class="token function">enable</span> clamd@scan.service
+
+<span class="token comment" spellcheck="true"># 等同于</span>
+$ <span class="token function">sudo</span> <span class="token function">ln</span> -s <span class="token string">'/usr/lib/systemd/system/clamd@scan.service'</span> <span class="token string">'/etc/systemd/system/multi-user.target.wants/clamd@scan.service'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p>如果配置文件里面设置了开机启动，<code>systemctl enable</code>命令相当于激活开机启动。</p>
+<p>与之对应的，<strong><code>systemctl disable</code>命令用于在两个目录之间，撤销符号链接关系，相当于撤销开机启动</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>配置文件的后缀名，就是该  <code>Unit</code>  的种类，比如<code>sshd.socket</code>。如果省略，<code>Systemd</code> <strong>默认后缀名</strong>为<code>.service</code>，所以<code>sshd</code>会被理解成<code>sshd.service</code>。</p>
+<hr>
+<h3 id="5-2-配置文件的状态"><a href="#5-2-配置文件的状态" class="headerlink" title="5.2 配置文件的状态"></a>5.2 配置文件的状态</h3><blockquote>
+<p><strong><code>systemctl list-unit-files</code></strong>命令用于列出所有配置文件</p>
+</blockquote>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 列出所有配置文件</span>
+$ systemctl list-unit-files
+
+<span class="token comment" spellcheck="true"># 列出指定类型的配置文件</span>
+$ systemctl list-unit-files --type<span class="token operator">=</span>service<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>这个命令会输出一个列表</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ systemctl list-unit-files
+UNIT FILE              STATE
+chronyd.service        enabled
+clamd@.service         static
+clamd@scan.service     disabled<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>这个列表显示每个配置文件的状态，一共有四种</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">enabled：已建立启动链接
+disabled：没建立启动链接
+static：该配置文件没有<span class="token punctuation">[</span>Install<span class="token punctuation">]</span>部分（无法执行），只能作为其他配置文件的依赖
+masked：该配置文件被禁止建立启动链接<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>注意，从配置文件的状态无法看出，该 Unit 是否正在运行。这必须执行前面提到的 systemctl status 命令。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ systemctl status bluetooth.service<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ul>
+<li>一旦修改配置文件，就要让 SystemD 重新加载配置文件，然后重新启动，否则修改不会生效。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> systemctl daemon-reload
+$ <span class="token function">sudo</span> systemctl restart httpd.service<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="5-3-配置文件的格式"><a href="#5-3-配置文件的格式" class="headerlink" title="5.3 配置文件的格式"></a>5.3 配置文件的格式</h3><blockquote>
+<p><strong><code>systemctl cat</code></strong>命令可以查看配置文件的内容</p>
+</blockquote>
+<pre class="line-numbers language-bash"><code class="language-bash">$ systemctl <span class="token function">cat</span> atd.service
+<span class="token punctuation">[</span>Unit<span class="token punctuation">]</span>
+Description<span class="token operator">=</span>ATD daemon
+<span class="token punctuation">[</span>Service<span class="token punctuation">]</span>
+Type<span class="token operator">=</span>forking
+ExecStart<span class="token operator">=</span>/usr/bin/atd
+<span class="token punctuation">[</span>Install<span class="token punctuation">]</span>
+WantedBy<span class="token operator">=</span>multi-user.target<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>从上面的输出可以看到，配置文件分成几个区块。</li>
+<li>每个区块的第一行，是用方括号表示的区别名，比如<code>[Unit]</code>。</li>
+<li>注意，配置文件的区块名和字段名，都是大小写敏感的。</li>
+<li>每个区块内部是一些等号连接的键值对。</li>
+<li>注意，键值对的等号两侧不能有空格。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>Section<span class="token punctuation">]</span>
+Directive1<span class="token operator">=</span>value
+Directive2<span class="token operator">=</span>value
+<span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="5-4-配置文件的区块"><a href="#5-4-配置文件的区块" class="headerlink" title="5.4 配置文件的区块"></a>5.4 配置文件的区块</h3><ul>
+<li><strong><code>[Unit]</code></strong>区块通常是配置文件的第一个区块，用来定义  <code>Unit</code>  的元数据，以及配置与其他  <code>Unit</code>  的关系。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 简短描述</span>
+Description
+
+<span class="token comment" spellcheck="true"># 文档地址</span>
+Documentation
+
+<span class="token comment" spellcheck="true"># 当前 Unit 依赖的其他 Unit，如果它们没有运行，当前 Unit 会启动失败</span>
+Requires
+
+<span class="token comment" spellcheck="true"># 与当前 Unit 配合的其他 Unit，如果它们没有运行，当前 Unit 不会启动失败</span>
+Wants
+
+<span class="token comment" spellcheck="true"># 与Requires类似，它指定的 Unit 如果退出，会导致当前 Unit 停止运行</span>
+BindsTo
+
+<span class="token comment" spellcheck="true"># 如果该字段指定的 Unit 也要启动，那么必须在当前 Unit 之后启动</span>
+Before
+
+<span class="token comment" spellcheck="true"># 如果该字段指定的 Unit 也要启动，那么必须在当前 Unit 之前启动</span>
+After
+
+<span class="token comment" spellcheck="true"># 这里指定的 Unit 不能与当前 Unit 同时运行</span>
+Conflicts
+
+<span class="token comment" spellcheck="true"># 当前 Unit 运行必须满足的条件，否则不会运行</span>
+Condition<span class="token punctuation">..</span>.
+
+<span class="token comment" spellcheck="true"># 当前 Unit 运行必须满足的条件，否则会报启动失败</span>
+Assert<span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong><code>[Install]</code></strong>通常是配置文件的最后一个区块，用来定义如何启动，以及是否开机启动。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 它的值是一个或多个 Target，当前 Unit 激活时（enable）符号链接会放入/etc/systemd/system目录下面以 Target 名 + .wants后缀构成的子目录中</span>
+WantedBy
+
+<span class="token comment" spellcheck="true"># 它的值是一个或多个 Target，当前 Unit 激活时，符号链接会放入/etc/systemd/system目录下面以 Target 名 + .required后缀构成的子目录中</span>
+RequiredBy
+
+<span class="token comment" spellcheck="true"># 当前 Unit 可用于启动的别名</span>
+Alias
+
+<span class="token comment" spellcheck="true"># 当前 Unit 激活（enable）时，会被同时激活的其他 Unit</span>
+Also<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong><code>[Service]</code></strong>区块用来  <code>Service</code>  的配置，只有  <code>Service</code>  类型的  <code>Unit</code>  才有这个区块。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 定义启动时的进程行为。它有以下几种值</span>
+Type
+
+<span class="token comment" spellcheck="true"># 默认值，执行ExecStart指定的命令，启动主进程</span>
+Type<span class="token operator">=</span>simple
+
+<span class="token comment" spellcheck="true"># 以 fork 方式从父进程创建子进程，创建后父进程会立即退出</span>
+Type<span class="token operator">=</span>forking
+
+<span class="token comment" spellcheck="true"># 一次性进程，Systemd 会等当前服务退出，再继续往下执行</span>
+Type<span class="token operator">=</span>oneshot
+
+<span class="token comment" spellcheck="true"># 当前服务通过D-Bus启动</span>
+Type<span class="token operator">=</span>dbus
+
+<span class="token comment" spellcheck="true"># 当前服务启动完毕，会通知Systemd，再继续往下执行</span>
+Type<span class="token operator">=</span>notify
+
+<span class="token comment" spellcheck="true"># 若有其他任务执行完毕，当前服务才会运行</span>
+Type<span class="token operator">=</span>idle
+
+<span class="token comment" spellcheck="true"># 启动当前服务的命令</span>
+ExecStart
+
+<span class="token comment" spellcheck="true"># 启动当前服务之前执行的命令</span>
+ExecStartPre
+
+<span class="token comment" spellcheck="true"># 启动当前服务之后执行的命令</span>
+ExecStartPost
+
+<span class="token comment" spellcheck="true"># 重启当前服务时执行的命令</span>
+ExecReload
+
+<span class="token comment" spellcheck="true"># 停止当前服务时执行的命令</span>
+ExecStop
+
+<span class="token comment" spellcheck="true"># 停止当其服务之后执行的命令</span>
+ExecStopPost
+
+<span class="token comment" spellcheck="true"># 自动重启当前服务间隔的秒数</span>
+RestartSec
+
+<span class="token comment" spellcheck="true"># 定义何种情况 Systemd 会自动重启当前服务，可能的值包括always（总是重启）、on-success、on-failure、on-abnormal、on-abort、on-watchdog</span>
+Restart
+
+<span class="token comment" spellcheck="true"># 定义 Systemd 停止当前服务之前等待的秒数</span>
+TimeoutSec
+
+<span class="token comment" spellcheck="true"># 指定环境变量</span>
+Environment<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="6-Target"><a href="#6-Target" class="headerlink" title="6. Target"></a>6. Target</h2><h3 id="6-1-Target-基本操作"><a href="#6-1-Target-基本操作" class="headerlink" title="6.1 Target 基本操作"></a>6.1 Target 基本操作</h3><p>启动计算机的时候，需要启动大量的  <code>Unit</code>。如果每一次启动，都要一一写明本次启动需要哪些  <code>Unit</code>，显然非常不方便。<code>Systemd</code>  的解决方案就是  <code>Target</code>。</p>
+<p>简单说，<strong><code>Target</code>  就是一个 Unit 组</strong>，包含许多相关的  <code>Unit</code> 。启动某个  <code>Target</code>  的时候，Systemd 就会启动里面所有的 Unit。从这个意义上说，Target 这个概念类似于”<strong>状态点</strong>“，启动某个 Target 就好比启动到某种状态。</p>
+<p>传统的<code>init</code>启动模式里面，有  <code>RunLevel</code>  的概念，跟  <code>Target</code>  的作用很类似。不同的是，<code>RunLevel</code>  是<strong>互斥</strong>的，不可能多个  <code>RunLevel</code>  同时启动，但是多个  <code>Target</code>  可以<strong>同时启动</strong>。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看当前系统的所有 Target</span>
+$ systemctl list-unit-files --type<span class="token operator">=</span>target
+
+<span class="token comment" spellcheck="true"># 查看一个 Target 包含的所有 Unit</span>
+$ systemctl list-dependencies multi-user.target
+
+<span class="token comment" spellcheck="true"># 查看启动时的默认 Target</span>
+$ systemctl get-default
+
+<span class="token comment" spellcheck="true"># 设置启动时的默认 Target</span>
+$ <span class="token function">sudo</span> systemctl set-default multi-user.target
+
+<span class="token comment" spellcheck="true"># 切换 Target 时，默认不关闭前一个 Target 启动的进程，</span>
+<span class="token comment" spellcheck="true"># systemctl isolate 命令改变这种行为，</span>
+<span class="token comment" spellcheck="true"># 关闭前一个 Target 里面所有不属于后一个 Target 的进程</span>
+$ <span class="token function">sudo</span> systemctl isolate multi-user.target<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="6-2-Target-与-RunLevel-的对照"><a href="#6-2-Target-与-RunLevel-的对照" class="headerlink" title="6.2 Target 与 RunLevel 的对照"></a>6.2 Target 与 RunLevel 的对照</h3><pre class="line-numbers language-bash"><code class="language-bash">Traditional runlevel      New target name     Symbolically linked to<span class="token punctuation">..</span>.
+Runlevel 0           <span class="token operator">|</span>    runlevel0.target -<span class="token operator">></span> poweroff.target
+Runlevel 1           <span class="token operator">|</span>    runlevel1.target -<span class="token operator">></span> rescue.target
+Runlevel 2           <span class="token operator">|</span>    runlevel2.target -<span class="token operator">></span> multi-user.target
+Runlevel 3           <span class="token operator">|</span>    runlevel3.target -<span class="token operator">></span> multi-user.target
+Runlevel 4           <span class="token operator">|</span>    runlevel4.target -<span class="token operator">></span> multi-user.target
+Runlevel 5           <span class="token operator">|</span>    runlevel5.target -<span class="token operator">></span> graphical.target
+Runlevel 6           <span class="token operator">|</span>    runlevel6.target -<span class="token operator">></span> reboot.target<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 运行级别</span>
+0  <span class="token operator">==</span><span class="token operator">></span> runlevel0.target, poweroff.target
+1  <span class="token operator">==</span><span class="token operator">></span> runlevel1.target, rescue.target
+2  <span class="token operator">==</span><span class="token operator">></span> runlevel2.target, multi-user.target
+3  <span class="token operator">==</span><span class="token operator">></span> runlevel3.target, multi-user.target
+4  <span class="token operator">==</span><span class="token operator">></span> runlevel4.target, multi-user.target
+5  <span class="token operator">==</span><span class="token operator">></span> runlevel5.target, graphical.target
+6  <span class="token operator">==</span><span class="token operator">></span> runlevel6.target, reboot.target<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="6-3-Target-与-init-的差别"><a href="#6-3-Target-与-init-的差别" class="headerlink" title="6.3 Target 与 init 的差别"></a>6.3 Target 与 init 的差别</h3><p>1）默认的  <code>RunLevel</code>（在<code>/etc/inittab</code>文件设置）现在被默认的  <code>Target</code>  取代，位置是<code>/etc/systemd/system/default.target</code>，通常符号链接到<code>graphical.target</code>（图形界面）或者<code>multi-user.target</code>（多用户命令行）</p>
+<p>2）启动脚本的位置，以前是<code>/etc/init.d</code>目录，符号链接到不同的  <code>RunLevel</code>  目录 （比如/etc/rc3.d、/etc/rc5.d 等），现在则存放在<code>/lib/systemd/system</code>和<code>/etc/systemd/system</code>目录。</p>
+<p>3）配置文件的位置，以前 init 进程的配置文件是<code>/etc/inittab</code>，各种服务的配置文件存放在<code>/etc/sysconfig</code>目录。现在的配置文件主要存放在<code>/lib/systemd</code>目录，在/<code>etc/systemd</code>目录里面的修改可以覆盖原始设置。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 级别切换</span>
+init N <span class="token operator">==</span><span class="token operator">></span> systemctl isolate name.target
+
+<span class="token comment" spellcheck="true"># 查看级别</span>
+runlevel <span class="token operator">==</span><span class="token operator">></span> systemctl list-units --type target
+
+<span class="token comment" spellcheck="true"># 获取默认运行级别</span>
+/etc/inittab <span class="token operator">==</span><span class="token operator">></span> systemctl get-default
+
+<span class="token comment" spellcheck="true"># 修改默认级别</span>
+/etc/inittab <span class="token operator">==</span><span class="token operator">></span> systemctl set-default name.target
+
+<span class="token comment" spellcheck="true"># 切换至紧急救援模式</span>
+systemctl rescue
+
+<span class="token comment" spellcheck="true"># 切换至emergency模式</span>
+systemctl emergency<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="7-日志管理"><a href="#7-日志管理" class="headerlink" title="7. 日志管理"></a>7. 日志管理</h2><blockquote>
+<p><code>Systemd</code>  统一管理所有 Unit 的启动日志</p>
+</blockquote>
+<ul>
+<li>可以只用<strong><code>journalctl</code></strong>一个<strong>命令</strong>，查看所有日志（内核日志和应用日志）</li>
+<li>日志的<strong>配置文件</strong>是<code>/etc/systemd/journald.conf</code></li>
+</ul>
+<h3 id="7-1-journalctl-用法"><a href="#7-1-journalctl-用法" class="headerlink" title="7.1 journalctl 用法"></a>7.1 journalctl 用法</h3><pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看所有日志（默认情况下 ，只保存本次启动的日志）</span>
+$ <span class="token function">sudo</span> journalctl
+
+<span class="token comment" spellcheck="true"># 查看内核日志（不显示应用日志）</span>
+$ <span class="token function">sudo</span> journalctl -k
+
+<span class="token comment" spellcheck="true"># 查看系统本次启动的日志</span>
+$ <span class="token function">sudo</span> journalctl -b
+$ <span class="token function">sudo</span> journalctl -b -0
+
+<span class="token comment" spellcheck="true"># 查看上一次启动的日志（需更改设置）</span>
+$ <span class="token function">sudo</span> journalctl -b -1
+
+<span class="token comment" spellcheck="true"># 查看指定时间的日志</span>
+$ <span class="token function">sudo</span> journalctl --since<span class="token operator">=</span><span class="token string">"2012-10-30 18:17:16"</span>
+$ <span class="token function">sudo</span> journalctl --since <span class="token string">"20 min ago"</span>
+$ <span class="token function">sudo</span> journalctl --since yesterday
+$ <span class="token function">sudo</span> journalctl --since <span class="token string">"2015-01-10"</span> --until <span class="token string">"2015-01-11 03:00"</span>
+$ <span class="token function">sudo</span> journalctl --since 09:00 --until <span class="token string">"1 hour ago"</span>
+
+<span class="token comment" spellcheck="true"># 显示尾部的最新10行日志</span>
+$ <span class="token function">sudo</span> journalctl -n
+
+<span class="token comment" spellcheck="true"># 显示尾部指定行数的日志</span>
+$ <span class="token function">sudo</span> journalctl -n 20
+
+<span class="token comment" spellcheck="true"># 实时滚动显示最新日志</span>
+$ <span class="token function">sudo</span> journalctl -f
+
+<span class="token comment" spellcheck="true"># 查看指定服务的日志</span>
+$ <span class="token function">sudo</span> journalctl /usr/lib/systemd/systemd
+
+<span class="token comment" spellcheck="true"># 查看指定进程的日志</span>
+$ <span class="token function">sudo</span> journalctl _PID<span class="token operator">=</span>1
+
+<span class="token comment" spellcheck="true"># 查看某个路径的脚本的日志</span>
+$ <span class="token function">sudo</span> journalctl /usr/bin/bash
+
+<span class="token comment" spellcheck="true"># 查看指定用户的日志</span>
+$ <span class="token function">sudo</span> journalctl _UID<span class="token operator">=</span>33 --since today
+
+<span class="token comment" spellcheck="true"># 查看某个 Unit 的日志</span>
+$ <span class="token function">sudo</span> journalctl -u nginx.service
+$ <span class="token function">sudo</span> journalctl -u nginx.service --since today
+
+<span class="token comment" spellcheck="true"># 实时滚动显示某个 Unit 的最新日志</span>
+$ <span class="token function">sudo</span> journalctl -u nginx.service -f
+
+<span class="token comment" spellcheck="true"># 合并显示多个 Unit 的日志</span>
+$ journalctl -u nginx.service -u php-fpm.service --since today
+
+<span class="token comment" spellcheck="true"># 查看指定优先级（及其以上级别）的日志，共有8级</span>
+<span class="token comment" spellcheck="true"># 0: emerg</span>
+<span class="token comment" spellcheck="true"># 1: alert</span>
+<span class="token comment" spellcheck="true"># 2: crit</span>
+<span class="token comment" spellcheck="true"># 3: err</span>
+<span class="token comment" spellcheck="true"># 4: warning</span>
+<span class="token comment" spellcheck="true"># 5: notice</span>
+<span class="token comment" spellcheck="true"># 6: info</span>
+<span class="token comment" spellcheck="true"># 7: debug</span>
+$ <span class="token function">sudo</span> journalctl -p err -b
+
+<span class="token comment" spellcheck="true"># 日志默认分页输出，--no-pager 改为正常的标准输出</span>
+$ <span class="token function">sudo</span> journalctl --no-pager
+
+<span class="token comment" spellcheck="true"># 以 JSON 格式（单行）输出</span>
+$ <span class="token function">sudo</span> journalctl -b -u nginx.service -o json
+
+<span class="token comment" spellcheck="true"># 以 JSON 格式（多行）输出，可读性更好</span>
+$ <span class="token function">sudo</span> journalctl -b -u nginx.serviceqq
+ -o json-pretty
+
+<span class="token comment" spellcheck="true"># 显示日志占据的硬盘空间</span>
+$ <span class="token function">sudo</span> journalctl --disk-usage
+
+<span class="token comment" spellcheck="true"># 指定日志文件占据的最大空间</span>
+$ <span class="token function">sudo</span> journalctl --vacuum-size<span class="token operator">=</span>1G
+
+<span class="token comment" spellcheck="true"># 指定日志文件保存多久</span>
+$ <span class="token function">sudo</span> journalctl --vacuum-time<span class="token operator">=</span>1years<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="8-实战教学"><a href="#8-实战教学" class="headerlink" title="8. 实战教学"></a>8. 实战教学</h2><h3 id="8-1-开机启动"><a href="#8-1-开机启动" class="headerlink" title="8.1 开机启动"></a>8.1 开机启动</h3><p>对于那些支持 Systemd 的软件，安装的时候，会自动在<code>/usr/lib/systemd/system</code>目录添加一个配置文件。</p>
+<p>如果你想让该软件开机启动，就执行下面的命令（以<code>httpd.service</code>为例）。</p>
+<ul>
+<li><code>$ sudo systemctl enable httpd</code></li>
+</ul>
+<p>上面的命令相当于在<code>/etc/systemd/system</code>目录添加一个符号链接，指向<code>/usr/lib/systemd/system</code>里面的<code>httpd.service</code>文件。</p>
+<p>这是因为开机时，Systemd 只执行/etc/systemd/system 目录里面的配置文件。这也意味着，如果把修改后的配置文件放在该目录，就可以达到覆盖原始配置的效果。</p>
+<hr>
+<h3 id="8-2-启动服务"><a href="#8-2-启动服务" class="headerlink" title="8.2 启动服务"></a>8.2 启动服务</h3><p>设置开机启动以后，软件并不会立即启动，必须等到下一次开机。如果想现在就运行该软件，那么要执行<code>systemctl start</code>命令。</p>
+<ul>
+<li><code>$ sudo systemctl start httpd</code></li>
+</ul>
+<p>执行上面的命令以后，有可能启动失败，因此要用<code>systemctl status</code>命令查看一下该服务的状态。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> systemctl status httpd
+httpd.service - The Apache HTTP Server
+   Loaded: loaded <span class="token punctuation">(</span>/usr/lib/systemd/system/httpd.service<span class="token punctuation">;</span> enabled<span class="token punctuation">)</span>
+   Active: active <span class="token punctuation">(</span>running<span class="token punctuation">)</span> since 金 2015-12-05 12:18:22 JST<span class="token punctuation">;</span> 7min ago
+ Main PID: 4349 <span class="token punctuation">(</span>httpd<span class="token punctuation">)</span>
+   Status: <span class="token string">"Total requests: 1; Current requests/sec: 0; Current traffic:   0 B/sec"</span>
+   CGroup: /system.slice/httpd.service
+           ├─4349 /usr/sbin/httpd -DFOREGROUND
+           ├─4350 /usr/sbin/httpd -DFOREGROUND
+           ├─4351 /usr/sbin/httpd -DFOREGROUND
+           ├─4352 /usr/sbin/httpd -DFOREGROUND
+           ├─4353 /usr/sbin/httpd -DFOREGROUND
+           └─4354 /usr/sbin/httpd -DFOREGROUND
+12月 05 12:18:22 localhost.localdomain systemd<span class="token punctuation">[</span>1<span class="token punctuation">]</span>: Starting The Apache HTTP Server<span class="token punctuation">..</span>.
+12月 05 12:18:22 localhost.localdomain systemd<span class="token punctuation">[</span>1<span class="token punctuation">]</span>: Started The Apache HTTP Server.
+12月 05 12:22:40 localhost.localdomain systemd<span class="token punctuation">[</span>1<span class="token punctuation">]</span>: Started The Apache HTTP Server.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>上面的字段含义</strong></p>
+<ul>
+<li><code>Loaded</code>行：配置文件的位置，是否设为开机启动</li>
+<li><code>Active</code>行：表示正在运行</li>
+<li><code>Main PID</code>行：主进程<code>ID</code></li>
+<li><code>Status</code>行：由应用本身（这里是<code>httpd</code>）提供的软件当前状态</li>
+<li><code>CGroup</code>块：应用的所有子进程</li>
+<li><code>日志块</code>：应用的日志</li>
+</ul>
+<hr>
+<h3 id="8-3-停止服务"><a href="#8-3-停止服务" class="headerlink" title="8.3 停止服务"></a>8.3 停止服务</h3><p>终止正在运行的服务，需要执行<code>systemctl stop</code>命令。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> systemctl stop httpd.service<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>有时候，该命令可能没有响应，服务停不下来。这时候就不得不”杀进程”了，向正在运行的进程发出<code>kill</code>信号。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> systemctl <span class="token function">kill</span> httpd.service<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>此外，重启服务要执行<code>systemctl restart</code>命令。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> systemctl restart httpd.service<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<hr>
+<h3 id="8-4-读懂配置文件"><a href="#8-4-读懂配置文件" class="headerlink" title="8.4 读懂配置文件"></a>8.4 读懂配置文件</h3><p>一个服务怎么启动，完全由它的配置文件决定。下面就来看，配置文件有些什么内容。</p>
+<p>前面说过，配置文件主要放在<code>/usr/lib/systemd/system</code>目录，也可能在<code>/etc/systemd/system</code>目录。找到配置文件以后，使用文本编辑器打开即可。</p>
+<p><code>systemctl cat</code>命令可以用来查看配置文件，下面以<code>sshd.service</code>文件为例，它的作用是启动一个  <code>SSH</code>  服务器，供其他用户以  <code>SSH</code>  方式登录。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ systemctl <span class="token function">cat</span> sshd.service
+<span class="token punctuation">[</span>Unit<span class="token punctuation">]</span>
+Description<span class="token operator">=</span>OpenSSH server daemon
+Documentation<span class="token operator">=</span>man:sshd<span class="token punctuation">(</span>8<span class="token punctuation">)</span> man:sshd_config<span class="token punctuation">(</span>5<span class="token punctuation">)</span>
+After<span class="token operator">=</span>network.target sshd-keygen.service
+Wants<span class="token operator">=</span>sshd-keygen.service
+<span class="token punctuation">[</span>Service<span class="token punctuation">]</span>
+EnvironmentFile<span class="token operator">=</span>/etc/sysconfig/sshd
+ExecStart<span class="token operator">=</span>/usr/sbin/sshd -D <span class="token variable">$OPTIONS</span>
+ExecReload<span class="token operator">=</span>/bin/kill -HUP <span class="token variable">$MAINPID</span>
+Type<span class="token operator">=</span>simple
+KillMode<span class="token operator">=</span>process
+Restart<span class="token operator">=</span>on-failure
+RestartSec<span class="token operator">=</span>42s
+<span class="token punctuation">[</span>Install<span class="token punctuation">]</span>
+WantedBy<span class="token operator">=</span>multi-user.target<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="8-5-Unit-区块：启动顺序与依赖关系"><a href="#8-5-Unit-区块：启动顺序与依赖关系" class="headerlink" title="8.5 [Unit]区块：启动顺序与依赖关系"></a>8.5 [Unit]区块：启动顺序与依赖关系</h3><p><strong><code>Unit</code>区块</strong>的<code>Description</code>字段给出当前服务的简单描述，<code>Documentation</code>字段给出文档位置。</p>
+<p>接下来的设置是启动顺序和依赖关系，这个比较重要。</p>
+<ul>
+<li><code>After字段：表示如果network.target或sshd-keygen.service需要启动，那么sshd.service应该在它们之后启动。</code></li>
+</ul>
+<p>相应地，还有一个<code>Before</code>字段，定义<code>sshd.service</code>应该在哪些服务之前启动。</p>
+<p>注意，<code>After</code>和<code>Before</code>字段只涉及启动顺序，不涉及依赖关系。</p>
+<p>举例来说，某  <code>Web</code>  应用需要  <code>postgresql</code>  数据库储存数据。在配置文件中，它只定义要在  <code>postgresql</code>  之后启动，而没有定义依赖  <code>postgresql</code> 。上线后，由于某种原因，<code>postgresql</code>  需要重新启动，在停止服务期间，该  <code>Web</code>  应用就会无法建立数据库连接。</p>
+<p>设置依赖关系，需要使用<code>Wants</code>字段和<code>Requires</code>字段。</p>
+<ul>
+<li><code>Wants字段：表示sshd.service与sshd-keygen.service之间存在"弱依赖"关系，即如果"sshd-keygen.service"启动失败或停止运行，不影响sshd.service继续执行。</code></li>
+</ul>
+<p><code>Requires</code>字段则表示”<strong>强依赖</strong>“关系，即如果该服务启动失败或异常退出，那么<code>sshd.service</code>也必须退出。</p>
+<p>注意，<code>Wants</code>字段与<code>Requires</code>字段只涉及依赖关系，与启动顺序无关，默认情况下是同时启动的。</p>
+<hr>
+<h3 id="8-6-Service-区块：启动行为"><a href="#8-6-Service-区块：启动行为" class="headerlink" title="8.6 [Service]  区块：启动行为"></a>8.6 <code>[Service]</code>  区块：启动行为</h3><blockquote>
+<p><strong><code>Service</code>区块</strong>定义如何启动当前服务</p>
+</blockquote>
+<h4 id="8-6-1-启动命令"><a href="#8-6-1-启动命令" class="headerlink" title="8.6.1 启动命令"></a>8.6.1 启动命令</h4><p>许多软件都有自己的环境参数文件，该文件可以用<code>EnvironmentFile</code>字段读取。</p>
+<ul>
+<li><code>EnvironmentFile字段：指定当前服务的环境参数文件。该文件内部的key=value键值对，可以用$key的形式，在当前配置文件中获取。</code></li>
+</ul>
+<p>上面的例子中，<code>sshd</code>  的环境参数文件是<code>/etc/sysconfig/sshd</code>。</p>
+<p>配置文件里面最重要的字段是<code>ExecStart</code>。</p>
+<ul>
+<li><code>ExecStart字段：定义启动进程时执行的命令。</code></li>
+</ul>
+<p>上面的例子中，启动<code>sshd</code>，执行的命令是<code>/usr/sbin/sshd -D $OPTIONS</code>，其中的变量<code>$OPTIONS</code>就来自<code>EnvironmentFile</code>字段指定的环境参数文件。</p>
+<p>与之作用相似的，还有如下这些字段</p>
+<pre class="line-numbers language-bash"><code class="language-bash">ExecReload字段：重启服务时执行的命令
+ExecStop字段：停止服务时执行的命令
+ExecStartPre字段：启动服务之前执行的命令
+ExecStartPost字段：启动服务之后执行的命令
+ExecStopPost字段：停止服务之后执行的命令<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>请看下面的例子</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>Service<span class="token punctuation">]</span>
+ExecStart<span class="token operator">=</span>/bin/echo execstart1
+ExecStart<span class="token operator">=</span>
+ExecStart<span class="token operator">=</span>/bin/echo execstart2
+ExecStartPost<span class="token operator">=</span>/bin/echo post1
+ExecStartPost<span class="token operator">=</span>/bin/echo post2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>上面这个配置文件，第二行 ExecStart 设为空值，等于取消了第一行的设置，运行结果如下。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">execstart2
+post1
+post2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>所有的启动设置之前，都可以加上一个连词号（-），表示”抑制错误”，即发生错误的时候，不影响其他命令的执行。比如，<code>EnvironmentFile=-/etc/sysconfig/sshd</code>（注意等号后面的那个连词号），就表示即使<code>/etc/sysconfig/sshd</code>文件不存在，也不会抛出错误。</p>
+<hr>
+<h4 id="8-6-2-启动类型"><a href="#8-6-2-启动类型" class="headerlink" title="8.6.2 启动类型"></a>8.6.2 启动类型</h4><p><strong><code>Type</code></strong>字段定义启动类型，它可以设置的值如下。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">simple（默认值）：ExecStart字段启动的进程为主进程
+forking：ExecStart字段将以fork<span class="token punctuation">(</span><span class="token punctuation">)</span>方式启动，此时父进程将会退出，子进程将成为主进程
+oneshot：类似于simple，但只执行一次，Systemd 会等它执行完，才启动其他服务
+dbus：类似于simple，但会等待 D-Bus 信号后启动
+notify：类似于simple，启动结束后会发出通知信号，然后 Systemd 再启动其他服务
+idle：类似于simple，但是要等到其他任务都执行完，才会启动该服务。一种使用场合是为让该服务的输出，不与其他服务的输出相混合<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>下面是一个<code>oneshot</code>的例子，笔记本电脑启动时，要把触摸板关掉，配置文件可以这样写。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>Unit<span class="token punctuation">]</span>
+Description<span class="token operator">=</span>Switch-off Touchpad
+
+<span class="token punctuation">[</span>Service<span class="token punctuation">]</span>
+Type<span class="token operator">=</span>oneshot
+ExecStart<span class="token operator">=</span>/usr/bin/touchpad-off
+
+<span class="token punctuation">[</span>Install<span class="token punctuation">]</span>
+WantedBy<span class="token operator">=</span>multi-user.target<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>上面的配置文件，启动类型设为<code>oneshot</code>，就表明这个服务只要运行一次就够了，不需要长期运行。</p>
+<p>如果关闭以后，将来某个时候还想打开，配置文件修改如下。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>Unit<span class="token punctuation">]</span>
+Description<span class="token operator">=</span>Switch-off Touchpad
+
+<span class="token punctuation">[</span>Service<span class="token punctuation">]</span>
+Type<span class="token operator">=</span>oneshot
+ExecStart<span class="token operator">=</span>/usr/bin/touchpad-off start
+ExecStop<span class="token operator">=</span>/usr/bin/touchpad-off stop
+RemainAfterExit<span class="token operator">=</span>yes
+
+<span class="token punctuation">[</span>Install<span class="token punctuation">]</span>
+WantedBy<span class="token operator">=</span>multi-user.target<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>上面配置文件中，<code>RemainAfterExit</code>字段设为<code>yes</code>，表示进程退出以后，服务仍然保持执行。这样的话，一旦使用<code>systemctl stop</code>命令停止服务，<code>ExecStop</code>指定的命令就会执行，从而重新开启触摸板。</p>
+<hr>
+<h4 id="8-6-3-重启行为"><a href="#8-6-3-重启行为" class="headerlink" title="8.6.3 重启行为"></a>8.6.3 重启行为</h4><p><strong><code>Service</code></strong>区块有一些字段，定义了重启行为。</p>
+<ul>
+<li><code>KillMode字段：定义 Systemd 如何停止 sshd 服务。</code></li>
+</ul>
+<p>上面这个例子中，将<code>KillMode</code>设为<code>process</code>，表示只停止主进程，不停止任何<code>sshd</code>  子进程，即子进程打开的  <code>SSH session</code>  仍然保持连接。这个设置不太常见，但对  <code>sshd</code>  很重要，否则你停止服务的时候，会连自己打开的  <code>SSH session</code>  一起杀掉。</p>
+<p><code>KillMode</code>字段可以设置的值如下</p>
+<pre class="line-numbers language-bash"><code class="language-bash">control-group（默认值）：当前控制组里面的所有子进程，都会被杀掉
+process：只杀主进程
+mixed：主进程将收到 SIGTERM 信号，子进程收到 SIGKILL 信号
+none：没有进程会被杀掉，只是执行服务的 stop 命令。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p>接下来是<code>Restart</code>字段</p>
+<ul>
+<li><code>Restart字段：定义了 sshd 退出后，Systemd 的重启方式。</code></li>
+</ul>
+<p>上面的例子中，<code>Restart</code>设为<code>on-failure</code>，表示任何意外的失败，就将重启<code>sshd</code>。如果  <code>sshd</code>  正常停止（比如执行<code>systemctl stop</code>命令），它就不会重启。</p>
+<p><code>Restart</code>字段可以设置的值如下</p>
+<pre class="line-numbers language-bash"><code class="language-bash">no（默认值）：退出后不会重启
+on-success：只有正常退出时（退出状态码为0），才会重启
+on-failure：非正常退出时（退出状态码非0），包括被信号终止和超时，才会重启
+on-abnormal：只有被信号终止和超时，才会重启
+on-abort：只有在收到没有捕捉到的信号终止时，才会重启
+on-watchdog：超时退出，才会重启
+always：不管是什么退出原因，总是重启<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>对于守护进程，推荐设为<code>on-failure</code>。对于那些允许发生错误退出的服务，可以设为<code>on-abnormal</code>。最后是<code>RestartSec</code>字段</p>
+<pre class="line-numbers language-bash"><code class="language-bash">RestartSec字段：表示 Systemd 重启服务之前，需要等待的秒数。上面的例子设为等待42秒。<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<hr>
+<h3 id="8-7-Install-区块"><a href="#8-7-Install-区块" class="headerlink" title="8.7 [Install]  区块"></a>8.7 [Install]  区块</h3><p><strong><code>Install</code>区块</strong>，定义如何安装这个配置文件，即怎样做到开机启动</p>
+<ul>
+<li><code>WantedBy字段：表示该服务所在的 Target</code></li>
+</ul>
+<p><code>Target</code>的含义是服务组，表示一组服务。<code>WantedBy=multi-user.target</code>指的是，<code>sshd</code>  所在的  <code>Target</code>  是<code>multi-user.target</code>。</p>
+<p>这个设置非常重要，因为执行<code>systemctl enable sshd.service</code>命令时，<code>sshd.service</code>的一个符号链接，就会放在<code>/etc/systemd/system</code>目录下面的<code>multi-user.target.wants</code>子目录之中。</p>
+<p><strong>Systemd 有默认的启动 Target</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ systemctl get-default
+multi-user.target<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>上面的结果表示，默认的启动  <code>Target</code>  是<code>multi-user.target</code>。在这个组里的所有服务，都将开机启动。这就是为什么<code>systemctl enable</code>命令能设置开机启动的原因。</p>
+<p>使用  <code>Target</code>  的时候，<code>systemctl list-dependencies</code>命令和<code>systemctl isolate</code>命令也很有用。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看 multi-user.target 包含的所有服务</span>
+$ systemctl list-dependencies multi-user.target
+
+<span class="token comment" spellcheck="true"># 切换到另一个 target</span>
+<span class="token comment" spellcheck="true"># shutdown.target 就是关机状态</span>
+$ <span class="token function">sudo</span> systemctl isolate shutdown.target<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>常用的 Target 有两个</strong></p>
+<ul>
+<li><code>multi-user.target</code>，表示多用户命令行状态</li>
+<li><code>graphical.target</code>，表示图形用户状态，它依赖于<code>multi-user.target</code></li>
+</ul>
+<hr>
+<h3 id="8-8-Target-的配置文件"><a href="#8-8-Target-的配置文件" class="headerlink" title="8.8 Target 的配置文件"></a>8.8 Target 的配置文件</h3><p><strong>Target 自己的配置文件</strong></p>
+<p>注意，<code>Target</code>  配置文件里面没有启动命令。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ systemctl <span class="token function">cat</span> multi-user.target
+<span class="token punctuation">[</span>Unit<span class="token punctuation">]</span>
+Description<span class="token operator">=</span>Multi-User System
+Documentation<span class="token operator">=</span>man:systemd.special<span class="token punctuation">(</span>7<span class="token punctuation">)</span>
+Requires<span class="token operator">=</span>basic.target
+Conflicts<span class="token operator">=</span>rescue.service rescue.target
+After<span class="token operator">=</span>basic.target rescue.service rescue.target
+AllowIsolate<span class="token operator">=</span>yes<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>上面字段含义</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash">Requires字段：要求basic.target一起运行。
+Conflicts字段：冲突字段。如果rescue.service或rescue.target正在运行，multi-user.target就不能运行，反之亦然。
+After：表示multi-user.target在basic.target 、 rescue.service、 rescue.target之后启动，如果它们有启动的话。
+AllowIsolate：允许使用systemctl isolate命令切换到multi-user.target。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="8-9-修改配置文件后重启"><a href="#8-9-修改配置文件后重启" class="headerlink" title="8.9 修改配置文件后重启"></a>8.9 修改配置文件后重启</h3><p>修改配置文件以后，需要重新加载配置文件，然后重新启动相关服务。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 重新加载配置文件</span>
+$ <span class="token function">sudo</span> systemctl daemon-reload
+
+<span class="token comment" spellcheck="true"># 重启相关服务</span>
+$ <span class="token function">sudo</span> systemctl restart foobar<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="9-参考链接"><a href="#9-参考链接" class="headerlink" title="9. 参考链接"></a>9. 参考链接</h2><blockquote>
+<ul>
+<li><a href="https://wiki.archlinux.org/index.php/systemd_%28%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87%29" target="_blank" rel="noopener">systemd (简体中文) - ArchWiki</a></li>
+<li><a href="https://fedoraproject.org/wiki/Systemd/zh-cn" target="_blank" rel="noopener">Systemd/zh-cn - FedoraProject</a></li>
+<li><a href="https://zh.opensuse.org/index.php?title=openSUSE:How_to_write_a_systemd_service&amp;variant=zh-cn" target="_blank" rel="noopener">openSUSE:How to write a systemd service - openSUSE</a></li>
+<li><a href="http://www.jinbuguo.com/" target="_blank" rel="noopener">金步国作品集</a></li>
+</ul>
+</blockquote>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Escape</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://escapelife.github.io/posts/68f06a0f.html">https://escapelife.github.io/posts/68f06a0f.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Escape</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Linux/">
+                                    <span class="chip bg-color">Linux</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/posts/48693f50.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/linux-learn-ssh-proc.png" class="responsive-img" alt="Linux安全之SSL协议">
+                        
+                        <span class="card-title">Linux安全之SSL协议</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2017-12-15
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/posts/4fb48da7.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/linux-init-system.png" class="responsive-img" alt="Linux初始化init系统">
+                        
+                        <span class="card-title">Linux初始化init系统</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2017-12-10
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('4'),
+            headingSelector: 'h2, h3, h4, h5'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4, h5').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="764454432"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='none'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">2017</span>
+            <a href="/about" target="_blank">Escape</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">740.4k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2017";
+                    var startMonth = "2";
+                    var startDate = "14";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/EscapeLife" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wenpanhappy@126.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
