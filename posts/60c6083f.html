@@ -1,0 +1,2030 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="使用Locust来压测网站, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>使用Locust来压测网站 | Escape</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Escape</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Escape</div>
+        <div class="logo-desc">
+            
+            听摇滚,但不偏颇;也挺古典,但不安逸
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/EscapeLife" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/EscapeLife" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/locust-performance-test-tool.png')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">使用Locust来压测网站</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Module/">
+                                <span class="chip bg-color">Module</span>
+                            </a>
+                        
+                            <a href="/tags/Tools/">
+                                <span class="chip bg-color">Tools</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Tools工具分享/" class="post-category">
+                                Tools工具分享
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2020-10-28
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2020-10-28
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    5.4k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    24 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <blockquote>
+<p><strong>Locust：一个功能强大的开源压测工具</strong></p>
+</blockquote>
+<p>使用 <code>Python</code> 代码来定义用户行为，并让数以百万计的并发用户集中到你的系统上，来测试网站性能。</p>
+<ul>
+<li><a href="https://locust.io/" target="_blank" rel="noopener">官方网站地址</a></li>
+<li><a href="https://github.com/locustio/locust" target="_blank" rel="noopener">Github 仓库地址</a></li>
+<li><a href="https://docs.locust.io/en/stable/index.html" target="_blank" rel="noopener">官方参考手册地址</a></li>
+</ul>
+<p><img src="../images/locust-performance-test-tool.png" alt="Locust压测工具 - 官网图片"></p>
+<hr>
+<h2 id="1-工具介绍"><a href="#1-工具介绍" class="headerlink" title="1. 工具介绍"></a>1. 工具介绍</h2><blockquote>
+<p><strong>Locust 是一个易于使用、可编写脚本和可扩展的网站性能测试工具。</strong></p>
+</blockquote>
+<p>在 <code>Locust</code> 中的核心思想就是可以让用户通过编写 <code>Python</code> 程序来进行性能测试，而不是使用 <code>UI</code> 界面点击或者其他的专属类型语言，这样可以让开发人员感到非常的友好，以及使用上面的便利。</p>
+<ul>
+<li><strong>[1] 用 Python 编写用户测试场景</strong></li>
+</ul>
+<p>如果希望用户循环、执行某些条件行为或进行某些计算，只需使用 <code>Python</code> 提供的常规编程结构。<code>Locust</code> 在自己的 <code>greenlet</code> (一个轻量级进程/协同程序)中运行每个用户。这使您能够像编写普通(阻塞式) <code>Python</code> 代码一样编写测试，而不必使用回调或其他机制。因为您的场景是“仅仅是 <code>python</code>” ，所以您可以使用常规 <code>IDE</code>，并将测试作为常规代码进行版本控制(与使用 <code>XML</code> 或二进制格式的其他工具相反)。</p>
+<ul>
+<li><strong>[2] 分布式和可扩展(支持高并发)</strong></li>
+</ul>
+<p><code>Locust</code> 使得分布在多台机器上的负载测试很容易运行。它是基于事件的(使用 <code>gevent</code>)，这使得单个进程可以处理数千个并发用户。虽然可能有其他工具能够在给定的硬件上每秒执行更多请求，但是 <code>Locust</code> 用户的低开销使得它非常适合测试高并发的工作负载。</p>
+<ul>
+<li><strong>[3] 基于 Web 的用户界面</strong></li>
+</ul>
+<p><code>Locust</code> 有一个用户友好的网络界面，显示了实时测试的进展。您甚至可以在测试运行时更改负载。它也可以在没有用户界面的情况下运行，这使得它很容易用于 <code>CI/CD</code> 测试。</p>
+<ul>
+<li><strong>[4] 可以测试任何系统</strong></li>
+</ul>
+<p>尽管 <code>Locust</code> 主要使用 <code>web</code> 站点/服务，但它可以用来测试几乎任何系统或协议。只需要为你想要测试的东西写一个客户端，或者探索一些由社区创建的东西。</p>
+<ul>
+<li><strong>[5] 黑客特性</strong></li>
+</ul>
+<p>蝗虫是小的和非常灵活的，我们打算保持这种方式。如果您希望将报告数据发送到您喜欢的数据库和图形系统，那么可以将调用包装到 <code>REST API</code> 来处理系统的细节，或者运行一个完全自定义的加载模式，没有什么可以阻止您！</p>
+<hr>
+<h2 id="2-安装使用"><a href="#2-安装使用" class="headerlink" title="2. 安装使用"></a>2. 安装使用</h2><blockquote>
+<p><strong>Locust 工具安装起来非常的简单！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] 安装方式</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用pip安装</span>
+$ pip <span class="token function">install</span> locust
+
+<span class="token comment" spellcheck="true"># 查看版本</span>
+$ locust -V
+
+<span class="token comment" spellcheck="true"># 基于最新代码构建</span>
+$ pip3 <span class="token function">install</span> -e <span class="token string">'git://github.com/locustio/locust.git@master#egg=locust'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 项目结构</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">locust_project
+├── common
+    ├── __init__.py
+    ├── auth.py
+    └── config.py
+├── locustfile.py
+└── requirements.txt<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash">locust_project
+├── common
+    ├── __init__.py
+    ├── auth.py
+    └── config.py
+├── locustfiles
+    ├── __init__.py
+    ├── api.py
+    └── website.py
+└── requirements.txt<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 容器运行</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 直接运行</span>
+$ docker run -p 8089:8089 --name<span class="token operator">=</span>Locust \
+    -v <span class="token variable">$PWD</span>:/mnt/locust \
+    -f /mnt/locust/locustfile.py \
+    locustio/locust<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token comment" spellcheck="true"># docker-compose.yml</span>
+<span class="token key atrule">version</span><span class="token punctuation">:</span> <span class="token string">"3"</span>
+
+<span class="token key atrule">services</span><span class="token punctuation">:</span>
+  <span class="token key atrule">master</span><span class="token punctuation">:</span>
+    <span class="token key atrule">image</span><span class="token punctuation">:</span> locustio/locust
+    <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> <span class="token string">"8089:8089"</span>
+    <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> ./<span class="token punctuation">:</span>/mnt/locust
+    <span class="token key atrule">command</span><span class="token punctuation">:</span> <span class="token punctuation">-</span>f /mnt/locust/locustfile.py <span class="token punctuation">-</span><span class="token punctuation">-</span>master <span class="token punctuation">-</span>H http<span class="token punctuation">:</span>//master<span class="token punctuation">:</span><span class="token number">8089</span>
+
+  <span class="token key atrule">worker</span><span class="token punctuation">:</span>
+    <span class="token key atrule">image</span><span class="token punctuation">:</span> locustio/locust
+    <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> ./<span class="token punctuation">:</span>/mnt/locust
+    <span class="token key atrule">command</span><span class="token punctuation">:</span> <span class="token punctuation">-</span>f /mnt/locust/locustfile.py <span class="token punctuation">-</span><span class="token punctuation">-</span>worker <span class="token punctuation">-</span><span class="token punctuation">-</span>master<span class="token punctuation">-</span>host master<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="3-快速上手"><a href="#3-快速上手" class="headerlink" title="3. 快速上手"></a>3. 快速上手</h2><blockquote>
+<p><strong>官方文档中将从一个示例脚本开始讲解其运作过程！</strong></p>
+</blockquote>
+<p><code>Locust</code> 文件都只是普通的 <code>Python</code> 脚本，可以从其他文件或者包中导入对应的函数和类等。模拟用户行为是由 <code>Locust</code> 库中的 <code>HttpUser</code> 类提供的，在开始测试运行时，<code>Locust</code> 将为每个并发用户创建一个类的实例。而 <code>between</code> 用来定义一个等待时间，使得模拟的用户在每个任务执行之后等待 <code>1-2</code> 秒。</p>
+<p>对应测试任务的创建，是由 <code>@task</code> 这个装饰器来完成的。<code>Locust</code> 为每个正在运行的用户创建一个 <code>greenlet</code> 的微线程，它将调用这些方法。其中 <code>client</code> 属性，就是用来执行 <code>HTTP</code> 调用的。</p>
+<p>我们可以设置 <code>@task</code> 装饰器的权重来改变任务的执行优先级，示例中使用 <code>@task(3)</code> 的方法就会比使用 <code>@task</code> 的方法执行的优先级大三倍，其更容易被执行到。</p>
+<p>示例中的 <code>on_start</code> 方法将会在每一次用户请求时调用一次，这里设置的的是每次用户请求之前都先通过 <strong>用户名和密码</strong> 的方式登录服务，然后在执行对应 <code>API</code> 接口请求。</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> time
+<span class="token keyword">from</span> locust <span class="token keyword">import</span> HttpUser<span class="token punctuation">,</span> task<span class="token punctuation">,</span> between
+
+<span class="token keyword">class</span> <span class="token class-name">QuickstartUser</span><span class="token punctuation">(</span>HttpUser<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    wait_time <span class="token operator">=</span> between<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span>
+
+    @task
+    <span class="token keyword">def</span> <span class="token function">index_page</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/hello"</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/world"</span><span class="token punctuation">)</span>
+
+    @task<span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span>
+    <span class="token keyword">def</span> <span class="token function">view_item</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">for</span> item_id <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token comment" spellcheck="true"># 请求分组到/item下面</span>
+            self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span>f<span class="token string">"/item?id={item_id}"</span><span class="token punctuation">,</span> name<span class="token operator">=</span><span class="token string">"/item"</span><span class="token punctuation">)</span>
+            time<span class="token punctuation">.</span>sleep<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">on_start</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>post<span class="token punctuation">(</span><span class="token string">"/login"</span><span class="token punctuation">,</span> json<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"username"</span><span class="token punctuation">:</span><span class="token string">"foo"</span><span class="token punctuation">,</span> <span class="token string">"password"</span><span class="token punctuation">:</span><span class="token string">"bar"</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 当前目录</span>
+$ locust
+
+<span class="token comment" spellcheck="true"># 执行对应文件</span>
+$ locust -f my_locust_file.py<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>一旦执行了上面的命令，就会启动 <code>Locust</code> 的 <code>UI</code> 界面，我们可以打开任意一个网页浏览器，访问 <code>http://127.0.0.1:8089</code> 地址，即可进入如下所示的界面。</p>
+<p><img src="../images/locust-performance-test-tool-1.png" alt="Locust压测工具 - 官网图片"></p>
+<p>填写上图所示的信息，包含自动化测试的 <strong>用户数并发数</strong>、自动化测试的 <strong>时间间隔频率</strong> 以及需要进行自动化测试的网站访问地址。填写完毕之后，将自动进行测试。</p>
+<p><img src="../images/locust-performance-test-tool-2.png" alt="Locust压测工具 - 官网图片"></p>
+<p><img src="../images/locust-performance-test-tool-3.png" alt="Locust压测工具 - 官网图片"></p>
+<hr>
+<h2 id="4-运行方式"><a href="#4-运行方式" class="headerlink" title="4. 运行方式"></a>4. 运行方式</h2><blockquote>
+<p><strong>主要介绍无头模式和分布式部署运行方式！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] 无头模式</strong></li>
+</ul>
+<p>当然也可以使用 <code>--headless</code> 这个命令行参数直接启动测试，而不是用 <code>Web</code> 界面。</p>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>命令行参数</th>
+<th>参数含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><code>--headless</code></td>
+<td>无头模式</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>-u</code></td>
+<td>设置用户数量</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>-r</code></td>
+<td>设置每秒的并发数量</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>-t</code>/<code>--run-time</code></td>
+<td>设置测试时间限制</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>--stop-timeout</code></td>
+<td>允许任务关闭时完整退出</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>--csv</code></td>
+<td>输出 CSV 格式的测试报告</td>
+</tr>
+</tbody></table>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 无界面模式</span>
+$ locust --headless
+
+<span class="token comment" spellcheck="true"># 设置用户数量和并发数量</span>
+$ locust --headless -u 1000 -r 100
+
+<span class="token comment" spellcheck="true"># 设置测试时间限制</span>
+$ locust --headless -u 1000 -r 100 --run-time 1h30m
+
+<span class="token comment" spellcheck="true"># 任务完整退出</span>
+$ locust --headless -u 1000 -r 100 --run-time 1h30m --stop-timeout 99
+
+<span class="token comment" spellcheck="true"># 输出CSV格式的测试报告</span>
+$ locust --csv<span class="token operator">=</span>example --headless -t10m<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 分布式部署</strong></li>
+</ul>
+<p>如果需要跨多个 <code>Python</code> 进程或机器运行 <code>Locust</code> 工具的话，可以使用 <code>--master</code> 这个命令行参数启动单个 <code>Locust</code> 的 <code>master</code> 进程，然后使用 <code>--worker</code> 这个命令行参数启动任意数量 <code>Locust</code> 的 <code>worker</code> 进程。</p>
+<table>
+<thead>
+<tr>
+<th>分布式参数</th>
+<th>参数含义</th>
+<th>参数默认值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--master</code></td>
+<td>设置为主节点</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>--worker</code></td>
+<td>设置为子节点</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>--master-host=X.X.X.X</code></td>
+<td>设置主节点的 IP 地址</td>
+<td>127.0.0.1</td>
+</tr>
+<tr>
+<td><code>--master-port=XX</code></td>
+<td>设置主节点的端口号</td>
+<td>5557</td>
+</tr>
+<tr>
+<td><code>--master-bind-host=X.X.X.X</code></td>
+<td>主节点将绑定到哪个网络接口</td>
+<td>*</td>
+</tr>
+<tr>
+<td><code>--master-bind-port=XX</code></td>
+<td>主节点将侦听哪些网络端口</td>
+<td>5557</td>
+</tr>
+<tr>
+<td><code>--expect-workers=X</code></td>
+<td>在启动主节点时使用 headless 模式</td>
+<td>-</td>
+</tr>
+</tbody></table>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># one master</span>
+$ locust -f my_locustfile.py --master
+
+<span class="token comment" spellcheck="true"># more worker</span>
+$ locust -f my_locustfile.py --worker --master-host<span class="token operator">=</span>192.168.0.14
+$ locust -f my_locustfile.py --worker --master-host<span class="token operator">=</span>192.168.0.14
+$ locust -f my_locustfile.py --worker --master-host<span class="token operator">=</span>192.168.0.14<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 作为库运行</strong></li>
+</ul>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> gevent
+<span class="token keyword">from</span> locust <span class="token keyword">import</span> HttpUser<span class="token punctuation">,</span> task<span class="token punctuation">,</span> between
+<span class="token keyword">from</span> locust<span class="token punctuation">.</span>env <span class="token keyword">import</span> Environment
+<span class="token keyword">from</span> locust<span class="token punctuation">.</span>stats <span class="token keyword">import</span> stats_printer<span class="token punctuation">,</span> stats_history
+<span class="token keyword">from</span> locust<span class="token punctuation">.</span>log <span class="token keyword">import</span> setup_logging
+
+setup_logging<span class="token punctuation">(</span><span class="token string">"INFO"</span><span class="token punctuation">,</span> None<span class="token punctuation">)</span>
+
+
+<span class="token keyword">class</span> <span class="token class-name">User</span><span class="token punctuation">(</span>HttpUser<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    wait_time <span class="token operator">=</span> between<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span>
+    host <span class="token operator">=</span> <span class="token string">"https://docs.locust.io"</span>
+
+    @task
+    <span class="token keyword">def</span> <span class="token function">my_task</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">)</span>
+
+    @task
+    <span class="token keyword">def</span> <span class="token function">task_404</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/non-existing-path"</span><span class="token punctuation">)</span>
+
+
+<span class="token comment" spellcheck="true"># setup Environment and Runner</span>
+env <span class="token operator">=</span> Environment<span class="token punctuation">(</span>user_classes<span class="token operator">=</span><span class="token punctuation">[</span>User<span class="token punctuation">]</span><span class="token punctuation">)</span>
+env<span class="token punctuation">.</span>create_local_runner<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># start a WebUI instance</span>
+env<span class="token punctuation">.</span>create_web_ui<span class="token punctuation">(</span><span class="token string">"127.0.0.1"</span><span class="token punctuation">,</span> <span class="token number">8089</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># start a greenlet that periodically outputs the current stats</span>
+gevent<span class="token punctuation">.</span>spawn<span class="token punctuation">(</span>stats_printer<span class="token punctuation">(</span>env<span class="token punctuation">.</span>stats<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># start a greenlet that save current stats to history</span>
+gevent<span class="token punctuation">.</span>spawn<span class="token punctuation">(</span>stats_history<span class="token punctuation">,</span> env<span class="token punctuation">.</span>runner<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># start the test</span>
+env<span class="token punctuation">.</span>runner<span class="token punctuation">.</span>start<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> spawn_rate<span class="token operator">=</span><span class="token number">10</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># in 60 seconds stop the runner</span>
+gevent<span class="token punctuation">.</span>spawn_later<span class="token punctuation">(</span><span class="token number">60</span><span class="token punctuation">,</span> <span class="token keyword">lambda</span><span class="token punctuation">:</span> env<span class="token punctuation">.</span>runner<span class="token punctuation">.</span>quit<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># wait for the greenlets</span>
+env<span class="token punctuation">.</span>runner<span class="token punctuation">.</span>greenlet<span class="token punctuation">.</span>join<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># stop the web server for good measures</span>
+env<span class="token punctuation">.</span>web_ui<span class="token punctuation">.</span>stop<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="5-进阶指导"><a href="#5-进阶指导" class="headerlink" title="5. 进阶指导"></a>5. 进阶指导</h2><blockquote>
+<p><strong>如何更好的编写 Locust 文件呢？</strong></p>
+</blockquote>
+<p>我们需要知道的是，在编写 <code>Locust</code> 文件的时候，我们创建的类必须继承自 <code>User</code> 类才可以，而在 <code>User</code> 类中我们可以定义一些常见的属性。一个用户类代表一个用户，<code>Locust</code> 将为每个被模拟的用户产生一个 <code>User</code> 类的实例。</p>
+<ul>
+<li><strong>[1] 等待时间 - wait_time</strong></li>
+</ul>
+<p>在 <code>User</code> 中，<code>wait_time</code> 方法用于明确模拟用户在执行任务之间应等待多长时间，并且提供了三个内置的等待时间函数。</p>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>内置等待时间函数</th>
+<th>对应等待时间函数含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><code>between</code></td>
+<td>在最小和最大值时间内随机</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>constant</code></td>
+<td>确保在一定时间内保持恒定</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>constant_pacing</code></td>
+<td>确保任务最多每 <code>X</code> 秒运行一次</td>
+</tr>
+</tbody></table>
+<p>让每个用户在每次任务执行之间等待 <code>0.5</code> 到 <code>10</code> 秒。</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> locust <span class="token keyword">import</span> User<span class="token punctuation">,</span> task<span class="token punctuation">,</span> between
+
+<span class="token keyword">class</span> <span class="token class-name">MyUser</span><span class="token punctuation">(</span>User<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    wait_time <span class="token operator">=</span> between<span class="token punctuation">(</span><span class="token number">0.5</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span>
+
+    @task
+    <span class="token keyword">def</span> <span class="token function">my_task</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"executing my_task"</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>也可以直接在类上声明自己的 <code>wait_time</code> 方法。例如，下面的 <code>User</code> 类将休眠一秒钟，然后两秒钟，然后三秒钟，等等。</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> locust <span class="token keyword">import</span> User
+
+<span class="token keyword">class</span> <span class="token class-name">MyUser</span><span class="token punctuation">(</span>User<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    last_wait_time <span class="token operator">=</span> <span class="token number">0</span>
+
+    <span class="token keyword">def</span> <span class="token function">wait_time</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>last_wait_time <span class="token operator">+=</span> <span class="token number">1</span>
+        <span class="token keyword">return</span> self<span class="token punctuation">.</span>last_wait_time
+
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 权重属性 - weight</strong></li>
+</ul>
+<p>如果文件中存在多个用户类，并且命令行上没有指定任何用户类，<code>Locust</code> 将生成相同数量的每个用户类。你也可以通过传递命令行参数来指定在同一个 <code>locustfile</code> 中使用哪个用户类。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 指定运行WebUser和MobileUser类</span>
+$ locust -f locust_file.py WebUser MobileUser<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>如果您希望模拟某种类型的更多用户，可以在这些类上设置一个权重属性。例如，网络用户比手机用户的可能性高三倍。</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 网络用户</span>
+<span class="token keyword">class</span> <span class="token class-name">WebUser</span><span class="token punctuation">(</span>User<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    weight <span class="token operator">=</span> <span class="token number">3</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+<span class="token comment" spellcheck="true"># 手机用户</span>
+<span class="token keyword">class</span> <span class="token class-name">MobileUser</span><span class="token punctuation">(</span>User<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    weight <span class="token operator">=</span> <span class="token number">1</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 主机属性 - host</strong></li>
+</ul>
+<p><code>Host</code> 属性是要加载的主机的 <code>URL</code> 前缀，这是在 <code>Locust</code> 的 <code>web UI</code> 或命令行中指定的，在 <code>Locust</code> 启动时也是可以通过使用 <code>--host</code> 选项指定的。</p>
+<p>需要注意的是，如果有人在用户类中声明了一个 <code>host</code> 属性，那么在命令行或 <code>web</code> 请求中没有指定 <code>host</code> 的情况下将使用该属性。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ locust --host 127.0.0.1<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ul>
+<li><strong>[4] 任务属性 - tasks</strong></li>
+</ul>
+<p><code>User</code> 类可以使用 <code>@task</code> 装饰器，将任务声明为其下方的方法，但也可以使用 <code>tasks</code> 属性指定任务，下面将详细介绍这一属性。</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> locust <span class="token keyword">import</span> User<span class="token punctuation">,</span> task<span class="token punctuation">,</span> constant
+
+<span class="token keyword">class</span> <span class="token class-name">MyUser</span><span class="token punctuation">(</span>User<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    wait_time <span class="token operator">=</span> constant<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+
+    @task
+    <span class="token keyword">def</span> <span class="token function">my_task</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"User instance (%r) executing my_task"</span> <span class="token operator">%</span> self<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> locust <span class="token keyword">import</span> User<span class="token punctuation">,</span> task<span class="token punctuation">,</span> between
+
+<span class="token keyword">class</span> <span class="token class-name">MyUser</span><span class="token punctuation">(</span>User<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    wait_time <span class="token operator">=</span> between<span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">15</span><span class="token punctuation">)</span>
+
+    @task<span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span>
+    <span class="token keyword">def</span> <span class="token function">task1</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">pass</span>
+
+    @task<span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">)</span>
+    <span class="token keyword">def</span> <span class="token function">task2</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">pass</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>另一种定义 <code>User</code> 任务的方法是设置 <code>tasks</code> 属性。<code>Tasks</code> 属性是 <code>Tasks</code> 的列表或者是一个 <code>&lt;Task:int&gt;</code> 的字典，其中 <code>Task</code> 是 <code>python</code> 可调用的类或 <code>TaskSet</code> 类。如果任务是一个普通的 <code>python</code> 函数，那么它们会接收一个参数，这个参数就是执行任务的 <code>User</code> 实例。</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> locust <span class="token keyword">import</span> User<span class="token punctuation">,</span> constant
+
+<span class="token keyword">def</span> <span class="token function">my_task</span><span class="token punctuation">(</span>user<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">pass</span>
+
+<span class="token keyword">class</span> <span class="token class-name">MyUser</span><span class="token punctuation">(</span>User<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    tasks <span class="token operator">=</span> <span class="token punctuation">[</span>my_task<span class="token punctuation">]</span>
+    wait_time <span class="token operator">=</span> constant<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>如果将 <code>tasks</code> 属性指定为列表，则每次执行任务时，都将从 <code>tasks</code> 属性中随机选择任务。但是，如果任务是 <code>dict</code> (使用调用表作为键，使用整型表作为值) 则将随机选择要执行的任务，但使用 <code>int</code> 作为比率。即 <code>my_task</code> 任务被执行的可能性是 <code>another_task</code> 任务的 <code>3</code> 倍。</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> locust <span class="token keyword">import</span> User<span class="token punctuation">,</span> constant
+
+<span class="token keyword">def</span> <span class="token function">my_task</span><span class="token punctuation">(</span>user<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">pass</span>
+
+<span class="token keyword">def</span> <span class="token function">another_task</span><span class="token punctuation">(</span>user<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">pass</span>
+
+<span class="token keyword">class</span> <span class="token class-name">MyUser</span><span class="token punctuation">(</span>User<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    tasks <span class="token operator">=</span> <span class="token punctuation">{</span>my_task<span class="token punctuation">:</span> <span class="token number">3</span><span class="token punctuation">,</span> another_task<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">}</span>
+    wait_time <span class="token operator">=</span> constant<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>通过 <code>@tag</code> 装饰器标记任务，即可以使用 <code>--tags</code> 和 <code>--exclude-tags</code> 命令行参数来挑选测试期间执行的任务。</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> locust <span class="token keyword">import</span> User<span class="token punctuation">,</span> constant<span class="token punctuation">,</span> task<span class="token punctuation">,</span> tag
+
+<span class="token keyword">class</span> <span class="token class-name">MyUser</span><span class="token punctuation">(</span>User<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    wait_time <span class="token operator">=</span> constant<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+
+    @tag<span class="token punctuation">(</span><span class="token string">'tag1'</span><span class="token punctuation">)</span>
+    @task
+    <span class="token keyword">def</span> <span class="token function">task1</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">pass</span>
+
+    @tag<span class="token punctuation">(</span><span class="token string">'tag1'</span><span class="token punctuation">,</span> <span class="token string">'tag2'</span><span class="token punctuation">)</span>
+    @task
+    <span class="token keyword">def</span> <span class="token function">task2</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">pass</span>
+
+    @tag<span class="token punctuation">(</span><span class="token string">'tag3'</span><span class="token punctuation">)</span>
+    @task
+    <span class="token keyword">def</span> <span class="token function">task3</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">pass</span>
+
+    @task
+    <span class="token keyword">def</span> <span class="token function">task4</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">pass</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># task1 task2</span>
+$ locust -f locust_file.py --tags tag1
+
+<span class="token comment" spellcheck="true"># task2 task3</span>
+$ locust -f locust_file.py --tags tag2 tag3
+
+<span class="token comment" spellcheck="true"># task1 task2 task4</span>
+$ locust -f locust_file.py --exclude-tags tag3<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] 环境属性 - environment</strong></li>
+</ul>
+<p>对用户运行环境的引用，使用它来与环境或其中包含的运动员进行交互。例如，阻止运行者使用任务方法。如果运行一个独立的 <code>locust</code> 实例，这将停止整个运行。如果在工作者节点上运行，它将停止该特定节点。</p>
+<pre class="line-numbers language-python"><code class="language-python">self<span class="token punctuation">.</span>environment<span class="token punctuation">.</span>runner<span class="token punctuation">.</span>quit<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ul>
+<li><strong>[6] 开始停止 - on_start/on_stop</strong></li>
+</ul>
+<p>用户和 <code>taskset</code> 可以声明 <code>on_start</code> 方法和 <code>on_stop</code> 方法。用户在开始运行时调用 <code>on_start</code> 方法，在停止运行时调用 <code>on_stop</code> 方法。对于 <code>TaskSet</code> 来说，当模拟用户开始执行 <code>TaskSet</code> 时调用 <code>on_start</code> 方法，当模拟用户停止执行 <code>TaskSet</code> 时调用 <code>on_stop</code> 方法(调用<code>interrupt()</code>或者用户死亡)。</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> locust <span class="token keyword">import</span> HttpUser<span class="token punctuation">,</span> task<span class="token punctuation">,</span> between
+
+<span class="token keyword">class</span> <span class="token class-name">QuickstartUser</span><span class="token punctuation">(</span>HttpUser<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">on_start</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>post<span class="token punctuation">(</span><span class="token string">"/login"</span><span class="token punctuation">,</span> json<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"username"</span><span class="token punctuation">:</span><span class="token string">"foo"</span><span class="token punctuation">,</span> <span class="token string">"password"</span><span class="token punctuation">:</span><span class="token string">"bar"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="6-相关配置"><a href="#6-相关配置" class="headerlink" title="6. 相关配置"></a>6. 相关配置</h2><blockquote>
+<p><strong>主要介绍 locust 命令的相关参数！</strong></p>
+</blockquote>
+<ul>
+<li>配置 <code>Locust</code> 如何运行的最直接的方法是通过命令行参数。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ locust --help
+Usage: locust <span class="token punctuation">[</span>OPTIONS<span class="token punctuation">]</span> <span class="token punctuation">[</span>UserClass <span class="token punctuation">..</span>.<span class="token punctuation">]</span>
+
+Common options:
+  -h, --help            show this <span class="token function">help</span> message and <span class="token keyword">exit</span>
+  -f LOCUSTFILE, --locustfile LOCUSTFILE
+                        Python module <span class="token function">file</span> to import, e.g. <span class="token string">'../other.py'</span><span class="token keyword">.</span>
+                        Default: locustfile
+  --config CONFIG       Config <span class="token function">file</span> path
+  -H HOST, --host HOST  Host to load <span class="token function">test</span> <span class="token keyword">in</span> the following format:
+                        http://10.21.32.33
+  -u NUM_USERS, --users NUM_USERS
+                        Number of concurrent Locust users. Primarily used
+                        together with --headless
+  -r SPAWN_RATE, --spawn-rate SPAWN_RATE
+                        The rate per second <span class="token keyword">in</span> <span class="token function">which</span> <span class="token function">users</span> are spawned.
+                        Primarily used together with --headless
+  -t RUN_TIME, --run-time RUN_TIME
+                        Stop after the specified amount of time, e.g. <span class="token punctuation">(</span>300s,
+                        20m, 3h, 1h30m, etc.<span class="token punctuation">)</span>. Only used together with
+                        --headless
+  -l, --list            Show list of possible User classes and <span class="token keyword">exit</span>
+
+Web UI options:
+  --web-host WEB_HOST   Host to bind the web interface to. Defaults to <span class="token string">'*'</span>
+                        <span class="token punctuation">(</span>all interfaces<span class="token punctuation">)</span>
+  --web-port WEB_PORT, -P WEB_PORT
+                        Port on <span class="token function">which</span> to run web host
+  --headless            Disable the web interface, and instead start the load
+                        <span class="token function">test</span> immediately. Requires -u and -t to be specified.
+  --web-auth WEB_AUTH   Turn on Basic Auth <span class="token keyword">for</span> the web interface. Should be
+                        supplied <span class="token keyword">in</span> the following format: username:password
+  --tls-cert TLS_CERT   Optional path to TLS certificate to use to serve over
+                        HTTPS
+  --tls-key TLS_KEY     Optional path to TLS private key to use to serve over
+                        HTTPS
+
+Master options:
+  Options <span class="token keyword">for</span> running a Locust Master node when running Locust distributed. A Master node need Worker nodes that connect to it before it can run load tests.
+
+  --master              Set locust to run <span class="token keyword">in</span> distributed mode with this
+                        process as master
+  --master-bind-host MASTER_BIND_HOST
+                        Interfaces <span class="token punctuation">(</span>hostname, ip<span class="token punctuation">)</span> that locust master should
+                        bind to. Only used when running with --master.
+                        Defaults to * <span class="token punctuation">(</span>all available interfaces<span class="token punctuation">)</span>.
+  --master-bind-port MASTER_BIND_PORT
+                        Port that locust master should bind to. Only used when
+                        running with --master. Defaults to 5557.
+  --expect-workers EXPECT_WORKERS
+                        How many workers master should <span class="token function">expect</span> to connect
+                        before starting the <span class="token function">test</span> <span class="token punctuation">(</span>only when --headless used<span class="token punctuation">)</span>.
+
+Worker options:
+
+  Options <span class="token keyword">for</span> running a Locust Worker node when running Locust distributed.
+  Only the LOCUSTFILE <span class="token punctuation">(</span>-f option<span class="token punctuation">)</span> need to be specified when starting a Worker, since other options such as -u, -r, -t are specified on the Master node.
+
+  --worker              Set locust to run <span class="token keyword">in</span> distributed mode with this
+                        process as worker
+  --master-host MASTER_NODE_HOST
+                        Host or IP address of locust master <span class="token keyword">for</span> distributed
+                        load testing. Only used when running with --worker.
+                        Defaults to 127.0.0.1.
+  --master-port MASTER_NODE_PORT
+                        The port to connect to that is used by the locust
+                        master <span class="token keyword">for</span> distributed load testing. Only used when
+                        running with --worker. Defaults to 5557.
+
+Tag options:
+  Locust tasks can be tagged using the @tag decorator. These options <span class="token keyword">let</span> specify <span class="token function">which</span> tasks to include or exclude during a test.
+
+  -T <span class="token punctuation">[</span>TAG <span class="token punctuation">[</span>TAG <span class="token punctuation">..</span>.<span class="token punctuation">]</span><span class="token punctuation">]</span>, --tags <span class="token punctuation">[</span>TAG <span class="token punctuation">[</span>TAG <span class="token punctuation">..</span>.<span class="token punctuation">]</span><span class="token punctuation">]</span>
+                        List of tags to include <span class="token keyword">in</span> the test, so only tasks
+                        with any matching tags will be executed
+  -E <span class="token punctuation">[</span>TAG <span class="token punctuation">[</span>TAG <span class="token punctuation">..</span>.<span class="token punctuation">]</span><span class="token punctuation">]</span>, --exclude-tags <span class="token punctuation">[</span>TAG <span class="token punctuation">[</span>TAG <span class="token punctuation">..</span>.<span class="token punctuation">]</span><span class="token punctuation">]</span>
+                        List of tags to exclude from the test, so only tasks
+                        with no matching tags will be executed
+
+Request statistics options:
+  --csv CSV_PREFIX      Store current request stats to files <span class="token keyword">in</span> CSV format.
+                        Setting this option will generate three files:
+                        <span class="token punctuation">[</span>CSV_PREFIX<span class="token punctuation">]</span>_stats.csv, <span class="token punctuation">[</span>CSV_PREFIX<span class="token punctuation">]</span>_stats_history.csv
+                        and <span class="token punctuation">[</span>CSV_PREFIX<span class="token punctuation">]</span>_failures.csv
+  --csv-full-history    Store each stats entry <span class="token keyword">in</span> CSV <span class="token function">format</span> to
+                        _stats_history.csv file. You must also specify the <span class="token string">'--
+                        csv'</span> argument to <span class="token function">enable</span> this.
+  --print-stats         Print stats <span class="token keyword">in</span> the console
+  --only-summary        Only print the summary stats
+  --reset-stats         Reset statistics once spawning has been completed.
+                        Should be <span class="token keyword">set</span> on both master and workers when running
+                        <span class="token keyword">in</span> distributed mode
+
+Logging options:
+  --skip-log-setup      Disable Locust<span class="token string">'s logging setup. Instead, the
+                        configuration is provided by the Locust test or Python
+                        defaults.
+  --loglevel LOGLEVEL, -L LOGLEVEL
+                        Choose between DEBUG/INFO/WARNING/ERROR/CRITICAL.
+                        Default is INFO.
+  --logfile LOGFILE     Path to log file. If not set, log will go to
+                        stdout/stderr
+
+Other options:
+  --show-task-ratio     Print table of the User classes'</span> task execution ratio
+  --show-task-ratio-json
+                        Print json data of the User classes<span class="token string">' task execution
+                        ratio
+  --version, -V         Show program'</span>s version number and <span class="token keyword">exit</span>
+  --exit-code-on-error EXIT_CODE_ON_ERROR
+                        Sets the process <span class="token keyword">exit</span> code to use when a <span class="token function">test</span> result
+                        contain any failure or error
+  -s STOP_TIMEOUT, --stop-timeout STOP_TIMEOUT
+                        Number of seconds to <span class="token function">wait</span> <span class="token keyword">for</span> a simulated user to
+                        complete any executing task before exiting. Default is
+                        to terminate immediately. This parameter only needs to
+                        be specified <span class="token keyword">for</span> the master process when running
+                        Locust distributed.
+
+User classes:
+  UserClass             Optionally specify <span class="token function">which</span> User classes that should be
+                        used <span class="token punctuation">(</span>available User classes can be listed with -l or
+                        --list<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>大多数可以通过命令行参数设置的选项也可以通过环境变量设置。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ LOCUST_LOCUSTFILE<span class="token operator">=</span>custom_locustfile.py locust<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ul>
+<li>也可以通过配置文件设置，同时可使用 <code>--config</code> 指定一个配置文件。</li>
+<li><code>Locust</code> 将默认查找 <code>~/.Locust.conf</code> 和 <code>./Locust.conf</code> 这两个配置。</li>
+<li><code>~/locust.conf</code> -&gt; <code>./locust.conf</code> -&gt; <code>--conf</code> -&gt; <code>env vars</code> -&gt; <code>cmd args</code></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># master.conf in current directory</span>
+locustfile <span class="token operator">=</span> locust_files/my_locust_file.py
+headless <span class="token operator">=</span> <span class="token boolean">true</span>
+master <span class="token operator">=</span> <span class="token boolean">true</span>
+expect-workers <span class="token operator">=</span> 5
+host <span class="token operator">=</span> http://target-system
+<span class="token function">users</span> <span class="token operator">=</span> 100
+spawn-rate <span class="token operator">=</span> 10
+run-time <span class="token operator">=</span> 10m
+
+<span class="token comment" spellcheck="true"># run server</span>
+$ locust --config<span class="token operator">=</span>master.conf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="7-高级特性"><a href="#7-高级特性" class="headerlink" title="7. 高级特性"></a>7. 高级特性</h2><blockquote>
+<p><strong>Locust 也可以设置很多钩子函数(Events)，但是这里我们不做涉及。</strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] HttpUser - Http 用户类</strong></li>
+</ul>
+<p><code>HttpUser</code> 是最常用的用户，它添加了一个用于发出 <code>HTTP</code> 请求的客户端属性。</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> locust <span class="token keyword">import</span> HttpUser<span class="token punctuation">,</span> task<span class="token punctuation">,</span> between
+
+<span class="token keyword">class</span> <span class="token class-name">MyUser</span><span class="token punctuation">(</span>HttpUser<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    wait_time <span class="token operator">=</span> between<span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">15</span><span class="token punctuation">)</span>
+
+    @task<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">)</span>
+    <span class="token keyword">def</span> <span class="token function">index</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">)</span>
+
+    @task<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+    <span class="token keyword">def</span> <span class="token function">about</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/about/"</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] HttpSession - 客户端属性</strong></li>
+</ul>
+<p><code>client</code> 是 <code>HttpSession</code> 的一个实例，而 <code>HttpSession</code> 是 <code>requests.Session</code> 的子类和包装器，因此它的特性被很好地记录下来并且应该为许多人所熟悉。<code>HttpSession</code> 添加的主要作用就是将请求结果报告到 <code>Locust</code> 中，包括成功和失败，响应时间，响应长度，名称。其中，包含所有 <code>HTTP</code> 方法，比如 <code>get</code>、<code>post</code>、<code>put</code> 等等。</p>
+<p>类似于 <code>requests.Session</code> 一样，它在请求之间保存 <code>cookie</code> 下来，所以可以很容易地用于登录网站。下面示例中，发出一个 <code>POST</code> 请求，查看响应并隐式重用我们为第二个请求获得的任何会话 <code>cookie</code>。</p>
+<pre class="line-numbers language-python"><code class="language-python">response <span class="token operator">=</span> self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>post<span class="token punctuation">(</span><span class="token string">"/login"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token string">"username"</span><span class="token punctuation">:</span><span class="token string">"testuser"</span><span class="token punctuation">,</span> <span class="token string">"password"</span><span class="token punctuation">:</span><span class="token string">"secret"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Response status code:"</span><span class="token punctuation">,</span> response<span class="token punctuation">.</span>status_code<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Response text:"</span><span class="token punctuation">,</span> response<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
+response <span class="token operator">=</span> self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/my-profile"</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] Vali Responses - 验证响应</strong></li>
+</ul>
+<p>如果 <code>HTTP</code> 响应代码是 <code>OK</code>(<code>&lt;400</code>) 的，那么请求被认为是成功的，但是对响应进行一些额外的验证通常是有用的。通过使用 <code>catch_response</code> 参数、<code>with-statement</code> 和对 <code>response.failure()</code> 的调用，可将请求标记为 <code>failed</code>。</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 响应不正确时可以将其标记为失败</span>
+<span class="token keyword">with</span> self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">,</span> catch_response<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span> <span class="token keyword">as</span> response<span class="token punctuation">:</span>
+    <span class="token keyword">if</span> response<span class="token punctuation">.</span>text <span class="token operator">!=</span> <span class="token string">"Success"</span><span class="token punctuation">:</span>
+        response<span class="token punctuation">.</span>failure<span class="token punctuation">(</span><span class="token string">"Got wrong response"</span><span class="token punctuation">)</span>
+    <span class="token keyword">elif</span> response<span class="token punctuation">.</span>elapsed<span class="token punctuation">.</span>total_seconds<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0.5</span><span class="token punctuation">:</span>
+        response<span class="token punctuation">.</span>failure<span class="token punctuation">(</span><span class="token string">"Request took too long"</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 即使响应代码不正确也可将请求标记为成功</span>
+<span class="token keyword">with</span> self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/does_not_exist/"</span><span class="token punctuation">,</span> catch_response<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span> <span class="token keyword">as</span> response<span class="token punctuation">:</span>
+    <span class="token keyword">if</span> response<span class="token punctuation">.</span>status_code <span class="token operator">==</span> <span class="token number">404</span><span class="token punctuation">:</span>
+        response<span class="token punctuation">.</span>success<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 可以通过抛出异常然后让with语句捕获异常</span>
+<span class="token keyword">from</span> locust<span class="token punctuation">.</span>exception <span class="token keyword">import</span> RescheduleTask
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token keyword">with</span> self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/does_not_exist/"</span><span class="token punctuation">,</span> catch_response<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span> <span class="token keyword">as</span> response<span class="token punctuation">:</span>
+    <span class="token keyword">if</span> response<span class="token punctuation">.</span>status_code <span class="token operator">==</span> <span class="token number">404</span><span class="token punctuation">:</span>
+        <span class="token keyword">raise</span> RescheduleTask<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] Http Proxy - 代理设置</strong></li>
+</ul>
+<p>为了提高性能，我们通常不会给请求配置 <code>HTTP</code> 代理设置，即对应属性的默认值为 <code>False</code>。如果我们需要设置代理的话，可以手动设置 <code>locust_instance.client.trust_env</code> 变量为 <code>True</code> 即可。</p>
+<pre class="line-numbers language-python"><code class="language-python">locust_instance<span class="token punctuation">.</span>client<span class="token punctuation">.</span>trust_env <span class="token operator">=</span> <span class="token boolean">True</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ul>
+<li><strong>[5] Grouping Requests - URL 请求分组</strong></li>
+</ul>
+<p>这是非常常见的，在网站的网址包含某种动态参数，将这些 <code>url</code> 按用户统计数据进行分组通常是有意义的。这可以通过向 <code>HttpSession</code> 的不同请求方法传递一个 <code>name</code> 参数来实现。</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># grouped under: /blog/?id=[id]</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/blog?id=%i"</span> <span class="token operator">%</span> i<span class="token punctuation">,</span> name<span class="token operator">=</span><span class="token string">"/blog?id=[id]"</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[6] FastHttpUser - 更快的客户端</strong></li>
+</ul>
+<p>使用更快的 <code>HTTP</code> 客户端提高 <code>Locust</code> 的性能。<code>Locust</code> 默认使用 <a href="http://www.python-requests.org/" target="_blank" rel="noopener">python-requests</a> 库来进行 <code>HTTP</code> 客户端的封装，使用的原因非常简单就是因为我们很熟悉。所以，在大多数情况下，建议继承 <code>HttpUser</code> 这个类。</p>
+<p>如果我们打算运行真正大规模测试的话，在 <code>Locust</code> 中附带了一个备用 <code>HTTP</code> 客户端，那就是 <code>FastHttpUser</code> 了。此客户端的速度明显提高，并且我们发现执行 <code>HTTP</code> 请求的性能提高了 <code>5-6</code> 倍。这并不一定意味着每个 <code>CPU</code> 内核可以模拟的用户数量将自动增加 <code>5-6</code> 倍，因为这还取决于负载测试脚本的其他功能。</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> locust <span class="token keyword">import</span> task<span class="token punctuation">,</span> between
+<span class="token keyword">from</span> locust<span class="token punctuation">.</span>contrib<span class="token punctuation">.</span>fasthttp <span class="token keyword">import</span> FastHttpUser
+
+<span class="token keyword">class</span> <span class="token class-name">MyUser</span><span class="token punctuation">(</span>FastHttpUser<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    wait_time <span class="token operator">=</span> between<span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span>
+
+    @task
+    <span class="token keyword">def</span> <span class="token function">index</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        response <span class="token operator">=</span> self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="8-示例代码"><a href="#8-示例代码" class="headerlink" title="8. 示例代码"></a>8. 示例代码</h2><blockquote>
+<p><strong>A fundamental feature of Locust is that you describe all your test in Python code. No need for clunky UIs or bloated XML, just plain code.</strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] Simple Example</strong></li>
+</ul>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> locust <span class="token keyword">import</span> HttpUser<span class="token punctuation">,</span> between<span class="token punctuation">,</span> task
+
+
+<span class="token keyword">class</span> <span class="token class-name">WebsiteUser</span><span class="token punctuation">(</span>HttpUser<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    wait_time <span class="token operator">=</span> between<span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">15</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">on_start</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>post<span class="token punctuation">(</span><span class="token string">"/login"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+            <span class="token string">"username"</span><span class="token punctuation">:</span> <span class="token string">"test_user"</span><span class="token punctuation">,</span>
+            <span class="token string">"password"</span><span class="token punctuation">:</span> <span class="token string">""</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    @task
+    <span class="token keyword">def</span> <span class="token function">index</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/static/assets.js"</span><span class="token punctuation">)</span>
+
+    @task
+    <span class="token keyword">def</span> <span class="token function">about</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/about/"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash">$ locust -f locustfile.py<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ul>
+<li><strong>[2] With HTML Parsing Example</strong></li>
+</ul>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> random
+<span class="token keyword">from</span> locust <span class="token keyword">import</span> HttpUser<span class="token punctuation">,</span> between<span class="token punctuation">,</span> task
+<span class="token keyword">from</span> pyquery <span class="token keyword">import</span> PyQuery
+
+
+<span class="token keyword">class</span> <span class="token class-name">AwesomeUser</span><span class="token punctuation">(</span>HttpUser<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    host <span class="token operator">=</span> <span class="token string">"https://docs.locust.io/en/latest/"</span>
+
+    <span class="token comment" spellcheck="true"># we assume someone who is browsing the Locust docs,</span>
+    <span class="token comment" spellcheck="true"># generally has a quite long waiting time (between</span>
+    <span class="token comment" spellcheck="true"># 10 and 600 seconds), since there's a bunch of text</span>
+    <span class="token comment" spellcheck="true"># on each page</span>
+    wait_time <span class="token operator">=</span> between<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">600</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">on_start</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token comment" spellcheck="true"># start by waiting so that the simulated users</span>
+        <span class="token comment" spellcheck="true"># won't all arrive at the same time</span>
+        self<span class="token punctuation">.</span>wait<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true"># assume all users arrive at the index page</span>
+        self<span class="token punctuation">.</span>index_page<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>urls_on_current_page <span class="token operator">=</span> self<span class="token punctuation">.</span>toc_urls
+
+    @task<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span>
+    <span class="token keyword">def</span> <span class="token function">index_page</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        r <span class="token operator">=</span> self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span>
+        pq <span class="token operator">=</span> PyQuery<span class="token punctuation">(</span>r<span class="token punctuation">.</span>content<span class="token punctuation">)</span>
+        link_elements <span class="token operator">=</span> pq<span class="token punctuation">(</span><span class="token string">".toctree-wrapper a.internal"</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>toc_urls <span class="token operator">=</span> <span class="token punctuation">[</span>
+            l<span class="token punctuation">.</span>attrib<span class="token punctuation">[</span><span class="token string">"href"</span><span class="token punctuation">]</span> <span class="token keyword">for</span> l <span class="token keyword">in</span> link_elements
+        <span class="token punctuation">]</span>
+
+    @task<span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">)</span>
+    <span class="token keyword">def</span> <span class="token function">load_page</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        url <span class="token operator">=</span> random<span class="token punctuation">.</span>choice<span class="token punctuation">(</span>self<span class="token punctuation">.</span>toc_urls<span class="token punctuation">)</span>
+        r <span class="token operator">=</span> self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token punctuation">)</span>
+        pq <span class="token operator">=</span> PyQuery<span class="token punctuation">(</span>r<span class="token punctuation">.</span>content<span class="token punctuation">)</span>
+        link_elements <span class="token operator">=</span> pq<span class="token punctuation">(</span><span class="token string">"a.internal"</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>urls_on_current_page <span class="token operator">=</span> <span class="token punctuation">[</span>
+            l<span class="token punctuation">.</span>attrib<span class="token punctuation">[</span><span class="token string">"href"</span><span class="token punctuation">]</span> <span class="token keyword">for</span> l <span class="token keyword">in</span> link_elements
+        <span class="token punctuation">]</span>
+
+    @task<span class="token punctuation">(</span><span class="token number">30</span><span class="token punctuation">)</span>
+    <span class="token keyword">def</span> <span class="token function">load_sub_page</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        url <span class="token operator">=</span> random<span class="token punctuation">.</span>choice<span class="token punctuation">(</span>self<span class="token punctuation">.</span>urls_on_current_page<span class="token punctuation">)</span>
+        r <span class="token operator">=</span> self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash">$ locust -f locustfile.py<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ul>
+<li><strong>[3] Nested TaskSets Example</strong></li>
+</ul>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> locust <span class="token keyword">import</span> HttpUser<span class="token punctuation">,</span> TaskSet<span class="token punctuation">,</span> task<span class="token punctuation">,</span> between
+
+<span class="token keyword">class</span> <span class="token class-name">ForumThread</span><span class="token punctuation">(</span>TaskSet<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">pass</span>
+
+<span class="token keyword">class</span> <span class="token class-name">ForumPage</span><span class="token punctuation">(</span>TaskSet<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token comment" spellcheck="true"># wait_time can be overridden for individual TaskSets</span>
+    wait_time <span class="token operator">=</span> between<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">300</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># TaskSets can be nested multiple levels</span>
+    tasks <span class="token operator">=</span> <span class="token punctuation">{</span>
+        ForumThread<span class="token punctuation">:</span><span class="token number">3</span>
+    <span class="token punctuation">}</span>
+
+    @task<span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span>
+    <span class="token keyword">def</span> <span class="token function">forum_index</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">pass</span>
+
+    @task<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+    <span class="token keyword">def</span> <span class="token function">stop</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>interrupt<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">class</span> <span class="token class-name">AboutPage</span><span class="token punctuation">(</span>TaskSet<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">pass</span>
+
+<span class="token keyword">class</span> <span class="token class-name">WebsiteUser</span><span class="token punctuation">(</span>HttpUser<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    wait_time <span class="token operator">=</span> between<span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">15</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># We can specify sub TaskSets using the tasks dict</span>
+    tasks <span class="token operator">=</span> <span class="token punctuation">{</span>
+        ForumPage<span class="token punctuation">:</span> <span class="token number">20</span><span class="token punctuation">,</span>
+        AboutPage<span class="token punctuation">:</span> <span class="token number">10</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true"># We can use the @task decorator as well as the</span>
+    <span class="token comment" spellcheck="true"># tasks dict in the same Locust/TaskSet</span>
+    @task<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span>
+    <span class="token keyword">def</span> <span class="token function">index</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">pass</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash">$ locust -f locustfile.py<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Escape</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://escapelife.github.io/posts/60c6083f.html">https://escapelife.github.io/posts/60c6083f.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Escape</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Module/">
+                                    <span class="chip bg-color">Module</span>
+                                </a>
+                            
+                                <a href="/tags/Tools/">
+                                    <span class="chip bg-color">Tools</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/posts/cd41fac0.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/2020_journal_10_month.jpg" class="responsive-img" alt="2020年第四季度总结">
+                        
+                        <span class="card-title">2020年第四季度总结</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2020-10-31
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Cycle月度总结/" class="post-category">
+                                    Cycle月度总结
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Journal/">
+                        <span class="chip bg-color">Journal</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/posts/4b66023c.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/ubuntu-freeze-during-restart.png" class="responsive-img" alt="防止服务器重启卡壳">
+                        
+                        <span class="card-title">防止服务器重启卡壳</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-10-25
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Bug解决之道/" class="post-category">
+                                    Bug解决之道
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Bug/">
+                        <span class="chip bg-color">Bug</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('4'),
+            headingSelector: 'h2, h3, h4, h5'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4, h5').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="764454432"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='none'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">2017</span>
+            <a href="/about" target="_blank">Escape</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">746k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2017";
+                    var startMonth = "2";
+                    var startDate = "14";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/EscapeLife" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wenpanhappy@126.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
