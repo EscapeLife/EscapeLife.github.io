@@ -467,14 +467,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    5.4k
+                    5.5k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    24 分
+                    25 分
                 </div>
                 
 
@@ -1184,32 +1184,29 @@ response <span class="token operator">=</span> self<span class="token punctuatio
         response <span class="token operator">=</span> self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="8-示例代码"><a href="#8-示例代码" class="headerlink" title="8. 示例代码"></a>8. 示例代码</h2><blockquote>
-<p><strong>A fundamental feature of Locust is that you describe all your test in Python code. No need for clunky UIs or bloated XML, just plain code.</strong></p>
+<p><strong>获取更新示例参考代码，请查看<a href="https://github.com/locustio/locust/tree/master/examples" target="_blank" rel="noopener">官方仓库</a>！</strong></p>
 </blockquote>
 <ul>
 <li><strong>[1] Simple Example</strong></li>
 </ul>
-<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> locust <span class="token keyword">import</span> HttpUser<span class="token punctuation">,</span> between<span class="token punctuation">,</span> task
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> locust <span class="token keyword">import</span> HttpUser<span class="token punctuation">,</span> TaskSet<span class="token punctuation">,</span> task<span class="token punctuation">,</span> between
 
+<span class="token keyword">def</span> <span class="token function">index</span><span class="token punctuation">(</span>l<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    l<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">stats</span><span class="token punctuation">(</span>l<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    l<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/stats/requests"</span><span class="token punctuation">)</span>
+
+<span class="token keyword">class</span> <span class="token class-name">UserTasks</span><span class="token punctuation">(</span>TaskSet<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    tasks <span class="token operator">=</span> <span class="token punctuation">[</span>index<span class="token punctuation">,</span> stats<span class="token punctuation">]</span>
+    @task
+    <span class="token keyword">def</span> <span class="token function">page404</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/does_not_exist"</span><span class="token punctuation">)</span>
 
 <span class="token keyword">class</span> <span class="token class-name">WebsiteUser</span><span class="token punctuation">(</span>HttpUser<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    wait_time <span class="token operator">=</span> between<span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">15</span><span class="token punctuation">)</span>
-
-    <span class="token keyword">def</span> <span class="token function">on_start</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>post<span class="token punctuation">(</span><span class="token string">"/login"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
-            <span class="token string">"username"</span><span class="token punctuation">:</span> <span class="token string">"test_user"</span><span class="token punctuation">,</span>
-            <span class="token string">"password"</span><span class="token punctuation">:</span> <span class="token string">""</span>
-        <span class="token punctuation">}</span><span class="token punctuation">)</span>
-
-    @task
-    <span class="token keyword">def</span> <span class="token function">index</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">)</span>
-        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/static/assets.js"</span><span class="token punctuation">)</span>
-
-    @task
-    <span class="token keyword">def</span> <span class="token function">about</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/about/"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash">$ locust -f locustfile.py<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+    host <span class="token operator">=</span> <span class="token string">"http://127.0.0.1:8089"</span>
+    wait_time <span class="token operator">=</span> between<span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span>
+    tasks <span class="token operator">=</span> <span class="token punctuation">[</span>UserTasks<span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[2] With HTML Parsing Example</strong></li>
 </ul>
@@ -1220,18 +1217,10 @@ response <span class="token operator">=</span> self<span class="token punctuatio
 
 <span class="token keyword">class</span> <span class="token class-name">AwesomeUser</span><span class="token punctuation">(</span>HttpUser<span class="token punctuation">)</span><span class="token punctuation">:</span>
     host <span class="token operator">=</span> <span class="token string">"https://docs.locust.io/en/latest/"</span>
-
-    <span class="token comment" spellcheck="true"># we assume someone who is browsing the Locust docs,</span>
-    <span class="token comment" spellcheck="true"># generally has a quite long waiting time (between</span>
-    <span class="token comment" spellcheck="true"># 10 and 600 seconds), since there's a bunch of text</span>
-    <span class="token comment" spellcheck="true"># on each page</span>
     wait_time <span class="token operator">=</span> between<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">600</span><span class="token punctuation">)</span>
 
     <span class="token keyword">def</span> <span class="token function">on_start</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token comment" spellcheck="true"># start by waiting so that the simulated users</span>
-        <span class="token comment" spellcheck="true"># won't all arrive at the same time</span>
         self<span class="token punctuation">.</span>wait<span class="token punctuation">(</span><span class="token punctuation">)</span>
-        <span class="token comment" spellcheck="true"># assume all users arrive at the index page</span>
         self<span class="token punctuation">.</span>index_page<span class="token punctuation">(</span><span class="token punctuation">)</span>
         self<span class="token punctuation">.</span>urls_on_current_page <span class="token operator">=</span> self<span class="token punctuation">.</span>toc_urls
 
@@ -1240,9 +1229,7 @@ response <span class="token operator">=</span> self<span class="token punctuatio
         r <span class="token operator">=</span> self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span>
         pq <span class="token operator">=</span> PyQuery<span class="token punctuation">(</span>r<span class="token punctuation">.</span>content<span class="token punctuation">)</span>
         link_elements <span class="token operator">=</span> pq<span class="token punctuation">(</span><span class="token string">".toctree-wrapper a.internal"</span><span class="token punctuation">)</span>
-        self<span class="token punctuation">.</span>toc_urls <span class="token operator">=</span> <span class="token punctuation">[</span>
-            l<span class="token punctuation">.</span>attrib<span class="token punctuation">[</span><span class="token string">"href"</span><span class="token punctuation">]</span> <span class="token keyword">for</span> l <span class="token keyword">in</span> link_elements
-        <span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>toc_urls <span class="token operator">=</span> <span class="token punctuation">[</span>l<span class="token punctuation">.</span>attrib<span class="token punctuation">[</span><span class="token string">"href"</span><span class="token punctuation">]</span> <span class="token keyword">for</span> l <span class="token keyword">in</span> link_elements<span class="token punctuation">]</span>
 
     @task<span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">)</span>
     <span class="token keyword">def</span> <span class="token function">load_page</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -1250,15 +1237,12 @@ response <span class="token operator">=</span> self<span class="token punctuatio
         r <span class="token operator">=</span> self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token punctuation">)</span>
         pq <span class="token operator">=</span> PyQuery<span class="token punctuation">(</span>r<span class="token punctuation">.</span>content<span class="token punctuation">)</span>
         link_elements <span class="token operator">=</span> pq<span class="token punctuation">(</span><span class="token string">"a.internal"</span><span class="token punctuation">)</span>
-        self<span class="token punctuation">.</span>urls_on_current_page <span class="token operator">=</span> <span class="token punctuation">[</span>
-            l<span class="token punctuation">.</span>attrib<span class="token punctuation">[</span><span class="token string">"href"</span><span class="token punctuation">]</span> <span class="token keyword">for</span> l <span class="token keyword">in</span> link_elements
-        <span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>urls_on_current_page <span class="token operator">=</span> <span class="token punctuation">[</span>l<span class="token punctuation">.</span>attrib<span class="token punctuation">[</span><span class="token string">"href"</span><span class="token punctuation">]</span> <span class="token keyword">for</span> l <span class="token keyword">in</span> link_elements<span class="token punctuation">]</span>
 
     @task<span class="token punctuation">(</span><span class="token number">30</span><span class="token punctuation">)</span>
     <span class="token keyword">def</span> <span class="token function">load_sub_page</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
         url <span class="token operator">=</span> random<span class="token punctuation">.</span>choice<span class="token punctuation">(</span>self<span class="token punctuation">.</span>urls_on_current_page<span class="token punctuation">)</span>
-        r <span class="token operator">=</span> self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash">$ locust -f locustfile.py<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+        r <span class="token operator">=</span> self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[3] Nested TaskSets Example</strong></li>
 </ul>
@@ -1268,10 +1252,8 @@ response <span class="token operator">=</span> self<span class="token punctuatio
     <span class="token keyword">pass</span>
 
 <span class="token keyword">class</span> <span class="token class-name">ForumPage</span><span class="token punctuation">(</span>TaskSet<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token comment" spellcheck="true"># wait_time can be overridden for individual TaskSets</span>
     wait_time <span class="token operator">=</span> between<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">300</span><span class="token punctuation">)</span>
 
-    <span class="token comment" spellcheck="true"># TaskSets can be nested multiple levels</span>
     tasks <span class="token operator">=</span> <span class="token punctuation">{</span>
         ForumThread<span class="token punctuation">:</span><span class="token number">3</span>
     <span class="token punctuation">}</span>
@@ -1290,18 +1272,102 @@ response <span class="token operator">=</span> self<span class="token punctuatio
 <span class="token keyword">class</span> <span class="token class-name">WebsiteUser</span><span class="token punctuation">(</span>HttpUser<span class="token punctuation">)</span><span class="token punctuation">:</span>
     wait_time <span class="token operator">=</span> between<span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">15</span><span class="token punctuation">)</span>
 
-    <span class="token comment" spellcheck="true"># We can specify sub TaskSets using the tasks dict</span>
     tasks <span class="token operator">=</span> <span class="token punctuation">{</span>
         ForumPage<span class="token punctuation">:</span> <span class="token number">20</span><span class="token punctuation">,</span>
         AboutPage<span class="token punctuation">:</span> <span class="token number">10</span><span class="token punctuation">,</span>
     <span class="token punctuation">}</span>
 
-    <span class="token comment" spellcheck="true"># We can use the @task decorator as well as the</span>
-    <span class="token comment" spellcheck="true"># tasks dict in the same Locust/TaskSet</span>
     @task<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span>
     <span class="token keyword">def</span> <span class="token function">index</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">pass</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash">$ locust -f locustfile.py<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+        <span class="token keyword">pass</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] Browse Docs Sequence Test</strong></li>
+</ul>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> random
+<span class="token keyword">from</span> locust <span class="token keyword">import</span> HttpUser<span class="token punctuation">,</span> SequentialTaskSet<span class="token punctuation">,</span> task<span class="token punctuation">,</span> between
+<span class="token keyword">from</span> pyquery <span class="token keyword">import</span> PyQuery
+
+<span class="token keyword">class</span> <span class="token class-name">BrowseDocumentationSequence</span><span class="token punctuation">(</span>SequentialTaskSet<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">on_start</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>urls_on_current_page <span class="token operator">=</span> self<span class="token punctuation">.</span>toc_urls <span class="token operator">=</span> None
+
+    @task
+    <span class="token keyword">def</span> <span class="token function">index_page</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        r <span class="token operator">=</span> self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">)</span>
+        pq <span class="token operator">=</span> PyQuery<span class="token punctuation">(</span>r<span class="token punctuation">.</span>content<span class="token punctuation">)</span>
+        link_elements <span class="token operator">=</span> pq<span class="token punctuation">(</span><span class="token string">".toctree-wrapper a.internal"</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>toc_urls <span class="token operator">=</span> <span class="token punctuation">[</span>l<span class="token punctuation">.</span>attrib<span class="token punctuation">[</span><span class="token string">"href"</span><span class="token punctuation">]</span> <span class="token keyword">for</span> l <span class="token keyword">in</span> link_elements<span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/favicon.ico"</span><span class="token punctuation">)</span>
+
+    @task
+    <span class="token keyword">def</span> <span class="token function">load_page</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> url<span class="token operator">=</span>None<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        url <span class="token operator">=</span> random<span class="token punctuation">.</span>choice<span class="token punctuation">(</span>self<span class="token punctuation">.</span>toc_urls<span class="token punctuation">)</span>
+        r <span class="token operator">=</span> self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token punctuation">)</span>
+        pq <span class="token operator">=</span> PyQuery<span class="token punctuation">(</span>r<span class="token punctuation">.</span>content<span class="token punctuation">)</span>
+        link_elements <span class="token operator">=</span> pq<span class="token punctuation">(</span><span class="token string">"a.internal"</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>urls_on_current_page <span class="token operator">=</span> <span class="token punctuation">[</span>l<span class="token punctuation">.</span>attrib<span class="token punctuation">[</span><span class="token string">"href"</span><span class="token punctuation">]</span> <span class="token keyword">for</span> l <span class="token keyword">in</span> link_elements<span class="token punctuation">]</span>
+
+    @task
+    <span class="token keyword">def</span> <span class="token function">load_sub_page</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        url <span class="token operator">=</span> random<span class="token punctuation">.</span>choice<span class="token punctuation">(</span>self<span class="token punctuation">.</span>urls_on_current_page<span class="token punctuation">)</span>
+        r <span class="token operator">=</span> self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token punctuation">)</span>
+
+<span class="token keyword">class</span> <span class="token class-name">AwesomeUser</span><span class="token punctuation">(</span>HttpUser<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    tasks <span class="token operator">=</span> <span class="token punctuation">[</span>BrowseDocumentationSequence<span class="token punctuation">]</span>
+    host <span class="token operator">=</span> <span class="token string">"https://docs.locust.io/en/latest/"</span>
+    wait_time <span class="token operator">=</span> between<span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">,</span> <span class="token number">600</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] Dynamice User Credentials</strong></li>
+</ul>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> locust <span class="token keyword">import</span> HttpUser<span class="token punctuation">,</span> TaskSet<span class="token punctuation">,</span> task<span class="token punctuation">,</span> between
+
+USER_CREDENTIALS <span class="token operator">=</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">(</span><span class="token string">"user1"</span><span class="token punctuation">,</span> <span class="token string">"password"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">(</span><span class="token string">"user2"</span><span class="token punctuation">,</span> <span class="token string">"password"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">(</span><span class="token string">"user3"</span><span class="token punctuation">,</span> <span class="token string">"password"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span>
+
+<span class="token keyword">class</span> <span class="token class-name">UserBehaviour</span><span class="token punctuation">(</span>TaskSet<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">on_start</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> len<span class="token punctuation">(</span>USER_CREDENTIALS<span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">:</span>
+            user<span class="token punctuation">,</span> passw <span class="token operator">=</span> USER_CREDENTIALS<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>post<span class="token punctuation">(</span><span class="token string">"/login"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token string">"username"</span><span class="token punctuation">:</span> user<span class="token punctuation">,</span> <span class="token string">"password"</span><span class="token punctuation">:</span> passw<span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    @task
+    <span class="token keyword">def</span> <span class="token function">some_task</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/protected/resource"</span><span class="token punctuation">)</span>
+
+
+<span class="token keyword">class</span> <span class="token class-name">User</span><span class="token punctuation">(</span>HttpUser<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    tasks <span class="token operator">=</span> <span class="token punctuation">[</span>UserBehaviour<span class="token punctuation">]</span>
+    wait_time <span class="token operator">=</span> between<span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">60</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[6] Multiple Hosts</strong></li>
+</ul>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> os
+<span class="token keyword">from</span> locust <span class="token keyword">import</span> HttpUser<span class="token punctuation">,</span> TaskSet<span class="token punctuation">,</span> task<span class="token punctuation">,</span> between
+<span class="token keyword">from</span> locust<span class="token punctuation">.</span>clients <span class="token keyword">import</span> HttpSession
+
+<span class="token keyword">class</span> <span class="token class-name">MultipleHostsUser</span><span class="token punctuation">(</span>HttpUser<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    abstract <span class="token operator">=</span> <span class="token boolean">True</span>
+
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> <span class="token operator">*</span>args<span class="token punctuation">,</span> <span class="token operator">**</span>kwargs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        super<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>__init__<span class="token punctuation">(</span><span class="token operator">*</span>args<span class="token punctuation">,</span> <span class="token operator">**</span>kwargs<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>api_client <span class="token operator">=</span> HttpSession<span class="token punctuation">(</span>base_url<span class="token operator">=</span>os<span class="token punctuation">.</span>environ<span class="token punctuation">[</span><span class="token string">"API_HOST"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+<span class="token keyword">class</span> <span class="token class-name">UserTasks</span><span class="token punctuation">(</span>TaskSet<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    @task
+    <span class="token keyword">def</span> <span class="token function">index</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>user<span class="token punctuation">.</span>client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">)</span>
+
+    @task
+    <span class="token keyword">def</span> <span class="token function">index_other_host</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>user<span class="token punctuation">.</span>api_client<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"/stats/requests"</span><span class="token punctuation">)</span>
+
+<span class="token keyword">class</span> <span class="token class-name">WebsiteUser</span><span class="token punctuation">(</span>MultipleHostsUser<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    host <span class="token operator">=</span> <span class="token string">"http://127.0.0.1:8089"</span>
+    wait_time <span class="token operator">=</span> between<span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span>
+    tasks <span class="token operator">=</span> <span class="token punctuation">[</span>UserTasks<span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -1849,7 +1915,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">746k</span>&nbsp;字
+                class="white-color">746.1k</span>&nbsp;字
             
             
             
