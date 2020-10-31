@@ -4,7 +4,7 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
-    <meta name="keywords" content="Linux服务之Samba服务器, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="keywords" content="Linux服务之NFS服务器, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Linux服务之Samba服务器 | Escape</title>
+    <title>Linux服务之NFS服务器 | Escape</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -307,7 +307,7 @@
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Linux服务之Samba服务器</h1>
+                    <h1 class="description center-align post-title">Linux服务之NFS服务器</h1>
                 </div>
             </div>
         </div>
@@ -463,14 +463,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    71
+                    4.3k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    16 分
                 </div>
                 
 
@@ -488,9 +488,437 @@
                 <blockquote>
 <p><strong>纸上得来终觉浅，绝知此事要躬行。</strong></p>
 </blockquote>
-<p><img src="/images/linux-samba-server.jpg" alt="Linux服务之NFS服务器"></p>
+<p><img src="/images/linux-nfs-server.jpg" alt="Linux服务之NFS服务器"></p>
 <hr>
-<h2 id="1-基础知识"><a href="#1-基础知识" class="headerlink" title="1. 基础知识"></a>1. 基础知识</h2><script>
+<h2 id="1-NFS-协议"><a href="#1-NFS-协议" class="headerlink" title="1. NFS 协议"></a>1. NFS 协议</h2><blockquote>
+<p><strong><code>NFS</code>服务工作在<code>TCP</code>的<code>2049</code>端口，<code>UDP</code>的<code>2049</code>端口。</strong></p>
+</blockquote>
+<p><code>NFS</code>是<code>Network File System</code>的缩写，即<strong>网络文件系统</strong>，是一种使用于分散式文件系统的协定。功能是通过网络让不同的机器、不同的操作系统能够彼此分享个别的数据，让应用程序在客户端通过网络访问位于服务器磁盘中的数据，是在类<code>Unix</code>系统间实现磁盘文件共享的一种方法。</p>
+<p>这个<code>NFS</code>服务器可以让你的<code>PC</code>来将网络远程的<code>NFS</code>服务器分享的目录，挂载到本地端的机器当中， 在本地端的机器看起来，那个远程主机的目录就好像是自己的一个磁盘分区槽一样。</p>
+<hr>
+<h3 id="1-1-工作原理"><a href="#1-1-工作原理" class="headerlink" title="1.1 工作原理"></a>1.1 工作原理</h3><p>因为  <code>NFS</code>  支持的功能相当的多，而不同的功能都会使用不同的程序来启动， 每启动一个功能就会启用一些端口来传输数据，因此， <code>NFS</code>  的功能所对应的端口才没有固定住， 而是随机取用一些未被使用的小于  <code>1024</code>  的端口来作为传输之用。但如此一来又造成客户端想要连上服务器时的困扰， 因为客户端得要知道服务器端的相关端口才能够联机吧！</p>
+<p><code>NFS</code>在文件传送或信息传送过程中依赖于<code>RPC</code>协议。<code>RPC</code>，即<strong>远程过程调用</strong>的缩写，是能使客户端执行其他系统中程序的一种机制。<code>RPC</code>  最主要的功能就是在指定每个  <code>NFS</code>  功能所对应的端口号，并且回报给客户端，让客户端可以连结到正确的端口上去。</p>
+<p><code>NFS</code>本身是没有提供信息传输的协议和功能的，但<code>NFS</code>却能让我们通过网络进行资料的分享，这是因为<code>NFS</code>使用了一些其它的传输协议。而这些传输协议用到这个<code>RPC</code>功能的。可以说<code>NFS</code>本身就是使用<code>RPC</code>的一个程序，或者说<code>NFS</code>也是一个<code>RPC SERVER</code>。所以只要用到<code>NFS</code>的地方都要启动<code>RPC</code>服务，不论是<code>NFS SERVER</code>或者<code>NFS CLIENT</code>。这样<code>SERVER</code>和<code>CLIENT</code>才能通过<code>RPC</code>来实现<code>PROGRAM PORT</code>的对应。可以这么理解<code>RPC</code>和<code>NFS</code>的关系：<strong><code>NFS</code>是一个文件系统，而<code>RPC</code>是负责负责信息的传输</strong>。</p>
+<p>事实上，有很多这样的服务器都是向  <code>RPC</code>  注册的，举例来说，<code>NIS</code> (<code>Network Information Service</code>) 也是  <code>RPC server</code>  的一种。</p>
+<p><img src="/images/linux-nfs-server-1.png" alt="Linux服务之NFS服务器"></p>
+<p><strong>那<code>RPC</code>又是如何知道每个<code>NFS</code>的端口呢？</strong></p>
+<ul>
+<li>这是因为当服务器在启动  <code>NFS</code>  时会随机取用数个端口，并主动的向  <code>RPC</code>  注册，因此  <code>RPC</code>  可以知道每个埠口对应的  <code>NFS</code>  功能，然后  <code>RPC</code>  又是固定使用  <code>111</code>  端口来监听客户端的需求并报客户端正确的埠口， 所以当然可以让  <code>NFS</code>  的启动更为轻松愉快了。</li>
+<li>所以你要注意，要启动  <code>NFS</code>  之前，<code>RPC</code>  就要先启动了，否则  <code>NFS</code>  会无法向  <code>RPC</code>  注册。 另外，<code>RPC</code>  若重新启动时，原本注册的数据会不见，因此  <code>RPC</code>  重新启动后，它管理的所有服务都要重新启动来重新向  <code>RPC</code>  注册。</li>
+</ul>
+<p><strong>那客户端如何向<code>NFS</code>服务端交换数据数据呢？</strong></p>
+<ul>
+<li>(1) 客户端会向服务器端的  <code>RPC</code>  的<code>111</code>端口发出  <code>NFS</code>  档案存取功能的询问要求</li>
+<li>(2) 服务器端找到对应的已注册的  <code>NFS</code>  守护进程端口后，会回报给客户端</li>
+<li>(3) 客户端了解正确的端口后，就可以直接与  <code>NFS</code>  守护进程来联机</li>
+</ul>
+<hr>
+<h3 id="1-2-激活-NFS-服务"><a href="#1-2-激活-NFS-服务" class="headerlink" title="1.2 激活 NFS 服务"></a>1.2 激活 NFS 服务</h3><blockquote>
+<p><strong><code>NFS</code>  服务需要激活几个重要的  <code>RPC</code>  守护进程</strong></p>
+</blockquote>
+<p><strong>工作流程</strong></p>
+<ul>
+<li><code>nfs—client</code> =&gt; <code>portmapper</code> =&gt; <code>mountd</code> =&gt; <code>nfs-server(nfsd)</code></li>
+</ul>
+<p><img src="/images/linux-nfs-server-2.png" alt="Linux服务之NFS服务器"></p>
+<p><strong>(1) <code>rpc.nfsd</code></strong></p>
+<ul>
+<li>这个守护进程主要的功能，则是在管理客户端是否能够登入主机的权限，其中还包含这个登入者的  <code>ID</code>  的判别。</li>
+</ul>
+<p><strong>(2) <code>rpc.mountd</code></strong></p>
+<ul>
+<li>主要功能<ul>
+<li>这个守护进程主要的功能，则是在管理  <code>NFS</code>  的档案系统，用于给用户提供访问令牌。</li>
+<li>访问的令牌，由本地的<code>RPC</code>提供随机端口。本地的<code>RPC</code>叫做<code>portmapper</code>，可以使用<code>rpcinfo -P</code>查看。</li>
+<li><code>RPC</code>的<code>portmapper</code>服务工作在<code>1111</code>端口。</li>
+</ul>
+</li>
+<li>请求过程<ul>
+<li>当客户端顺利的通过  <code>rpc.nfsd</code>  而登入主机之后，在它可以使用  <code>NFS server</code>  提供的档案之前，还会经过档案使用权限 的认证程序，就是那个<code>-rwxrwxrwx</code>、<code>owner</code>、<code>group</code>那几个权限啦。</li>
+<li>然后它会去读  <code>NFS</code>  的设定档  <code>/etc/exports</code>  来比对客户端的权限，当通过这一关之后，客户端就可以取得使用  <code>NFS</code>  档案的权限啦。</li>
+</ul>
+</li>
+</ul>
+<p><strong>注释：<code>NFS</code>需要有两个套件</strong></p>
+<ul>
+<li><strong><code>nfs-utils</code></strong><ul>
+<li><code>NFS</code>服务的主要套件</li>
+<li>提供<code>rpc.nfsd</code>和<code>rpc.mountd</code>两个<code>NFS</code>守护进程和与其它相关文档与说明文件、执行档等的套件</li>
+</ul>
+</li>
+<li><strong><code>portmap</code></strong><ul>
+<li>主要负责<code>RPC</code>端口和守护进程的映射关系，即<code>portmapper</code></li>
+<li>在激活任何一个<code>RPC server</code>之前，我们都需要激活<code>portmapper</code>才行</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="1-3-各个版本之间的比较"><a href="#1-3-各个版本之间的比较" class="headerlink" title="1.3 各个版本之间的比较"></a>1.3 各个版本之间的比较</h3><p><code>NFS</code>是一种网络文件系统，从<code>1985</code>年推出至今，共发布了<code>3</code>个版本：<code>NFSv2</code>、<code>NFSv3</code>、<code>NFSv4</code>，<code>NFSv4</code>包含两个次版本<code>NFSv4.0</code>和<code>NFSv4.1</code>。经过<code>20</code>多年发展，<code>NFS</code>发生了非常大的变化，最大的变化就是推动者从<code>Sun</code>变成了<code>NetApp</code>，<code>NFSv2</code>和<code>NFSv3</code>基本上是<code>Sun</code>起草的，<code>NetApp</code>从<code>NFSv4.0</code>参与进来，并且主导了<code>NFSv4.1</code>标准的制定过程，而<code>Sun</code>已经被<code>Oracle</code>收购了。</p>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>协议版本</th>
+<th>RFC</th>
+<th>时间</th>
+<th>页数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><code>NFSv2</code></td>
+<td>rfc1094</td>
+<td>1989 年 3 月</td>
+<td>27 页</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>NFSv3</code></td>
+<td>rfc1813</td>
+<td>1995 年 6 月</td>
+<td>126 页</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>NFSv4.0</code></td>
+<td>rfc3530</td>
+<td>2003 年 4 月</td>
+<td>275 页</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>NFSv4.1</code></td>
+<td>rfc5661</td>
+<td>2010 年 1 月</td>
+<td>617 页</td>
+</tr>
+</tbody></table>
+<p><strong>1. NFSv2</strong></p>
+<ul>
+<li><code>NFSv2</code>是第一个以<code>RFC</code>形式发布的版本，实现了基本的功能。</li>
+</ul>
+<p><strong>2. NFSv3</strong></p>
+<ul>
+<li>协议特点<ul>
+<li><code>NFSv3</code>修正了<code>NFSv2</code>的一些<code>bug</code>，两者有如下一些差别，但是感觉没有本质的差别。</li>
+</ul>
+</li>
+<li>区别差别<ul>
+<li>(1) <code>NFSv2</code>只支持同步写，如果客户端向服务器端写入数据，服务器必须将数据写入磁盘中才能发送应答消息。<code>NFSv3</code>支持异步写操作，服务器只需要将数据写入缓存中就可以发送应答信息了。</li>
+<li>(2) <code>NFSv3</code>增加了<code>ACCESS</code>请求，<code>ACCESS</code>用来检查用户的访问权限。因为服务器端可能进行<code>uid</code>映射，因此客户端的<code>uid</code>和<code>gid</code>不能正确反映用户的访问权限。</li>
+<li>(3) 一些请求调整了参数和返回信息，毕竟<code>NFSv3</code>和<code>NFSv2</code>发布的间隔有<code>6</code>年，经过长期运行可能觉得<code>NFSv2</code>某些请求参数和返回信息需要改进。</li>
+</ul>
+</li>
+</ul>
+<p><strong>3. NFSv4.0</strong></p>
+<ul>
+<li>协议特点<ul>
+<li>相比<code>NFSv3</code>，<code>NFSv4</code>发生了比较大的变化，最大的变化是<code>NFSv4</code>有状态了。<code>NFSv2</code>和<code>NFSv3</code>都是无状态协议，服务区端不需要维护客户端的状态信息。</li>
+<li>无状态协议的一个优点在于灾难恢复，当服务器出现问题后，客户端只需要重复发送失败请求就可以了，直到收到服务器的响应信息。</li>
+</ul>
+</li>
+<li>区别差别<ul>
+<li>(1) <code>NFSv4</code>增加了安全性，支持<code>RPCSEC-GSS</code>身份认证。</li>
+<li>(2) <code>NFSv4</code>设计成了一种有状态的协议，自身实现了文件锁功能和获取文件系统根节点功能。</li>
+<li>(3) <code>NFSv4</code>只提供了两个请求<code>NULL</code>和<code>COMPOUND</code>，所有的操作都整合进了<code>COMPOUND</code>中，客户端可以根据实际请求将多个操作封装到一个<code>COMPOUND</code>请求中，增加了灵活性。</li>
+<li>(4) <code>NFSv4</code>文件系统的命令空间发生了变化，服务器端必须设置一个根文件系统(<code>fsid=0</code>)，其他文件系统挂载在根文件系统上导出。</li>
+<li>(5) <code>NFSv4</code>支持<code>delegation</code>。由于多个客户端可以挂载同一个文件系统，为了保持文件同步，<code>NFSv3</code>中客户端需要经常向服务器发起请求，请求文件属性信息，判断其他客户端是否修改了文件。如果文件系统是只读的，或者客户端对文件的修改不频繁，频繁向服务器请求文件属性信息会降低系统性能。<code>NFSv4</code>可以依靠<code>delegation</code>实现文件同步。</li>
+<li>(6) <code>NFSv4</code>修改了文件属性的表示方法。由于<code>NFS</code>是<code>Sun</code>开发的一套文件系统，设计之出<code>NFS</code>文件属性参考了<code>UNIX</code>中的文件属性，可能<code>Windows</code>中不具备某些属性，因此<code>NFS</code>对操作系统的兼容性不太好。</li>
+</ul>
+</li>
+</ul>
+<p><strong>4. NFSv4.1</strong></p>
+<ul>
+<li>与<code>NFSv4.0</code>相比，<code>NFSv4.1</code>最大的变化是支持并行存储了。在以前的协议中，客户端直接与服务器连接，客户端直接将数据传输到服务器中。</li>
+<li>当客户端数量较少时这种方式没有问题，但是如果大量的客户端要访问数据时，<code>NFS</code>服务器很快就会成为一个瓶颈，抑制了系统的性能。<code>NFSv4.1</code>支持并行存储，服务器由一台元数据服务器(<code>MDS</code>)和多台数据服务器(<code>DS</code>)构成，元数据服务器只管理文件在磁盘中的布局，数据传输在客户端和数据服务器之间直接进行。由于系统中包含多台数据服务器，因此数据可以以并行方式访问，系统吞吐量迅速提升。</li>
+</ul>
+<hr>
+<h2 id="2-NFS-服务"><a href="#2-NFS-服务" class="headerlink" title="2. NFS 服务"></a>2. NFS 服务</h2><blockquote>
+<p><code>CentOS7</code>以<code>NFSv4</code>作为默认版本，<code>NFSv4</code>使用<code>TCP</code>协议（端口号是<code>2049</code>）和<code>NFS</code>服务器建立连接。</p>
+</blockquote>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 系统环境</span>
+系统平台：CentOS release 7.0 <span class="token punctuation">(</span>Final<span class="token punctuation">)</span>
+NFS Server IP：192.168.10.10
+防火墙已关闭/iptables: Firewall is not running.
+SELINUX<span class="token operator">=</span>disabled<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-1-安装-NFS-服务"><a href="#2-1-安装-NFS-服务" class="headerlink" title="2.1 安装 NFS 服务"></a>2.1 安装 NFS 服务</h3><ul>
+<li><strong>服务端</strong><ul>
+<li>服务端，程序包名<code>nfs-utils</code>、<code>rpcbind</code>，默认都已经安装了</li>
+<li>可以通过<code>rpm -ql nfs-utils</code>查看帮助文档等信息</li>
+</ul>
+</li>
+<li><strong>客户端</strong><ul>
+<li>客户端，需要安装程序包名<code>nfs-utils</code>，提供基本的客户端命令工具</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># yum install nfs-utils</span>
+Loaded plugins: langpacks, product-id, subscription-manager
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+Package 1:nfs-utils-1.3.0-0.el7.x86_64 already installed and latest version
+Nothing to <span class="token keyword">do</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>查看<code>NFS</code>服务端口</strong><ul>
+<li><code>NFS</code>启动时会随机启动多个端口并向<code>RPC</code>注册，为了方便配置防火墙，需要固定<code>NFS</code>服务端口。</li>
+<li>这样如果使用<code>iptables</code>对<code>NFS</code>端口进行限制就会有点麻烦，可以更改配置文件固定<code>NFS</code>服务相关端口</li>
+<li>分配端口，编辑配置文件<code>/etc/sysconfig/nfs</code></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用rpcinfo -P会发现rpc启动了很多监听端口</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># rpcinfo -p localhost</span>
+   program vers proto   port  <span class="token function">service</span>
+    100000    4   tcp    111  portmapper
+    100000    2   udp    111  portmapper
+    100005    1   udp  49979  mountd
+    100005    1   tcp  58393  mountd
+    100003    2   tcp   2049  nfs
+    100227    2   tcp   2049  nfs_acl
+    <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+
+<span class="token comment" spellcheck="true"># 添加如下</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># vim /etc/sysconfig/nfs</span>
+RQUOTAD_PORT<span class="token operator">=</span>30001
+LOCKD_TCPPORT<span class="token operator">=</span>30002
+LOCKD_UDPPORT<span class="token operator">=</span>30002
+MOUNTD_PORT<span class="token operator">=</span>30003
+STATD_PORT<span class="token operator">=</span>30004<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>启动服务</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># service nfs start</span>
+Starting NFS services:        <span class="token punctuation">[</span>OK<span class="token punctuation">]</span>
+Starting NFS quotas:          <span class="token punctuation">[</span>OK<span class="token punctuation">]</span>
+Starting NFS mountd:          <span class="token punctuation">[</span>OK<span class="token punctuation">]</span>
+Starting NFS daemon:          <span class="token punctuation">[</span>OK<span class="token punctuation">]</span>
+Starting NFS idmapd:          <span class="token punctuation">[</span>OK<span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-2-服务文件配置"><a href="#2-2-服务文件配置" class="headerlink" title="2.2 服务文件配置"></a>2.2 服务文件配置</h3><ul>
+<li><strong>相关文件和命令</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>文件名</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>/etc/exports</code></strong></td>
+<td>NFS 服务器端需要设定的内容，其作用是设定谁拥有什么样的权限去访问此机器的哪个目录</td>
+</tr>
+<tr>
+<td><code>/var/lib/nfs/etab</code></td>
+<td>无需设定，用于纪录 NFS 服务器完整的权限设定，exports 中没有设定的缺省值也会被列出</td>
+</tr>
+<tr>
+<td><code>/var/lib/nfs/xtab</code></td>
+<td>纪录 NFS 连接的相关信息</td>
+</tr>
+<tr>
+<td><code>/usr/sbin/exportfs</code></td>
+<td>NFS 设定管理命令，用于 Server 侧设定，通过此条命令使得 exports 的设定变得有效或者无效</td>
+</tr>
+<tr>
+<td><code>/usr/sbin/showmount</code></td>
+<td>用于显示 NFS 设定的相关信息，Server 端和 Client 端均可</td>
+</tr>
+</tbody></table>
+<p><strong>配置文件<code>/etc/exports</code></strong></p>
+<ul>
+<li>我们可以按照<strong>“共享目录的路径 允许访问的 NFS 客户端(共享权限参数)”</strong>的格式，定义要共享的目录与相应的权限</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>常用参数</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ro</code></td>
+<td>只读</td>
+</tr>
+<tr>
+<td><code>rw</code></td>
+<td>读写</td>
+</tr>
+<tr>
+<td><code>sync</code></td>
+<td>同时将数据写入到内存与硬盘中，保证不丢失数据</td>
+</tr>
+<tr>
+<td><code>async</code></td>
+<td>优先将数据保存到内存，然后再写入硬盘；这样效率更高，但可能会丢失数据</td>
+</tr>
+<tr>
+<td><code>root_squash</code></td>
+<td>当 NFS 客户端以 root 管理员访问时，映射为 NFS 服务器的匿名用户</td>
+</tr>
+<tr>
+<td><code>all_squash</code></td>
+<td>无论 NFS 客户端使用什么账户访问，均映射为 NFS 服务器的匿名用户</td>
+</tr>
+<tr>
+<td><code>no_root_squash</code></td>
+<td>当 NFS 客户端以 root 管理员访问时，映射为 NFS 服务器的 root 管理员</td>
+</tr>
+<tr>
+<td><code>secure</code></td>
+<td>这个选项是缺省选项，它使用了 1024 以下的 TCP/IP 端口实现 NFS 的连接</td>
+</tr>
+<tr>
+<td><code>insecure</code></td>
+<td>禁止使用了 1024 以下的 TCP/IP 端口实现 NFS 的连接</td>
+</tr>
+<tr>
+<td><code>no_wdelay</code></td>
+<td>这个选项关闭写延时，如果设置了 async，那么 NFS 就会忽略这个选项</td>
+</tr>
+<tr>
+<td><code>nohide</code></td>
+<td>如果将一个目录挂载到另外一个目录之上，那么原来的目录通常就被隐藏起来或看起来像空的一样。要禁用这种行为，需启用 hide 选项</td>
+</tr>
+<tr>
+<td><code>no_subtree_check</code></td>
+<td>这个选项关闭子树检查，子树检查会执行一些不想忽略的安全性检查，缺省选项是启用子树检查</td>
+</tr>
+<tr>
+<td><code>no_auth_nlm</code></td>
+<td>这个选项也可以作为<code>insecure_locks</code>指定，它告诉 NFS 守护进程不要对加锁请求进行认证。如果关心安全性问题，就要避免使用这个选项。缺省选项是<code>auth_nlm</code>或<code>secure_locks</code>。</td>
+</tr>
+<tr>
+<td><code>mp(mountpoint=path)</code></td>
+<td>通过显式地声明这个选项，NFS 要求挂载所导出的目录</td>
+</tr>
+<tr>
+<td><code>fsid=num</code></td>
+<td>这个选项通常都在 NFS 故障恢复的情况中使用，如果希望实现 NFS 的故障恢复，请参考 NFS 文档</td>
+</tr>
+</tbody></table>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat /etc/exports</span>
+/nfsfile 192.168.10.*<span class="token punctuation">(</span>rw,sync,root_squash<span class="token punctuation">)</span>
+/tmp/serverdir 192.168.174.132<span class="token punctuation">(</span>rw,sync,no_root_squash<span class="token punctuation">)</span> 192.168.174.133<span class="token punctuation">(</span>ro,sync,no_root_squash<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="3-实战演示"><a href="#3-实战演示" class="headerlink" title="3. 实战演示"></a>3. 实战演示</h2><blockquote>
+<p>如果有兴趣，可以尝试：两台 web 服务器，共享关系型数据库，共享 NFS 服务器，利用 DNS 记录轮询提供负载均衡</p>
+</blockquote>
+<ul>
+<li><strong>第 1 步：机器设置</strong><ul>
+<li>创建服务端和客户端</li>
+<li>关闭<code>iptables</code>和<code>selinux</code>服务</li>
+</ul>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>主机名称</th>
+<th>操作系统</th>
+<th>IP 地址</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>NFS 服务端</td>
+<td>RHEL 7</td>
+<td>192.168.10.10</td>
+</tr>
+<tr>
+<td>NFS 客户端</td>
+<td>RHEL 7</td>
+<td>192.168.10.20</td>
+</tr>
+</tbody></table>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 清空NFS服务器上面iptables防火墙的默认策略，以免默认的防火墙策略禁止正常的NFS共享服务</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># iptables -F</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># service iptables save</span>
+iptables: Saving firewall rules to /etc/sysconfig/iptables:<span class="token punctuation">[</span> OK <span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>第 2 步：创建共享目录</strong></p>
+<ul>
+<li>在<code>NFS</code>服务器上，建立用于<code>NFS</code>文件共享的目录</li>
+<li>在<code>NFS</code>服务器上，设置足够的权限确保其他人也有写入权限</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># mkdir /nfsfile</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># chmod -Rf 777 /nfsfile</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># echo "welcome to localhost.com" > /nfsfile/readme</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>第 3 步：编辑配置文件/etc/exports</strong><ul>
+<li>定义要共享的目录与相应的权限</li>
+<li>请注意，NFS 客户端地址与权限之间没有空格</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 把/nfsfile目录共享给192.168.10.0/24网段内的所有主机，让这些主机都拥有读写权限</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># vim /etc/exports</span>
+/nfsfile 192.168.10.*<span class="token punctuation">(</span>rw,sync,root_squash<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p><strong>第 4 步：启动和启用 NFS 服务程序</strong></p>
+<ul>
+<li>在启动<code>NFS</code>服务之前，还需要顺带重启并启用<code>rpcbind</code>服务程序，并将这两个服务一并加入开机启动项中</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># systemctl restart rpcbind</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># systemctl enable rpcbind</span>
+
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># systemctl start nfs-server</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># systemctl enable nfs-server</span>
+<span class="token function">ln</span> -s <span class="token string">'/usr/lib/systemd/system/nfs-server.service'</span> <span class="token string">'/etc/systemd/system/nfs.target.wants/nfs-server.service'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>第 5 步：NFS 客户端的配置</strong></p>
+<ul>
+<li>使用<code>showmount</code>命令查询<code>NFS</code>服务器的远程共享信息</li>
+<li><code>showmount</code>命令输出格式为<strong>“共享的目录名称 允许使用客户端地址”</strong></li>
+</ul>
+<hr>
+<p><strong><code>showmount</code>命令</strong></p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-e</code></td>
+<td>显示 NFS 服务器的共享列表</td>
+</tr>
+<tr>
+<td><code>-a</code></td>
+<td>显示本机挂载的文件资源的情况 NFS 资源的情况</td>
+</tr>
+<tr>
+<td><code>-v</code></td>
+<td>显示版本号</td>
+</tr>
+</tbody></table>
+<p><strong><code>exportfs</code>命令</strong></p>
+<ul>
+<li>维护<code>exports</code>文件导出的文件系统表的专用工具，可以修改配置之后不重启<code>NFS</code>服务</li>
+<li><code>export -ar</code>：重新导出所有的文件系统</li>
+<li><code>export -au</code>：关闭导出的所有文件系统</li>
+<li><code>export -u FS</code>:：关闭指定的导出的文件系统</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看NFS服务器端共享的文件系统</span>
+<span class="token comment" spellcheck="true"># showmount -e NFSSERVER_IP</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># showmount -e 192.168.10.10</span>
+Export list <span class="token keyword">for</span> 192.168.10.10:
+/nfsfile 192.168.10.*
+
+<span class="token comment" spellcheck="true"># NFS客户端创建一个挂载目录，挂载服务端NFS文件系统到本地</span>
+<span class="token comment" spellcheck="true"># mount -t nfs SERVER:/path/to/sharedfs  /path/to/mount_point</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># mkdir /nfsfile</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># mount -t nfs 192.168.10.10:/nfsfile /nfsfile</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 挂载成功后就应该能够顺利地看到在执行前面的操作时写入的文件内容了</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat /nfsfile/readme</span>
+welcome to linuxprobe.com
+
+<span class="token comment" spellcheck="true"># 如果希望NFS文件共享服务能一直有效，则需要将其写入到fstab文件中</span>
+<span class="token comment" spellcheck="true"># SERVER:/PATH/TO/EXPORTED_FS  /mount_point  nfs  defaults,_netdev  0  0</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># vim /etc/fstab</span>
+/dev/mapper/rhel-root / xfs defaults 1 1
+UUID<span class="token operator">=</span>812b1f7c-8b5b-43da-8c06-b9999e0fe48b /boot xfs defaults 1 2
+/dev/mapper/rhel-swap swap swap defaults 0 0
+/dev/cdrom /media/cdrom iso9660 defaults 0 0
+192.168.10.10:/nfsfile /nfsfile nfs defaults 0 0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -744,12 +1172,12 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/posts/c49dfbab.html">
+                <a href="/posts/f4e4ea9e.html">
                     <div class="card-image">
                         
-                        <img src="/images/linux-nfs-server.jpg" class="responsive-img" alt="Linux服务之NFS服务器">
+                        <img src="/images/linux-samba-server.jpg" class="responsive-img" alt="Linux服务之Samba服务器">
                         
-                        <span class="card-title">Linux服务之NFS服务器</span>
+                        <span class="card-title">Linux服务之Samba服务器</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -760,7 +1188,7 @@
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2018-06-13
+                            <i class="far fa-clock fa-fw icon-date"></i>2018-06-14
                         </span>
                         <span class="publish-author">
                             
@@ -1033,7 +1461,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">759.1k</span>&nbsp;字
+                class="white-color">763.7k</span>&nbsp;字
             
             
             
