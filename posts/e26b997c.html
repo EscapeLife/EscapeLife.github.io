@@ -1,0 +1,1340 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="LVS服务之体系结构, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>LVS服务之体系结构 | Escape</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Escape</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Escape</div>
+        <div class="logo-desc">
+            
+            听摇滚,但不偏颇;也挺古典,但不安逸
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/EscapeLife" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/EscapeLife" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/linux-lvs-cluster-tech-10.png')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">LVS服务之体系结构</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Linux/">
+                                <span class="chip bg-color">Linux</span>
+                            </a>
+                        
+                            <a href="/tags/LVS/">
+                                <span class="chip bg-color">LVS</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                Linux运维之路
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2018-07-06
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2020-11-02
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    6.9k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    24 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <blockquote>
+<p><strong>LVS 服务之可伸缩网络服务的体系结构。</strong></p>
+</blockquote>
+<p>人类社会正在进入以网络为中心的信息时代，人们需要更快捷、更可靠、功能更丰富的网络服务。万维网的流行促进互联网使用的指数级增长，现在很多站点收到前所未有的访问负载，经常担心系统如何被扩展来满足不断增长的性能需求，同时系统如何保持 <code>24x7</code> 的可用性。未来的应用将需要更高的吞吐率、更好的交互性、更高的安全性，这要求服务平台具有更强的处理能力和更高的可用性。所以，如何给出合理的框架和有效的设计方法，来建立高性能、高可伸缩、高可用的网络服务，这是摆在研究者和系统设计者面前极富挑战性的任务。</p>
+<p><img src="/images/linux-lvs-cluster-tech-10.png" alt="LVS服务之体系结构"></p>
+<hr>
+<h2 id="1-可伸缩网络服务的定义"><a href="#1-可伸缩网络服务的定义" class="headerlink" title="1. 可伸缩网络服务的定义"></a>1. 可伸缩网络服务的定义</h2><p><strong>可伸缩性</strong>(<code>Scalability</code>)是在当今计算机技术中经常用到的词汇。对于不同的人，可伸缩性有不同的含义。 现在，我们来定义可伸缩网络服务的含义。</p>
+<p>可伸缩网络服务是指网络服务能随着用户数目的增长而扩展其性能，如在系统中增加服务器、内存或硬盘等；整个系统很容易被扩展，无需重新设置整个系统，无需中断服务。换句话说，系统管理员扩展系统的操作对最终用户是透明的，他们不会知道系统的改变。</p>
+<p>可伸缩系统通常是高可用的系统。在部分<strong>硬件</strong>(如硬盘、服务器、子网络)和部分<strong>软件</strong>(如操作系统、服务进程)的失效情况下，系统可以继续提供服务，最终用户不会感知到整个服务的中断，除了正在失效点上处理请求的部分用户可能会收到服务处理失败，需要重新提交请求。<strong><code>Caching</code>和复制是建立高可用系统的常用技术</strong>，建立多个副本会导致如何将原件的修改传播到多个副本上的问题。</p>
+<p>实现可伸缩网络服务的方法一般是通过<strong>一对多的映射机制</strong>，将服务请求流<strong>分而治之</strong>(<code>Divide and Conquer</code>)到多个结点上处理。一对多的映射可以在很多层次上存在，如主机名上的<code>DNS</code>系统、网络层的<code>TCP/IP</code>、文件系统等。<strong>虚拟</strong>(<code>Virtual</code>)是描述一对多映射机制的词汇，将多个实体组成一个逻辑上的、虚拟的整体。例如，<strong>虚存</strong>(<code>Virtual Memory</code>)是现代操作系统中最典型的一对多映射机制，虚存建立一个虚拟内存空间，将它映射到多个物理内存上。</p>
+<hr>
+<h2 id="2-网络服务的需求"><a href="#2-网络服务的需求" class="headerlink" title="2. 网络服务的需求"></a>2. 网络服务的需求</h2><p>随着<code>Internet</code>的飞速发展和对我们生活的深入影响，越来越多的企业把他们与顾客和业务伙伴之间的联络搬到互联网上，通过网络来完成交易，建立与客户之间的联系。例如，比较热门的<code>Web</code>站点会因为被访问次数急剧增长而不能及时处理用户的请求，导致用户进行长时间的等待，大大降低了服务质量。另外，随着电子商务等关键性应用在网上运行，任何例外的服务中断都将造成不可估量的损失，服务的高可用性也越来越重要。所以，对用硬件和软件方法实现高可伸缩、高可用网络服务的需求不断增长，这种需求可以归结以下几点：</p>
+<ul>
+<li><strong>可伸缩性</strong>(<code>Scalability</code>)<ul>
+<li>当服务的负载增长时，系统能被扩展来满足需求，且不降低服务质量。</li>
+</ul>
+</li>
+<li><strong>高可用性</strong>(<code>Availability</code>)<ul>
+<li>尽管部分硬件和软件会发生故障，整个系统的服务必须<code>7*24</code>可用。</li>
+</ul>
+</li>
+<li><strong>可管理性</strong>(<code>Manageability</code>)<ul>
+<li>整个系统可能在物理上很大，但应该容易管理。</li>
+</ul>
+</li>
+<li><strong>价格有效性</strong>(<code>Cost-effectiveness</code>)<ul>
+<li>整个系统实现是经济的、易支付的。</li>
+</ul>
+</li>
+</ul>
+<p>单服务器显然不能处理不断增长的负载，升级方法有下列不足：</p>
+<ul>
+<li>一是<strong>升级过程繁琐</strong>，机器切换会使服务暂时中断，并造成原有计算资源的浪费。</li>
+<li>二是越往高端的服务器，所花费的<strong>代价越大</strong>。</li>
+<li>三是一旦该服务器或应用软件失效，会导致整个<strong>服务的中断</strong>。</li>
+</ul>
+<p>通过高性能网络或局域网互联的服务器集群正成为实现高可伸缩的、高可用网络服务的有效结构。这种<strong>松耦合结构</strong>比紧耦合的多处理器系统具有更好的伸缩性和性能价格比，组成集群的<code>PC</code>服务器或<code>RISC</code>服务器和标准网络设备因为大规模生产，价格低，具有很高的性能价格比。但是，这里有很多挑战性的工作，如何在集群系统实现并行网络服务，它对外是透明的，它具有良好的可伸缩性和可用性。</p>
+<p>针对上述需求，我们给出了基于 IP 层和基于内容请求分发的负载平衡调度解决方法，并在<code>Linux</code>内核中实现了这些方法，将一组服务器构成一个实现可伸缩的、高可用网络服务的服务器集群，我们称之为<code>Linux</code>虚拟服务器(<code>Linux Virtual Server</code>)。在<code>LVS</code>集群中，使得服务器集群的结构对客户是透明的，客户访问集群提供的网络服务就像访问一台高性能、高可用的服务器一样。客户程序不受服务器集群的影响不需作任何修改。系统的伸缩性通过在服务机群中透明地加入和删除一个节点来达到，通过检测节点或服务进程故障和正确地重置系统达到高可用性。</p>
+<hr>
+<h2 id="3-LVS-集群的体系结构"><a href="#3-LVS-集群的体系结构" class="headerlink" title="3. LVS 集群的体系结构"></a>3. LVS 集群的体系结构</h2><blockquote>
+<p>下面先给出<code>LVS</code>集群的通用结构，讨论了它的设计原则和相应的特点，然后将<code>LVS</code>集群应用于建立可伸缩的<code>Web</code>、<code>Media</code>、<code>Cache</code>和<code>Mail</code>等服务。</p>
+</blockquote>
+<h3 id="3-1-LVS-集群的通用结构"><a href="#3-1-LVS-集群的通用结构" class="headerlink" title="3.1 LVS 集群的通用结构"></a>3.1 LVS 集群的通用结构</h3><p><code>LVS</code>集群采用<strong>IP 负载均衡技术</strong>和基于<strong>内容请求分发技术</strong>。调度器具有很好的吞吐率，将请求均衡地转移到不同的服务器上执行，且调度器自动屏蔽掉服务器的故障，从而将一组服务器构成一个高性能的、高可用的虚拟服务器。</p>
+<p><img src="/images/linux-lvs-cluster-tech-11.jpg" alt="LVS服务之体系结构"></p>
+<p>为此，在设计时需要考虑系统的透明性、可伸缩性、高可用性和易管理性。<code>LVS</code>集群的体系结构如图所示，它有三个主要组成部分：</p>
+<ul>
+<li><strong>负载调度器</strong>(<code>load balancer</code>)<ul>
+<li>负载调度器是整个集群对外面的前端机，负责将客户的请求发送到一组服务器上执行，而客户认为服务是来自一个<code>IP</code>地址上的。它可以是用<strong>IP 负载均衡技术</strong>的负载调度器，也可以是基于<strong>内容请求分发</strong>的负载调度器，还可以是两者的结合。</li>
+</ul>
+</li>
+<li><strong>服务器池</strong>(<code>server pool</code>)<ul>
+<li>服务器池是一组真正执行客户请求的服务器，执行的服务有<code>WEB</code>、<code>MAIL</code>、<code>FTP</code>和<code>DNS</code>等。</li>
+</ul>
+</li>
+<li><strong>后端存储</strong>(<code>backend storage</code>)<ul>
+<li>后端存储为服务器池提供一个共享的存储区，这样很容易使得服务器池拥有相同的内容，提供相同的服务。</li>
+</ul>
+</li>
+</ul>
+<p><strong>调度器</strong>采用 IP 负载均衡技术、基于内容请求分发技术或者两者相结合。在<strong>IP 负载均衡技术</strong>中，需要服务器池拥有相同的内容提供相同的服务。当客户请求到达时，调度器只根据负载情况从服务器池中选出一个服务器，将该请求转发到选出的服务器，并记录这个调度；当这个请求的其他报文到达，也会被转发到前面选出的服务器。在<strong>基于内容请求分发技术</strong>中，服务器可以提供不同的服务，当客户请求到达时，调度器可根据请求的内容和服务器的情况选择服务器执行请求。因为所有的操作都是在操作系统核心空间中将完成的，它的调度开销很小，所以它具有很高的吞吐率。</p>
+<p><strong>服务器池</strong>的结点数目是可变的。当整个系统收到的负载超过目前所有结点的处理能力时，可以在服务器池中增加服务器来满足不断增长的请求负载。对大多数网络服务来说，结点与结点间不存在很强的相关性，所以整个系统的性能可以随着服务器池的结点数目增加而线性增长。</p>
+<p><strong>后端存储</strong>通常用容错的分布式文件系统，如<code>AFS</code>、<code>GFS</code>、<code>Coda</code>和<code>Intermezzo</code>等。<strong>分布式文件系统</strong>为各服务器提供共享的存储区，它们访问分布式文件系统就像访问本地文件系统一样。同时，分布式文件系统提供良好的伸缩性和可用性。然而，当不同服务器上的应用程序同时访问分布式文件系统上同一资源时，应用程序的访问冲突需要消解才能使得资源处于一致状态。这需要一个<strong>分布式锁管理器</strong>(<code>Distributed Lock Manager</code>)，它可能是分布式文件系统内部提供的，也可能是外部的。开发者在写应用程序时，可以使用分布式锁管理器来保证应用程序在不同结点上并发访问的一致性。</p>
+<p>负载调度器、服务器池和分布式文件系统通过<strong>高速网络</strong>相连，如<code>100Mbps</code>交换机、<code>Myrinet</code>、<code>CompactNET</code>和<code>Gigabit</code>交换机等。使用高速的网络，主要为避免当系统规模扩大时互联网络成为瓶颈。</p>
+<ul>
+<li><strong>为什么使用层次的体系结构呢？</strong><ul>
+<li>层次的体系结构可以使得层与层之间相互独立，允许在一个层次的已有软件在不同的系统中被重用。例如，调度器层提供了负载平衡、可伸缩性和高可用性等，在服务器层可以运行不同的网络服务，如<code>Web</code>、<code>Cache</code>、<code>Mail</code>和<code>Media</code>等，来提供不同的可伸缩网络服务。</li>
+</ul>
+</li>
+<li><strong>为什么使用共享存储呢？</strong><ul>
+<li>共享存储如分布式文件系统在这个<code>LVS</code>集群系统是可选项。当网络服务需要有相同的内容，共享存储是很好的选择，否则每台服务器需要将相同的内容复制到本地硬盘上。当系统存储的内容越多，这种不共享结构的代价越大，因为每台服务器需要一样大的存储空间，所有的更新需要涉及到每台服务器，系统的维护代价也很高。共享存储为服务器组提供统一的存储空间，这使得系统的维护工作比较轻松。</li>
+</ul>
+</li>
+<li><strong>为什么需要高可用性呢？</strong><ul>
+<li>集群系统的特点是它在软硬件上都有冗余。系统的高可用性可以通过检测节点或服务进程故障和正确地重置系统来实现，使得系统收到的请求能被存活的结点处理。通常，我们在调度器上有资源监视进程来时刻监视各个服务器结点的健康状况，当服务器对<code>ICMP ping</code>不可达时或者她的网络服务在指定的时间没有响应时，资源监视进程通知操作系统内核将该服务器从调度列表中删除或者失效。这样，新的服务请求就不会被调度到坏的结点。资源监测程序能通过电子邮件或传呼机向管理员报告故障，一旦监测到服务进程恢复工作，通知调度器将其加入调度列表进行调度。</li>
+<li>现在前端的调度器有可能成为系统的单一失效点。为了避免调度器失效导致整个系统不能工作，我们需要设立调度器的备份。两个心跳进程(<code>两个心跳进程</code>)分别在主、从调度器上运行，它们通过串口线和<code>UDP</code>等心跳线来相互汇报各自的健康情况。当从调度器不能听得主调度器的心跳时，从调度器会接管主调度器的工作来提供负载调度服务。这里，一般通过<strong>ARP 欺骗</strong>来接管集群的虚拟 IP 地址。</li>
+<li>当主调度器恢复时，这里有两种方法，一是主调度器自动变成从调度器，二是从调度器释放虚拟 IP 地址，主调度器收回虚拟 IP 地址并提供负载调度服务。然而，当主调度器故障后或者接管后，会导致已有的调度信息丢失，这需要客户程序重新发送请求。</li>
+</ul>
+</li>
+</ul>
+<p><code>Graphic Monitor</code>是为系统管理员提供整个<strong>集群系统的监视器</strong>，它可以监视系统中每个结点的状况。<code>Graphic Monitor</code>是基于浏览器的，所以无论管理员在本地还是异地都可以监测系统的状况。为了安全的原因，浏览器要通过<code>HTTPS</code>协议和身份认证后，才能进行系统监测，并进行系统的配置和管理。</p>
+<hr>
+<h3 id="3-2-可伸缩-Web-和媒体服务"><a href="#3-2-可伸缩-Web-和媒体服务" class="headerlink" title="3.2 可伸缩 Web 和媒体服务"></a>3.2 可伸缩 Web 和媒体服务</h3><p>基于<code>LVS</code>可伸缩<code>Web</code>和媒体服务的体系结构所示：在前端是一个<strong>负载调度器</strong>，一般采用<code>IP</code>负载均衡技术来获得整个系统的高吞吐率；在第二层是<strong>Web 服务器池</strong>，<code>Web</code>服务和媒体服务分别运行在每个结点上；第三层是<strong>数据存储</strong>，通过分布式文件系统使得每个服务器结点共享相同的数据。集群中结点间是通过高速网络相连的。</p>
+<p><img src="/images/linux-lvs-cluster-tech-12.jpg" alt="LVS服务之体系结构"></p>
+<p><strong>分布式文件系统</strong>提供统一的存储空间，这使得系统的维护工作比较方便，且系统运行比较高效。当所有服务器结点超载时，管理员可以很快地加入新的结点来处理请求，而无需将<code>Web</code>文档等复制到结点的本地硬盘上。<code>Webmaster</code>可以看到统一的文档存储空间，维护和更新页面比较方便，对分布式文件系统中页面的修改对所有的服务器都有效。大的媒体文件(如视频文件)分段存储在分布式文件系统的多个结点上，可以提高文件系统的性能和文件服务器间的负载均衡。</p>
+<p><strong>IP 负载调度器</strong>(即<code>VS/DR</code>方法)可以分别将<code>Web</code>服务和媒体服务负载均衡地分发到各个服务器上，服务器将响应数据直接返回给客户，这样可以极大地提高系统的吞吐率。</p>
+<hr>
+<h3 id="3-3-可伸缩-Cache-服务"><a href="#3-3-可伸缩-Cache-服务" class="headerlink" title="3.3 可伸缩 Cache 服务"></a>3.3 可伸缩 Cache 服务</h3><p>有效的网络<code>Cache</code>系统可以大大地减少网络流量、降低响应延时以及服务器的负载。但是，若<code>Cache</code>服务器超载而不能及时地处理请求，反而会增加响应延时。所以，<code>Cache</code>服务的可伸缩性很重要，当系统负载不断增长时，整个系统能被扩展来提高<code>Cache</code>服务的处理能力。尤其，在主干上的<code>Cache</code>服务可能需要几个<code>Gbps</code>的吞吐率，单台服务器远不能达到这个吞吐率。可见，通过<code>PC</code>服务器集群实现可伸缩<code>Cache</code>服务是很有效的方法，也是性能价格比最高的方法。</p>
+<p>基于<code>LVS</code>可伸缩<code>Cache</code>集群的体系结构如图所示：在前端是一个<strong>负载调度器</strong>，一般采用<code>IP</code>负载均衡技术来获得整个系统的高吞吐率；在第二层是<strong>Cache 服务器池</strong>，一般<code>Cache</code>服务器放置在接近主干<code>Internet</code>连接处，它们可以分布在不同的网络中。调度器可以有多个，放在离客户接近的地方，可实现透明的<code>Cache</code>服务。</p>
+<p><img src="/images/linux-lvs-cluster-tech-13.jpg" alt="LVS服务之体系结构"></p>
+<p><strong>Cache 服务器</strong>采用本地硬盘来存储可缓存的对象，因为存储可缓存的对象是写操作，且占有一定的比例，通过本地硬盘可以提高<code>I/O</code>的访问速度。<code>Cache</code>服务器间有专用的多播通道，通过<code>ICP</code>协议(<code>Internet Cache Protocol</code>)来交互信息。当一台<code>Cache</code>服务器在本地硬盘中未命中当前请求时，它可以通过<code>ICP</code>查询其他<code>Cache</code>服务器是否有请求对象的副本，若存在，则从邻近的<code>Cache</code>服务器取该对象的副本，这样可以进一步提高<code>Cache</code>服务的命中率。</p>
+<hr>
+<h3 id="3-4-可伸缩邮件服务"><a href="#3-4-可伸缩邮件服务" class="headerlink" title="3.4 可伸缩邮件服务"></a>3.4 可伸缩邮件服务</h3><p>随着<code>Internet</code>用户不断增长，很多<code>ISP</code>面临他们邮件服务器超载的问题。当邮件服务器不能容纳更多的用户帐号时，有些<code>ISP</code>买更高档的服务器来代替原有的，将原有服务器的信息(如用户邮件)迁移到新服务器是很繁琐的工作，会造成服务的中断；有些<code>ISP</code>设置新的服务器和新的邮件域名，新的邮件用户放置在新的服务器上，如上海电信现在用不同的邮件服务器<code>public1.sta.net.cn</code>、<code>public2.sta.net.cn</code>到<code>public9.sta.net.cn</code>放置用户的邮件帐号，这样静态地将用户分割到不同的服务器上，会造成邮件服务器负载不平衡，系统的资源利用率低，对用户来说邮件的地址比较难记。</p>
+<p><img src="/images/linux-lvs-cluster-tech-14.jpg" alt="LVS服务之体系结构"></p>
+<p>可以利用<code>LVS</code>框架实现可伸缩邮件服务。它的体系结构如图所示：在前端是一个采用 IP 负载均衡技术的<strong>负载调度器</strong>；在第二层是<strong>服务器池</strong>，有<code>LDAP</code>(<code>Light-weight Directory Access Protocol</code>)服务器和一组邮件服务器。第三层是<strong>数据存储</strong>，通过分布式文件系统来存储用户的邮件。集群中结点间是通过高速网络相连的。</p>
+<p>用户的信息如用户名、口令、主目录和邮件容量限额等存储在<code>LDAP</code>服务器中，可以通过<code>HTTPS</code>让管理员进行用户管理。在各个邮件服务器上运行<code>SMTP</code>、<code>POP3</code>、<code>IMAP4</code>和<code>HTTP</code>服务。<code>SMTP</code>接受和转发用户的邮件，<code>SMTP</code>服务进程查询<code>LDAP</code>服务器获得用户信息，再存储邮件。<code>POP3</code>和<code>IMAP4</code>通过<code>LDAP</code>服务器获得用户信息，口令验证后，处理用户的邮件访问请求。<code>SMTP</code>、<code>POP3</code>和<code>IMAP4</code>服务进程需要有机制避免用户邮件的读写冲突。<code>HTTP</code>服务是让用户通过浏览器可以访问邮件。负载调度器将四种服务请求负载均衡地调度到各个服务器上。</p>
+<p>系统中可能的瓶颈是<code>LDAP</code>服务器，对<code>LDAP</code>服务中<strong>B+树</strong>的参数进行优化，再结合高端的服务器，可以获得较高的性能。若分布式文件系统没有多个存储结点间的负载均衡机制，则需要相应的邮件迁移机制来避免邮件访问的倾斜。</p>
+<p>这样，这个集群系统对用户来说就像一个高性能、高可靠的邮件服务器。当邮件用户不断增长时，只要在集群中增加服务器结点和存储结点。</p>
+<hr>
+<h2 id="4-地理分布-LVS-集群的体系结构"><a href="#4-地理分布-LVS-集群的体系结构" class="headerlink" title="4. 地理分布 LVS 集群的体系结构"></a>4. 地理分布 LVS 集群的体系结构</h2><blockquote>
+<p>由于互联网用户分布在世界各地，通过地理分布的服务器让用户访问就近的服务器，来节省网络流量和提高响应速度。以下，我们给出地理分布的<code>LVS</code>集群系统，通过<code>BGP</code>路由插入使得用户访问离他们最近的服务器集群，并提供服务器集群之间的负载平衡。</p>
+</blockquote>
+<h3 id="4-1-体系结构"><a href="#4-1-体系结构" class="headerlink" title="4.1 体系结构"></a>4.1 体系结构</h3><p>地理分布<code>LVS</code>集群的体系结构如图所示：有三个<code>LVS</code>集群系统分布在<code>Internet</code>上，他们一般放置在不同区域的<code>Internet</code>数据中心中，例如他们分别放在中国、美国和德国的三个不同的<code>IDC</code>中。三个<code>LVS</code>集群系统都有自己的分布式文件系统，它们的内容是相互复制的，提供相同的网络服务。它们共享一个<code>Virtual IP Address</code>来提供网络服务。当用户通过<code>Virtual IP Address</code>访问网络服务，离用户最近的<code>LVS</code>集群提供服务。例如，中国的用户访问在中国的<code>LVS</code>集群系统，美国的用户使用美国的<code>LVS</code>集群系统，这一切对用户来说是透明的。</p>
+<p><img src="/images/linux-lvs-cluster-tech-15.jpg" alt="LVS服务之体系结构"></p>
+<p>地理分布<code>LVS</code>集群系统可以带来以下好处：</p>
+<ul>
+<li>使得用户访问离他们最近的系统，对用户来说体验到更快的响应速度，对服务提供商来说节约网络带宽，降低成本。</li>
+<li>避免灾难导致系统中止服务。当一个地点发生地震、火灾等使得系统或者网络连接瘫痪时，所有的用户访问可以很快由其他地点的 LVS 集群来提供。除了已建立的连接中断以外，这一切对用户来说都是透明的。</li>
+</ul>
+<hr>
+<h3 id="4-2-基于-BGP-的集群调度"><a href="#4-2-基于-BGP-的集群调度" class="headerlink" title="4.2 基于 BGP 的集群调度"></a>4.2 基于 BGP 的集群调度</h3><blockquote>
+<p><strong>基于 BGP 的地理分布服务器集群调度</strong></p>
+</blockquote>
+<p><strong>BGP</strong>(<code>Border Gateway Protocol</code>)是用于自治系统之间交换路由信息的协议，<code>BGP</code>可以设置路由策略，如政策、安全和经济上的考虑。</p>
+<p>我们可以利用<code>BGP</code>协议在<code>Internet</code>的<code>BGP</code>路由器插入到<code>Virtual IP Address</code>的路由信息。在不同区域的<code>LVS</code>集群向它附近的<code>BGP</code>路由器广播到<code>Virtual IP Address</code>的路由信息，这样就存在多条到<code>Virtual IP Address</code>的路径，<code>Internet</code>的<code>BGP</code>路由器会根据评价函数选出最近的一条路径。这样，我们可以使得用户访问离他们最近的<code>LVS</code>集群。当一个<code>LVS</code>集群系统失效时，它的路由信息自然不会在<code>Internet</code>的<code>BGP</code>路由器中交换，<code>BGP</code>路由器会选择其他到<code>Virtual IP Address</code>的路径。这样可以做到抗灾害性。</p>
+<p><img src="/images/linux-lvs-cluster-tech-16.jpg" alt="LVS服务之体系结构"></p>
+<p>下面我们举一个基于<code>BGP</code>的地理分布服务器集群调度例子。测试的例子如图所示，<code>R11</code>、<code>R22</code>分别在不同自治系统<code>AS1</code>和<code>AS2</code>中的<code>Internet</code>服务提供商，<code>R31</code>和<code>R32</code>表示在自治系统<code>AS3</code>中两个<code>ISP</code>。两个<code>LVS</code>集群系统分别放置在两个不同数据中心<code>IDC1</code>和<code>IDC2</code>中，<code>LB1</code>和<code>LB2</code>分别是两个<code>LVS</code>集群系统的负载调度器，它们对外提供网络服务的<code>IP</code>地址为<code>10.101.4.1</code>。在第一个集群中，请求被调度到服务器<code>10.101.5.11</code>和<code>10.101.5.12</code>执行。在第二个集群中，请求被调度到服务器<code>10.101.6.11</code>和<code>10.101.6.12</code>。<code>10.101.4.1</code>是在自治系统<code>AS5</code>的网络<code>10.101.4.0/24</code>中。<code>LB1</code>上的<code>BGP</code>服务进程将网络<code>10.101.4.0/24</code>的路由信息广播到邻近的<code>AS1</code>，<code>LB2</code>上的<code>BGP</code>服务进程将网络<code>10.101.4.0/24</code>的路由信息广播到邻近的<code>AS2</code>中。</p>
+<p>我们在<code>R31</code>端口<code>10.101.3.1</code>相连的<code>BGP</code>路由器上查到<code>AS5</code>的自治系统路径为<code>3→1→5</code>。在与<code>R32</code>端口<code>10.101.3.9</code>相连的<code>BGP</code>路由器上查到<code>AS5</code>的自治系统路径为<code>3→2→5</code>，并在该路由器上访问<code>10.101.4.1上</code>提供的<code>Web</code>服务，是由服务器<code>10.101.6.11</code>处理的。当我们关掉<code>LB2</code>后，在该<code>BGP</code>路由器上查到<code>AS5</code>的自治系统路径变为<code>3→1→5</code>。</p>
+<hr>
+<h3 id="4-3-服务器集群间的负载均衡"><a href="#4-3-服务器集群间的负载均衡" class="headerlink" title="4.3 服务器集群间的负载均衡"></a>4.3 服务器集群间的负载均衡</h3><p>通过<code>BGP</code>插入路由信息的方法可以使得用户访问邻近的服务器集群，但是用户访问存在突发性，在某个区域的访问高峰可能会导致该区域的服务器集群系统超载，而其他服务器集群系统可能处于低负载状态，这时与其将请求在超载系统上排队等候，不如将请求送到远处的低负载系统上执行，可以提高响应速度。例如，中国用户在白天时间的一段访问高峰使得在中国的镜像服务器集群系统超载，而此时美国是晚上时间其镜像服务器集群系统处于低负载状态。</p>
+<p>我们提出通过<strong>IP 隧道</strong>的方法将请求从一个调度器转发到另一个调度器，再调度到真实服务器上执行。在下来将详细描述如何通过 IP 隧道作 IP 负载均衡调度。在通过 IP 隧道转发请求前，各个服务器集群需要定时交换负载信息(如 2 分钟交换一次)，当确信远处的集群系统处于低负载状态，再转发请求。例如，当本地集群系统的综合负载大于<code>1.1</code>和远处集群系统的负载小于<code>0.7</code>时，调度器通过 IP 隧道将新的请求转发到远处的集群系统。若远处集群系统的负载超过<code>0.7</code>时，停止转发请求。当本地集群系统的负载降至<code>1.0</code>时，也停止转发请求，由本地服务器处理。这样，基本上可以避免两个调度器间相互转发一个请求。即使两个调度器间相互转发一个请求报文的例外情况发生，报文的<code>TTL</code>会降到零，报文被丢掉。</p>
+<hr>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><p>我们分析了现在和将来网络服务的需求，提出可伸缩网络服务的体系结构，分为负载调度器、服务器池和后端存储三层结构。负载调度器采用 IP 负载均衡技术和基于内容请求分发技术。它的实现将在<code>Linux</code>操作系统进行，将一组服务器组成一个高可伸缩的、高可用的服务器，故称之为<code>Linux Virtual Server</code>。它提供了负载平衡、可伸缩性和高可用性，可以应用于建立很多可伸缩网络服务，如<code>Web</code>、<code>Cache</code>、<code>Mail</code>和<code>Media</code>等服务。</p>
+<p>在此基础上，我们给出了地理分布的<code>LVS</code>集群系统，通过<code>BGP</code>插入路由信息的方法可以使得用户访问邻近的服务器集群，通过 IP 隧道实现服务器集群间的负载均衡，进一步提高响应速度。地理分布的<code>LVS</code>集群系统可以节约网络带宽，改善网络服务质量，有很好的抗灾害性。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Escape</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://escapelife.github.io/posts/e26b997c.html">https://escapelife.github.io/posts/e26b997c.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Escape</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Linux/">
+                                    <span class="chip bg-color">Linux</span>
+                                </a>
+                            
+                                <a href="/tags/LVS/">
+                                    <span class="chip bg-color">LVS</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/posts/c5a428d9.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/python-func.png" class="responsive-img" alt="Python函数式编程">
+                        
+                        <span class="card-title">Python函数式编程</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2018-07-08
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Python成长之途/" class="post-category">
+                                    Python成长之途
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Python/">
+                        <span class="chip bg-color">Python</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/posts/67ef8c43.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/python-magic.png" class="responsive-img" alt="Python魔法方法进阶">
+                        
+                        <span class="card-title">Python魔法方法进阶</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2018-07-05
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Python成长之途/" class="post-category">
+                                    Python成长之途
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Python/">
+                        <span class="chip bg-color">Python</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('4'),
+            headingSelector: 'h2, h3, h4, h5'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4, h5').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="764454432"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='none'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">2017</span>
+            <a href="/about" target="_blank">Escape</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">791.2k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2017";
+                    var startMonth = "2";
+                    var startDate = "14";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/EscapeLife" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wenpanhappy@126.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
