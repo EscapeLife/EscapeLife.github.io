@@ -467,14 +467,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    90
+                    3.6k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    17 分
                 </div>
                 
 
@@ -492,11 +492,536 @@
                 <blockquote>
 <p><strong>纸上得来终觉浅，绝知此事要躬行。</strong></p>
 </blockquote>
-<p><img src="/images/linux-lvs-cluster-tech-70.jpg" alt="LVS服务之高级进阶"></p>
+<p><img src="/images/linux-lvs-cluster-tech-80.png" alt="LVS服务之高级进阶"></p>
 <hr>
 <h2 id="1-DR-模式的扩展"><a href="#1-DR-模式的扩展" class="headerlink" title="1. DR 模式的扩展"></a>1. DR 模式的扩展</h2><blockquote>
 <p><strong>DR 模式</strong>上<code>VIP</code>和<code>RIP</code>在和不在同一网段的实验</p>
 </blockquote>
+<p><img src="/images/linux-lvs-cluster-tech-81.png" alt="LVS服务之高级进阶"></p>
+<p><strong>主要纪要</strong></p>
+<ul>
+<li>在虚拟一个路由器，将<code>RIPs</code>的网关都指向这个虚拟出来的路由器</li>
+<li>虚拟路由器的另一个端口连接至<code>DS</code>所在的交换机</li>
+<li>或者直接通过另外的路由器响应客户端</li>
+</ul>
+<p><strong>物理网络搭建</strong></p>
+<ul>
+<li>本机当做客户端，创建四个虚拟机</li>
+<li><code>DS</code>和两个<code>RIP</code>只有一块物理网卡且都是桥接模式</li>
+<li>第四台虚拟机，一个网卡两个地址或者两块网卡各一个地址，打开网卡转发功能，分别将<code>RIPs</code>的网关都指向其中一个地址，另外一个接口还要连接交换机</li>
+</ul>
+<hr>
+<h3 id="1-1-配置都在同一网络"><a href="#1-1-配置都在同一网络" class="headerlink" title="1.1 配置都在同一网络"></a>1.1 配置都在同一网络</h3><p><img src="/images/linux-lvs-cluster-tech-82.png" alt="LVS服务之高级进阶"></p>
+<ul>
+<li><strong>物理网卡地址</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># DS和RSs都是桥接模式</span>
+DS的DIP物理网卡：172.16.100.9
+RS1的RIP物理网卡：172.16.100.21
+RS2的RIP物理网卡：172.16.100.22<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>DS 配置网络地址</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 配置都在同一网络</span>
+<span class="token comment" spellcheck="true"># DS主机，可以使用ifconfig、ip、setup命令配置</span>
+<span class="token function">ifconfig</span> eno16777724:0 172.16.100.10 netmask 255.255.255.255 broadcast 172.16.100.10 up
+
+<span class="token comment" spellcheck="true"># 别名配置路由</span>
+route add -host 172.16.100.10 dev eno16777724:0
+
+<span class="token comment" spellcheck="true"># 在本机查看规则是否好了</span>
+arp -a<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用ip添加规则</span>
+ip addr add 172.16.100.10/32 dev eno16777724
+ip addr list
+ip addr del 172.16.100.10/32 dev eno16777724
+
+<span class="token comment" spellcheck="true"># 添加路由规则，可以不加，没有使用别名</span>
+ip route add 172.16.100.10 dev eno16777724
+ip route list
+ip route del 172.16.100.10
+
+<span class="token comment" spellcheck="true"># 在本机查看规则是否好了</span>
+arp -a<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>RSs 配置网络地址</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 分别配置RSs主机，启动web服务</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># vim set_lvs_dr.sh</span>
+<span class="token comment" spellcheck="true">#!/bin/bash</span>
+VIP<span class="token operator">=</span>172.16.100.10
+VIP_MASK<span class="token operator">=</span>255.255.255.255
+
+<span class="token keyword">case</span> <span class="token variable">$1</span> <span class="token keyword">in</span>
+    start_dr<span class="token punctuation">)</span>
+        <span class="token keyword">echo</span> 1 <span class="token operator">></span> /proc/sys/net/ipv4/conf/all/arp-ignore
+        <span class="token keyword">echo</span> 1 <span class="token operator">></span> /proc/sys/net/ipv4/conf/eth0/arp-ignore
+        <span class="token keyword">echo</span> 2 <span class="token operator">></span> /proc/sys/net/ipv4/conf/all/arp-announce
+        <span class="token keyword">echo</span> 2 <span class="token operator">></span> /proc/sys/net/ipv4/conf/eth0/arp-announce
+        <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    stop_dr<span class="token punctuation">)</span>
+        <span class="token keyword">echo</span> 0 <span class="token operator">></span> /proc/sys/net/ipv4/conf/all/arp-ignore
+        <span class="token keyword">echo</span> 0 <span class="token operator">></span> /proc/sys/net/ipv4/conf/eth0/arp-ignore
+        <span class="token keyword">echo</span> 0 <span class="token operator">></span> /proc/sys/net/ipv4/conf/all/arp-announce
+        <span class="token keyword">echo</span> 0 <span class="token operator">></span> /proc/sys/net/ipv4/conf/eth0/arp-announce
+        <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    start_ip<span class="token punctuation">)</span>
+        <span class="token function">ifconfig</span> lo:0 <span class="token variable">$VIP</span> netmask <span class="token variable"><span class="token variable">$(</span>VIP_MASK<span class="token variable">)</span></span> broadbcast <span class="token variable">$VIP</span> up
+        <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    stop_ip<span class="token punctuation">)</span>
+        <span class="token function">ifconfig</span> lo:0 down
+        <span class="token punctuation">;</span><span class="token punctuation">;</span>
+esac
+
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># chmod +x set_lvs_dr.sh</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ./set_lvs_dr.sh start_dr</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ./set_lvs_dr.sh start_ip</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>DS 配置调度算法</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># DS上设置调度规则</span>
+ipvsadm -A -t 172.16.100.10:80 -s rr
+ipvsadm -L -n
+
+ipvsadm -a -t 172.16.100.10:80 -r 172.16.100.21 -g
+ipvsadm -a -t 172.16.100.10:80 -r 172.16.100.22 -g<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="1-2-配置都不在同一网络"><a href="#1-2-配置都不在同一网络" class="headerlink" title="1.2 配置都不在同一网络"></a>1.2 配置都不在同一网络</h3><p><img src="/images/linux-lvs-cluster-tech-83.png" alt="LVS服务之高级进阶"></p>
+<ul>
+<li><strong>DS 配置网络地址</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># DS上设置网络</span>
+<span class="token comment" spellcheck="true"># 删除之前配置的网络100.9的物理地址还在</span>
+ip addr del 172.16.100.10/32 dev eno16777724
+
+<span class="token comment" spellcheck="true"># 添加非本网段地址，VIP地址</span>
+<span class="token comment" spellcheck="true"># 网关都要指向，172.16.0.1，包括物理地址和本机地址</span>
+ip addr add 192.168.0.10/32 dev eno16777724
+
+<span class="token comment" spellcheck="true"># 在本机查看规则是否好了</span>
+arp -a<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>RSs 配置网络地址</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 分别配置RSs主机，启动web服务</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># vim set_lvs_dr.sh</span>
+<span class="token comment" spellcheck="true">#!/bin/bash</span>
+VIP<span class="token operator">=</span>192.168.0.10
+VIP_MASK<span class="token operator">=</span>255.255.255.255
+
+<span class="token keyword">case</span> <span class="token variable">$1</span> <span class="token keyword">in</span>
+    start_dr<span class="token punctuation">)</span>
+        <span class="token keyword">echo</span> 1 <span class="token operator">></span> /proc/sys/net/ipv4/conf/all/arp-ignore
+        <span class="token keyword">echo</span> 1 <span class="token operator">></span> /proc/sys/net/ipv4/conf/eth0/arp-ignore
+        <span class="token keyword">echo</span> 2 <span class="token operator">></span> /proc/sys/net/ipv4/conf/all/arp-announce
+        <span class="token keyword">echo</span> 2 <span class="token operator">></span> /proc/sys/net/ipv4/conf/eth0/arp-announce
+        <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    stop_dr<span class="token punctuation">)</span>
+        <span class="token keyword">echo</span> 0 <span class="token operator">></span> /proc/sys/net/ipv4/conf/all/arp-ignore
+        <span class="token keyword">echo</span> 0 <span class="token operator">></span> /proc/sys/net/ipv4/conf/eth0/arp-ignore
+        <span class="token keyword">echo</span> 0 <span class="token operator">></span> /proc/sys/net/ipv4/conf/all/arp-announce
+        <span class="token keyword">echo</span> 0 <span class="token operator">></span> /proc/sys/net/ipv4/conf/eth0/arp-announce
+        <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    start_ip<span class="token punctuation">)</span>
+        <span class="token function">ifconfig</span> lo:0 <span class="token variable">$VIP</span> netmask <span class="token variable"><span class="token variable">$(</span>VIP_MASK<span class="token variable">)</span></span> broadbcast <span class="token variable">$VIP</span> up
+        <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    stop_ip<span class="token punctuation">)</span>
+        <span class="token function">ifconfig</span> lo:0 down
+        <span class="token punctuation">;</span><span class="token punctuation">;</span>
+esac
+
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># chmod +x set_lvs_dr.sh</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ./set_lvs_dr.sh start_dr</span>
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ./set_lvs_dr.sh start_ip</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>DS 配置调度算法</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 清除之前配置的规则</span>
+ipvsadm -C
+
+<span class="token comment" spellcheck="true"># DS上设置调度规则</span>
+ipvsadm -A -t 192.168.0.10:80 -s rr
+ipvsadm -L -n
+
+ipvsadm -a -t 192.168.0.10:80 -r 172.16.100.21 -g
+ipvsadm -a -t 192.168.0.10:80 -r 172.16.100.22 -g<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="1-3-示例脚本"><a href="#1-3-示例脚本" class="headerlink" title="1.3 示例脚本"></a>1.3 示例脚本</h3><ul>
+<li><strong>DR 类型 director 脚本示例</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
+
+vip<span class="token operator">=</span>172.16.100.33
+rip<span class="token operator">=</span><span class="token punctuation">(</span><span class="token string">'172.16.100.8'</span> <span class="token string">'172.16.100.9'</span><span class="token punctuation">)</span>
+weight<span class="token operator">=</span><span class="token punctuation">(</span><span class="token string">'1'</span> <span class="token string">'2'</span><span class="token punctuation">)</span>
+port<span class="token operator">=</span>80
+scheduler<span class="token operator">=</span>rr
+ipvstype<span class="token operator">=</span><span class="token string">'-g'</span>
+
+<span class="token keyword">case</span> <span class="token variable">$1</span> <span class="token keyword">in</span>
+start<span class="token punctuation">)</span>
+    iptables -F -t filter
+    ipvsadm -C
+
+    <span class="token function">ifconfig</span> eth0:0 <span class="token variable">$vip</span> broadcast <span class="token variable">$vip</span> netmask 255.255.255.255 up
+    route add -host <span class="token variable">$vip</span> dev eth0:0
+    <span class="token keyword">echo</span> 1 <span class="token operator">></span> /proc/sys/net/ipv4/ip_forward
+
+    ipvsadm -A -t <span class="token variable">$vip</span><span class="token keyword">:</span><span class="token variable">$port</span> -s <span class="token variable">$scheduler</span>
+    <span class="token punctuation">[</span> <span class="token variable">$?</span> -eq 0 <span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token keyword">echo</span> <span class="token string">"ipvs service <span class="token variable">$vip</span>:<span class="token variable">$port</span> added."</span>  <span class="token operator">||</span> <span class="token keyword">exit</span> 2
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token variable"><span class="token variable">`</span><span class="token function">seq</span> 0 $<span class="token punctuation">[</span>$<span class="token punctuation">{</span>#rip<span class="token punctuation">[</span>@<span class="token punctuation">]</span><span class="token punctuation">}</span>-1<span class="token punctuation">]</span><span class="token variable">`</span></span><span class="token punctuation">;</span> <span class="token keyword">do</span>
+        ipvsadm -a -t <span class="token variable">$vip</span><span class="token keyword">:</span><span class="token variable">$port</span> -r <span class="token variable">${rip[$i]}</span> <span class="token variable">$ipvstype</span> -w <span class="token variable">${weight[$i]}</span>
+        <span class="token punctuation">[</span> <span class="token variable">$?</span> -eq 0 <span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token keyword">echo</span> <span class="token string">"RS <span class="token variable">${rip[$i]}</span> added."</span>
+    <span class="token keyword">done</span>
+    <span class="token function">touch</span> /var/lock/subsys/ipvs
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+stop<span class="token punctuation">)</span>
+    <span class="token keyword">echo</span> 0 <span class="token operator">></span> /proc/sys/net/ipv4/ip_forward
+    ipvsadm -C
+    <span class="token function">ifconfig</span> eth0:0 down
+    <span class="token function">rm</span> -f /var/lock/subsys/ipvs
+    <span class="token keyword">echo</span> <span class="token string">"ipvs stopped."</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+status<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token punctuation">[</span> -f /var/lock/subsys/ipvs <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+        <span class="token keyword">echo</span> <span class="token string">"ipvs is running."</span>
+        ipvsadm -L -n
+    <span class="token keyword">else</span>
+        <span class="token keyword">echo</span> <span class="token string">"ipvs is stopped."</span>
+    <span class="token keyword">fi</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+*<span class="token punctuation">)</span>
+    <span class="token keyword">echo</span> <span class="token string">"Usage: <span class="token variable"><span class="token variable">`</span><span class="token function">basename</span> $0<span class="token variable">`</span></span> {start|stop|status}"</span>
+    <span class="token keyword">exit</span> 3
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+esac<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>DR 类型 RS 脚本示例</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
+
+vip<span class="token operator">=</span>172.16.100.33
+interface<span class="token operator">=</span><span class="token string">"lo:0"</span>
+
+<span class="token keyword">case</span> <span class="token variable">$1</span> <span class="token keyword">in</span>
+start<span class="token punctuation">)</span>
+    <span class="token keyword">echo</span> 1 <span class="token operator">></span> /proc/sys/net/ipv4/conf/all/arp_ignore
+    <span class="token keyword">echo</span> 1 <span class="token operator">></span> /proc/sys/net/ipv4/conf/lo/arp_ignore
+    <span class="token keyword">echo</span> 2 <span class="token operator">></span> /proc/sys/net/ipv4/conf/all/arp_announce
+    <span class="token keyword">echo</span> 2 <span class="token operator">></span> /proc/sys/net/ipv4/conf/lo/arp_announce
+
+    <span class="token function">ifconfig</span> <span class="token variable">$interface</span> <span class="token variable">$vip</span> broadcast <span class="token variable">$vip</span> netmask 255.255.255.255 up
+    route add -host <span class="token variable">$vip</span> dev <span class="token variable">$interface</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+stop<span class="token punctuation">)</span>
+    <span class="token keyword">echo</span> 0 <span class="token operator">></span> /proc/sys/net/ipv4/conf/all/arp_ignore
+    <span class="token keyword">echo</span> 0 <span class="token operator">></span> /proc/sys/net/ipv4/conf/lo/arp_ignore
+    <span class="token keyword">echo</span> 0 <span class="token operator">></span> /proc/sys/net/ipv4/conf/all/arp_announce
+    <span class="token keyword">echo</span> 0 <span class="token operator">></span> /proc/sys/net/ipv4/conf/lo/arp_announce
+
+    <span class="token function">ifconfig</span> <span class="token variable">$interface</span> down
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+status<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token function">ifconfig</span> lo:0 <span class="token operator">|</span><span class="token function">grep</span> <span class="token variable">$vip</span> <span class="token operator">&amp;</span><span class="token operator">></span> /dev/null<span class="token punctuation">;</span> <span class="token keyword">then</span>
+        <span class="token keyword">echo</span> <span class="token string">"ipvs is running."</span>
+    <span class="token keyword">else</span>
+        <span class="token keyword">echo</span> <span class="token string">"ipvs is stopped."</span>
+    <span class="token keyword">fi</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+*<span class="token punctuation">)</span>
+    <span class="token keyword">echo</span> <span class="token string">"Usage: <span class="token variable"><span class="token variable">`</span><span class="token function">basename</span> $0<span class="token variable">`</span></span> {start|stop|status}"</span>
+    <span class="token keyword">exit</span> 1
+esac<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="2-LVS-的防火墙标记"><a href="#2-LVS-的防火墙标记" class="headerlink" title="2. LVS 的防火墙标记"></a>2. LVS 的防火墙标记</h2><blockquote>
+<p>我们都已经知道<code>ipvs</code>是定义在<code>INPUT</code>链上的，所有要进行防火墙标记就需要在<code>PREROUTING</code>链上进行，不然<code>ipvs</code>不可能对标记进行处理的。</p>
+</blockquote>
+<p><strong>防火墙标记的要点</strong></p>
+<ul>
+<li><strong>格式：<code>-j MARK --set-mark 10</code></strong></li>
+<li><code>mark</code>的取值范围为<code>0-2^32</code>，一般都会在设置<code>100</code>以内</li>
+<li>可以过滤某一类特定请求，如<code>tcp/80</code>进行标记处理</li>
+<li>可以将多个服务进行标记，如<code>tcp/80</code>和<code>tcp/22</code>进行合并处理</li>
+</ul>
+<p><strong>定义集群的方式</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># (1) 在DS上netfilter的mangle表的PREROUTING定义用于打标的规则</span>
+<span class="token comment" spellcheck="true"># $vip: VIP地址</span>
+<span class="token comment" spellcheck="true"># $protocol: 协议</span>
+<span class="token comment" spellcheck="true"># $port: 协议端口</span>
+iptables -t mangle -A PREROUTING -d <span class="token variable">$vip</span> -p <span class="token variable">$protocol</span> --dports <span class="token variable">$port</span> -j MARK --set-mark xxx
+
+<span class="token comment" spellcheck="true"># (2) 基于FWM定义集群服务</span>
+ipvsadm -A -f xxx -s scheduler
+
+<span class="token comment" spellcheck="true"># 功用：将共享一组RS的集群服务统一进行定义</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-1-标记配置方式"><a href="#2-1-标记配置方式" class="headerlink" title="2.1 标记配置方式"></a>2.1 标记配置方式</h3><ul>
+<li><strong>通过防火墙标记定义集群的方式</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># -j MARK：来定义使用防火墙标记</span>
+<span class="token comment" spellcheck="true"># --set-mark：来设置防火墙标记的数字</span>
+iptables -t mangle -A PREROUTING -d 192.168.0.10 -p tcp --dport 80 -j MARK --set-mark 10
+
+ipvsadm -C
+ipvsadm -A -f 10 -s rr
+ipvsadm -a -f 10 -r 172.16.100.21 -g
+ipvsadm -a -f 10 -r 172.16.100.22 -g<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>通过防火墙标记将多个服务进行标记</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># http访问VIP可以在21和22上跳转</span>
+iptables -t mangle -A PREROUTING -d 192.168.0.10 -p tcp --dport 80 -j MARK --set-mark 10
+<span class="token comment" spellcheck="true"># ssh访问VIP可以在21和22上跳转</span>
+iptables -t mangle -A PREROUTING -d 192.168.0.10 -p tcp --dport 22 -j MARK --set-mark 10
+<span class="token comment" spellcheck="true"># https访问VIP可以在21和22上跳转</span>
+iptables -t mangle -A PREROUTING -d 192.168.0.10 -p tcp --dport 443 -j MARK --set-mark 10
+
+ipvsadm -C
+ipvsadm -A -f 10 -s rr
+ipvsadm -a -f 10 -r 172.16.100.21 -g
+ipvsadm -a -f 10 -r 172.16.100.22 -g<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-2-配置-HTTPS-服务"><a href="#2-2-配置-HTTPS-服务" class="headerlink" title="2.2 配置 HTTPS 服务"></a>2.2 配置 HTTPS 服务</h3><pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># DS作为CA颁发签名证书</span>
+<span class="token function">cd</span> /etc/pki/CA
+<span class="token punctuation">(</span>umask 077<span class="token punctuation">;</span> openssl genrsa -out private/cakey.pem 2048<span class="token punctuation">)</span>
+<span class="token function">touch</span> index.txt
+<span class="token keyword">echo</span> 01 <span class="token operator">></span> serial
+
+openssl -req -new -x509 -key private/cakey.pem -out cacert.pem -days 465
+填写信息等<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># RS申请证书</span>
+<span class="token function">mkdir</span> -pv /etc/httpd/ssl
+<span class="token function">cd</span> /etc/httpd/ssl
+<span class="token punctuation">(</span>umask 077<span class="token punctuation">;</span> openssl genrsa -out httpd.key 1024<span class="token punctuation">)</span>
+
+openssl req -new -key httpd.key -out httpd.csr
+填写信息等
+
+<span class="token function">scp</span> httpd.csr root@172.16.100.0:/tmp<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># CA颁发签名</span>
+openssl ca -in /tmp/httpd.csr -out /tmp/httpd.crt
+<span class="token function">scp</span> /tmp/httpd.crt root@172.16.100.21:/etc/httpd/ssl<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 把21的证书复制给22服务器</span>
+<span class="token function">cd</span> /etc/httpd/ssl
+<span class="token function">scp</span> -rp ssl/ root@172.16.100.22:/etc/httpd/<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 分别配置RS主机中安装ssl服务</span>
+yum <span class="token function">install</span> mod_ssl
+
+vim /etc/httpd/conf.d/ssl.conf
+启用ssl服务
+DocumentRoot <span class="token string">"/var/www/html"</span>
+SSLCertificateFile /etc/httpd/ssl/httpd.crt
+SSLCertificateKeyFile /etc/httpd/ssl/httpd.key
+
+httpd -t
+<span class="token function">service</span> httpd restart<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 配置DS的ipvs规则的HTTPS服务，80</span>
+ipvsadm -C
+ipvsadm -A -t 192.168.0.10:443 -s rr
+ipvsadm -a -t 192.168.0.10:443 -r 172.16.100.21 -g
+ipvsadm -a -t 192.168.0.10:443 -r 172.16.100.22 -g<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 配置DS的ipvs规则的HTTPS服务，80和443</span>
+<span class="token comment" spellcheck="true"># 也可以通过iptables的配置文件进行修改，查看一下呗</span>
+iptables -t mangle -A PREROUTING -d 192.168.0.10 -p tcp --dport 80 -j MARK --set-mark 10
+iptables -t mangle -A PREROUTING -d 192.168.0.10 -p tcp --dport 443 -j MARK --set-mark 10
+
+ipvsadm -C
+ipvsadm -A -f 10 -s rr
+ipvsadm -a -f 10 -r 172.16.100.21 -g
+ipvsadm -a -f 10 -r 172.16.100.22 -g<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-3-session-保持"><a href="#2-3-session-保持" class="headerlink" title="2.3 session 保持"></a>2.3 session 保持</h3><p><strong>持久连接的引入</strong></p>
+<ul>
+<li>对于<code>HTTP</code>和<code>HTTPS</code>的会话保持就很难区分了，即使是<code>sh</code>算法也不可用了，即<code>session</code>绑定不可用了。</li>
+<li>用户一开始使用<code>HTTP</code>协议进行网页浏览，而结账的时候使用<code>HTTPS</code>协议，这就导致可能用户的请求被调度道不同的服务上了。<code>session</code>绑定就解决不了问题了，<code>session</code>复制和<code>session</code>服务器就可以保证，同一<code>IP</code>地址访问网站始终调用到同一服务器，但是会引入额外的组件。其实<code>LVS</code>自己也只有实现的机制，就是<code>LVS</code>的持久连接<code>lvs persistence</code>。</li>
+</ul>
+<p><strong>持久连接的实现方式</strong></p>
+<ul>
+<li><strong>每端口持久(<code>PPC</code>)</strong>：单服务持久调度<ul>
+<li>可以实现<code>sh</code>的功能且可以设置超时时长，而<code>sh</code>不能设置超时时长</li>
+<li>用户如果超时之后没有断开连接，会自动续<code>2min</code>时长，之后连接为新请求</li>
+</ul>
+</li>
+<li><strong>每 FWM 持久(<code>PFWMC</code>)</strong>：单防火墙标记持久调度<ul>
+<li><code>PORT AFFINITY</code></li>
+<li>只对标记进行调度，不管服务类型，需要将多种服务进行同一打标时使用</li>
+</ul>
+</li>
+<li><strong>每客户端持久(<code>PCC</code>)</strong>：单客户端持久调度<ul>
+<li><code>DS</code>会将用户的任何请求都识别为集群服务，并向<code>RS</code>进行调度</li>
+<li>请求<code>TCP</code>服务的端口范围：<code>1-65535</code></li>
+<li>请求<code>UDP</code>服务的端口范围：<code>1-65535</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>持久连接的注意事项</strong></p>
+<ul>
+<li>持久连接的实现方式，会占据内存空间，而且空间存储的条目有限制</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># PPC: DS上设置</span>
+<span class="token comment" spellcheck="true"># 定义: 将来自于同一个客户端对同一个集群服务的请求，始终定向至此前选定的RS ==> 持久端口连接</span>
+<span class="token comment" spellcheck="true"># 特点: client --> LVS(80) --> RS1 或 client --> LVS(80) --> RS2</span>
+<span class="token comment" spellcheck="true"># 缺陷: 期望访问不同的端口到同一台RS上，无法实现</span>
+
+<span class="token comment" spellcheck="true"># 单服务持久调度</span>
+<span class="token comment" spellcheck="true"># 可以实现类似于sh功能的调度算法，并可以设置超时时长</span>
+ipvsadm -C
+ipvsadm -A -t 192.168.0.10:80 -s rr -p 3600
+ipvsadm -a -t 192.168.0.10:80 -r 172.16.100.21 -g -w 1
+ipvsadm -a -t 192.168.0.10:80 -r 172.16.100.22 -g -w 2
+
+ipvsadm -L -n
+
+<span class="token comment" spellcheck="true"># 加深理解: 原本的调度模式</span>
+<span class="token comment" spellcheck="true"># 没有-p参数，所有不是持久连接的方式</span>
+ipvsadm -A -t 192.168.0.10:22 -s rr
+ipvsadm -a -t 192.168.0.10:22 -r 172.16.100.21 -g
+ipvsadm -a -t 192.168.0.10:22 -r 172.16.100.22 -g<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># PFWMC：DS上设置</span>
+<span class="token comment" spellcheck="true"># 定义: 根据iptables的规则，将对于某类服务几个不同端口的访问定义为一类 ==> 持久防火墙标记连接</span>
+
+<span class="token comment" spellcheck="true"># 配置DS的ipvs规则的HTTP/HTTPS服务，80和443端口</span>
+<span class="token comment" spellcheck="true"># 也可以通过iptables的配置文件进行修改，查看一下呗</span>
+iptables -t mangle -A PREROUTING -d 192.168.0.10 -p tcp --dport 80 -j MARK --set-mark 10
+iptables -t mangle -A PREROUTING -d 192.168.0.10 -p tcp --dport 443 -j MARK --set-mark 10
+
+<span class="token comment" spellcheck="true"># 单防火墙标记持久调度</span>
+ipvsadm -C
+ipvsadm -A -f 10 -s rr -p 3600
+ipvsadm -a -f 10 -r 172.16.100.21 -g
+ipvsadm -a -f 10 -r 172.16.100.22 -g
+
+ipvsadm -L -n
+
+<span class="token comment" spellcheck="true"># 加深理解：原本的调度模式</span>
+ipvsadm -A -t 192.168.0.10:22 -s rr
+ipvsadm -a -t 192.168.0.10:22 -r 172.16.100.21 -g
+ipvsadm -a -t 192.168.0.10:22 -r 172.16.100.22 -g<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># PCC: DS上设置</span>
+<span class="token comment" spellcheck="true"># 定义: 将来自于同一个客户端对所有端口的请求，始终定向至此前选定的RS ==> 持久客户端连接</span>
+<span class="token comment" spellcheck="true"># 特点: PCC是一个虚拟服务没有端口号或者端口号为0，使用-p来标识服务超市时长</span>
+<span class="token comment" spellcheck="true"># 缺陷: 定向所有服务，期望访问不同的RS无法实现</span>
+
+<span class="token comment" spellcheck="true"># 单客户端持久调度</span>
+ipvsadm -C
+ipvsadm -A -t 192.168.0.10:0 -s rr -p
+ipvsadm -a -t 192.168.0.10:0 -r 172.16.100.21 -g -w 1
+ipvsadm -a -t 192.168.0.10:0 -r 172.16.100.22 -g -w 2
+
+ipvsadm -L -n
+
+<span class="token comment" spellcheck="true"># 加深理解: 原本的调度模式</span>
+ipvsadm -A -t 192.168.0.10:22 -s rr
+ipvsadm -a -t 192.168.0.10:22 -r 172.16.100.21 -g
+ipvsadm -a -t 192.168.0.10:22 -r 172.16.100.22 -g<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="3-LVS-的高可用解决方案"><a href="#3-LVS-的高可用解决方案" class="headerlink" title="3. LVS 的高可用解决方案"></a>3. LVS 的高可用解决方案</h2><blockquote>
+<p><strong>SPOF：</strong><code>Single Point of Failure</code></p>
+</blockquote>
+<p><strong>故障点</strong></p>
+<ul>
+<li><strong>DS 服务器单点故障</strong> -&gt; <code>HA</code>高可用集群<ul>
+<li><code>DS</code>如果挂了，会导致整个服务都不可用，所有需要做高可用</li>
+<li>如<code>KeepAlived</code>可以进行高可用，而且还可以实现对<code>RS</code>的健康监测</li>
+</ul>
+</li>
+<li><strong>后端真实主机挂了</strong> -&gt; <code>DS</code>对<code>RS</code>做健康监测<ul>
+<li>如果后端主机<code>RS</code>挂了，<code>DS</code>能够监测到并将其上的连接交给其他主机处理</li>
+<li>当<code>RS</code>恢复的时候，<code>DS</code>能够检测到恢复的主机，并让主机自动上线，继续提供对应的服务</li>
+</ul>
+</li>
+</ul>
+<p><strong>健康监测设计方案</strong></p>
+<ul>
+<li><strong>1、基于协议层次检查：效率</strong><ul>
+<li>IP 层: <code>icmp</code></li>
+<li>传输层：检测端口的开放状态</li>
+<li>应用层：请求获取关键性的资源</li>
+</ul>
+</li>
+<li><strong>2、检查频度</strong><ul>
+<li>不能过于频繁也不能过于不频繁，折中处理</li>
+<li>日志中需要对其监测进行过滤，保存或者保存到其他地方</li>
+</ul>
+</li>
+<li><strong>3、状态判断</strong><ul>
+<li>下线：<code>ok --&gt; failure --&gt; failure --&gt; failure</code></li>
+<li>上线：<code>failure --&gt; ok --&gt; ok</code></li>
+</ul>
+</li>
+<li><strong>4、back server</strong><ul>
+<li><code>DS</code>可以在<code>RS</code>都挂了的情况下，<code>DS</code>启动服务响应用户请求</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
+
+fwm<span class="token operator">=</span>6
+sorry_server<span class="token operator">=</span>127.0.0.1
+rs<span class="token operator">=</span><span class="token punctuation">(</span><span class="token string">'172.16.100.21'</span> <span class="token string">'172.16.100.22'</span><span class="token punctuation">)</span>
+rw<span class="token operator">=</span><span class="token punctuation">(</span><span class="token string">'1'</span> <span class="token string">'2'</span><span class="token punctuation">)</span>
+type<span class="token operator">=</span><span class="token string">'-g'</span>
+chkloop<span class="token operator">=</span>3
+rsstatus<span class="token operator">=</span><span class="token punctuation">(</span>0 0<span class="token punctuation">)</span>
+logfile<span class="token operator">=</span>/var/log/ipvs_health_check.log
+
+addrs<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    ipvsadm -a -f <span class="token variable">$fwm</span> -r <span class="token variable">$1</span> <span class="token variable">$type</span> -w <span class="token variable">$2</span>
+    <span class="token punctuation">[</span> <span class="token variable">$?</span> -eq 0 <span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token keyword">return</span> 0 <span class="token operator">||</span> <span class="token keyword">return</span> 1
+<span class="token punctuation">}</span>
+
+delrs<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    ipvsadm -d -f <span class="token variable">$fwm</span> -r <span class="token variable">$1</span>
+    <span class="token punctuation">[</span> <span class="token variable">$?</span> -eq 0 <span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token keyword">return</span> 0 <span class="token operator">||</span> <span class="token keyword">return</span> 1
+<span class="token punctuation">}</span>
+
+chkrs<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    local i<span class="token operator">=</span>1
+    <span class="token keyword">while</span> <span class="token punctuation">[</span> <span class="token variable">$i</span> -le <span class="token variable">$chkloop</span> <span class="token punctuation">]</span>
+    <span class="token keyword">do</span>
+        <span class="token keyword">if</span> curl --connect-timeout 1 -s http://<span class="token variable">$1</span>/.health.html <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">"OK"</span> <span class="token operator">&amp;</span><span class="token operator">></span> /dev/null<span class="token punctuation">;</span> <span class="token keyword">then</span>
+            <span class="token keyword">return</span> 0
+        <span class="token keyword">fi</span>
+        <span class="token keyword">let</span> i++
+        <span class="token function">sleep</span> 1
+    <span class="token keyword">done</span>
+    <span class="token keyword">return</span> 1
+<span class="token punctuation">}</span>
+
+initstatus<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">for</span> host <span class="token keyword">in</span> <span class="token variable"><span class="token variable">`</span><span class="token function">seq</span> 0 $<span class="token punctuation">[</span>$<span class="token punctuation">{</span>#rs<span class="token punctuation">[</span>@<span class="token punctuation">]</span><span class="token punctuation">}</span>-1<span class="token punctuation">]</span><span class="token variable">`</span></span>
+    <span class="token keyword">do</span>
+        <span class="token keyword">if</span> chkrs <span class="token variable">${rs[$host]}</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+            <span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token variable">${rsstatus[$host]}</span> -eq 0 <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+                rsstatus<span class="token punctuation">[</span><span class="token variable">$host</span><span class="token punctuation">]</span><span class="token operator">=</span>1
+            <span class="token keyword">fi</span>
+        <span class="token keyword">else</span>
+            <span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token variable">${rsstatus[$host]}</span> -eq 1 <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+                rsstatus<span class="token punctuation">[</span><span class="token variable">$host</span><span class="token punctuation">]</span><span class="token operator">=</span>0
+            <span class="token keyword">fi</span>
+        <span class="token keyword">fi</span>
+    <span class="token keyword">done</span>
+<span class="token punctuation">}</span>
+
+initstatus
+<span class="token keyword">while</span>
+<span class="token keyword">do</span>
+    <span class="token keyword">for</span> host <span class="token keyword">in</span> <span class="token variable"><span class="token variable">`</span><span class="token function">seq</span> 0 $<span class="token punctuation">[</span>$<span class="token punctuation">{</span>#rs<span class="token punctuation">[</span>@<span class="token punctuation">]</span><span class="token punctuation">}</span>-1<span class="token punctuation">]</span><span class="token variable">`</span></span>
+    <span class="token keyword">do</span>
+        <span class="token keyword">if</span> chkrs <span class="token variable">${rs[$host]}</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+            <span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token variable">${rsstatus[$host]}</span> -eq 0 <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+                addrs <span class="token variable">${rs[$host]}</span> <span class="token variable">${rw[$host]}</span>
+                <span class="token punctuation">[</span> <span class="token variable">$?</span> -eq 0 <span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> rsstatus<span class="token punctuation">[</span><span class="token variable">$host</span><span class="token punctuation">]</span><span class="token operator">=</span>1
+            <span class="token keyword">fi</span>
+        <span class="token keyword">else</span>
+            <span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token variable">${rsstatus[$host]}</span> -eq 1 <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+                delrs <span class="token variable">${rs[$host]}</span> <span class="token variable">${rw[$host]}</span>
+                <span class="token punctuation">[</span> <span class="token variable">$?</span> -eq 0 <span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> rsstatus<span class="token punctuation">[</span><span class="token variable">$host</span><span class="token punctuation">]</span><span class="token operator">=</span>0
+            <span class="token keyword">fi</span>
+        <span class="token keyword">fi</span>
+    <span class="token keyword">done</span>
+    <span class="token function">sleep</span> 5
+<span class="token keyword">done</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -1044,7 +1569,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">808.3k</span>&nbsp;字
+                class="white-color">811.9k</span>&nbsp;字
             
             
             
