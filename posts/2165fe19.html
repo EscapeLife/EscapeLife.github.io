@@ -1,0 +1,1524 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Apache服务之httpd基础, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Apache服务之httpd基础 | Escape</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Escape</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Escape</div>
+        <div class="logo-desc">
+            
+            听摇滚,但不偏颇;也挺古典,但不安逸
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/EscapeLife" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/EscapeLife" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/linux-apache-server-30.png')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Apache服务之httpd基础</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Linux/">
+                                <span class="chip bg-color">Linux</span>
+                            </a>
+                        
+                            <a href="/tags/Apache/">
+                                <span class="chip bg-color">Apache</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                Linux运维之路
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2018-12-08
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2020-11-02
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    2.5k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    9 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <blockquote>
+<p><strong>纸上得来终觉浅，绝知此事要躬行。</strong></p>
+</blockquote>
+<p><img src="/images/linux-apache-server-30.png" alt="Apache服务之httpd基础"></p>
+<hr>
+<h2 id="1-Web服务器和应用服务器"><a href="#1-Web服务器和应用服务器" class="headerlink" title="1. Web服务器和应用服务器"></a>1. <code>Web</code>服务器和应用服务器</h2><h3 id="1-1-Web服务器"><a href="#1-1-Web服务器" class="headerlink" title="1.1 Web服务器"></a>1.1 <code>Web</code>服务器</h3><blockquote>
+<p><strong><code>Web</code>服务器</strong>只负责处理<code>HTTP</code>协议，只是简单的通过响应<code>HTML</code>页面来处理<code>HTTP</code>请求。</p>
+</blockquote>
+<p><strong>(1) <code>httpd(Apache)</code></strong></p>
+<ul>
+<li><p>简述</p>
+<ul>
+<li><code>Apache HTTP Server</code>是<code>Apache</code>软件基金会的一个开放源码的网页服务器，可以在大多数计算机操作系统中运行，由于其多平台和安全性被广泛使用，是最流行的<code>Web</code>服务器端软件之一。它快速、可靠并且可通过简单的<code>API</code>扩展，将<code>Perl/Python</code>等解释器编译到服务器中。</li>
+</ul>
+</li>
+<li><p>特性</p>
+<ul>
+<li>支持通用网关接口</li>
+<li>集成代理服务器模块</li>
+<li>提供用户会话过程的跟踪</li>
+<li>支持安全<code>Socket</code>层(<code>SSL</code>)</li>
+<li>支持多种方式的<code>HTTP</code>认证</li>
+<li>支持最新的<code>HTTP/1.1</code>通信协议</li>
+<li>支持基于 IP 和基于域名的虚拟主机</li>
+</ul>
+</li>
+</ul>
+<p><strong>(2) <code>IIS</code></strong></p>
+<ul>
+<li>简述<ul>
+<li><code>IIS</code>是<code>Internet Information Services</code>的缩写，意为互联网信息服务，是由微软公司提供的基于运行<code>Microsoft Windows</code>的互联网基本服务。</li>
+<li><code>IIS</code>是一种<code>Web</code>服务组件，其中包括<code>Web</code>服务器(网页浏览)、<code>FTP</code>服务器(文件传输)、<code>NNTP</code>服务器(新闻服务)和<code>SMTP</code>服务器(邮件发送)。</li>
+</ul>
+</li>
+<li>缺点<ul>
+<li><code>IIS</code>的安全脆弱性曾长时间被业内诟病，一旦<code>IIS</code>出现远程执行漏洞威胁将会非常严重。</li>
+</ul>
+</li>
+</ul>
+<p><strong>(3) <code>Lighttpd</code></strong></p>
+<ul>
+<li>简述<ul>
+<li><code>Lighttpd</code>是一个德国人领导的开源<code>Web</code>服务器软件，也是最流行的<code>Apache</code>服务器替代者。</li>
+</ul>
+</li>
+<li>优点<ul>
+<li><code>Lighttpd</code>是一个<strong>单线程</strong>的针对大量持续连接做出专门优化的<code>Web</code>服务器(这正是多数高流量网站需要的)。</li>
+<li><code>Lighttpd</code>支持<code>FastCGI</code>、<code>HTTP</code>服务器端压缩、<code>mod-rewrite</code>和其他众多有用的功能。</li>
+<li>尽管<code>Lighttpd</code>拥有<code>Apache</code>的绝大多数功能，但它仍然保持轻量级(仅<code>1MB</code>)并且可以与<code>Apache</code>使用相同的配置。</li>
+</ul>
+</li>
+</ul>
+<p><strong>(4) <code>Nginx</code></strong></p>
+<ul>
+<li>简述<ul>
+<li><code>Nginx</code>是一款轻量级的<code>Web</code>服务器/反向代理服务器及电子邮件(<code>IMAP/POP3</code>)代理服务器，其特点是占有内存少，并发能力强。<code>Nginx</code>对静态页面的支持相当出色，轻量且免费。<code>Nginx</code>不支持<code>CGI</code>，但是支持更灵活的<code>FastCGI</code>。</li>
+</ul>
+</li>
+<li>优点<ul>
+<li><code>Nginx</code>可以在大多数<code>Unix/Linux/MacOS</code>上编译运行，并有<code>Windows</code>移植版</li>
+<li><code>Nginx</code>是一个很强大的高性能<code>Web</code>和反向代理服务器</li>
+<li>在连接高并发的情况下，<code>Nginx</code>是<code>Apache</code>服务器不错的替代品</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="1-2-应用服务器"><a href="#1-2-应用服务器" class="headerlink" title="1.2 应用服务器"></a>1.2 应用服务器</h3><blockquote>
+<p><strong>应用服务器</strong>一般是用来处理动态请求的服务器。应用服务器一般也支持<code>HTTP</code>协议，因此界限没这么清晰。但是应用服务器的<code>HTTP</code>协议部分仅仅是支持，一般不会做特别优化，所以很少有见<code>Tomcat</code>直接暴露给外面，而是和<code>Nginx</code>、<code>httpd(Apache)</code>等配合，只让<code>Tomcat</code>处理<code>JSP</code>和<code>Servlet</code>部分。</p>
+</blockquote>
+<p><strong>Java</strong></p>
+<ul>
+<li><code>GlassFish</code></li>
+<li><code>JBoss</code></li>
+<li><code>Apache Tomcat</code></li>
+<li><code>WebLogic</code></li>
+</ul>
+<p><strong>.Net</strong></p>
+<ul>
+<li><code>IIS</code></li>
+<li><code>Mono</code></li>
+<li><code>Base4</code></li>
+<li><code>TNAPS Application Server</code></li>
+</ul>
+<p><strong>PHP</strong></p>
+<ul>
+<li><code>Zend Server</code></li>
+<li><code>HHVM</code></li>
+</ul>
+<hr>
+<h2 id="2-httpd服务的历史"><a href="#2-httpd服务的历史" class="headerlink" title="2. httpd服务的历史"></a>2. <code>httpd</code>服务的历史</h2><blockquote>
+<p><code>httpd(Apache)</code>的历史就是<code>Web服务器的</code>发展历史。</p>
+</blockquote>
+<p><strong><code>Apache 1.x</code></strong>（1995 年）</p>
+<ul>
+<li>(1) 支持更多平台</li>
+<li>(2) 支持动态共享对象<ul>
+<li>能够在多种平台上支持以动态共享对象(<code>DSO</code>)的方式加载模块。</li>
+<li>这样是服务器更加灵活的工作，同时也使<code>Apache</code>的内容消耗量有所下降，从而响应更多请求连接。</li>
+<li>但是，因为频繁的加载模块会使服务器的效率变低。</li>
+</ul>
+</li>
+<li>(3) 增加<code>APACI</code>和<code>APXS</code>脚本<ul>
+<li>通过<code>APACI</code>脚本用户可以在编译<code>Apache</code>的时候指定各种参数或安装布局，从而降低安装难度。</li>
+</ul>
+</li>
+<li>(4) 增加和增强了模块功能<ul>
+<li>代理模块更容易使用</li>
+<li>支持以<code>CONNECT</code>方式连接</li>
+<li>别名和重定向开始支持正则表达式</li>
+<li>引入<code>mod_negotiation</code>模块以支持当时最新的<code>HTTP/1.1</code>协议</li>
+</ul>
+</li>
+</ul>
+<p><strong><code>Apache 2.0/2.2</code></strong>（2002 年）</p>
+<ul>
+<li>(1) 加强了<code>Apache</code>的跨平台移植能力</li>
+<li>(2) 支持多路处理模块(<code>MPM</code>)<ul>
+<li>提高了服务器的性能和稳定性，而且改善<code>Apache</code>可扩展性</li>
+<li>而在支持<code>POSIX</code>线程的<code>UNIX/Linux</code>系统上，可以使用混合的多进程、多线程模型运行</li>
+</ul>
+</li>
+<li>(3) 改变了原本的<code>API</code>接口<ul>
+<li>增加了新的调用方式以提高模块性能</li>
+</ul>
+</li>
+<li>(4) 模块功能的增强<ul>
+<li><code>mod_ssl</code>作为官方模块正式引入到<code>Apache</code>中</li>
+<li>新增<code>mod_auth_ldap</code>可以使<code>LDAP</code>数据库进行认证</li>
+<li>代理模块重写，并且提供了过滤功能的结构优势</li>
+</ul>
+</li>
+<li>(5) 授权/认证模块的变动<ul>
+<li><code>mod_auth</code>模块被分为<code>mod_auth_basic</code>和<code>mod_authn_file</code>模块</li>
+<li><code>mod_auth_dbm</code>模块更名为<code>mod_authn_dbm</code></li>
+<li><code>mod_access</code>模块更名为<code>mod_authz_host</code></li>
+<li>新增<code>mod_authn_alias</code>模块用于简化身份认证配置</li>
+<li>新增<code>htcacheclean</code>工具来清除<code>mod_disk_cache</code>模块使用的缓冲存储区</li>
+<li>新增<code>mod_proxy_balancer</code>模块来为<code>mod_proxy</code>提供负载均衡服务</li>
+<li>更新了正则表达式库的支持</li>
+<li>通过<code>mod_dbd</code>和<code>apr_dbd</code>框架支持<code>SQL</code>数据库使用</li>
+</ul>
+</li>
+</ul>
+<p><strong><code>Apache 2.3/2.4</code></strong>（2008 年）</p>
+<ul>
+<li>增强多路处理模块(<code>MPM</code>)<ul>
+<li><code>mpm</code>模块将不再是只能选择一种<code>mpm</code>编译进内核，而是全部编译并根据配置文件进行配置</li>
+</ul>
+</li>
+<li><code>KeepAliveTimeout</code>支持毫秒为单位<ul>
+<li>减轻服务器负担</li>
+</ul>
+</li>
+<li>内存使用量减少<ul>
+<li>使得<code>Apache</code>能在有限的内存中处理更多请求连接</li>
+</ul>
+</li>
+<li>新增表达式解析器</li>
+<li>新增大量模块<ul>
+<li><code>mod_lua</code>对<code>LUA</code>语言的支持</li>
+<li><code>mod_ratelimit</code>提供客户端限速功能</li>
+<li><code>mod_proxy_fcgi</code>提供了<code>FastCGI</code>的支持</li>
+<li><code>mod_proxy_scgi</code>提供了<code>SCGI</code>网关的支持</li>
+<li><code>mod_allowmethods</code>更深入的限制<code>HTTP</code>连接方式</li>
+<li><code>event</code>模块不再是测试模块，以及可以运行在生产平台了</li>
+</ul>
+</li>
+<li><code>FastkCGI</code>加入到守护进程中</li>
+</ul>
+<hr>
+<h2 id="3-httpd服务的特性"><a href="#3-httpd服务的特性" class="headerlink" title="3. httpd服务的特性"></a>3. <code>httpd</code>服务的特性</h2><p><strong>服务特性<code>DSO</code></strong></p>
+<ul>
+<li>简述<ul>
+<li><code>DSO</code>是动态共享模块(<code>Dynamic Shared Object</code>)的缩写</li>
+<li><code>httpd</code>具有高度模块化：<code>core + modules</code></li>
+<li>我们可以更加灵活的对<code>httpd</code>服务进行自己的个人定制和特性化</li>
+</ul>
+</li>
+<li>优点<ul>
+<li>在<code>httpd.conf</code>配置文件中使用<code>LoadModule</code>来完成模块的加载，使用更加灵活</li>
+<li>使用<code>DSO</code>与<code>apxs</code>(<code>Apache</code>扩展)可以将新模块快速加入服务器，无须重新编译</li>
+<li>通过<code>DSO</code>模块的扩展和不同配置，可以在一个服务器运行多个副本提供不同的功能</li>
+</ul>
+</li>
+<li>缺点<ul>
+<li><code>DSO</code>受操作系统的限制，加载时需要进行符号解析，因此启动时间需要加载</li>
+<li>更换平台后，所以模块都必须在此平台上重新编译，否则无法使用</li>
+</ul>
+</li>
+</ul>
+<p><strong>服务特性<code>MPM</code></strong></p>
+<ul>
+<li>简述<ul>
+<li><code>MPM</code>是混合多进程模型(<code>Multipath Processing Modules</code>)的缩写</li>
+</ul>
+</li>
+<li><code>prefork</code><ul>
+<li><strong>多进程模型</strong>：每个进程响应一个请求</li>
+<li>一个主进程负责生成<code>n</code>个子进程，子进程也称为工作进程，每个子进程处理一个用户请求。即便没有用户请求，也会预先生成多个空闲进程，随时等待请求到达；最大不会超过<code>1024</code>个(这个数据可以设置)。</li>
+<li><code>c10k</code>问题</li>
+</ul>
+</li>
+<li><code>worker</code><ul>
+<li><strong>多线程模型</strong>：每个线程响应一个请求</li>
+<li>一个主进程生成<code>m</code>个子进程，每个子进程负责生个<code>n</code>个线程，每个线程响应一个请求</li>
+<li><code>m</code>进程和<code>n</code>线程：<code>m*n</code></li>
+</ul>
+</li>
+<li><code>event</code><ul>
+<li><strong>事件驱动模型</strong>：基于事件回调(异步)完成，每个线程响应 n 个请求</li>
+<li>一个主进程生成<code>m</code>个子进程，每个进程处理<code>n</code>个请求</li>
+<li><code>m*n</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>功能特性</strong></p>
+<ul>
+<li>虚拟主机</li>
+<li>日志控制</li>
+<li>身份认证</li>
+<li>性能调整</li>
+<li>别名和重命名</li>
+<li>数据库连接管理</li>
+<li>服务器安全设置</li>
+<li>代理服务器和缓存</li>
+<li>元信息和内容协商</li>
+<li><code>SSL</code>安全套接字</li>
+<li><code>CGI</code>/<code>FastCGI</code>接口</li>
+</ul>
+<hr>
+<h2 id="4-httpd安装"><a href="#4-httpd安装" class="headerlink" title="4. httpd安装"></a>4. <code>httpd</code>安装</h2><h3 id="4-1-二进制程序安装"><a href="#4-1-二进制程序安装" class="headerlink" title="4.1 二进制程序安装"></a>4.1 二进制程序安装</h3><pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查询RPM包信息</span>
+$ rpm -qi httpd-2.4.6-67.el7.centos.6.x86_64.rpm
+
+<span class="token comment" spellcheck="true"># 安装RPM包</span>
+$ rpm -ivh httpd-2.4.6-67.el7.centos.6.x86_64.rpm
+
+<span class="token comment" spellcheck="true"># 卸载RPM包</span>
+$ rpm -e httpd-2.4.6-67.el7.centos.6.x86_64.rpm
+
+<span class="token comment" spellcheck="true"># 推荐使用yum安装</span>
+$ yum <span class="token function">install</span> -y httpd<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 如果使用的LFS可以使用已经编译好的包安装</span>
+$ <span class="token function">wget</span> http://archive.apache.org/dist/httpd/binaries/linux/httpd-2.0.50-i686-pc-linux-gnu.tar.gz
+$ <span class="token function">tar</span> -zxvf httpd-2.0.50-i686-pc-linux-gnu.tar.gz
+$ <span class="token function">cd</span> httpd-2.0.50
+
+<span class="token comment" spellcheck="true"># 安装到指定目录并启动</span>
+$ ./install-bindist.sh /usr/local/apache2.0.50
+$ ./httpd start<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="4-2-源代码编译安装"><a href="#4-2-源代码编译安装" class="headerlink" title="4.2 源代码编译安装"></a>4.2 源代码编译安装</h3><blockquote>
+<p>为了方便源代码安装，可以使用<code>Apache Toolbox</code>工具图形化安装<code>httpd</code>服务。</p>
+</blockquote>
+<ul>
+<li><strong>(1) 下载</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 下载安装包并进行校验</span>
+$ <span class="token function">wget</span> http://archive.apache.org/dist/httpd/httpd-2.4.29.tar.bz2
+$ <span class="token function">wget</span> http://archive.apache.org/dist/httpd/httpd-2.4.29.tar.bz2.md5
+$ md5sum -c httpd-2.4.29.tar.bz2.md5
+httpd-2.4.29.tar.bz2: 确定
+
+<span class="token comment" spellcheck="true"># 解压</span>
+$ <span class="token function">tar</span> -xjvpf httpd-2.4.29.tar.bz2 -C /usr/src
+$ <span class="token function">cd</span> /usr/src/httpd-2.4.29<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>(2) 编译需求</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 编译要求</span>
+<span class="token comment" spellcheck="true"># 1. 空间需求（存放源码目录至少70MB，安装目录至少20MB）</span>
+<span class="token comment" spellcheck="true"># 2. 编译器需求（GCC编译器）</span>
+<span class="token comment" spellcheck="true"># 3. 时间需求（ntp服务同步）</span>
+<span class="token comment" spellcheck="true"># 4. 工具包需求（apr/apr-util）</span>
+<span class="token comment" spellcheck="true"># 5. APACI</span>
+$ ntpdate stdtime.gor.hk
+$ hwclock -w<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>(3) configure 脚本</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 常用配置</span>
+<span class="token comment" spellcheck="true"># ./configure -h  可以查看更多参数选项信息</span>
+--prefix<span class="token operator">=</span>/apache_patch: 指定Apache安装位置
+--enable-module<span class="token operator">=</span>so: 启用so模块，让Apache可以通过DSO方式加载模块
+--enable-mods-shared<span class="token operator">=</span>all: 以共享方式编译全部的模块，不包括核心模块
+--enable-modules<span class="token operator">=</span>all/most: 以静态方式编码全部的模块
+--with-mpm<span class="token operator">=</span>worker: 让Apache以worker方式运行<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 手动编译事例</span>
+$ CC<span class="token operator">=</span><span class="token string">"gcc"</span> \
+<span class="token operator">></span> ./configure --enable-modules<span class="token operator">=</span><span class="token string">"mod_proxy mod_so mod_authn_dbd"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>(4) 编译安装</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 加速安装，一个CPU可以使用-j3，之后每增加一个+2</span>
+$ <span class="token function">make</span> -j9
+$ <span class="token function">make</span> <span class="token function">install</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>(5) 清除调试符号</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ strip /usr/local/apache2/bin/httpd<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Escape</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://escapelife.github.io/posts/2165fe19.html">https://escapelife.github.io/posts/2165fe19.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Escape</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Linux/">
+                                    <span class="chip bg-color">Linux</span>
+                                </a>
+                            
+                                <a href="/tags/Apache/">
+                                    <span class="chip bg-color">Apache</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/posts/a207988d.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/use-rsync-command.jpg" class="responsive-img" alt="愉快的使用rsync备份数据">
+                        
+                        <span class="card-title">愉快的使用rsync备份数据</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2018-12-08
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                    <a href="/tags/Command/">
+                        <span class="chip bg-color">Command</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/posts/fee70937.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/linux-apache-server-20.jpg" class="responsive-img" alt="Apache服务之HTTPS基础">
+                        
+                        <span class="card-title">Apache服务之HTTPS基础</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2018-12-05
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                    <a href="/tags/Apache/">
+                        <span class="chip bg-color">Apache</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('4'),
+            headingSelector: 'h2, h3, h4, h5'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4, h5').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="764454432"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='none'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">2017</span>
+            <a href="/about" target="_blank">Escape</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">823k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2017";
+                    var startMonth = "2";
+                    var startDate = "14";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/EscapeLife" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wenpanhappy@126.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
