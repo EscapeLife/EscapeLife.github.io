@@ -1,0 +1,1379 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="LVS服务之内容请求分发, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>LVS服务之内容请求分发 | Escape</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Escape</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Escape</div>
+        <div class="logo-desc">
+            
+            听摇滚,但不偏颇;也挺古典,但不安逸
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/EscapeLife" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/EscapeLife" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/linux-lvs-cluster-tech-60.png')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">LVS服务之内容请求分发</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Linux/">
+                                <span class="chip bg-color">Linux</span>
+                            </a>
+                        
+                            <a href="/tags/LVS/">
+                                <span class="chip bg-color">LVS</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                Linux运维之路
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2018-07-26
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2020-11-02
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    5.8k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    21 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <blockquote>
+<p><strong>纸上得来终觉浅，绝知此事要躬行。</strong></p>
+</blockquote>
+<p><img src="/images/linux-lvs-cluster-tech-60.png" alt="LVS服务之内容请求分发"></p>
+<p>前面我们讲述了在<code>Linux</code>虚拟服务器的框架下，先在<code>Linux</code>内核中实现了含有三种 IP 负载均衡技术的<strong>IP 虚拟服务器</strong>，可将一组服务器构成一个实现高可伸缩、高可用的网络服务的服务器集群。在<code>IPVS</code>中，使得服务器集群的结构对客户是透明的，客户访问集群提供的网络服务就像访问一台高性能、高可用的服务器一样。客户程序不受服务器集群的影响不需作任何修改。系统的伸缩性通过在服务机群中透明地加入和删除一个节点来达到，通过检测节点或服务进程故障和正确地重置系统达到高可用性。</p>
+<p><code>IPVS</code>基本上是一种高效的<code>Layer-4</code>交换机，它提供负载平衡的功能。当一个<code>TCP</code>连接的初始<code>SYN</code>报文到达时，<code>IPVS</code>就选择一台服务器，将报文转发给它。此后通过查发报文的<code>IP</code>和<code>TCP</code>报文头地址，保证此连接的后继报文被转发到相同的服务器。这样，<code>IPVS</code>无法检查到请求的内容再选择服务器，这就要求后端的服务器组是提供相同的服务，不管请求被送到哪一台服务器，返回结果都应该是一样的。但是在有一些应用中后端的服务器可能功能不一，有的是提供<code>HTML</code>文档的<code>Web</code>服务器，有的是提供图片的<code>Web</code>服务器，有的是提供<code>CGI</code>的<code>Web</code>服务器。这时，就需要<strong>基于内容请求分发</strong>，同时基于内容请求分发可以提高后端服务器上访问的局部性。</p>
+<hr>
+<h2 id="1-基于内容的请求分发"><a href="#1-基于内容的请求分发" class="headerlink" title="1. 基于内容的请求分发"></a>1. 基于内容的请求分发</h2><p>根据应用层(<code>Layer-7</code>)的信息调度<code>TCP</code>负载不是很容易实现，对于所有的<code>TCP</code>服务，应用层信息必须等到<code>TCP</code>连接建立(<strong>三次握手</strong>)后才能获得。这就说明连接不能用<code>Layer-4</code>交换机收到一个<code>SYN</code>报文时进行调度。来自客户的<code>TCP</code>连接必须在交换机上被接受，建立在客户与交换机之间<code>TCP</code>连接，来获得应用的请求信息。一旦获得请求信息，分析其内容来决定哪一个后端服务器来处理，再将请求调度到该服务器。</p>
+<h3 id="1-1-实现内容调度的方法"><a href="#1-1-实现内容调度的方法" class="headerlink" title="1.1 实现内容调度的方法"></a>1.1 实现内容调度的方法</h3><p>现有两种方法实现基于内容的调度。一种是<strong>TCP 网关</strong>(<code>TCP Gateway</code>)，交换机建立一个到后端服务器的<code>TCP</code>连接，将客户请求通过这个连接发到服务器，服务器将响应结果通过该连接返回到交换机，交换机再将结果通过客户到交换机的连接返回给客户。另一种是<strong>TCP 迁移</strong>(<code>TCP Migration</code>)，将客户到交换机<code>TCP</code>连接的交换机端迁移到服务器，这样客户与服务器就可以建立直接的 TCP 连接，但请求报文还需要经过交换机调度到服务器，响应报文直接返回给客户。</p>
+<p>就我们所知，<code>Resonate</code>实现了<code>TCP</code>迁移方法，他们称之为<strong>TCP 连接跳动</strong>(<code>TCP Connection Hop</code>)，他们的软件是专有的。<code>TCP</code>迁移需要修改交换机的<code>TCP/IP</code>协议栈，同时需要修改所有后端服务器的<code>TCP/IP</code>协议栈，才能实现将<code>TCP</code>连接的一端从一台机器及其迁移到另一台上。虽然在交换机获得客户请求后，<code>TCP</code>迁移方法比较高效，但是该方法实现工作量大，要修改交换机和后端服务器的操作系统，不具有一般性。</p>
+<p>因此，<strong>TCP 网关</strong>方法被绝大部分<code>Layer-7</code>交换的商业产品和自由软件所使用，如<code>ArrowPoint</code>的<code>CS-100</code>和<code>CS-800</code>的<code>Web</code>交换机、<code>Zeus</code>负载调度器、爱立信实验室的<code>EDDIE</code>、自由软件<code>Apache</code>和<code>Squid</code>等。<code>TCP</code>网关方法不需要更改服务器的操作系统，服务器只要支持<code>TCP/IP</code>即可，它具有很好的通用性。但是，<code>TCP</code>网关一般都是在用户空间实现的，其处理开销比较大，如下图所示。</p>
+<p><img src="/images/linux-lvs-cluster-tech-61.jpg" alt="LVS服务之内容请求分发"></p>
+<p>从图中我们可以看出，对于任一<code>TCP</code>请求，客户将请求发到交换机，计算机将请求报文从内核传给用户空间的<code>Layer-7</code>交换程序，<code>Layer-7</code>交换程序根据请求选出服务器，再建一个<code>TCP</code>连接将请求发给服务器，返回的响应报文必须先由内核传给用户空间的<code>Layer-7</code>交换程序，再由<code>Layer-7</code>交换程序通过内核将结果返回给客户。对于一个请求报文和对应的响应报文，都需要四次内核与用户空间的切换，切换和内存复制的开销是非常高的，所以用户空间<code>TCP Gateway</code>的伸缩能力很有限，一般来说一个用户空间<code>TCP Gateway</code>只能调度三、四台服务器，当连接的速率到达每秒<code>1000</code>个连接时，<code>TCP Gateway</code>本身会成为瓶颈。所以，在<code>ArrowPoint</code>的<code>CS-800</code>的<code>Web</code>交换机中集成了多个<code>TCP Gateway</code>。</p>
+<hr>
+<h3 id="1-2-举例说明"><a href="#1-2-举例说明" class="headerlink" title="1.2 举例说明"></a>1.2 举例说明</h3><p>虽然<code>Layer-7</code>交换比<code>Layer-4</code>交换处理复杂，但<code>Layer-7</code>交换带来以下好处：</p>
+<ul>
+<li>相同页面的请求被发送到同一台的服务器，所请求的页面很有可能会被服务器缓存，可以提高单台服务器的主存<code>Cache</code>使用效率。</li>
+<li>一些研究表明<code>WEB</code>访问流中存在空间的局部性。<code>Layer-7</code>交换可以充分利用访问的局部性，将相同类型的请求发送到同一台服务器，使得每个后端服务器收到的请求相似性好，有利于进一步提高单台服务器的主存<code>Cache</code>使用效率，从而在有限的硬件配置下提高系统的整体性能。</li>
+<li>后端的服务器可运行不同类型的服务，如文档服务，图片服务，<code>CGI</code>服务和数据库服务等。</li>
+</ul>
+<p><img src="/images/linux-lvs-cluster-tech-62.jpg" alt="LVS服务之内容请求分发"></p>
+<p>上图举例说明了<strong>基于内容请求分发</strong>可以提高后端服务器的<code>Cache</code>命中率。在例子中，一个有两台后端服务器的集群来处理进来的请求序列<code>AACBAACABC</code>。在基于内容的请求分发中，调度器将所有请求<code>A</code>发到后端服务器<code>1</code>，将请求<code>B</code>和<code>C</code>序列发到后端服务器<code>2</code>。这样，有很大的可能性请求所要的对象会在后端服务器的<code>Cache</code>中找到。相反在轮叫请求分发中，后端服务器都收到请求<code>A</code>、<code>B</code>和<code>C</code>，这增加了<code>Cache</code>不命中的可能性。因为分散的请求序列会增大工作集，当工作集的大小大于后端服务器的主存<code>Cache</code>时，导致<code>Cache</code>不命中。</p>
+<p>在基于内容的请求分发中，不同的请求被发送到不同的服务器，当然这有可能导致后端服务器的负载不平衡，也有可能导致更差的性能。所以，在设计基于内容请求分发的服务器集群中，我们不仅要考虑如何高效地进行基于内容的请求分发，而且要设计有效的算法来保证后端服务器间的负载平衡和提高单个服务器的<code>Cache</code>命中率。</p>
+<hr>
+<h2 id="2-内容请求分发-KTCPVS"><a href="#2-内容请求分发-KTCPVS" class="headerlink" title="2. 内容请求分发 KTCPVS"></a>2. 内容请求分发 KTCPVS</h2><blockquote>
+<p>内核中的基于内容请求分发 KTCPVS 集群</p>
+</blockquote>
+<p>由于用户空间<code>TCP Gateway</code>的开销太大，导致其伸缩能力有限。为此，我们提出在操作系统的内核中实现<code>Layer-7</code>交换方法，来避免用户空间与核心空间的切换开销和内存复制的开销。在<code>Linux</code>操作系统的内核中，我们实现了<code>Layer-7</code>交换，称之为<strong>KTCPVS</strong>(<code>Kernel TCP Virtual Server</code>)。</p>
+<h3 id="2-1-KTCPVS-的体系结构"><a href="#2-1-KTCPVS-的体系结构" class="headerlink" title="2.1 KTCPVS 的体系结构"></a>2.1 KTCPVS 的体系结构</h3><p><strong>KTCPVS 集群</strong>的体系结构如下图所示：它主要由两个组成部分，一是<strong>KTCPVS 交换机</strong>，根据内容不同将请求发送到不同的服务器上；二是<strong>后端服务器</strong>，可运行不同的网络服务。<code>KTCPVS</code>交换机和后端服务器通过<code>LAN/WAN</code>互联。</p>
+<p><img src="/images/linux-lvs-cluster-tech-63.jpg" alt="LVS服务之内容请求分发"></p>
+<p><code>KTCPVS</code>交换机能进行根据内容的调度，将不同类型的请求发送到不同的后端服务器，再将结果返回给客户，后端服务器对客户是不可见的。所以，<code>KTCPVS</code>集群的结构对客户是透明的，客户访问集群提供的网络服务就像访问一台高性能、高可用的服务器一样，故我们也称之为虚拟服务器。客户程序不受服务器集群的影响不需作任何修改。</p>
+<hr>
+<h3 id="2-2-KTCPVS-实现方式"><a href="#2-2-KTCPVS-实现方式" class="headerlink" title="2.2 KTCPVS 实现方式"></a>2.2 KTCPVS 实现方式</h3><p>在<code>Linux</code>内核<code>2.4</code>中，我们用<strong>内核线程</strong>(<code>Kernel thread</code>)实现<code>Layer-7</code>交换服务程序，并把所有的程序封装在可装卸的<code>KTCPVS</code>模块。<strong>KTCPVS</strong>的主要功能模块如下图所示：当<code>KTCPVS</code>模块被加载到内核中时，<code>KTCPVS</code>主内核线程被激活，并在<code>/proc</code>文件系统和<code>setsockopt</code>上挂接<code>KTCPVS</code>的内核控制程序，用户空间的管理程序<code>tcpvsadm</code>通过<code>setsockopt</code>函数来设置<code>KTCPVS</code>服务器的规则，通过<code>/proc</code>文件系统把<code>KTCPVS</code>服务器的规则读出。基于内容调度的模块被做成可装卸的模块(<code>Loadable Module</code>)，不同的网络服务可以使用不同的基于内容调度模块，如<code>HTTP</code>和<code>RTSP</code>等。另外，系统的结构灵活，用户也可以为自己不同类型的网络服务编写相应的模块。</p>
+<p><img src="/images/linux-lvs-cluster-tech-64.jpg" alt="LVS服务之内容请求分发"></p>
+<p>可以通过<code>tcpvsadm</code>命令使得<code>KTCPVS</code>主线程生成多个子线程监听在某个端口。这组子线程可以接受来自客户的请求，通过与其绑定的基于内容的调度模块获得能处理当前请求的服务器，并建立一个<code>TCP</code>连接到该服务器，将请求发到服务器；子线程获得来自服务器的响应结果后，再将结果返回给客户。所有的请求和响应数据处理都是在操作系统的内核中进行的，所以没有用户空间与核心空间的切换开销和内存复制的开销，其处理开销比用户空间的<code>TCP Gateway</code>小很多。</p>
+<hr>
+<h3 id="2-3-KTCPVS-高可用性"><a href="#2-3-KTCPVS-高可用性" class="headerlink" title="2.3 KTCPVS 高可用性"></a>2.3 KTCPVS 高可用性</h3><p><code>KTCPVS</code>集群系统的高可用性可分为二部分达到，一是<strong>服务器故障处理</strong>，二是<strong>KTCPVS 调度器故障处理</strong>。</p>
+<p>在服务器故障处理上，我们可以一种或者组合多种方法来检测服务器或者网络服务是否可用。例如，一是资源监测器每隔 t 个毫秒对每个服务器发<strong>ARP</strong>(<code>Address Resolve Protocol</code>)请求，若有服务器过了<code>r</code>毫秒没有响应，则说明该服务器已发生故障，资源监测器通知调度器将该服务器的所有服务进程调度从调度列表中删除。二是资源监测器定时地向每个服务进程发请求，若不能返回结果则说明该服务进程发生故障，资源监测器通知调度器将该服务进程调度从<code>KTCPVS</code>调度列表中删除。资源监测器能通过电子邮件或传呼机向管理员报告故障，一旦监测到服务进程恢复工作，通知调度器将其加入调度列表进行调度。通过检测节点或服务进程故障和正确地重置系统，可以将部分结点或软件故障对用户屏蔽掉，从而实现系统的高可用性。</p>
+<p>在<code>KTCPVS</code>调度器故障处理上，跟<code>IPVS</code>调度器故障处理类似，通过心跳或者<code>VRRP</code>来实现<code>KTCPVS</code>调度器的高可用性。</p>
+<hr>
+<h2 id="3-KTCPVS-的调度算法"><a href="#3-KTCPVS-的调度算法" class="headerlink" title="3. KTCPVS 的调度算法"></a>3. KTCPVS 的调度算法</h2><p><code>KTCPVS</code>的负载均衡调度是以<code>TCP</code>连接为粒度的。同一用户的不同连接可能会被调度到不同的服务器上，所以这种细粒度的调度可避免不同用户的访问差异引起服务器间的负载不平衡。</p>
+<p>在调度算法上，我们先实现了<strong>加权最小连接调度</strong>，因为该算法都较容易实现，便于调试和测试。另外，<code>KTCPVS</code>交换机网络配置比<code>Layer-4</code>交换机的简单，<code>KTCPVS</code>交换机和服务器只要有网络相连，能进行<code>TCP/IP</code>通讯即可，安装使用比较方便，所以在整个系统规模不大（例如不超过 10 个结点）且结点提供的服务相同时，可以利用以上算法来调度这些服务器，<code>KTCPVS</code>交换机仍是不错的选择。同时，在实际的性能测试中，这些调度算法可以用作比较。</p>
+<p>我们给出基于<strong>局部性的最小连接调度</strong>和基于<strong>内容的调度</strong>算法。基于局部性的最小连接调度是假设后端服务器都是相同的，在后端服务器的负载基本平衡情况下，尽可能将相同的请求分到同一台服务器，以提高后端服务器的访问局部性，从而提高后端服务器的<code>Cache</code>命中率。基于内容的调度是考虑后端服务器不相同时，若同一类型的请求有多个服务器可以选择时，将请求负载均衡地调度到这些服务器上。</p>
+<hr>
+<h3 id="3-1-加权最小连接调度"><a href="#3-1-加权最小连接调度" class="headerlink" title="3.1 加权最小连接调度"></a>3.1 加权最小连接调度</h3><p><strong>最小连接调度</strong>(<code>Least-Connection Scheduling</code>)是把新的连接请求分配到当前连接数最小的服务器。最小连接调度是一种动态调度算法，它通过服务器当前所活跃的连接数来估计服务器的负载情况。调度器需要记录各个服务器已建立连接的数目，当一个请求被调度到某台服务器，其连接数加 1；当连接中止或超时，其连接数减一。</p>
+<p><strong>加权最小连接调度</strong>(<code>Weighted Least-Connection Scheduling</code>)是最小连接调度的超集，各个服务器用相应的权值表示其处理性能。服务器的缺省权值为<code>1</code>，系统管理员可以动态地设置服务器的权值。加权最小连接调度在调度新连接时尽可能使服务器的已建立连接数和其权值成比例。</p>
+<hr>
+<h3 id="3-2-基于局部性的最小连接调度"><a href="#3-2-基于局部性的最小连接调度" class="headerlink" title="3.2 基于局部性的最小连接调度"></a>3.2 基于局部性的最小连接调度</h3><p>在基于局部性的<strong>最小连接负载调度</strong>中，我们假设任何后端服务器都可以处理任一请求。算法的目标是在后端服务器的负载平衡情况下，提高后端服务器的访问局部性，从而提高后端服务器的主存<code>Cache</code>命中率。</p>
+<p>在<code>WEB</code>应用中，来自不同用户的请求很有可能重叠，<code>WEB</code>访问流中存在空间的局部性，容易获得<code>WEB</code>请求的<code>URL</code>，所以，<code>LBLC</code>算法主要针对<code>WEB</code>应用。静态<code>WEB</code>页面的请求格式如下：</p>
+<pre class="line-numbers language-http"><code class="language-http">&lt;scheme>://&lt;host>:&lt;port>/&lt;path><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>其中，区分页面不同的变量是文件的路径<code>&lt;path&gt;</code>，我们将之记为请求的目标。<code>CGI</code>动态页面的格式如下：</p>
+<pre class="line-numbers language-http"><code class="language-http">&lt;scheme>://&lt;host>:&lt;port>/&lt;path>?&lt;query><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>我们将其中的<code>CGI</code>文件路径<code>&lt;path&gt;</code>记为请求的目标。因为<code>CGI</code>程序一般要读一个或者多个文件来生成一个动态页面，若在服务器负载基本平衡情况下将相同的<code>CGI</code>请求发送到同一服务器，可以提高服务器文件系统的<code>Cache</code>命中率。<code>LBLC</code>算法的基本流程如下：</p>
+<pre class="line-numbers language-c"><code class="language-c"><span class="token keyword">while</span> <span class="token punctuation">(</span>true<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  get next request r<span class="token punctuation">;</span>
+  r<span class="token punctuation">.</span>target <span class="token operator">=</span> <span class="token punctuation">{</span> extract path from <span class="token keyword">static</span><span class="token operator">/</span>dynamic request r <span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>server<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> then <span class="token punctuation">{</span>
+    n <span class="token operator">=</span> <span class="token punctuation">{</span> least connection node <span class="token punctuation">}</span><span class="token punctuation">;</span>
+    server<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span> <span class="token operator">=</span> n<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    n <span class="token operator">=</span> server<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>n<span class="token punctuation">.</span>conns <span class="token operator">></span> n<span class="token punctuation">.</span>high <span class="token operator">&amp;&amp;</span> a node with node<span class="token punctuation">.</span>conns <span class="token operator">&lt;</span> node<span class="token punctuation">.</span>low<span class="token punctuation">)</span> <span class="token operator">||</span>
+      n<span class="token punctuation">.</span>conns <span class="token operator">>=</span> <span class="token number">2</span><span class="token operator">*</span>n<span class="token punctuation">.</span>high then <span class="token punctuation">{</span>
+      n <span class="token operator">=</span> <span class="token punctuation">{</span> least connection node <span class="token punctuation">}</span><span class="token punctuation">;</span>
+      server<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span> <span class="token operator">=</span> n<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>r is dynamic request<span class="token punctuation">)</span> then
+    n<span class="token punctuation">.</span>conns <span class="token operator">=</span> n<span class="token punctuation">.</span>conns <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">;</span>
+  <span class="token keyword">else</span>
+    n<span class="token punctuation">.</span>conns <span class="token operator">=</span> n<span class="token punctuation">.</span>conns <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">;</span>
+  send r to n and <span class="token keyword">return</span> results to the client<span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>r is dynamic request<span class="token punctuation">)</span> then
+    n<span class="token punctuation">.</span>conns <span class="token operator">=</span> n<span class="token punctuation">.</span>conns <span class="token operator">-</span> <span class="token number">2</span><span class="token punctuation">;</span>
+  <span class="token keyword">else</span>
+    n<span class="token punctuation">.</span>conns <span class="token operator">=</span> n<span class="token punctuation">.</span>conns <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>在算法中，我们用后端服务器的活跃连接数(<code>n.conns</code>)来表示它的负载，<code>server</code>是个关联变量，它将访问的目标和服务器对应起来。在这里，假设动态页面的处理是静态页面的<code>2</code>倍。开销算法的意图是将请求序列进行分割，相同的请求去同一服务器，可以提高访问的局部性；除非出现严重的负载不平衡了，我们进行调整，重新分配该请求的服务器。我们不想因为微小或者临时的负载不平衡，进行重新分配服务器，会导致<code>Cache</code>不命中和磁盘访问。所以，<strong>“严重的负载不平衡”</strong>是为了避免有些服务器空闲着而有服务器超载了。</p>
+<p>我们定义每个结点有连接数目的高低阀值，当结点的连接数(<code>node.conns</code>)小于其连接数低阀值(<code>node.low</code>)时，表明该结点有空闲资源；当结点的连接数(<code>node.conns</code>)大于其连接数高阀值(<code>node.high</code>)时，表明该结点在处理请求时可能会有一定的延时。在调度中，当一个结点的连接数大于其高阀值并且有结点的连接数小于其低阀值时，重新分配，将请求发到负载较轻的结点上。还有，为了限制结点过长的响应延时，当结点的连接数大于 2 倍的高阀值时，将请求重新分配到负载较轻的结点，不管是否有结点的连接数小于它的低阀值。</p>
+<p>我们在调度器上进行限制后端服务器的正在处理连接数必须小于<code>∑node.high</code>，这样可以避免所有结点的连接数大于它们的 2 倍的高阀值。这样，可以保证当有结点的连接数大于<code>2</code>倍的高阀值时，必有结点的连接数小于其高阀值。</p>
+<p>正确选择结点的高低阀值是根结点的处理性能相关的。在实践中，结点的低阀值应尽可能高来避免空闲资源，否则会造成结点的低吞吐率；结点的高阀值应该一个较高的值并且结点的响应延时不大。选择结点的高低阀值是一个折衷平衡的过程，结点的高低阀值之差有一定空间，这样可以限制负载不平衡和短期负载不平衡，而不破坏访问的局部性。对于一般结点，我们选择高低阀值分别为<code>30</code>和<code>60</code>；对于性能很高的结点，可以将其阀值相应调高。</p>
+<p>在基本的<code>LBLC</code>算法中，在任何时刻，任一请求目标只能由一个结点来服务。然而，有可能一个请求目标会导致一个后端服务器进入超载状态，这样比较理想的方法就是由多个服务器来服务这个文档，将请求负载均衡地分发到这些服务器上。这样，我们设计了带复制的<code>LBLC</code>算法，其流程如下：</p>
+<pre class="line-numbers language-c"><code class="language-c"><span class="token keyword">while</span> <span class="token punctuation">(</span>true<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  get next request r<span class="token punctuation">;</span>
+  r<span class="token punctuation">.</span>target <span class="token operator">=</span> <span class="token punctuation">{</span> extract path from <span class="token keyword">static</span><span class="token operator">/</span>dynamic request r <span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span> <span class="token operator">==</span> ∮<span class="token punctuation">)</span> then <span class="token punctuation">{</span>
+    n <span class="token operator">=</span> <span class="token punctuation">{</span> least connection node <span class="token punctuation">}</span><span class="token punctuation">;</span>
+    add n to serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    n <span class="token operator">=</span> <span class="token punctuation">{</span>least connection node in serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>n<span class="token punctuation">.</span>conns <span class="token operator">></span> n<span class="token punctuation">.</span>high <span class="token operator">&amp;&amp;</span> a node with node<span class="token punctuation">.</span>conns <span class="token operator">&lt;</span> node<span class="token punctuation">.</span>low<span class="token punctuation">)</span> <span class="token operator">||</span>
+      n<span class="token punctuation">.</span>conns <span class="token operator">>=</span> <span class="token number">2</span><span class="token operator">*</span>n<span class="token punctuation">.</span>high then <span class="token punctuation">{</span>
+      n <span class="token operator">=</span> <span class="token punctuation">{</span> least connection node <span class="token punctuation">}</span><span class="token punctuation">;</span>
+      add n to serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token operator">|</span>serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token operator">|</span> <span class="token operator">></span> <span class="token number">1</span>
+      <span class="token operator">&amp;&amp;</span> <span class="token function">time</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span>serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token punctuation">.</span>lastMod <span class="token operator">></span> K then <span class="token punctuation">{</span>
+      m <span class="token operator">=</span> <span class="token punctuation">{</span>most connection node in serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+      remove m from serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>r is dynamic request<span class="token punctuation">)</span> then
+    n<span class="token punctuation">.</span>conns <span class="token operator">=</span> n<span class="token punctuation">.</span>conns <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">;</span>
+  <span class="token keyword">else</span>
+    n<span class="token punctuation">.</span>conns <span class="token operator">=</span> n<span class="token punctuation">.</span>conns <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">;</span>
+  send r to n and <span class="token keyword">return</span> results to the client<span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>r is dynamic request<span class="token punctuation">)</span> then
+    n<span class="token punctuation">.</span>conns <span class="token operator">=</span> n<span class="token punctuation">.</span>conns <span class="token operator">-</span> <span class="token number">2</span><span class="token punctuation">;</span>
+  <span class="token keyword">else</span>
+    n<span class="token punctuation">.</span>conns <span class="token operator">=</span> n<span class="token punctuation">.</span>conns <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span> changed<span class="token punctuation">)</span> then
+    serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token punctuation">.</span>lastMod <span class="token operator">=</span> <span class="token function">time</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这个算法与原来算法的差别是调度器维护请求目标到一个能服务该目标的结点集合。请求会被分发到其目标的结点集中负载最轻的一个，调度器会检查是否发生结点集中存在负载不平衡，若是，则挑选所有结点中负载最轻的一个，将它加入该目标的结点集中，让它来服务该请求。另一方面，当请求目标的结点集有多个服务器，并且上次结点集的修改时间之差大于<code>K</code>秒时，将最忙的一个结点从该目标的结点集中删除。在实验中，<code>K</code>的缺省值为<code>60</code>秒。</p>
+<hr>
+<h3 id="3-3-基于内容的调度"><a href="#3-3-基于内容的调度" class="headerlink" title="3.3 基于内容的调度"></a>3.3 基于内容的调度</h3><p>在基于内容的调度（Content-based Scheduling）中，不同类型的请求会被送到不同的服务器，但是同一类型的请求有多个服务器可以选择，例如，CGI 应用往往是 CPU 密集型的，需要多台 CGI 服务器去完成，这时需要将请求负载均衡地调度到这些服务器上。其基本算法如下：</p>
+<pre class="line-numbers language-c"><code class="language-c"><span class="token keyword">while</span> <span class="token punctuation">(</span>true<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  get next request r<span class="token punctuation">;</span>
+  extract path from <span class="token keyword">static</span><span class="token operator">/</span>dynamic request and set r<span class="token punctuation">.</span>target<span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>definedServerSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span> <span class="token operator">==</span>∮<span class="token punctuation">)</span> then
+    n <span class="token operator">=</span> <span class="token punctuation">{</span>least connection node in defaultServerSet<span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token keyword">else</span>
+    n <span class="token operator">=</span> <span class="token punctuation">{</span>least connection node in definedServerSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+  send r to n and <span class="token keyword">return</span> results to the client<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>当请求目标有定义的结点集，即该类型的请求有一些服务器能处理，从该结点集中挑选负载最轻的一个，把当前的请求发到该服务器。当请求目标没有定义好的结点集，则从缺省的结点集中选负载最轻的结点，由它来处理该请求。</p>
+<p>在上面的算法中，只考虑了结点间的负载平衡和结点上静态分割好的局部性，没有考虑动态访问时的局部性。我们对该算法改进如下：</p>
+<pre class="line-numbers language-c"><code class="language-c"><span class="token keyword">while</span> <span class="token punctuation">(</span>true<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  get next request r<span class="token punctuation">;</span>
+  r<span class="token punctuation">.</span>target <span class="token operator">=</span> <span class="token punctuation">{</span> extract path from <span class="token keyword">static</span><span class="token operator">/</span>dynamic request r <span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>definedServerSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span> <span class="token operator">==</span>∮<span class="token punctuation">)</span> then
+    staticServerSet <span class="token operator">=</span> defaultServerSet<span class="token punctuation">;</span>
+  <span class="token keyword">else</span>
+    staticServerSet <span class="token operator">=</span> definedServerSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span> <span class="token operator">==</span> ∮<span class="token punctuation">)</span> then <span class="token punctuation">{</span>
+    n <span class="token operator">=</span> <span class="token punctuation">{</span> least connection node in statisServerSet<span class="token punctuation">}</span><span class="token punctuation">;</span>
+    add n to serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    n <span class="token operator">=</span> <span class="token punctuation">{</span>least connection node in serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>n<span class="token punctuation">.</span>conns <span class="token operator">></span> n<span class="token punctuation">.</span>high <span class="token operator">&amp;&amp;</span> a node in staticServerSet with
+       node<span class="token punctuation">.</span>conns <span class="token operator">=</span> <span class="token number">2</span><span class="token operator">*</span>n<span class="token punctuation">.</span>high then <span class="token punctuation">{</span>
+      n <span class="token operator">=</span> <span class="token punctuation">{</span> least connection node in staticServerSet<span class="token punctuation">}</span><span class="token punctuation">;</span>
+      add n to serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token operator">|</span>serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token operator">|</span> <span class="token operator">></span><span class="token number">1</span>
+      <span class="token operator">&amp;&amp;</span> <span class="token function">time</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span>serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token punctuation">.</span>lastMod <span class="token operator">></span> K then <span class="token punctuation">{</span>
+       m <span class="token operator">=</span> <span class="token punctuation">{</span>most connection node in serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+       remove m from serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>r is dynamic request<span class="token punctuation">)</span> then
+    n<span class="token punctuation">.</span>conns <span class="token operator">=</span> n<span class="token punctuation">.</span>conns <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">;</span>
+  <span class="token keyword">else</span>
+    n<span class="token punctuation">.</span>conns <span class="token operator">=</span> n<span class="token punctuation">.</span>conns <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">;</span>
+  send r to n and <span class="token keyword">return</span> results to the client<span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>r is dynamic request<span class="token punctuation">)</span> then
+    n<span class="token punctuation">.</span>conns <span class="token operator">=</span> n<span class="token punctuation">.</span>conns <span class="token operator">-</span> <span class="token number">2</span><span class="token punctuation">;</span>
+  <span class="token keyword">else</span>
+    n<span class="token punctuation">.</span>conns <span class="token operator">=</span> n<span class="token punctuation">.</span>conns <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span> changed then
+    serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token punctuation">.</span>lastMod <span class="token operator">=</span> <span class="token function">time</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Escape</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://escapelife.github.io/posts/6ae72895.html">https://escapelife.github.io/posts/6ae72895.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Escape</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Linux/">
+                                    <span class="chip bg-color">Linux</span>
+                                </a>
+                            
+                                <a href="/tags/LVS/">
+                                    <span class="chip bg-color">LVS</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/posts/e258e9f6.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/python-virtualenv-pipenv.png" class="responsive-img" alt="Python包管理和虚拟环境">
+                        
+                        <span class="card-title">Python包管理和虚拟环境</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2018-07-26
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Python成长之途/" class="post-category">
+                                    Python成长之途
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Python/">
+                        <span class="chip bg-color">Python</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/posts/5e76085b.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/python-socket-selectors.png" class="responsive-img" alt="Python网络编程进阶">
+                        
+                        <span class="card-title">Python网络编程进阶</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2018-07-24
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Python成长之途/" class="post-category">
+                                    Python成长之途
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Python/">
+                        <span class="chip bg-color">Python</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('4'),
+            headingSelector: 'h2, h3, h4, h5'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4, h5').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="764454432"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='none'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">2017</span>
+            <a href="/about" target="_blank">Escape</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">808.3k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2017";
+                    var startMonth = "2";
+                    var startDate = "14";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/EscapeLife" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wenpanhappy@126.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
