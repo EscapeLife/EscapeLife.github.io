@@ -467,14 +467,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    66
+                    3.4k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    12 分
                 </div>
                 
 
@@ -494,6 +494,360 @@
 </blockquote>
 <p><img src="/images/linux-apache-server-100.png" alt="Apache服务之代理和缓存"></p>
 <hr>
+<h2 id="1-代理"><a href="#1-代理" class="headerlink" title="1. 代理"></a>1. 代理</h2><p><strong>代理服务器</strong>的主要作用就是为了那些不能直接连接到<code>Internet</code>或目标网络的用户提供一个转发服务，它就像是一个中转站，转发用户的请求到目标网络并取回用户所需要的信息，在回馈给用户。</p>
+<p><strong>代理服务器的优势</strong></p>
+<ul>
+<li>(1) 隐匿内部网络，节约 IP 地址<ul>
+<li>通过代理对内部网络的主机，全部进行映射，进行数据包的转发</li>
+</ul>
+</li>
+<li>(2) 提高访问速度，节约网络带宽<ul>
+<li>对于经常访问却不经常改动的网站，可以设置缓存，提高访问速度</li>
+</ul>
+</li>
+<li>(3) 监控和过滤<ul>
+<li>通过日志记录和查看用户访问的清新请求，过滤掉某些不希望访问的网站和内容</li>
+</ul>
+</li>
+<li>(4) 支持多种协议<ul>
+<li><code>HTTP</code>、<code>HTTPS</code>、<code>FTP</code></li>
+</ul>
+</li>
+</ul>
+<p>从<code>Apache2.0</code>开始，<code>mod_proxy</code>模块不但被重写了，而且还分割为<code>4</code>个不同的模块：<code>mod_proxy</code>、<code>mod_proxy_http</code>、<code>mod_proxy_ftp</code>、<code>mod_proxy_connect</code>，并且能够使用<code>HTTP</code>规范比较新的特征。而到了<code>Apache2.2</code>以后则更进一步加入了<code>mod_proxy_ajp</code>、<code>mod_proxy_balancer</code>者两个模块。所有需要了解<code>mod_proxy</code>模块的最新动态，请查看官网文档。</p>
+<ul>
+<li><code>mod_proxy</code>模块：基础模块</li>
+<li><code>mod_proxy_ajp</code>模块：提供<code>Apache JServ Protocol Version 1.3</code>的支持</li>
+<li><code>mod_proxy_balancer</code>模块：为了<code>Apache</code>提供负载均衡支持，支持<code>HTTP</code>、<code>HTTPS</code>、<code>FTP</code>协议</li>
+<li><code>mod_proxy_connect</code>模块：提供对处理<code>HTTP CONNECT</code>方法的支持，这种支持主要应用于处理通过代理服务器的<code>SSL</code>连接请求</li>
+<li><code>mod_proxy_ftp</code>模块：提供对<code>FTP</code>功能的支持，但是只支持<code>GET</code>方式，即支持下载不支持上传</li>
+<li><code>mod_proxy_http</code>模块：提供代理<code>HTTP</code>请求的功能</li>
+</ul>
+<p><strong>正向代理</strong></p>
+<p><img src="/images/linux-apache-server-101.png" alt="Apache服务之代理和缓存"></p>
+<p><strong>反向代理</strong></p>
+<p><img src="/images/linux-apache-server-102.png" alt="Apache服务之代理和缓存"></p>
+<hr>
+<h3 id="1-1-mod-proxy模块"><a href="#1-1-mod-proxy模块" class="headerlink" title="1.1 mod_proxy模块"></a>1.1 <code>mod_proxy</code>模块</h3><blockquote>
+<p><strong><code>mod_proxy</code>模块</strong>是<code>Apache</code>实现代理或网关的关键模块，其他的<code>5</code>个模块都需要它的支持才能运行，<code>mod_proxy_http</code>、<code>mod_proxy_ftp</code>、<code>mod_proxy_connect</code>、<code>mod_proxy_ajp</code>、<code>mod_proxy_balancer</code>。</p>
+</blockquote>
+<p><strong>启用 mod_proxy 模块</strong></p>
+<ul>
+<li>需要说明的是<code>Apache</code>的代理模块并不提供缓冲支持，如果你需要缓冲支持，还需要使用<code>mod_cache</code>模块。同样，如果要使用<code>SSL</code>的代理支持，还需要使用<code>mod_ssl</code>的代理支持。</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># httpd.conf配置文件加载模块
+LoadModule proxy_module modules/mod_proxy.so<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><strong>mod_proxy 模块的指令</strong></p>
+<ul>
+<li><code>ProxyRequests</code>指令<ul>
+<li>设置启用或禁止<code>Apache</code>作为正向代理服务器的功能</li>
+<li>但如果将它设置为<code>off</code>也不会禁用<code>ProxyPass</code>指令的功能</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache">ProxyRequests on<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><code>&lt;Proxy&gt;</code>和<code>&lt;ProxyMatch&gt;</code>容器</p>
+<ul>
+<li><code>&lt;Proxy&gt;</code>用来存放作用于代理服务器指令，容器中可以控制用户的访问权限</li>
+<li><code>&lt;ProxyMatch&gt;</code>容器则多了支持正则表达式的功能</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"><Proxy *>
+    Order Deny,Allow
+    Deny from all
+    Allow from www.wsescape.com
+</Proxy><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>AllowCONNECT</code>指令</p>
+<ul>
+<li>用于指定以<code>CONNECT</code>方式连接时的端口号，使用时需要先加载<code>mod_proxy_connect</code>模块</li>
+<li>默认状况下，<code>Apache</code>的代理会使用<code>HTTPS</code>和<code>SNEWS</code>进行连接，而使用了<code>AllowCONNECT</code>指令后可以指定一个端口进行连接</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache">AllowCONNECT 8080 8081<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><code>NoProxy</code>指令</p>
+<ul>
+<li>只在局域网内使用，可以让用户不适用<code>Apache</code>的代理服务而直接连接到主机或者网络上</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># 可以使用主机名、网站名、域名、网段
+NoProxy 172.16.3.1/24
+
+# Apache会进行DNS查找消耗时间和性能
+NoProxy .wsescpae.com<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>ProxyBlock</code>指令</p>
+<ul>
+<li>用于屏蔽网站</li>
+<li>可以设定主机、域、IP 地址设置是语句的列表来进行屏蔽，支持<code>HTTP</code>、<code>HTTPS</code>、<code>FTP</code></li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache">ProxyBlock wsescape<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><code>ProxyDomain</code>指令</p>
+<ul>
+<li>只能作用于局域网，用来指定一个默认的域名，当用户使用一个没有域名的访问请求时，代理模块会自动加上一个默认的域名</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># 用户在浏览器输入www，代理服务器会自动补上.wsescape.com，转到正确的地址上
+ProxyDomain .wsescape.com<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><code>ProxyIOBufferSize</code>指令</p>
+<ul>
+<li>用于调整内部缓冲区的大小</li>
+<li>有效值必须小于或者等于<code>8192</code>，建议使用<code>mod_cache</code>模块来作缓存</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache">ProxyIOBufferSize 8192<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><code>ProxyMaxForwards</code>指令</p>
+<ul>
+<li>主要是为了防止<code>DoS</code>攻击，用它指定允许转发请求的最大代理数目，以防止连接数太多导致崩溃</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache">ProxyMaxForwards 1024<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><code>ProxyPass</code>指令</p>
+<ul>
+<li>将一个远程服务器映射到本地服务器中，类似于镜像，但又不太一样</li>
+<li>它只是将用户对远程服务器的请求缓存到本地服务器中，使用户以更快的速度进行访问</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># 如果http://wsescpae.com为本地服务器地址，则对http://wsescpae.com/apache/2.2/xxx.tar.gz的本地请求将会在内部转换为一个代理请求http://www.wsescpae.com/apache/2.2/xxx.tar.gz
+ProxyPass /apache/2.2/ http://www.wsescpae.com
+
+# 如果不想对某个子目录进行反向代理，可以使用!符号
+ProxyPass /apache/2.2/docs !<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/linux-apache-server-103.png" alt="Apache服务之代理和缓存"></p>
+<p><code>ProxyPassReverse</code>指令</p>
+<ul>
+<li>用于重写<code>HTTP</code>重写向应应答中的<code>Location</code>、<code>Content-Location</code>、<code>URI</code>头里的<code>URL</code></li>
+<li>以避免在<code>Apache</code>作为反向代理使用时，后端服务器的<code>HTTP</code>重定向造成的绕过反向代理的问题</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache">ProxyPass /apache/2.2/ http://www.wsescpae.com
+ProxyPassReverse /apache/2.2/ http://www.wsescpae.com<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><p><code>ProxyPassReverseCookieDomain</code>和<code>ProxyPassReverseCookiePath</code>指令</p>
+<ul>
+<li><code>ProxyPassReverseCookieDomain</code>改写域名</li>
+<li><code>ProxyPassReverseCookiePath</code>改写<code>cookie</code></li>
+</ul>
+</li>
+<li><p><code>ProxyRemote</code>和<code>ProxyRemoteMatch</code>指令</p>
+<ul>
+<li><code>ProxyRemote</code>定义了此代理的远程代理，可以是远程代理服务器支持的<code>URL</code>形式的名称</li>
+<li>也可以是远程代理服务器使用的部分<code>URL</code>或代表服务器可以接受所有请求的<code>*</code></li>
+<li><code>ProxyRemoteMatch</code>在此基础上，支持了正则表达式匹配功能</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache">ProxyRemote * http://www.proxy.org/<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ul>
+<li><p><code>ProxyReceivBufferSize</code>指令</p>
+<ul>
+<li>用于设置代理服务器的<code>HTTP</code>或<code>FTP</code>连接的缓冲区域大小</li>
+<li>这个区域必须大于<code>512</code>或直接设置为<code>0</code>表示禁止使用系统缓冲大小</li>
+</ul>
+</li>
+<li><p><code>ProxyTimeout</code>指令</p>
+<ul>
+<li>用于设置反向代理时请求连接超时时间</li>
+<li>如果网络比较慢，可以将这个时间设置的长一点</li>
+</ul>
+</li>
+<li><p><code>ProxyBadHeader</code>指令</p>
+<ul>
+<li>用来设置<code>mod_proxy</code>如何处理不合法的应答头</li>
+</ul>
+</li>
+<li><p><code>ProxyPreserveHost</code>指令</p>
+<ul>
+<li>用于将用户请求的<code>HOST:</code>行传递给被代理的服务器，而不是传递给<code>ProxyPass</code>中指定的主机名</li>
+</ul>
+</li>
+<li><p><code>ProxyVia</code>指令</p>
+<ul>
+<li>用于控制代理服务器对<code>Via:</code>头的使用</li>
+<li>根据<code>HTTP/1.1</code>协议，代理服务器的出入连接中必须带有一个<code>Via:</code>头以说明服务器的身份或表示服务器软件的版本</li>
+<li>而通过<code>Via:</code>头管理员可以记录代理请求的流向，从而最大成都避免循环的产生</li>
+<li>有一下<code>4</code>中参数进行控制</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/linux-apache-server-104.png" alt="Apache服务之代理和缓存"></p>
+<hr>
+<h3 id="1-2-常见的代理"><a href="#1-2-常见的代理" class="headerlink" title="1.2 常见的代理"></a>1.2 常见的代理</h3><ul>
+<li><strong>正向代理服务器</strong><ul>
+<li><code>ProxyRequests On</code>开启正向代理服务</li>
+<li><code>ProxyVia</code>所有的连接请求和应答增加一个<code>Via:</code>头</li>
+<li><code>Proxy</code>容器接受所有用户的连接</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache">ProxyRequests On
+ProxyVia on
+
+<Proxy *>
+    Order deny,allow
+    Deny from all
+    Allow from all
+</Proxy><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>反向代理服务器</strong></li>
+</ul>
+<ul>
+<li><code>ProxyRequests Off</code>关闭正向代理功能</li>
+<li><code>Proxy</code>容器接受所有用户的连接</li>
+<li>最后使用<code>ProxyPass</code>功能来将<code>http://www.wsescape.com</code>映射到本地服务器的<code>/wsescape</code>目录中</li>
+<li>同时使用<code>ProxyPassReverse</code>改写<code>http://www.wsescape.com</code>的重定向应答到<code>/wsescape</code></li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache">ProxyRequests Off
+
+<Proxy *>
+    Order deny,allow
+    Allow from all
+</Proxy>
+
+ProxyPass /wsescape http://www.wsescape.com
+ProxyPassReverse /wsescape http://www.wsescape.com<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="2-缓存"><a href="#2-缓存" class="headerlink" title="2. 缓存"></a>2. 缓存</h2><blockquote>
+<p>几乎每个大型的<code>Web</code>网站中都可以看到缓存技术的使用，可以有效的降低负载和提高响应速度。而这些站点使用的缓存技术无非两种，一种是基于磁盘的，另一种则时基于内存的。</p>
+</blockquote>
+<p>在<code>Apache</code>中缓存模块可以将本地服务器提供的<code>Web</code>连接进行缓存，同时也可以为正、反向代理服务器提供一个缓存空间，而这些内容会被以<code>URL</code>的方式进行缓存和索引。</p>
+<p>在<code>Aapche</code>中有三个缓存模块：</p>
+<ul>
+<li><code>mod_cache</code>模块：提供缓存的全局设置支持</li>
+<li><code>mod_mem_cache</code>模块：基于内存的缓存支持</li>
+<li><code>mod_disk_cache</code>模块：基于磁盘的缓存支持</li>
+</ul>
+<hr>
+<h3 id="2-1-mod-cache模块"><a href="#2-1-mod-cache模块" class="headerlink" title="2.1 mod_cache模块"></a>2.1 <code>mod_cache</code>模块</h3><blockquote>
+<p><code>mod_cache</code>模块是在<code>Apache2.x</code>之后的版本中新提供的</p>
+</blockquote>
+<ul>
+<li><code>CacheDefaultExpire</code><ul>
+<li>设置缓存资源的有效时间，单位为秒，默认为<code>3600</code>，即一个小时</li>
+<li>一般来说，这个时间太短了，因此建议设置更长的时间，如 48 小时</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache">CacheDefaultExpire 3600<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ul>
+<li><code>CacheDisable</code></li>
+</ul>
+<ul>
+<li>用于设置指定目录或是所有以<code>url-string</code>开头的<code>URL</code>不进行缓存</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache">CacheDisable /code/github<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ul>
+<li><code>CacheEnable</code></li>
+</ul>
+<ul>
+<li>用于指定用何种缓存方式来缓存指定的目录或网址</li>
+<li><code>mem</code>参数：使用内存缓存指定内容</li>
+<li><code>disk</code>参数：使用磁盘缓存指定内容</li>
+<li><code>fd</code>参数：使用文件描述符缓存指定内容</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache">CacheEnable mem /srv/svn
+CacheEnable disk /srv/www/htdocs
+CacheEnable fd /srv/www/img
+
+CacheEnable disk http://www.wsescape.com<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><p><code>CacheMaxExpire</code></p>
+<ul>
+<li>缓存文件的最长有效时间，单位为秒，默认为<code>86400</code>，即<code>24</code>小时</li>
+</ul>
+</li>
+<li><p><code>CacheIgnoreHeaders</code></p>
+<ul>
+<li>不缓存指定的<code>HTTP</code>头部</li>
+</ul>
+</li>
+<li><p><code>CacheIgnoreCacheControl</code></p>
+<ul>
+<li>缓存所有没有在<code>header</code>中设置<code>Cache-Control</code>或<code>Pragma</code>为<code>no-cache</code>的资源</li>
+</ul>
+</li>
+<li><p><code>CacheIgnoreNoLastMod</code></p>
+<ul>
+<li>缓存所有没有在<code>header</code>中设置<code>LastMod</code>的资源</li>
+</ul>
+</li>
+<li><p><code>CacheIgnoreQueryString</code></p>
+<ul>
+<li>在缓存中忽略查询字符串</li>
+</ul>
+</li>
+<li><p><code>CacheLastModifiedFactor</code></p>
+<ul>
+<li>用来回应<code>Last Modified</code>资源从而计算出到期时间</li>
+</ul>
+</li>
+<li><p><code>CacheStoreNoStore</code></p>
+<ul>
+<li>可以使用<code>on</code>或<code>off</code>开关来控制</li>
+<li>设置为<code>on</code>，表示返回内容的头部信息<code>Cache-Control:</code>中包含<code>no-sotre</code>，则进行缓存</li>
+<li>设置为<code>off</code>，表示不进行缓存</li>
+</ul>
+</li>
+<li><p><code>CacheStorePrivate</code></p>
+<ul>
+<li>可以使用<code>on</code>或<code>off</code>开关来控制</li>
+<li>设置为<code>on</code>，表示返回内容的头部信息<code>Cache-Control:</code>中包含<code>private</code>，则进行缓存</li>
+<li>设置为<code>off</code>，表示不进行缓存</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-2-mod-mem-cache模块"><a href="#2-2-mod-mem-cache模块" class="headerlink" title="2.2 mod_mem_cache模块"></a>2.2 <code>mod_mem_cache</code>模块</h3><blockquote>
+<p>内存读取速度比磁盘快很多倍</p>
+</blockquote>
+<p>在<code>Apache</code>中，我们可以使用<code>mod_mem_cache</code>模块来做基于内存的缓存管理，它需要配合<code>mod_cache</code>模块才能使用，你可以将它配合为两种不同的缓存模式。</p>
+<ul>
+<li>缓存打开的文件描述符</li>
+<li>在堆上缓存资源</li>
+</ul>
+<p><img src="/images/linux-apache-server-105.png" alt="Apache服务之代理和缓存"></p>
+<ul>
+<li><code>MCacheMaxObjectCount</code><ul>
+<li>用于设置最大缓存对象的数量</li>
+<li>示例：<code>MCacheMaxObjectCount 1000</code></li>
+</ul>
+</li>
+<li><code>MCacheMaxObjectSize</code><ul>
+<li>设定允许缓存的最大文档大小，单位为<code>Byte</code></li>
+<li>示例：<code>MCacheMaxObjectSize 6400000</code></li>
+</ul>
+</li>
+<li><code>MCacheMinObjectSize</code><ul>
+<li>设定允许缓存的最小文档大小，单位为<code>Byte</code></li>
+<li>示例：<code>MCacheMinObjectSize 10000</code></li>
+</ul>
+</li>
+<li><code>MCacheRemovalAlgorithm</code><ul>
+<li>指定当需要从缓存中一处哪个文档时所使用的算法</li>
+<li><code>LRU</code>算法：最近最少使用的文档</li>
+<li><code>GDSF</code>算法：先计算命中率和文档大小并形成一个优先级，需要移除时，优先级最低的文档先移除缓存</li>
+</ul>
+</li>
+<li><code>MCacheSize</code><ul>
+<li>用来设置缓存使用的最大内存量数量，单位为<code>KB</code></li>
+<li>示例：<code>MCacheSize 10240</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-3-mod-disk-cache模块"><a href="#2-3-mod-disk-cache模块" class="headerlink" title="2.3 mod_disk_cache模块"></a>2.3 <code>mod_disk_cache</code>模块</h3><p>在<code>Apache</code>中，我们可以使用<code>mod_disk_cache</code>模块来做基于磁盘的缓存管理，它需要配合<code>mod_cache</code>模块才能使用，你可以通过<code>Apache</code>服务器提供的<code>htcacheclean</code>程序来管理缓存，以将缓存保持在一个合适的水平上。</p>
+<p><code>mod_disk_cache</code>模块也是一个只能的缓存，当有请求时，只有在缓存没有找到的情况下才会在本地进行查找，而对缓存区内的文件，<code>mod_disk_cache</code>模块首先根据<code>CacheRoot</code>指令定义缓存文件存放在服务器磁盘上的具体位置，如：</p>
+<pre class="line-numbers language-apache"><code class="language-apache">CacheRoot /var/cache/Apache2/mod_disk_cache<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>当启用<code>mod_disk_cache</code>模块后，<code>mod_disk_cache</code>模块会在每一个连接请求生成一个<code>22</code>个字符的哈希值。该哈希值将包含请求连接的主机名、协议、端口、路径、<code>CGI</code>变量等信息，以确保每一个请求连接都会不一样。当然可以使用<code>CacheDirLevels</code>指定每级子目录名的字符数，默认为<code>4</code>，用<code>CacheDirLength</code>指令指定每个子目录名的字符数，默认是<code>3</code>。</p>
+<p>如果<code>CacheDirLevels</code>设置为<code>1</code>，则任意一层目录下的子目录数都不会超过<code>64</code>；如果为<code>2</code>，则为<code>64x64</code>，以此类推。<code>CacheDirLength</code>的设置与其类似，如果设置为<code>2</code>，则会建立<code>4096</code>个目录保存约<code>100</code>万个文件。需要说明的是，<code>CacheDirLevels</code>和<code>CacheDirLength</code>指令的最大值不可以超过<code>20</code>，否则会报错的。</p>
+<pre class="line-numbers language-apache"><code class="language-apache">CacheDirLevels 5
+CacheDirLength 5<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>每个<code>URL</code>在缓存目录中至少会使用连个文件，一个是<code>.data</code>文件是按节缓存的，为链接的内容；而<code>.header</code>文件则包含了<code>URL</code>的元信息，例如何时失效等。</p>
+<p><code>CacheMaxFileSize</code>与<code>CacheMinFileSize</code>指令分别用来设置缓存文件的最大和最小体积，单位为<code>Bytes</code>。</p>
+<pre class="line-numbers language-apache"><code class="language-apache">CacheMaxFileSize 64000
+CacheMinFileSize 64<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>对于<code>mod_disk_cache</code>模块来说，虽然它也会自动删除缓存中的失效文件，但是并不是主动维护缓存区的去使用情况，只是根据用户设置的参数来决定失效时长。因此<code>Apache</code>提供了一个工具用来清理有<code>mod_disk_cache</code>模块生成的缓存，就是<code>htcacheclean</code>程序。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 周期任务</span>
+<span class="token function">crontab</span> -e
+0  23  *  *  6 htcacheclean -p /var/cache/Apache2/mod_disk_cache/ -l 50k<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-4-mod-file-cache的文件缓存支持"><a href="#2-4-mod-file-cache的文件缓存支持" class="headerlink" title="2.4 mod_file_cache的文件缓存支持"></a>2.4 <code>mod_file_cache</code>的文件缓存支持</h3><blockquote>
+<p><code>mod_file_cache</code>模块提供了文件缓存的支持，可以将指定的页面进行缓存，从而提高用户访问速度。</p>
+</blockquote>
+<p>使用<code>MMapFile</code>指令将<code>index.html</code>文件中的内容映射到内存中，当用户访问这个文件时，会从内存中读取并返回给用户，从而提高访问效率。也可以使用<code>CacheFile</code>指令来进行缓存，与<code>MMapFile</code>指令不同的是，<code>CacheFile</code>指令在<code>Apache</code>启动时记录打开你所指定的文件的文件描述符，并为之后这个文件的所有访问重复使用这个文件描述符。</p>
+<pre class="line-numbers language-apache"><code class="language-apache">MMapFile /srv/www/index.html
+
+CacheFile /srv/www/index.html<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -752,12 +1106,12 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/posts/3b97d592.html">
+                <a href="/posts/37e7f618.html">
                     <div class="card-image">
                         
-                        <img src="/images/linux-apache-server-100.png" class="responsive-img" alt="Apache服务之缓存和代理">
+                        <img src="/images/linux-apache-server-110.png" class="responsive-img" alt="Apache服务之数据库连接">
                         
-                        <span class="card-title">Apache服务之缓存和代理</span>
+                        <span class="card-title">Apache服务之数据库连接</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -768,7 +1122,7 @@
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2018-12-21
+                            <i class="far fa-clock fa-fw icon-date"></i>2018-12-23
                         </span>
                         <span class="publish-author">
                             
@@ -1049,7 +1403,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">852.1k</span>&nbsp;字
+                class="white-color">853.4k</span>&nbsp;字
             
             
             
