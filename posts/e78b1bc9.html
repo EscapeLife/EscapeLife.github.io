@@ -460,21 +460,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-11-02
+                    2020-11-03
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    66
+                    2.7k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    11 分
                 </div>
                 
 
@@ -492,8 +492,383 @@
                 <blockquote>
 <p><strong>纸上得来终觉浅，绝知此事要躬行。</strong></p>
 </blockquote>
-<p><img src="/images/linux-apache-server-40.png" alt="Apache服务之httpd基础"></p>
+<p><img src="/images/linux-apache-server-40.png" alt="Apache服务之httpd运行监控"></p>
 <hr>
+<h2 id="1-运行-Apache"><a href="#1-运行-Apache" class="headerlink" title="1. 运行 Apache"></a>1. 运行 Apache</h2><h3 id="1-1-手动启动和停止"><a href="#1-1-手动启动和停止" class="headerlink" title="1.1 手动启动和停止"></a>1.1 手动启动和停止</h3><p><strong>启动操作</strong></p>
+<ul>
+<li><code>CentOS6/7</code>基本操作一致</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># CentOS6上是系统默认安装的；CentOS6上是使用yum安装的</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># which httpd</span>
+/usr/sbin/httpd
+
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># /usr/sbin/httpd</span>
+AH00558: httpd: Could not reliably determine the server<span class="token string">'s fully qualified domain name, using fe80::20c:29ff:feb8:76b5. Set the '</span>ServerName' directive globally to suppress this message
+
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ps -aux | grep httpd</span>
+root      18849  0.0  0.3 228272  3704 ?        Ss   18:42   0:00 /usr/sbin/httpd
+apache    18850  0.0  0.3 230492  3896 ?        S    18:42   0:00 /usr/sbin/httpd
+apache    18851  0.0  0.3 230492  3904 ?        S    18:42   0:00 /usr/sbin/httpd
+apache    18852  0.0  0.3 230356  3380 ?        S    18:42   0:00 /usr/sbin/httpd
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>停止操作</strong></p>
+<ul>
+<li>通常不推荐手动<code>Kill</code>掉<code>httpd</code>进程，因为可以导致用户请求无法响应等问题</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 【方法一】手动杀死所有httpd进程</span>
+root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ps -aux | grep httpd | grep -v grep | awk '{print $2}' | xargs kill -9</span>
+
+<span class="token comment" spellcheck="true"># 【方法二】手动杀死主httpd进程，推荐使用</span>
+root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># updatedb</span>
+root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># locate httpd.pid</span>
+/var/run/httpd/httpd.pid
+root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat /var/run/httpd/httpd.pid</span>
+18849
+root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat /var/run/httpd/httpd.pid | kill -9</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>注释：</strong></p>
+<ul>
+<li>提示如下信息<code>httpd: Could not reliably determine the server's fully qualified domain name, using fe80::20c:29ff:feb8:76b5.</code></li>
+<li>说明<code>Apache</code>没有找到默认的服务器主机名，这时使用本机的<code>IP</code>地址作为服务器名称，之后可以通过修改配置文件解决此问题。</li>
+</ul>
+<hr>
+<h3 id="1-2-自动启动和关闭"><a href="#1-2-自动启动和关闭" class="headerlink" title="1.2 自动启动和关闭"></a>1.2 自动启动和关闭</h3><blockquote>
+<p>通常在<code>Linux</code>上有两种启动风格：<code>BSD</code>和<code>SysV</code>两种启动风格</p>
+<ul>
+<li><code>BSD</code>：<code>FreeBSD</code>、<code>Slackware</code></li>
+<li><code>SysV</code>：<code>CentOS</code>、<code>debian</code>、<code>RHEL</code></li>
+</ul>
+</blockquote>
+<p><strong><code>BSD</code>风格</strong></p>
+<ul>
+<li>由于<code>BSD</code>风格的脚本倾向于使用顺序运行，因此只需要在启动脚本的后面加上启动方式就可以了</li>
+<li>最直接和暴力的方法就是在<code>rc</code>文件的最后加上<code>/usr/sbin/httpd</code>启动<code>httpd</code>服务</li>
+<li>更合理的方法就是编写一个启动脚本，然后在<code>rc</code>的后面加上对这个脚本的调用</li>
+</ul>
+<p><strong><code>SysV</code>风格</strong></p>
+<ul>
+<li><code>SysV</code>风格将<code>Linux</code>的启动分为很多不同的级别，每个级别有不同的定义</li>
+<li>启动级别<code>3</code>为命令行模式，启动级别<code>5</code>为图形化模式</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># CentOS6中实例，7中启动机制为Systemd</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat /etc/inittab | grep id</span>
+id:5:initdefault:
+
+<span class="token comment" spellcheck="true"># 启动脚本可以借鉴apachectl脚本</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat `which apachectl`</span>
+
+<span class="token comment" spellcheck="true"># 连接启动级别</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cp /usr/sbin/apachectl /etc/init.d/</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ln -sv /etc/init.d/apachectl /etc/rc3.d/S90httpd</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ln -sv /etc/init.d/apachectl /etc/rc0.d/K90httpd</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ln -sv /etc/init.d/apachectl /etc/rc6.d/K90httpd</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="1-3-使用-apachectl-管理"><a href="#1-3-使用-apachectl-管理" class="headerlink" title="1.3 使用 apachectl 管理"></a>1.3 使用 apachectl 管理</h3><p><strong>程序使用参数</strong></p>
+<ul>
+<li><code>start</code><ul>
+<li>如果配置文件检查没有问题，启动<code>httpd</code>程序，重复启动报错</li>
+</ul>
+</li>
+<li><code>stop</code><ul>
+<li>停止<code>httpd</code>程序，重复停止报错</li>
+</ul>
+</li>
+<li><strong><code>status</code></strong><ul>
+<li>显示简要的状态报告，类似于<code>fullstatus</code>选项，但省略正在处理的请求</li>
+</ul>
+</li>
+<li><strong><code>restart</code></strong><ul>
+<li>重启启动<code>httpd</code>并检查<code>httpd</code>配置文件</li>
+</ul>
+</li>
+<li><strong><code>graceful</code></strong><ul>
+<li>类似于<code>start</code>，但不会中断当前正在处理的连接和日志记录，推荐使用</li>
+</ul>
+</li>
+<li><strong><code>graceful-stop</code></strong><ul>
+<li>类似于<code>stop</code>，但不会中断当前正在处理的连接和日志记录，推荐使用</li>
+</ul>
+</li>
+<li><code>configtest</code><ul>
+<li>解析并检查配置文件语法</li>
+</ul>
+</li>
+<li><code>fullstatus</code><ul>
+<li>显示出有<code>mod_status</code>提供的状态报告，需要启动<code>mod_status</code>模块并安装<code>elinks</code>浏览器</li>
+</ul>
+</li>
+</ul>
+<p><strong>程序帮助信息</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># /usr/sbin/apachectl -h</span>
+Usage: /usr/sbin/httpd <span class="token punctuation">[</span>-D name<span class="token punctuation">]</span> <span class="token punctuation">[</span>-d directory<span class="token punctuation">]</span> <span class="token punctuation">[</span>-f file<span class="token punctuation">]</span>
+                       <span class="token punctuation">[</span>-C <span class="token string">"directive"</span><span class="token punctuation">]</span> <span class="token punctuation">[</span>-c <span class="token string">"directive"</span><span class="token punctuation">]</span>
+                       <span class="token punctuation">[</span>-k start<span class="token operator">|</span>restart<span class="token operator">|</span>graceful<span class="token operator">|</span>graceful-stop<span class="token operator">|</span>stop<span class="token punctuation">]</span>
+                       <span class="token punctuation">[</span>-v<span class="token punctuation">]</span> <span class="token punctuation">[</span>-V<span class="token punctuation">]</span> <span class="token punctuation">[</span>-h<span class="token punctuation">]</span> <span class="token punctuation">[</span>-l<span class="token punctuation">]</span> <span class="token punctuation">[</span>-L<span class="token punctuation">]</span> <span class="token punctuation">[</span>-t<span class="token punctuation">]</span> <span class="token punctuation">[</span>-S<span class="token punctuation">]</span>
+Options:
+  -D name            <span class="token keyword">:</span> define a name <span class="token keyword">for</span> use <span class="token keyword">in</span> <span class="token operator">&lt;</span>IfDefine name<span class="token operator">></span> directives
+  -d directory       <span class="token keyword">:</span> 指定初始的ServerRoot根路径
+  -f <span class="token function">file</span>            <span class="token keyword">:</span> 指定一个替代ServerConfigFile文件
+  -C <span class="token string">"directive"</span>     <span class="token keyword">:</span> process directive before reading config files
+  -c <span class="token string">"directive"</span>     <span class="token keyword">:</span> process directive after reading config files
+  -e level           <span class="token keyword">:</span> 指定错误级别<span class="token punctuation">(</span>see LogLevel<span class="token punctuation">)</span>
+  -E <span class="token function">file</span>            <span class="token keyword">:</span> 指定错误信息输出到那个文件中
+  -v                 <span class="token keyword">:</span> 显示版本号
+  -V                 <span class="token keyword">:</span> 显示编译配置<span class="token punctuation">(</span>show compile settings<span class="token punctuation">)</span>
+  -h                 <span class="token keyword">:</span> 列出可用的命令行选项
+  -l                 <span class="token keyword">:</span> 显示编译模块<span class="token punctuation">(</span>list compiled <span class="token keyword">in</span> modules<span class="token punctuation">)</span>
+  -L                 <span class="token keyword">:</span> list available configuration directives
+  -S                 <span class="token keyword">:</span> a synonym <span class="token keyword">for</span> -t -D DUMP_VHOSTS
+  -t -D DUMP_MODULES <span class="token keyword">:</span> 显示加载模块<span class="token punctuation">(</span>show all loaded modules<span class="token punctuation">)</span>
+  -t -D DUMP_VHOSTS  <span class="token keyword">:</span> show parsed settings <span class="token punctuation">(</span>currently only vhost settings<span class="token punctuation">)</span>
+  -M                 <span class="token keyword">:</span> a synonym <span class="token keyword">for</span> -t -D DUMP_MODULES
+  -t                 <span class="token keyword">:</span> 运行语法检查配置文件<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="1-4-运行多个-Apache-服务器"><a href="#1-4-运行多个-Apache-服务器" class="headerlink" title="1.4 运行多个 Apache 服务器"></a>1.4 运行多个 Apache 服务器</h3><blockquote>
+<p>所以的<code>Apache</code>管理员都会遇到一个问题，就是在一台物理系统上运行多个版本的<code>Apache</code>服务器，或者是运行多个同一个版本的<code>Apache</code>服务器。</p>
+</blockquote>
+<p><strong>运行多个不同版本</strong></p>
+<ul>
+<li>运行多个不同版本的<code>Apache</code>，只需要在编译时为不同版本的<code>Apache</code>指定不同的安装目录就可以了</li>
+<li>这样安装后的服务器及其组件都在指定目录下，每个版本拥有自己的守护进程<code>httpd</code>、<code>DSO</code>模块和配置文件</li>
+<li><code>./configure --prefix=/usr/local/apache2.4</code></li>
+</ul>
+<p><strong>运行多个同一个版本</strong></p>
+<ul>
+<li>运行多个同一个版本的<code>Apache</code>，只需要指定一个不同的配置文件就可以了</li>
+<li>要同时启动多个<code>Apache</code>服务器的关键则是为不同的<code>Apache</code>服务器指定唯一的端口，通过指定不同的配置文件实现</li>
+<li><code>httpd -f /usr/local/apache2/conf/httpd.conf</code></li>
+</ul>
+<hr>
+<h3 id="1-5-httpd-命令"><a href="#1-5-httpd-命令" class="headerlink" title="1.5 httpd 命令"></a>1.5 httpd 命令</h3><blockquote>
+<p><code>httpd</code>和<code>apachectl</code>命令参数使用基本一致</p>
+</blockquote>
+<ul>
+<li><code>-D name</code><ul>
+<li>通过指定<code>&lt;ifDefine&gt;</code>容器的名称来确认是否使用<code>&lt;ifDefine&gt;</code>容器配置的内容</li>
+<li><code>httpd -D SSL</code></li>
+</ul>
+</li>
+<li><code>-d directory</code><ul>
+<li>指定一个新的<code>ServerRoot</code>目录</li>
+<li><code>httpd -C /var/www</code></li>
+</ul>
+</li>
+<li><code>-f file</code><ul>
+<li>使用指定的文件作为<code>Apache</code>配置文件</li>
+<li><code>httpd -f /usr/local/apache2/conf/httpd.conf</code></li>
+</ul>
+</li>
+<li><code>-e level</code><ul>
+<li>设置<code>LogLevel</code>的错误信息级别</li>
+<li><code>httpd -e warn</code></li>
+</ul>
+</li>
+<li><code>-E file</code><ul>
+<li>将错误信息送入到一个指定的文件中</li>
+<li><code>httpd -E /var/www/log/log/warn.log</code></li>
+</ul>
+</li>
+<li><code>-C "directive"</code><ul>
+<li>在读取配置文件之前，先处理<code>"directive"</code>的配置</li>
+<li><code>httpd -C "DocumentHome" /home/escape</code></li>
+</ul>
+</li>
+<li><code>-c "directive"</code><ul>
+<li>在读取配置文件之后，再处理<code>"directive"</code>的配置</li>
+<li><code>httpd -c "DocumentHome" /home/escape</code></li>
+</ul>
+</li>
+<li><code>-V</code><ul>
+<li>显示<code>httpd</code>的版本信息以及编译时的参数</li>
+<li><code>httpd -V</code></li>
+</ul>
+</li>
+<li><code>-l</code><ul>
+<li>列出编译到<code>Apache</code>中的模块(核心模块)</li>
+<li><code>httpd -l</code></li>
+</ul>
+</li>
+<li><code>-L</code><ul>
+<li>列出可以用到指令的有效参数和使用区域</li>
+<li><code>httpd -L</code></li>
+</ul>
+</li>
+<li><code>-S</code>/<code>-t-D DUMP_VHOSTS</code><ul>
+<li>分析配置文件(现在只用于虚拟主机中的配置)</li>
+<li><code>httpd -S</code></li>
+<li><code>httpd -t-D DUMP_VHOSTS</code></li>
+</ul>
+</li>
+<li><code>-M</code>/<code>-t-D DUMP_MODULES</code><ul>
+<li>显示所有可供加载的模块</li>
+<li><code>httpd -M</code></li>
+<li><code>httpd -t-D DUMP_MODULES</code></li>
+</ul>
+</li>
+<li><code>-t</code><ul>
+<li>测试配置文件</li>
+<li><code>httpd -l</code></li>
+</ul>
+</li>
+<li><code>-v</code><ul>
+<li>显示版本信息和编译时间</li>
+<li><code>httpd -v</code></li>
+</ul>
+</li>
+<li><code>-h</code><ul>
+<li>显示命令行的帮助</li>
+<li><code>httpd -h</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-监控-Apache"><a href="#2-监控-Apache" class="headerlink" title="2. 监控 Apache"></a>2. 监控 Apache</h2><blockquote>
+<p>将介绍一些<code>Apache</code>类<code>Web</code>服务器的监控工具，其中有的是<code>Apache</code>自带的，还有一些是由社区提供的。</p>
+</blockquote>
+<h3 id="2-1-自带的-Web-监视器"><a href="#2-1-自带的-Web-监视器" class="headerlink" title="2.1 自带的 Web 监视器"></a>2.1 自带的 Web 监视器</h3><blockquote>
+<p>通过这两个模块，用户可以很容易知道<code>Apache</code>的工作状态和配置情况。但是在正常工作的服务器上，不推荐使用这两个模块，一是因为它们消耗一点系统资源，二是因为它们会泄露你的服务器信息。</p>
+</blockquote>
+<p><strong>主要模块</strong></p>
+<ul>
+<li><code>mod_status</code><ul>
+<li>动态显示当前服务器的运行状态</li>
+</ul>
+</li>
+<li><code>mod_info</code><ul>
+<li>提供服务器附加的配置信息</li>
+</ul>
+</li>
+</ul>
+<p><strong><code>mod_status</code>模块</strong></p>
+<ul>
+<li>功能<ul>
+<li>当前工作的进程数量</li>
+<li>空闲的进程数量</li>
+<li>服务器已经运行的时间</li>
+<li>当前正在连接的主机和请求</li>
+<li>单个进程的<code>CPU</code>使用率和<code>Apache</code>当前<code>CPU</code>使用的百分比</li>
+<li>每秒平均请求量，每秒发送的字节数，每秒请求发送的字节数</li>
+</ul>
+</li>
+<li>启用<ul>
+<li>配置<code>httpd</code>的配置文件(这里使用<code>/etc/httpd/conf/httpd.conf</code>)</li>
+<li>重新<code>reload</code>加载<code>httpd</code>服务</li>
+</ul>
+</li>
+<li>页面地址<ul>
+<li><code>mod_status</code>页面的访问地址<code>http://you_server_name/server-status</code></li>
+<li><code>mod_status</code>页面的<code>URL</code>之后可以使用<code>?refresh</code>(浏览器刷新间隔)、<code>?auto</code>(显示为状态表格样式)选项等</li>
+</ul>
+</li>
+<li><code>Scoreboard</code>含义<ul>
+<li><code>_</code>发送回复，<code>S</code>保持连接，<code>R</code>DNS 查询</li>
+<li><code>W</code>关闭连接，<code>L</code>登录，<code>G</code>收到结束表示后关闭</li>
+<li><code>I</code>需要清除，<code>.</code>空的进程位</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># CentOS6中配置</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># vim /etc/httpd/conf/httpd.conf</span>
+<span class="token comment" spellcheck="true"># 确认mod_status模块已经加载</span>
+LoadModule status_module modules/mod_status.so
+
+<span class="token comment" spellcheck="true"># 取消对于注释，让模块显示更多信息，如每个字httpd进程的应答信息等</span>
+ExtendedStatus On
+
+<span class="token comment" spellcheck="true"># 取消对于注释</span>
+<span class="token operator">&lt;</span>Location /server-status<span class="token operator">></span>
+    SetHandler server-status
+    Order deny,allow
+    Deny from all
+    Allow from .example.com
+<span class="token operator">&lt;</span>/Location<span class="token operator">></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/linux-apache-server-41.png" alt="Apache服务之httpd运行监控"></p>
+<p><strong><code>mod_info</code>模块</strong></p>
+<ul>
+<li>功能<ul>
+<li>提供服务器的配置信息并且也不能动态更新</li>
+<li>显示了哪些模块正在被使用，每个模块的钩子信息</li>
+</ul>
+</li>
+<li>启用<ul>
+<li>修改<code>httpd</code>配置文件(这里使用<code>/etc/httpd/conf/httpd.conf</code>)</li>
+<li>重新<code>reload</code>加载<code>httpd</code>服务</li>
+</ul>
+</li>
+<li>页面地址<ul>
+<li><code>mod_info</code>页面的访问地址<code>http://you_server_name/server-info</code></li>
+<li>可以显示模块信息，如<code>http://you_server_name/server-info#mod_perl.c</code></li>
+<li><code>mod_info</code>页面的<code>URL</code>之后可以使用<code>?config</code>(配置文件)、<code>?&lt;module-name&gt;</code>(模块信息)、<code>?list</code>(所有使用中的模块列表)、<code>server</code>(基本服务器信息)、<code>?hooks</code>(每个模块所属钩子列表)选项等</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># CentOS7中配置，mod_info模块不在httpd.conf文件中，而是使用模块化配置</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat /etc/httpd/conf.modules.d/00-base.conf | grep mod_info</span>
+LoadModule status_module modules/mod_info.so
+
+<span class="token comment" spellcheck="true"># 【方式一】在/etc/httpd/conf/httpd.conf文件，添加如下内容</span>
+<span class="token comment" spellcheck="true"># 【方式二】在/etc/httpd/conf.d中新建server-info.conf文件，添加如下内容</span>
+<span class="token operator">&lt;</span>Location <span class="token string">"/server-info"</span><span class="token operator">></span>
+    SetHandler server-info
+    Require host example.com
+    Require ip 127.0.0.1
+    Require ip 192.168.31.173
+    Require not ip 192.168.31.94
+<span class="token operator">&lt;</span>/Location<span class="token operator">></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/linux-apache-server-42.png" alt="Apache服务之httpd运行监控"></p>
+<hr>
+<h3 id="2-2-第三方-Web-工具"><a href="#2-2-第三方-Web-工具" class="headerlink" title="2.2 第三方 Web 工具"></a>2.2 第三方 Web 工具</h3><p><strong>主要工具</strong></p>
+<ul>
+<li><code>zabbix</code></li>
+<li><code>nagios</code></li>
+</ul>
+<p><strong><code>zabbix</code>软件</strong></p>
+<ul>
+<li>简述<ul>
+<li>基于<code>PHP</code>脚本的分布式系统监视以及网络监视功能的企业级开源解决方案</li>
+</ul>
+</li>
+<li>特点<ul>
+<li>自动发现服务器与网络设备</li>
+<li>分布式检视以及<code>Web</code>集中管理功能</li>
+<li>用户安全认证和可定义的授权方式</li>
+<li>通过<code>Web</code>界面设置或查看检视结果</li>
+<li>支持<code>pgsql</code>/<code>mysql</code>数据库</li>
+</ul>
+</li>
+<li>安装<ul>
+<li><code>yum install zabbix20-agent</code></li>
+<li><a href="https://www.zabbix.com/documentation/3.4/zh/manual" target="_blank" rel="noopener">最近的 zabbix 官方文档</a></li>
+</ul>
+</li>
+</ul>
+<p><strong><code>nagios</code>软件</strong></p>
+<ul>
+<li>简述<ul>
+<li><code>nagios</code>是一个检视系统运行状态和网络信息的监视系统</li>
+</ul>
+</li>
+<li>特点<ul>
+<li>服务等检视的并发处理</li>
+<li>检视主机资源(进程、磁盘等)</li>
+<li>监事网络服务(<code>SMTP</code>、<code>POP3</code>、<code>HTTP</code>、<code>NNTP</code>、<code>PING</code>等)</li>
+<li>可指定自定义的事件处理控制器</li>
+<li>简单的插件设计可以轻松扩展<code>nagios</code>的监视功能</li>
+<li>错误通知功能(通过<code>email</code>、<code>pager</code>或其他用户自定义方法)</li>
+<li>可选的基于浏览器的<code>Web</code>界面以及方便查看网络状态、各种系统问题以及日志等</li>
+</ul>
+</li>
+<li>安装<ul>
+<li><code>yum install nagios</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>区别</strong></p>
+<ul>
+<li>中小规模（服务器&lt;=1k）：Zabbix</li>
+<li>大规模（1k&gt;=服务器&lt;=10k）：Nagios 进行二次开发</li>
+<li>超大规模（服务器&gt;=10k）：开发适应自己平台的监控软件吧</li>
+<li>一个牛逼的东西<a href="https://link.zhihu.com/?target=http%3A//prometheus.io" target="_blank" rel="noopener"><u>prometheus.io</u></a></li>
+</ul>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -1045,7 +1420,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">823k</span>&nbsp;字
+                class="white-color">825.7k</span>&nbsp;字
             
             
             
