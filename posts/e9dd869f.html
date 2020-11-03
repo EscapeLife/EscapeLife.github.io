@@ -4,7 +4,7 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
-    <meta name="keywords" content="Nginx服务之Tengine服务, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="keywords" content="Nginx服务之完整配置实例, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Nginx服务之Tengine服务 | Escape</title>
+    <title>Nginx服务之完整配置实例 | Escape</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -307,7 +307,7 @@
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Nginx服务之Tengine服务</h1>
+                    <h1 class="description center-align post-title">Nginx服务之完整配置实例</h1>
                 </div>
             </div>
         </div>
@@ -317,105 +317,10 @@
 
 
 
-<main class="post-container content">
+<main class="container content">
 
     
-    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
-<style>
-    #articleContent h1::before,
-    #articleContent h2::before,
-    #articleContent h3::before,
-    #articleContent h4::before,
-    #articleContent h5::before,
-    #articleContent h6::before {
-        display: block;
-        content: " ";
-        height: 100px;
-        margin-top: -100px;
-        visibility: hidden;
-    }
-
-    #articleContent :focus {
-        outline: none;
-    }
-
-    .toc-fixed {
-        position: fixed;
-        top: 64px;
-    }
-
-    .toc-widget {
-        width: 345px;
-        padding-left: 20px;
-    }
-
-    .toc-widget .toc-title {
-        margin: 35px 0 15px 0;
-        padding-left: 17px;
-        font-size: 1.5rem;
-        font-weight: bold;
-        line-height: 1.5rem;
-    }
-
-    .toc-widget ol {
-        padding: 0;
-        list-style: none;
-    }
-
-    #toc-content {
-        height: calc(100vh - 250px);
-        overflow: auto;
-    }
-
-    #toc-content ol {
-        padding-left: 10px;
-    }
-
-    #toc-content ol li {
-        padding-left: 10px;
-    }
-
-    #toc-content .toc-link:hover {
-        color: #42b983;
-        font-weight: 700;
-        text-decoration: underline;
-    }
-
-    #toc-content .toc-link::before {
-        background-color: transparent;
-        max-height: 25px;
-
-        position: absolute;
-        right: 23.5vw;
-        display: block;
-    }
-
-    #toc-content .is-active-link {
-        color: #42b983;
-    }
-
-    #floating-toc-btn {
-        position: fixed;
-        right: 15px;
-        bottom: 76px;
-        padding-top: 15px;
-        margin-bottom: 0;
-        z-index: 998;
-    }
-
-    #floating-toc-btn .btn-floating {
-        width: 48px;
-        height: 48px;
-    }
-
-    #floating-toc-btn .btn-floating i {
-        line-height: 48px;
-        font-size: 1.4rem;
-    }
-</style>
-<div class="row">
-    <div id="main-content" class="col s12 m12 l9">
-        <!-- 文章内容详情 -->
+    <!-- 文章内容详情 -->
 <div id="artDetail">
     <div class="card">
         <div class="card-content article-info">
@@ -467,14 +372,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    66
+                    640
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    3 分
                 </div>
                 
 
@@ -494,6 +399,161 @@
 </blockquote>
 <p><img src="/images/linux-nginx-server-70.jpeg" alt="Nginx服务之实例配置"></p>
 <hr>
+<blockquote>
+<p><strong>完整配置实例：生产环境中使用</strong></p>
+</blockquote>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 指定运行的用户、启动的进程数、打开的最大文件数</span>
+<span class="token keyword">user</span>                              nobody nobody<span class="token punctuation">;</span>
+<span class="token keyword">worker_processes</span>                  <span class="token number">4</span><span class="token punctuation">;</span>
+<span class="token keyword">worker_rlimit_nofile</span>              <span class="token number">51200</span><span class="token punctuation">;</span>
+<span class="token keyword">error_log</span>                         logs<span class="token operator">/</span>error<span class="token punctuation">.</span>log  notice<span class="token punctuation">;</span>
+<span class="token keyword">pid</span>                               <span class="token operator">/</span>var<span class="token operator">/</span>run<span class="token operator">/</span>nginx<span class="token punctuation">.</span><span class="token keyword">pid</span><span class="token punctuation">;</span>
+
+<span class="token keyword">events</span> <span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true"># 使用的模型、每个进程能够承载的请求数</span>
+  <span class="token keyword">use</span>                             epoll<span class="token punctuation">;</span>
+  <span class="token keyword">worker_connections</span>              <span class="token number">51200</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">http</span> <span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true"># 是否详细显示输出信息</span>
+  <span class="token keyword">server_tokens</span>                   off<span class="token punctuation">;</span>
+  <span class="token keyword">include</span>                         mime<span class="token punctuation">.</span><span class="token keyword">types</span><span class="token punctuation">;</span>
+
+  <span class="token comment" spellcheck="true"># 关闭重定向功能</span>
+  <span class="token keyword">proxy_redirect</span>                off<span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true"># 向后端服务器发送请求的主机名、IP地址、上级代理服务器(用于多级代理中)</span>
+  <span class="token keyword">proxy_set_header</span>              Host <span class="token variable">$host</span><span class="token punctuation">;</span>
+  <span class="token keyword">proxy_set_header</span>              X<span class="token operator">-</span>Real<span class="token operator">-</span>IP <span class="token variable">$remote_addr</span><span class="token punctuation">;</span>
+  <span class="token keyword">proxy_set_header</span>              X<span class="token operator">-</span>Forwarded<span class="token operator">-</span>For <span class="token variable">$proxy_add_x_forwarded_for</span><span class="token punctuation">;</span>
+
+  <span class="token comment" spellcheck="true"># 限制客户端的上传内容大小</span>
+  <span class="token keyword">client_max_body_size</span>          20m<span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true"># 设置客户端上传时的缓存内存大小，当大量用户上传时这个数值就不小了</span>
+  <span class="token keyword">client_body_buffer_size</span>       256k<span class="token punctuation">;</span>
+  <span class="token keyword">proxy_connect_timeout</span>         <span class="token number">90</span><span class="token punctuation">;</span>
+  <span class="token keyword">proxy_send_timeout</span>            <span class="token number">90</span><span class="token punctuation">;</span>
+  <span class="token keyword">proxy_read_timeout</span>            <span class="token number">90</span><span class="token punctuation">;</span>
+  <span class="token keyword">proxy_buffer_size</span>             128k<span class="token punctuation">;</span>
+  <span class="token keyword">proxy_buffers</span>                 <span class="token number">4</span> 64k<span class="token punctuation">;</span>
+  <span class="token keyword">proxy_busy_buffers_size</span>       128k<span class="token punctuation">;</span>
+  <span class="token keyword">proxy_temp_file_write_size</span>    128k<span class="token punctuation">;</span>
+
+  <span class="token keyword">default_type</span>                    application<span class="token operator">/</span>octet<span class="token operator">-</span>stream<span class="token punctuation">;</span>
+  <span class="token keyword">charset</span>                         utf<span class="token number">-8</span><span class="token punctuation">;</span>
+
+  <span class="token comment" spellcheck="true"># 设置客户端上传时缓存内存不够时，可以存放在物理磁盘上</span>
+  <span class="token keyword">client_body_temp_path</span>           <span class="token operator">/</span>var<span class="token operator">/</span>tmp<span class="token operator">/</span>client_body_temp <span class="token number">1</span> <span class="token number">2</span><span class="token punctuation">;</span>
+  <span class="token keyword">proxy_temp_path</span>                 <span class="token operator">/</span>var<span class="token operator">/</span>tmp<span class="token operator">/</span>proxy_temp <span class="token number">1</span> <span class="token number">2</span><span class="token punctuation">;</span>
+  <span class="token keyword">fastcgi_temp_path</span>               <span class="token operator">/</span>var<span class="token operator">/</span>tmp<span class="token operator">/</span>fastcgi_temp <span class="token number">1</span> <span class="token number">2</span><span class="token punctuation">;</span>
+  uwsgi_temp_path                 <span class="token operator">/</span>var<span class="token operator">/</span>tmp<span class="token operator">/</span>uwsgi_temp <span class="token number">1</span> <span class="token number">2</span><span class="token punctuation">;</span>
+  scgi_temp_path                  <span class="token operator">/</span>var<span class="token operator">/</span>tmp<span class="token operator">/</span>scgi_temp <span class="token number">1</span> <span class="token number">2</span><span class="token punctuation">;</span>
+
+  <span class="token comment" spellcheck="true"># 忽略无法理解的首部信息</span>
+  <span class="token keyword">ignore_invalid_headers</span>          on<span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true"># 对多个后端服务器名称进行哈希，提高查找效率</span>
+  <span class="token keyword">server_names_hash_max_size</span>      <span class="token number">256</span><span class="token punctuation">;</span>
+  <span class="token keyword">server_names_hash_bucket_size</span>   <span class="token number">64</span><span class="token punctuation">;</span>
+  <span class="token keyword">client_header_buffer_size</span>       8k<span class="token punctuation">;</span>
+  <span class="token keyword">large_client_header_buffers</span>     <span class="token number">4</span> 32k<span class="token punctuation">;</span>
+  <span class="token keyword">connection_pool_size</span>            <span class="token number">256</span><span class="token punctuation">;</span>
+  <span class="token keyword">request_pool_size</span>               64k<span class="token punctuation">;</span>
+
+  output_buffers                  <span class="token number">2</span> 128k<span class="token punctuation">;</span>
+  <span class="token keyword">postpone_output</span>                 <span class="token number">1460</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">client_header_timeout</span>           1m<span class="token punctuation">;</span>
+  <span class="token keyword">client_body_timeout</span>             3m<span class="token punctuation">;</span>
+  <span class="token keyword">send_timeout</span>                    3m<span class="token punctuation">;</span>
+
+  <span class="token comment" spellcheck="true"># 定义日志记录格式</span>
+  <span class="token keyword">log_format</span> main                 <span class="token string">'$server_addr $remote_addr [$time_local] $msec+$connection '</span>
+                                  <span class="token string">'"$request" $status $connection $request_time $body_bytes_sent "$http_referer" '</span>
+                                  <span class="token string">'"$http_user_agent" "$http_x_forwarded_for"'</span><span class="token punctuation">;</span>
+
+  <span class="token comment" spellcheck="true"># 设置打开日志的缓存</span>
+  <span class="token keyword">open_log_file_cache</span>             max<span class="token operator">=</span><span class="token number">1000</span> inactive<span class="token operator">=</span>20s min_uses<span class="token operator">=</span><span class="token number">1</span> valid<span class="token operator">=</span>1m<span class="token punctuation">;</span>
+  <span class="token keyword">access_log</span>                      logs<span class="token operator">/</span>access<span class="token punctuation">.</span>log      main<span class="token punctuation">;</span>
+  <span class="token keyword">log_not_found</span>                   on<span class="token punctuation">;</span>
+
+
+  <span class="token keyword">sendfile</span>                        on<span class="token punctuation">;</span>
+  <span class="token keyword">tcp_nodelay</span>                     on<span class="token punctuation">;</span>
+  <span class="token keyword">tcp_nopush</span>                      off<span class="token punctuation">;</span>
+
+  <span class="token keyword">reset_timedout_connection</span>       on<span class="token punctuation">;</span>
+  <span class="token keyword">keepalive_timeout</span>               <span class="token number">10</span> <span class="token number">5</span><span class="token punctuation">;</span>
+  <span class="token keyword">keepalive_requests</span>              <span class="token number">100</span><span class="token punctuation">;</span>
+
+
+  <span class="token keyword">gzip</span>                            on<span class="token punctuation">;</span>
+  <span class="token keyword">gzip_http_version</span>               <span class="token number">1.1</span><span class="token punctuation">;</span>
+  <span class="token keyword">gzip_vary</span>                       on<span class="token punctuation">;</span>
+  <span class="token keyword">gzip_proxied</span>                    any<span class="token punctuation">;</span>
+  <span class="token keyword">gzip_min_length</span>                 <span class="token number">1024</span><span class="token punctuation">;</span>
+  <span class="token keyword">gzip_comp_level</span>                 <span class="token number">6</span><span class="token punctuation">;</span>
+  <span class="token keyword">gzip_buffers</span>                    <span class="token number">16</span> 8k<span class="token punctuation">;</span>
+  <span class="token keyword">gzip_proxied</span>                    expired no<span class="token operator">-</span>cache no<span class="token operator">-</span>store private <span class="token keyword">auth</span> no_last_modified no_etag<span class="token punctuation">;</span>
+  <span class="token keyword">gzip_types</span>                      text<span class="token operator">/</span>plain application<span class="token operator">/</span>x<span class="token operator">-</span>javascript text<span class="token operator">/</span>css application<span class="token operator">/</span>xml application<span class="token operator">/</span>json<span class="token punctuation">;</span>
+  <span class="token keyword">gzip_disable</span>                    <span class="token string">"MSIE [1-6]\.(?!.*SV1)"</span><span class="token punctuation">;</span>
+
+
+  <span class="token keyword">upstream</span> tomcat8080 <span class="token punctuation">{</span>
+    <span class="token keyword">ip_hash</span><span class="token punctuation">;</span>
+    <span class="token keyword">server</span>                        <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.103</span><span class="token punctuation">:</span><span class="token number">8080</span> weight<span class="token operator">=</span><span class="token number">1</span> max_fails<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">;</span>
+    <span class="token keyword">server</span>                        <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.104</span><span class="token punctuation">:</span><span class="token number">8080</span> weight<span class="token operator">=</span><span class="token number">1</span> max_fails<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">;</span>
+    <span class="token keyword">server</span>                        <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.105</span><span class="token punctuation">:</span><span class="token number">8080</span> weight<span class="token operator">=</span><span class="token number">1</span> max_fails<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">listen</span>                        <span class="token number">80</span><span class="token punctuation">;</span>
+    <span class="token keyword">server_name</span>                   www<span class="token punctuation">.</span>wsescape<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true"># config_apps_begin</span>
+    <span class="token keyword">root</span>                          <span class="token operator">/</span>data<span class="token operator">/</span>webapps<span class="token operator">/</span>htdocs<span class="token punctuation">;</span>
+    <span class="token keyword">access_log</span>                    <span class="token operator">/</span>var<span class="token operator">/</span>logs<span class="token operator">/</span>webapp<span class="token punctuation">.</span>access<span class="token punctuation">.</span>log     main<span class="token punctuation">;</span>
+    <span class="token keyword">error_log</span>                     <span class="token operator">/</span>var<span class="token operator">/</span>logs<span class="token operator">/</span>webapp<span class="token punctuation">.</span>error<span class="token punctuation">.</span>log      notice<span class="token punctuation">;</span>
+
+    <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true"># 请求网站图标配置</span>
+      <span class="token keyword">location</span> <span class="token operator">~</span><span class="token operator">*</span> <span class="token operator">^</span><span class="token punctuation">.</span><span class="token operator">*</span><span class="token operator">/</span>favicon<span class="token punctuation">.</span>ico$ <span class="token punctuation">{</span>
+        <span class="token keyword">root</span>                      <span class="token operator">/</span>data<span class="token operator">/</span>webapps<span class="token punctuation">;</span>
+        <span class="token keyword">expires</span>                   180d<span class="token punctuation">;</span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+
+      <span class="token comment" spellcheck="true"># 如果请求名不是一个文件，将交给后端的tomcat服务器</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span> <span class="token operator">!</span><span class="token operator">-</span>f <span class="token variable">$request_filename</span> <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">proxy_pass</span>                <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>tomcat8080<span class="token punctuation">;</span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">error_page</span>                    <span class="token number">500</span> <span class="token number">502</span> <span class="token number">503</span> <span class="token number">504</span>  <span class="token operator">/</span>50x<span class="token punctuation">.</span>html<span class="token punctuation">;</span>
+      <span class="token keyword">location</span> <span class="token operator">=</span> <span class="token operator">/</span>50x<span class="token punctuation">.</span>html <span class="token punctuation">{</span>
+      <span class="token keyword">root</span>                        html<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">listen</span>                        <span class="token number">8088</span><span class="token punctuation">;</span>
+    <span class="token keyword">server_name</span>                   nginx_status<span class="token punctuation">;</span>
+
+      <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+          <span class="token keyword">access_log</span>                  off<span class="token punctuation">;</span>
+          <span class="token keyword">deny</span>                        all<span class="token punctuation">;</span>
+          <span class="token keyword">return</span>                      <span class="token number">503</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+
+      <span class="token keyword">location</span> <span class="token operator">/</span>status <span class="token punctuation">{</span>
+          <span class="token keyword">stub_status</span>                 on<span class="token punctuation">;</span>
+          <span class="token keyword">access_log</span>                  off<span class="token punctuation">;</span>
+          <span class="token keyword">allow</span>                       <span class="token number">127.0</span><span class="token punctuation">.</span><span class="token number">0.1</span><span class="token punctuation">;</span>
+          <span class="token keyword">allow</span>                       <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.71</span><span class="token punctuation">;</span>
+          <span class="token keyword">deny</span>                        all<span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -752,12 +812,12 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/posts/e9dd869f.html">
+                <a href="/posts/ce7e137f.html">
                     <div class="card-image">
                         
-                        <img src="/images/linux-nginx-server-70.jpeg" class="responsive-img" alt="Nginx服务之完整配置实例">
+                        <img src="/images/linux-nginx-server-71.png" class="responsive-img" alt="Nginx服务之Tengine服务">
                         
-                        <span class="card-title">Nginx服务之完整配置实例</span>
+                        <span class="card-title">Nginx服务之Tengine服务</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -768,7 +828,7 @@
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2019-01-15
+                            <i class="far fa-clock fa-fw icon-date"></i>2019-01-18
                         </span>
                         <span class="publish-author">
                             
@@ -878,100 +938,6 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
 </style>
 
 
-    </div>
-    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
-        <div class="toc-widget" style="background-color: white;">
-            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
-            <div id="toc-content"></div>
-        </div>
-    </div>
-</div>
-
-<!-- TOC 悬浮按钮. -->
-
-<div id="floating-toc-btn" class="hide-on-med-and-down">
-    <a class="btn-floating btn-large bg-color">
-        <i class="fas fa-list-ul"></i>
-    </a>
-</div>
-
-
-<script src="/libs/tocbot/tocbot.min.js"></script>
-<script>
-    $(function () {
-        tocbot.init({
-            tocSelector: '#toc-content',
-            contentSelector: '#articleContent',
-            headingsOffset: -($(window).height() * 0.4 - 45),
-            collapseDepth: Number('4'),
-            headingSelector: 'h2, h3, h4, h5'
-        });
-
-        // modify the toc link href to support Chinese.
-        let i = 0;
-        let tocHeading = 'toc-heading-';
-        $('#toc-content a').each(function () {
-            $(this).attr('href', '#' + tocHeading + (++i));
-        });
-
-        // modify the heading title id to support Chinese.
-        i = 0;
-        $('#articleContent').children('h2, h3, h4, h5').each(function () {
-            $(this).attr('id', tocHeading + (++i));
-        });
-
-        // Set scroll toc fixed.
-        let tocHeight = parseInt($(window).height() * 0.4 - 64);
-        let $tocWidget = $('.toc-widget');
-        $(window).scroll(function () {
-            let scroll = $(window).scrollTop();
-            /* add post toc fixed. */
-            if (scroll > tocHeight) {
-                $tocWidget.addClass('toc-fixed');
-            } else {
-                $tocWidget.removeClass('toc-fixed');
-            }
-        });
-
-        
-        /* 修复文章卡片 div 的宽度. */
-        let fixPostCardWidth = function (srcId, targetId) {
-            let srcDiv = $('#' + srcId);
-            if (srcDiv.length === 0) {
-                return;
-            }
-
-            let w = srcDiv.width();
-            if (w >= 450) {
-                w = w + 21;
-            } else if (w >= 350 && w < 450) {
-                w = w + 18;
-            } else if (w >= 300 && w < 350) {
-                w = w + 16;
-            } else {
-                w = w + 14;
-            }
-            $('#' + targetId).width(w);
-        };
-
-        // 切换TOC目录展开收缩的相关操作.
-        const expandedClass = 'expanded';
-        let $tocAside = $('#toc-aside');
-        let $mainContent = $('#main-content');
-        $('#floating-toc-btn .btn-floating').click(function () {
-            if ($tocAside.hasClass(expandedClass)) {
-                $tocAside.removeClass(expandedClass).hide();
-                $mainContent.removeClass('l9');
-            } else {
-                $tocAside.addClass(expandedClass).show();
-                $mainContent.addClass('l9');
-            }
-            fixPostCardWidth('artDetail', 'prenext-posts');
-        });
-        
-    });
-</script>
-
     
 
 </main>
@@ -1045,7 +1011,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">902.2k</span>&nbsp;字
+                class="white-color">908k</span>&nbsp;字
             
             
             
