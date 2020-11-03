@@ -4,7 +4,7 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
-    <meta name="keywords" content="Apache服务之httpd2.4配置, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="keywords" content="Apache服务之httpd2.2配置, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Apache服务之httpd2.4配置 | Escape</title>
+    <title>Apache服务之httpd2.2配置 | Escape</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -307,7 +307,7 @@
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Apache服务之httpd2.4配置</h1>
+                    <h1 class="description center-align post-title">Apache服务之httpd2.2配置</h1>
                 </div>
             </div>
         </div>
@@ -467,14 +467,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    59
+                    12.3k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    50 分
                 </div>
                 
 
@@ -490,10 +490,1790 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <blockquote>
-<p><strong>CentOS7 配置 httpd2.4 服务</strong></p>
+<p><strong>CentOS6 配置 httpd2.2 服务</strong></p>
 </blockquote>
 <p><img src="/images/linux-apache-server-70.jpg" alt="Apache服务之httpd2.2服务配置"></p>
 <hr>
+<h2 id="1-程序环境"><a href="#1-程序环境" class="headerlink" title="1. 程序环境"></a>1. 程序环境</h2><blockquote>
+<p>这里使用的是<code>CentOS6</code>自带的<code>httpd</code>程序，而非编译安装的程序，基本和<code>CentOS7</code>通过<code>yum</code>安装的配置文件一致。</p>
+</blockquote>
+<ul>
+<li><strong>配置文件</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 主配置文件，默认/etc/httpd为根目录</span>
+/etc/httpd/conf/httpd.conf
+
+<span class="token comment" spellcheck="true"># 主配置文件的附加片段</span>
+/etc/httpd/conf.d/*.conf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>服务脚本</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># CentOS6服务脚本，使用的是Upstart启动模式</span>
+/etc/rc.d/init.d/httpd
+
+<span class="token comment" spellcheck="true"># 服务脚本的配置文件</span>
+/etc/sysconfig/httpd
+
+<span class="token comment" spellcheck="true"># CentOS7服务脚本，使用的是Systemd启动模式，只有这点配置上的区别</span>
+/usr/lib/systemd/system/httpd.service<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>主程序文件</strong><ul>
+<li>通过<code>rpm -ql httpd | grep bin</code>查询得到的结果</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">/usr/sbin/httpd         <span class="token comment" spellcheck="true"># 默认prefork模型的，可以在配置文件/etc/sysconfig/httpd中切换</span>
+/usr/sbin/httpd.event   <span class="token comment" spellcheck="true"># 2.2版本中event还不够稳定</span>
+/usr/sbin/httpd.worker  <span class="token comment" spellcheck="true"># 多线程模型</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>日志文件目录</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># httpd服务的访问日志</span>
+/var/log/httpd/access_log
+
+<span class="token comment" spellcheck="true"># httpd服务的错误日志</span>
+/var/log/httpd/error_log<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>站点文档目录</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 默认的站点目录</span>
+/var/www/html<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>模块文件路径</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 默认的模块文件路径</span>
+/usr/lib64/httpd/modules<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>配置文件的组成</strong><ul>
+<li>基本上由三段组成，建议第二段和第三段不要同时配置</li>
+<li>配置格式：<code>directive value</code></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>escape@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># grep "Section" /etc/httpd/conf/httpd.conf</span>
+<span class="token comment" spellcheck="true">### Section 1: Global Environment           # 全局配置</span>
+<span class="token comment" spellcheck="true">### Section 2: 'Main' server configuration  # 主服务器配置</span>
+<span class="token comment" spellcheck="true">### Section 3: Virtual Hosts                # 虚拟主机配置</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="2-常用配置"><a href="#2-常用配置" class="headerlink" title="2. 常用配置"></a>2. 常用配置</h2><blockquote>
+<p>修改的文件为<code>httpd.conf</code>主配置文件</p>
+</blockquote>
+<h3 id="2-1-监听IP和Port"><a href="#2-1-监听IP和Port" class="headerlink" title="2.1 监听IP和Port"></a>2.1 监听<code>IP</code>和<code>Port</code></h3><ul>
+<li>使用格式<ul>
+<li><strong>格式：</strong><code>Listen [IP:]PORT</code></li>
+</ul>
+</li>
+<li>重点说明<ul>
+<li>省略<code>UP</code>表示监听本机所有<code>IP</code>(多块网卡有多个<code>IP</code>地址)</li>
+<li><code>Listen</code>可重复指定多个端口，且修改端口需要<code>restart</code>服务</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache">Listen 80
+Listen 172.16.100.16:8080<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-2-配置持久连接"><a href="#2-2-配置持久连接" class="headerlink" title="2.2 配置持久连接"></a>2.2 配置持久连接</h3><ul>
+<li>功能介绍<ul>
+<li>持久连接 == 长连接</li>
+<li><strong>优点：</strong>连接建立，每个资源获取完成后不会断开连接，而是继续等待其它的请求完成</li>
+<li><strong>缺点：</strong>对并发访问量较大的服务器，持久连接功能会使用有些请求得不到响应</li>
+<li><strong>折中方法：</strong>使用较短的持久连接时间</li>
+</ul>
+</li>
+<li>连接断开方式<ul>
+<li>限制请求数量，默认为<code>100</code>个，之后就断开连接</li>
+<li>限制时间，可配置，建议配置且不要配置太大</li>
+</ul>
+</li>
+<li>注意事项<ul>
+<li>在<code>HTTP/1.0</code>版本中默认使用非持久连接，在<code>HTTP/1.1</code>版本中默认使用持久连接</li>
+<li>在<code>httpd2.4</code>中支持毫秒级持久时间，可以使用较短的持久连接时间</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># 配置
+KeepAlive On|Off      # 启动，下面的配置才有效
+MaxKeepAliveRequests  # 最大持久连接的请求数量
+KeepAliveTimeout      # 最大持久连接的超时时间，单位为秒钟<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 测试方法，持久连接在telnet中可以多次请求不中断</span>
+$ telnet 192.168.31.94 80
+<span class="token operator">></span> GET / HTTP/1.1
+<span class="token operator">></span> Host: 192.168.31.94<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-3-选择MPM模式"><a href="#2-3-选择MPM模式" class="headerlink" title="2.3 选择MPM模式"></a>2.3 选择<code>MPM</code>模式</h3><blockquote>
+<p>目前在<code>Apache 2.x</code>版本中<code>MPM</code>只能选择一个，同一台服务器是无法使用多个<code>MPM</code>模块的，不过在<code>Apache 2.4</code>版中，已经增加了可以同时选择使用多个<code>MPM</code>模块。</p>
+</blockquote>
+<p><strong><code>MPM</code>模式使用</strong></p>
+<ul>
+<li>功能介绍<ul>
+<li><code>MPM</code>(<code>Multipath Process Module</code>)多道处理模块</li>
+<li>有三种模式：<code>prefork</code>、<code>worker</code>、<code>event</code></li>
+<li>默认为<code>/usr/sbin/httpd</code>，其使用<code>prefork</code>模式</li>
+</ul>
+</li>
+<li>注意事项<ul>
+<li><code>httpd2.2</code>不支持同时编译多个模块，所以只能编译时选定一个</li>
+<li><code>rpm</code>安装的包提供三个二进制程序文件，分别用于实现对不同<code>MPM</code>机制的支持</li>
+</ul>
+</li>
+</ul>
+<p><strong>三大模块介绍</strong></p>
+<ul>
+<li><code>prefork</code>模块<ul>
+<li>为<code>UNIX/Linux</code>系统的默认选择模块</li>
+<li><code>prefork</code>模块通过预先派生一定数量的子进程来等待用户请求</li>
+<li>优势在于当一个进程崩溃之后并不会影响其他的进程工作，具有很大的调节能力</li>
+</ul>
+</li>
+<li><code>worker</code>模块<ul>
+<li>使用混合的多线程多进程模型，使用进程处理用户请求</li>
+<li>启动多个进程且每个进程派生多个线程来服务请求，所以稳定性更加好</li>
+</ul>
+</li>
+<li><code>event</code>模块</li>
+</ul>
+<p><strong>模块说明</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看当前的MPM模式</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ps -aux | grep httpd</span>
+root       5806  0.0  0.4 185924  2316 ?        Ss   Nov28   0:04 /usr/sbin/httpd
+apache     5809  0.0  0.4 186060  2212 ?        S    Nov28   0:00 /usr/sbin/httpd
+apache     5810  0.0  0.4 186060  2296 ?        S    Nov28   0:00 /usr/sbin/httpd
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+
+<span class="token comment" spellcheck="true"># 查看静态编译的模块</span>
+$ httpd -l
+<span class="token comment" spellcheck="true"># 查看所以模块(包括静态编译及动态装载的模块)</span>
+$ httpd -M<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>更换使用的<code>httpd</code>程序<ul>
+<li>修改配置文件<code>/etc/sysconfig/httpd</code>，启用<code>HTTPD</code>参数</li>
+<li>需要重启服务才能生效配置</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看ps aux | grep httpd</span>
+<span class="token comment" spellcheck="true"># 如果修改为worker之后，httpd命令就变为httpd.worker</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat /etc/sysconfig/httpd</span>
+HTTPD<span class="token operator">=</span>/usr/sbin/httpd.worker
+PIDFILE<span class="token operator">=</span>/var/run/httpd/httpd.pid<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>根据<code>httpd</code>程序进行加载配置</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># httpd.conf主配置文件
+# prefork的配置：httpd2.2中event还不稳定
+<IfModule prefork.c>
+  StartServers       8       # 服务启动时启动的子进程数，即主控进程启动的子进程数
+  MinSpareServers    5       # 最少空闲的子进程数
+  MaxSpareServers   20       # 最大空闲的子进程数
+  ServerLimit      256       # 服务器进程数量最大值，限制MaxClients
+  MaxClients       256       # 允许同时伺服的最大接入请求数量，数值取决于资源
+  MaxRequestsPerChild  4000  # 每个子进程在其生存期允许伺服的最大请求数量，超过时就重新启动
+</IfModule>
+# worker的配置：多进程多线程模型
+<IfModule worker.c>
+  StartServers         4     # 服务启动时启动的进程数，主控进程启动的子进程数
+  MaxClients         300     # 服务器端最大启动的线程数量，数值取决于资源
+  MinSpareThreads     25     # 最少空闲线程数
+  MaxSpareThreads     75     # 最大空闲线程数
+  ThreadsPerChild     25     # 每个进程最大能够启动的线程数
+  MaxRequestsPerChild  0     # 每个线程最大的响应次数，0表示不做限制
+</IfModule><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>通过<code>PV</code>和<code>UV</code>粗略计算带宽</strong></p>
+<ul>
+<li>【访问量】<strong><code>PV</code>：</strong>即页面浏览量或点击量；在一定统计周期内用户每次刷新网页一次即被计算一次</li>
+<li>【独立访客】<strong><code>UV</code>：</strong>访问您网站的一台电脑客户端为一个访客；<code>00:00-24:00</code>内相同的客户端只被计算一次</li>
+<li>【独立<code>IP</code>】<strong><code>IP</code>：</strong>指独立<code>IP</code>数；<code>00:00-24:00</code>内相同<code>IP</code>地址之被计算一次</li>
+<li><code>网站独享带宽 = 一天总的PV值 ÷ 一天总时间(换算为秒) * 平均页面大小(单位为KB) * 8</code></li>
+</ul>
+<p><strong>粗略计算内存消耗</strong></p>
+<ul>
+<li>计算单个线程内存消耗量来设置线程数量</li>
+<li>使用<code>ps</code>、<code>top</code>等命令查看<code>Apache</code>单个线程的消耗内存(如<code>2MB</code>)，那么<code>prefork</code>模型默认线程数<code>256</code>，则使用<code>256x2=512MB</code>内存，从而根据物理机的实际内存定义启动的线程数量</li>
+</ul>
+<hr>
+<h3 id="2-4-使用DSO加载模块"><a href="#2-4-使用DSO加载模块" class="headerlink" title="2.4 使用DSO加载模块"></a>2.4 使用<code>DSO</code>加载模块</h3><ul>
+<li>配置指令实现模块加载和卸载</li>
+<li><strong>格式：</strong><code>LoadModule &lt;mod_name&gt; &lt;mod_path&gt;</code></li>
+<li>模块路径可使用相对地址，相对于<code>ServerRoot</code>(<code>/etc/httpd</code>)指向的路径而言</li>
+<li>配置完成之后，需要使用<code>restart</code>才能生效</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache">LoadModule auth_basic_module modules/mod_auth_basic.so
+LoadModule auth_digest_module modules/mod_auth_digest.so
+LoadModule authn_file_module modules/mod_authn_file.so
+LoadModule authn_alias_module modules/mod_authn_alias.so
+LoadModule authn_anon_module modules/mod_authn_anon.so
+LoadModule authn_dbm_module modules/mod_authn_dbm.so<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-5-定义DocumentRoot路径"><a href="#2-5-定义DocumentRoot路径" class="headerlink" title="2.5 定义DocumentRoot路径"></a>2.5 定义<code>DocumentRoot</code>路径</h3><ul>
+<li><code>DocumentRoot</code>指向的路径为<code>URL</code>路径的起始位置</li>
+<li>保证功能正常运行，暂时关闭<code>selinux</code>和<code>iptables</code></li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># 基于URL实现访问控制
+DocumentRoot "/var/www/html"
+
+# 基于文件系统实现访问控制
+<Directory "/var/www/html">
+
+# 定义DocumentRoot
+DocumentRoot "/var/www/htocs"
+
+# 访问网站下的bash二进制包会映射到/var/www/htdocs/下查找
+http://www.escape.com/download/bash-4.4.2-3.el6.x86_64.rpm
+  --> /var/www/htdocs/download/bash-4.4.2-3.el6.x86_64.rpm<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-6-定义默认主页面"><a href="#2-6-定义默认主页面" class="headerlink" title="2.6 定义默认主页面"></a>2.6 定义默认主页面</h3><ul>
+<li>定义的默认页面可以有多个，自左往右查找</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># httpd.conf文件中配置
+DirectoryIndex index.html index.php index.html.var<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-7-指定路径别名"><a href="#2-7-指定路径别名" class="headerlink" title="2.7 指定路径别名"></a>2.7 指定路径别名</h3><ul>
+<li>路径别名用于对路径地址进行映射</li>
+<li><strong>格式：</strong><code>Alias /URL/ "/PATH/TO/SOMEDIR/"</code></li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># 定义Alias别名
+Alias /bbs/ "/forum/htdocs"
+
+# 访问网站的bbs会映射到/forum/htdocs目录下的bbs子目录
+http://www.escape.com/bbs/index.html
+  --> /forum/htdocs/bbs/index.html<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-8-设定默认字符集"><a href="#2-8-设定默认字符集" class="headerlink" title="2.8 设定默认字符集"></a>2.8 设定默认字符集</h3><ul>
+<li>支持很多字符集，如<code>GBK</code>、<code>GB2312</code>、<code>GB18030</code></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">AddDefaultCharset UTF-8<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<hr>
+<h3 id="2-9-压缩页面设置"><a href="#2-9-压缩页面设置" class="headerlink" title="2.9 压缩页面设置"></a>2.9 压缩页面设置</h3><blockquote>
+<p>使用<code>mod_deflate</code>模块压缩页面优化传输速度，能够让<code>httpd</code>使用压缩功能。</p>
+</blockquote>
+<ul>
+<li>适用场景<ul>
+<li>(1) 好处是节约带宽，但是额外消耗<code>CPU</code>时钟周期；可能有些较老浏览器不支持</li>
+<li>(2) 压缩适于压缩的资源，例如文本文件、图片等效果显著</li>
+</ul>
+</li>
+<li>使用方法<ul>
+<li>复制如下内容到<code>httpd.conf</code>文件中</li>
+<li>确保<code>deflate_module</code>模块已经启用</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 输出过滤器设置为DEFLATE</span>
+SetOutputFilter DEFLATE
+<span class="token comment" spellcheck="true"># mod_deflate configuration</span>
+<span class="token comment" spellcheck="true"># Restrict compression to these MIME types  定义压缩文件类型</span>
+AddOutputFilterByType DEFLATE text/plain
+AddOutputFilterByType DEFLATE text/html
+AddOutputFilterByType DEFLATE application/xhtml+xml
+AddOutputFilterByType DEFLATE text/xml
+AddOutputFilterByType DEFLATE application/xml
+AddOutputFilterByType DEFLATE application/x-javascript
+AddOutputFilterByType DEFLATE text/javascript
+AddOutputFilterByType DEFLATE text/css
+<span class="token comment" spellcheck="true"># Level of compression (Highest 9 - Lowest 1)  定义压缩级别</span>
+DeflateCompressionLevel 9
+<span class="token comment" spellcheck="true"># Netscape 4.x has some problems.  定义不需要压缩的浏览器</span>
+BrowserMatch ^Mozilla/4 gzip-only-text/html
+<span class="token comment" spellcheck="true"># Netscape 4.06-4.08 have some more problems  定义不需要压缩的浏览器</span>
+BrowserMatch ^Mozilla/4\.0<span class="token punctuation">[</span>678<span class="token punctuation">]</span> no-gzip
+<span class="token comment" spellcheck="true"># MSIE masquerades as Netscape, but it is fine  定义不需要压缩的浏览器</span>
+BrowserMatch \bMSI<span class="token punctuation">[</span>E<span class="token punctuation">]</span> <span class="token operator">!</span>no-gzip <span class="token operator">!</span>gzip-only-text/html<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-10-禁止DNS查询"><a href="#2-10-禁止DNS查询" class="headerlink" title="2.10 禁止DNS查询"></a>2.10 禁止<code>DNS</code>查询</h3><ul>
+<li>禁止<code>DNS</code>查询提高服务器的请求效率</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">HostnameLookups off<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<hr>
+<h3 id="2-11-服务器安全检查"><a href="#2-11-服务器安全检查" class="headerlink" title="2.11 服务器安全检查"></a>2.11 服务器安全检查</h3><p><strong>防范方法</strong></p>
+<ul>
+<li>保证<code>Apache</code>服务器的软件和组件的稳定性和安全性，及时打补丁</li>
+<li>保证不使用危险的字符，如<code>*</code>、<code>|</code>等</li>
+<li>设置会话超时时间与<code>cookie</code>过期时间，以避免暴力破解</li>
+<li>服务器崩溃时，不会像客户端显示调试信息</li>
+<li>禁止不是用的模块</li>
+</ul>
+<p><strong>常用检测工具</strong></p>
+<ul>
+<li><code>mod_security</code>模块</li>
+<li><code>nikto</code>网站<code>Web</code>检查工具</li>
+<li><code>chkrootkit</code>系统漏洞检查工具</li>
+</ul>
+<hr>
+<h2 id="3-高级配置"><a href="#3-高级配置" class="headerlink" title="3. 高级配置"></a>3. 高级配置</h2><blockquote>
+<p>安装包不需要追求最新的，稳定高效安全最为重要。</p>
+</blockquote>
+<h3 id="3-1-站点访问控制"><a href="#3-1-站点访问控制" class="headerlink" title="3.1 站点访问控制"></a>3.1 站点访问控制</h3><blockquote>
+<p>在<code>httpd2.4</code>中需要做授权才能正常使用</p>
+</blockquote>
+<p><strong>访问控制机制分类</strong></p>
+<ul>
+<li>基于来源地址</li>
+<li>基于用户账号</li>
+</ul>
+<p><strong>路径资源分类</strong></p>
+<ul>
+<li><strong>文件系统路径</strong><ul>
+<li><code>&lt;Directory ""&gt; &lt;/Directory&gt;</code>  指明目录路径</li>
+<li><code>&lt;DirectoryMatch ""&gt; &lt;/DirectoryMatch&gt;</code>  尽量不要使用，效率低</li>
+<li><code>&lt;File ""&gt; &lt;/File&gt;</code>  针对单个文件</li>
+<li><code>&lt;FileMatch ""&gt; &lt;/FileMatch&gt;</code>  尽量不要使用，效率低</li>
+</ul>
+</li>
+<li><strong><code>URL</code>路径</strong><ul>
+<li><code>&lt;Location ""&gt; &lt;/Location&gt;</code>  还有指明请求方式的功能等特殊方法</li>
+<li><code>&lt;LocationMatch ""&gt; &lt;/LocationMatch&gt;</code>  尽量不要使用，效率低</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h4 id="3-1-1-基于来源地址的访问控制"><a href="#3-1-1-基于来源地址的访问控制" class="headerlink" title="3.1.1 基于来源地址的访问控制"></a>3.1.1 基于来源地址的访问控制</h4><blockquote>
+<p>在<code>Directory</code>中<strong>“基于来源地址”</strong>实现访问控制机制，这里主要针对于<code>httpd2.2</code>进行说明。</p>
+</blockquote>
+<p><strong>（1）<code>Options</code>属性</strong></p>
+<ul>
+<li>介绍<ul>
+<li>定义用户对<code>Directory</code>中的资源访问的控制选项</li>
+<li>常用特性：<code>Indexes</code>、<code>FollowSymLinks</code>、<code>ExecCGI</code></li>
+<li>较少使用特性：<code>Includes</code>、<code>SymLinksifOwnerMatch</code>、<code>MultiViews</code></li>
+</ul>
+</li>
+<li>属性选项<ul>
+<li><code>None</code>：所以特性都不支持</li>
+<li><code>All</code>：所以特性都支持</li>
+<li><code>Indexes</code>: 索引</li>
+<li><code>FollowSymlinks</code>：允许跟踪符号链接文件</li>
+<li><code>Includes</code>：服务器端包含</li>
+<li><code>SymLinksifOwnerMatch</code>：允许跟踪符号链接文件，但需要链接目标文件和源文件属组一直</li>
+<li><code>ExecCGI</code>：允许<code>CGI</code>脚本执行</li>
+<li><code>MultiViews</code>：根据用户浏览器的语言环境显示针对的内容，内容协商机制，效率低</li>
+</ul>
+</li>
+<li>注意事项<ul>
+<li>如果网站没有设置默认页面且启用<code>Indexes</code>选项，列出当前访问路径下的文件，但是你会发现设置之后，显示的是欢迎页面，这是因为在<code>/etc/httpd/conf.d/welcome.conf</code>中系统做了配置，将其移除，则显示文件列表，需要注意的是还要和<code>DocumentRoot</code>对于起来，否则匹配和设置不一致，导致无法生效；有时网站做下载站的时候需要使用</li>
+<li>如果网站使用<code>FollowSymlinks</code>选项，通过<code>ln -sv /etc/issue /www/html/issue.html</code>连接的文件，能够让用户访问到<code>/www/html/issue.html</code>文件</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 可以使用在全局，也可以使用在特定Directory容器内</span>
+Options Indexes FollowSymLinks
+Options -Indexes FollowSymLinks
+<span class="token operator">&lt;</span>Directory <span class="token string">"/var/www/html"</span><span class="token operator">></span>
+  Options Indexes FollowSymLinks
+<span class="token operator">&lt;</span>/Directory<span class="token operator">></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<p><strong>（2）基于来源地址的访问控制机制</strong></p>
+<ul>
+<li><code>Order</code>指明：检查次序，后者为默认机制<ul>
+<li>白名单：<code>Order allow,deny</code></li>
+<li>黑名单：<code>Order deny,allow</code></li>
+</ul>
+</li>
+<li>允许访问：<code>Allow from 来源地址</code></li>
+<li>拒绝访问：<code>Deny from 来源地址</code></li>
+<li>来源地址地址可以是<code>IP</code>地址、网络地址、主机名<ul>
+<li><code>IP</code>地址：<code>192.168.31.173</code></li>
+<li>网络地址：<code>172.16</code></li>
+<li>网络地址：<code>172.16.0.0</code></li>
+<li>网络地址：<code>172.16.0.0/16</code></li>
+<li>网络地址：<code>172.16.0.0/255.255.0.0</code></li>
+<li>主机名是<code>DNS</code>服务器中定义的<code>FQDN</code></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 在/var/www/html中定义白名单，拒绝192.168.31.173的访问，允许192.168网络的访问</span>
+<span class="token operator">&lt;</span>Directory <span class="token string">"/var/www/html"</span><span class="token operator">></span>
+  Options Indexes FollowSymLinks
+  Order allow,deny
+  Deny from 192.168.31.173
+  Allow from 192.168
+  Allow from all
+<span class="token operator">&lt;</span>/Directory<span class="token operator">></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<p><strong>（3）是否允许<code>Directory</code>定义下的文件自行进行设置</strong></p>
+<ul>
+<li>解释<ul>
+<li><code>AllowOverride</code>: 是否允许被覆盖</li>
+<li>在<code>Directory</code>目录下的文件中创建一个隐藏文件<code>.htaccess</code>，在其中进行各目录自己的权限规则</li>
+<li>虽然这样很灵活，但是风险很大，所以很少使用</li>
+<li>是否允许在设置目录定义的规则覆盖各个子目录下的<code>.htaccess</code>规则</li>
+</ul>
+</li>
+<li>方法<ul>
+<li><code>AllowOverride None</code></li>
+<li>可选的值：<code>All</code>、<code>None</code>、<code>FileInfo</code>、<code>AuthConfig</code>、<code>Limit</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h4 id="3-1-2-基于用户账号的访问控制"><a href="#3-1-2-基于用户账号的访问控制" class="headerlink" title="3.1.2 基于用户账号的访问控制"></a>3.1.2 基于用户账号的访问控制</h4><blockquote>
+<p><strong>认证概念：</strong>服务器需要通过某种方式来验证用户的身份的合法性，一旦服务器知道了用户的身份就可以判定用户是否可以访问受限资源，通常使用用户名和密码验证。</p>
+</blockquote>
+<p><strong>认证质询</strong></p>
+<ul>
+<li><code>WWW-Authenticate</code>：响应码为<code>401</code>，拒绝客户端请求，并说明要求客户提供账号和密码</li>
+</ul>
+<p><img src="/images/linux-apache-server-71.png" alt="Apache服务之httpd2.2服务配置"></p>
+<p><img src="/images/linux-apache-server-72.png" alt="Apache服务之httpd2.2服务配置"></p>
+<p><strong>注意事项</strong></p>
+<ul>
+<li>一般情况下，我们会优先使用表单的进行认证机制</li>
+<li>在没有表单认证机制的情况下，可以使用<code>basic</code>认证，因为是明文传送且不够安全，可将其放入<code>https</code>中保证安全</li>
+<li>认证是指客户端用户填入账号和密码后再次发送请求报文，认证通过，则服务器发送响应的资源</li>
+</ul>
+<p><strong>认证类型</strong></p>
+<ul>
+<li>防止密码信息在传输过程中被窃取加的保护方式</li>
+<li><code>basic</code>：明文传输，一般使用为<code>base64</code>编码</li>
+<li><code>digest</code>：消息摘要，使用 md5 编码，老版本浏览器不支持</li>
+</ul>
+<p><strong><code>Basic</code>认证</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># (1) 定义安全域</span>
+<span class="token operator">&lt;</span>Directory <span class="token string">""</span><span class="token operator">></span>          <span class="token comment" spellcheck="true"># 指定需要控制的文件目录</span>
+  Options None
+  AllowOverride None
+  AuthType Basic      <span class="token comment" spellcheck="true"># 认证类型</span>
+  AuthName <span class="token string">"STRING"</span>   <span class="token comment" spellcheck="true"># 认证提示信息</span>
+  AuthUserFile <span class="token string">"/PATH/TO/HTTPD_USER_PASSWD_FILE"</span>  <span class="token comment" spellcheck="true"># 用户认证文件</span>
+  Require user username1 username2 <span class="token punctuation">..</span>.            <span class="token comment" spellcheck="true"># 可选，需要哪些用户可以登录</span>
+<span class="token operator">&lt;</span>/Directory<span class="token operator">></span>
+
+<span class="token comment" spellcheck="true"># 允许账号文件中的所有用户登录访问</span>
+Require valid-user
+
+<span class="token comment" spellcheck="true"># (2) 提供账号和密码存储(文本文件)</span>
+使用htpasswd命令进行管理
+  htpasswd <span class="token punctuation">[</span>options<span class="token punctuation">]</span> passwordfile username
+    -c: 自动创建passwordfile，因此，仅应该在添加第一个用户时使用
+    -m: md5加密用户密码；
+    -s: sha1加密用户密码；
+    -D: 删除指定用户
+
+<span class="token comment" spellcheck="true"># (3) 实现基于组进行认证，要提供用户账号文件和组文件</span>
+<span class="token operator">&lt;</span>Directory <span class="token string">""</span><span class="token operator">></span>
+  Options None
+  AllowOverride None
+  AuthType Basic
+  AuthName <span class="token string">"STRING"</span>
+  AuthUserFile <span class="token string">"/PATH/TO/HTTPD_USER_PASSWD_FILE"</span>  <span class="token comment" spellcheck="true"># 用户认证文件</span>
+  AuthGroupFile <span class="token string">"/PATH/TO/HTTPD_GROUP_FILE"</span>       <span class="token comment" spellcheck="true"># 组认证文件</span>
+  Require group GROUP1 GROUP2 <span class="token punctuation">..</span>.                 <span class="token comment" spellcheck="true"># 可选，需要哪些组可以登录</span>
+<span class="token operator">&lt;</span>/Directory<span class="token operator">></span>
+
+<span class="token comment" spellcheck="true"># 组文件格式: 每一行定义一个组</span>
+webadmin: tom bob
+sysadmin: root escape<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-apache"><code class="language-apache"># 实例说明
+<Directory "/www/htdocs/admin">
+    Options None
+    AllowOverride None
+    AuthType Basic
+    AuthName "Administator private"
+    AuthUserFile "/etc/httpd/conf.d/.htpasswd"
+    AuthGroupFile "/etc/httpd/conf.d/.htgroup"
+    Require group webadmin
+</Directory><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-2-虚拟主机"><a href="#3-2-虚拟主机" class="headerlink" title="3.2 虚拟主机"></a>3.2 虚拟主机</h3><blockquote>
+<p>一般虚拟主机不要和中心主机混用，所以，要使用虚拟主机，先禁用中心主机（注释<code>DocumentRoot</code>）</p>
+<ul>
+<li>虚拟主机是指一个物理服务器上运行多个<code>Web</code>站点</li>
+<li>在<code>HTTP/1.1</code>之后，<code>Apache</code>才开始同时支持基于<code>IP</code>和基于主机名的虚拟主机。</li>
+</ul>
+</blockquote>
+<p><strong>虚拟主机实现的三种方案</strong></p>
+<ul>
+<li><strong>(1) 基于<code>ip</code>地址</strong><ul>
+<li>为每个虚拟主机准备至少一个独立的<code>ip</code>地址</li>
+<li><code>ip</code>地址用户很难记忆，所以也比较少用</li>
+</ul>
+</li>
+<li><strong>(2) 基于端口号(<code>port</code>)</strong><ul>
+<li>为每个虚拟主机准备至少一个专用<code>port</code></li>
+<li>需要记忆端口号，生成环境中很少使用</li>
+</ul>
+</li>
+<li><strong>(3) 基于主机名(<code>hostname</code>)</strong><ul>
+<li>为每个虚拟主机准备至少一个专用<code>hostname</code></li>
+<li>一般都是使用主机名的方式应用虚拟主机，所以使用最多</li>
+</ul>
+</li>
+<li>注释：可混合使用上述三种方式中任意方式</li>
+</ul>
+<p><strong>虚拟主机配置</strong></p>
+<ul>
+<li>每个虚拟主机都有专用配置：包括日志、访问控制、虚拟主机的别名等指令</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 虚拟主机一般配置如下</span>
+<span class="token operator">&lt;</span>VirtualHost <span class="token string">"IP:PORT"</span><span class="token operator">></span>
+  SeverName         <span class="token comment" spellcheck="true"># [主要] 定义虚拟主机名称</span>
+  DocumentRoot <span class="token string">""</span>   <span class="token comment" spellcheck="true"># [主要] 定义网站访问根目录</span>
+  ServerAlias
+  ErrorLog
+  CustomLog
+  <span class="token operator">&lt;</span>Directory <span class="token string">""</span><span class="token operator">></span>
+    <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+  <span class="token operator">&lt;</span>/Directory<span class="token operator">></span>
+<span class="token operator">&lt;</span>/VirtualHost<span class="token operator">></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>检测配置语法</strong></p>
+<ul>
+<li>检测语法错误：<code>httpd -t</code></li>
+<li>检测虚拟主机配置：<code>httpd -S</code></li>
+<li><code>service httpd configtest</code></li>
+</ul>
+<hr>
+<h4 id="3-2-1-基于IP地址的虚拟主机"><a href="#3-2-1-基于IP地址的虚拟主机" class="headerlink" title="3.2.1 基于IP地址的虚拟主机"></a>3.2.1 基于<code>IP</code>地址的虚拟主机</h4><p><strong>优点特性</strong></p>
+<ul>
+<li>可以让那些不支持<code>HTTP/1.1</code>的浏览器能够正常访问</li>
+<li>能够支持<code>SSL</code>安全套接字功能，<code>SSL</code>需要独立的<code>IP</code>地址和主机名才能进行关联</li>
+</ul>
+<p><strong>(1) 配置虚拟<code>IP</code>地址</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看eth0网卡</span>
+<span class="token variable">$ifconfig</span>
+192.168.31.6
+
+<span class="token comment" spellcheck="true"># 配置网卡别名</span>
+$ <span class="token function">ifconfig</span> eth0:0 192.168.31.7 netmask 255.255.255.0 up
+
+<span class="token comment" spellcheck="true"># 查看配置的eth0:0</span>
+$ <span class="token function">ifconfig</span> eth0:0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>(2) 配置虚拟主机</strong></p>
+<pre class="line-numbers language-apache"><code class="language-apache"><VirtualHost 192.168.31.6:80>
+    ServerName web1.escape.com
+    DocumentRoot "/vhosts/web1/htdocs"
+</VirtualHost>
+
+<VirtualHost 192.168.31.7:80>
+    ServerName web2.escape.com
+    DocumentRoot "/vhosts/web2/htdocs"
+</VirtualHost><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>让虚拟主机支持<code>SSL</code></strong></p>
+<ul>
+<li>在基于<code>IP</code>地址的虚拟主机中可以为其开启<code>SSL</code>功能加上<code>SSL</code>证书来支持<code>SSL</code></li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache">Listen 443
+
+<VirtualHost 192.168.31.6:80>
+    ServerName web1.escape.com
+    DocumentRoot "/vhosts/web1/htdocs"
+    SSLEngine on
+    SSLCertificateFile /srv/www/ssl/escape.crt
+    SSKcertificateKeyFile /srv/www/ssl/escape.key
+</VirtualHost><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h4 id="3-2-2-基于端口号的虚拟主机"><a href="#3-2-2-基于端口号的虚拟主机" class="headerlink" title="3.2.2 基于端口号的虚拟主机"></a>3.2.2 基于端口号的虚拟主机</h4><pre class="line-numbers language-apache"><code class="language-apache"><VirtualHost 172.16.100.7:80>
+    ServerName web1.escape.com
+    DocumentRoot "/vhosts/web1/htdocs"
+</VirtualHost>
+
+<VirtualHost 172.16.100.7:8000>
+    ServerName web2.escape.com
+    DocumentRoot "/vhosts/web2/htdocs"
+</VirtualHost>
+
+<VirtualHost 172.16.100.7:8080>
+    ServerName web3.escape.com
+    DocumentRoot "/vhosts/web3/htdocs"
+</VirtualHost><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h4 id="3-2-3-基于主机名的虚拟主机"><a href="#3-2-3-基于主机名的虚拟主机" class="headerlink" title="3.2.3 基于主机名的虚拟主机"></a>3.2.3 基于主机名的虚拟主机</h4><blockquote>
+<p>基于主机名的虚拟主机是根据客户端提交的<code>HTTP</code>头中标识主机名的部分决定的。因此多个虚拟主机可以共用同一个<code>IP</code>地址来同时启用多个虚拟主机服务，但是需要设置<code>DNS</code>，在<code>DNS</code>中增加与虚拟主机名相对应得<code>IP</code>地址。</p>
+</blockquote>
+<p><strong>注意事项</strong></p>
+<ul>
+<li><code>httpd2.2</code>中需要启用<code>NameVirtualHost</code>指令，<code>httpd2.4</code>中不再需要，且需要一致</li>
+<li>由于<code>SSL</code>协议的特性决定了基于名称的虚拟主机无法成为<code>SSL</code>服务器，及时配置了<code>SSL</code>，因为<code>SSL</code>只能工作在独立的<code>IP</code>地址上，不允许多个<code>Web</code>站点公用同一个<code>IP</code>地址</li>
+<li>配置基于主机名的虚拟主机需要设置对于主机名的<code>DNS</code>解析，如果不设置使用<code>IP</code>地址就只能访问到第一个虚拟主机了。本机测试通过修改本机的<code>hosts</code>文件，即可达到同样效果</li>
+</ul>
+<p><strong>(1) 设置<code>DNS</code>解析</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 本机的hosts文件达到DNS进行解析的效果</span>
+$ vim /etc/hosts
+172.16.100.6  web1.escape.com
+172.16.100.6  web2.escape.com
+172.16.100.6  web3.escape.com<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>(2) 设置<code>NameVirtualHost</code>指令</strong></p>
+<pre class="line-numbers language-apache"><code class="language-apache"># 三种选其一即可，通常指定IP地址配置
+# 服务器监听在本机的所有IP地址的80端口上
+NameVirtualHost *:80
+
+# 服务器监听在本机172.16.100.6的80端口上
+NameVirtualHost 172.16.100.6:80
+
+# 服务器监听在本机IPv6地址的80端口上
+NameVirtualHost [fe80::20c:29ff:feae:471b]:80<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>(3) 设置虚拟主机配置</strong></p>
+<pre class="line-numbers language-apache"><code class="language-apache"># 使用httpd -S检测语法错误，没有问题重启服务器即可生效
+<VirtualHost 172.16.100.6:80>
+    ServerName web1.escape.com
+    DocumentRoot "/vhosts/web1/htdocs"
+</VirtualHost>
+
+<VirtualHost 172.16.100.6:80>
+    ServerName web2.escape.com
+    DocumentRoot "/vhosts/web2/htdocs"
+</VirtualHost>
+
+<VirtualHost 172.16.100.6:80>
+    ServerName web3.escape.com
+    DocumentRoot "/vhosts/web3/htdocs"
+</VirtualHost><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-3-动态虚拟主机"><a href="#3-3-动态虚拟主机" class="headerlink" title="3.3 动态虚拟主机"></a>3.3 动态虚拟主机</h3><h4 id="3-3-1-vhost-alias-mudule模块"><a href="#3-3-1-vhost-alias-mudule模块" class="headerlink" title="3.3.1 vhost_alias_mudule模块"></a>3.3.1 <code>vhost_alias_mudule</code>模块</h4><blockquote>
+<p>通常使用上述三种方式就可以满足大多数人的需求，但是对于服务器剧情或者<code>ISP</code>提供者来说，一个物理服务器可能提供上百上千个<code>Web</code>站点都是正常的。这里虚拟主机通常都是基于名称的，每个主机都有自己的主机名和<code>DNS</code>记录，对于动态的虚拟主机，<code>Apache</code>提供了<code>vhost_alias_mudule</code>模块来满足需求。</p>
+<ul>
+<li><code>vhost_alias_mudule</code>模块提供了四个指令用来生成虚拟主机</li>
+</ul>
+</blockquote>
+<p><strong>生成虚拟主机指令</strong></p>
+<ul>
+<li>基于名称<ul>
+<li><code>VirtualDocumentRoot</code></li>
+<li><code>VirtualScriptAlias</code></li>
+</ul>
+</li>
+<li>基于<code>IP</code>地址<ul>
+<li><code>VirtualDocumentRootIP</code></li>
+<li><code>VirtualScriptAliasIP</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>指令含义</strong></p>
+<p><img src="/images/linux-apache-server-73.png" alt="Apache服务之httpd2.2服务配置"></p>
+<p><strong>分类符号</strong></p>
+<ul>
+<li>上面的四个指令都是通过分类符来从<code>URL</code>中获取标记，并将标记作为<code>VirtualDocumentRoot</code>或是<code>VirtualScriptAlias</code>的路径，以供<code>Apache</code>来生成虚拟主机</li>
+</ul>
+<p><img src="/images/linux-apache-server-74.png" alt="Apache服务之httpd2.2服务配置"></p>
+<hr>
+<p><strong>实例说明</strong></p>
+<ul>
+<li><code>UseCanonicalName</code>指令</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># 会将ServerName这个域名用于所有自引用URL、SERVER_NAME、CGI中的服务端口
+UseCanonicalName on
+
+# Apache将会由用户提供的主机名与端口信息来建立自引用URL，同时为客户端服务
+UseCanonicalName off
+
+# 为了那些基于IP地址的虚拟主机来支持那些不支持HTTP/1.1的浏览器所使用
+# 使用此选项时，Apache将对客户端连入的服务器的IP地址进行反向DNS查询，建立自引用的URL
+UseCanonicalName DNS<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>服务配置</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># 当客户端使用http://www.jonsk.com:443/index.html访问时
+# %1获取的是www，%2获取的是jonsk，%p获取的是443
+# 于是VirtualDocumentRoot的路径就是/srv/www/vhosts/www/jonsk/443/index.html
+UseCanonicalName off
+VirtualDocumentRoot /srv/www/vhosts/%1/%2/%p<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h4 id="3-3-1-rewrite-module模块"><a href="#3-3-1-rewrite-module模块" class="headerlink" title="3.3.1 rewrite_module模块"></a>3.3.1 <code>rewrite_module</code>模块</h4><blockquote>
+<p>使用<code>vhost_alias_mudule</code>模块来建立大量的虚拟主机时非常方便的，但是他只能设置除了主机名外，其他配置完全相同的虚拟主机。而使用<code>rewrite_module</code>模块建立大量虚拟主机不存在这个问题。</p>
+<ul>
+<li><code>rewrite_module</code>模块通过正则表达式来重写<code>URL</code>，因此也可以用来创建大量虚拟主机</li>
+<li><code>rewrite_module</code>模块因为使用正则表达式，所以性能上要低一些</li>
+</ul>
+</blockquote>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 当客户端使用http://www.jonsk.com访问时</span>
+<span class="token comment" spellcheck="true"># 通过正则表达式对所有进来请求的HTTP_HOST进行确认</span>
+<span class="token comment" spellcheck="true"># 然后过滤出www和com，再将匹配jonsk到/srv/www/jonsk目录中去</span>
+RewriteEngine on
+RewriteConf %<span class="token punctuation">{</span>HTTP_HOST<span class="token punctuation">}</span> ^<span class="token punctuation">(</span>WWW\.<span class="token punctuation">)</span>?<span class="token punctuation">(</span><span class="token punctuation">[</span>^.<span class="token punctuation">]</span>+<span class="token punctuation">)</span>.com$
+RewriteRule ^<span class="token punctuation">(</span>.*<span class="token punctuation">)</span>$ /srv/www/%2<span class="token variable">$1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-4-日志控制"><a href="#3-4-日志控制" class="headerlink" title="3.4 日志控制"></a>3.4 日志控制</h3><blockquote>
+<p><code>Apache</code>用于记录服务器生成的信息，分为<strong>错误日志</strong>和<strong>访问日志</strong>。</p>
+<ul>
+<li><code>Apache</code>的错误日志是由核心模块<code>mod_core</code>提供的</li>
+<li><code>Apache</code>的错误日志是由核心模块<code>lod_log_config</code>提供的，最好使用<code>ECLF</code>格式记录</li>
+</ul>
+</blockquote>
+<hr>
+<h4 id="3-4-1-LogLevel指令"><a href="#3-4-1-LogLevel指令" class="headerlink" title="3.4.1 LogLevel指令"></a>3.4.1 <code>LogLevel</code>指令</h4><ul>
+<li>通过<code>LogLevel</code>指令指定选用的日志级别</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>日志级别</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><code>debug</code></td>
+<td>调试信息</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>info</code></td>
+<td>普通信息</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>notice</code></td>
+<td>提示信息</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>warn</code></td>
+<td>告警信息</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>error</code></td>
+<td>一般信息</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>crit</code></td>
+<td>关键信息</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>alert</code></td>
+<td>马上需要处理的信息</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>emerg</code></td>
+<td>致命的错误或者导致系统无法使用</td>
+</tr>
+</tbody></table>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 定义错误日志记录级别</span>
+LogLevel warn<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<h4 id="3-4-2-错误日志"><a href="#3-4-2-错误日志" class="headerlink" title="3.4.2 错误日志"></a>3.4.2 错误日志</h4><ul>
+<li>使用<code>ErrorLog</code>指令定义存放的错误信息位置</li>
+<li>相对于<code>/etc/httpd/logs</code>链接文件的<code>/var/log/httpd</code>目录</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 错误log文件路径</span>
+ErrorLog logs/error_log
+
+<span class="token comment" spellcheck="true"># 关闭错误文件</span>
+ErrorLog /dev/null
+
+<span class="token comment" spellcheck="true"># 错误文件参数还可以是管道，可将日志送到一个处理器中，处理器可以是一个程序或者脚本</span>
+ErrorLog <span class="token string">"|/usr/local/bin/httpd_errors"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h4 id="3-4-3-访问日志"><a href="#3-4-3-访问日志" class="headerlink" title="3.4.3 访问日志"></a>3.4.3 访问日志</h4><ul>
+<li><code>CustomLog</code>指令：定义访问日志文件和格式<ul>
+<li><code>CustomLog logs/access_log combined</code></li>
+</ul>
+</li>
+<li><code>LogFormat</code>指令：定义访问日志格式保存格式<ul>
+<li><code>LogFormat "%h %l %u %t \"%r\" %&gt;s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined</code></li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/linux-apache-server-75.png" alt="Apache服务之httpd2.2服务配置"></p>
+<p><img src="/images/linux-apache-server-76.png" alt="Apache服务之httpd2.2服务配置"></p>
+<hr>
+<h4 id="3-4-4-日志循环"><a href="#3-4-4-日志循环" class="headerlink" title="3.4.4 日志循环"></a>3.4.4 日志循环</h4><p>如果访问量巨大的<code>Apache</code>服务器上，日志文件会变的很大。因此需要对日志以时间为单位进行循环处理，借用管道将日志送入外部的日志处理程序进行日志的循环处理，<code>Apache</code>本身并不处理。</p>
+<p><strong>手动处理</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">mv</span> /var/log/httpd/access.log /var/log/httpd/access.log.20171111
+$ apachectl graceful<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><strong>自动处理</strong></p>
+<ul>
+<li><code>Apache</code>自身提供了一个日志循环工具<code>rotatelogs</code>，以秒为单位</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># 访问日志，以24小时进行一次分割需要设置86400
+CustomLog "|/usr/local/apache/bin/rotatelogs logs/access_log_%Y_%m_%d 86400 480" combined
+
+# 错误日志，以24小时进行一次分割需要设置86400
+ErrorLog "|/usr/local/apache/bin/rotatelogs logs/access_log_%Y_%m_%d 86400 480"<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h4 id="3-4-5-syslog来控制和存储日志"><a href="#3-4-5-syslog来控制和存储日志" class="headerlink" title="3.4.5 syslog来控制和存储日志"></a>3.4.5 <code>syslog</code>来控制和存储日志</h4><p><code>Apache</code>除了使用自身的日志外，还可以使用<code>syslog</code>、<code>syslog-ng</code>等日志服务来存储日志。<code>syslog</code>不但提供内核日志功能，还可以为各种程序通过<code>syslogd</code>来进行日志记录，默认情况下<code>Apache</code>使用<code>local7</code>工具，可以在<code>/etc/syslog.conf</code>文件中进行定义。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 编辑syslog配置文件，星号在这里指本项服务生产的所有日志消息都发送到指定文件中</span>
+$ vim /etc/syslog.conf
+local.* /var/log/apache_log
+
+<span class="token comment" spellcheck="true"># httpd.conf文件中配置，二选一</span>
+ErrorLog syslog
+ErrorLog syslog:local7
+
+<span class="token comment" spellcheck="true"># 重启httpd服务</span>
+$ apachctl restart<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h4 id="3-4-6-跟踪用户日志"><a href="#3-4-6-跟踪用户日志" class="headerlink" title="3.4.6 跟踪用户日志"></a>3.4.6 跟踪用户日志</h4><blockquote>
+<p><code>Apache</code>日志处理监控服务是否正常以外，还可以记录用户的访问记录，并对记录进行分析。如分析用户在那个页面停留的时间最长、最关心那些商品等。使用<code>cookie</code>技术能够追踪用户信息。</p>
+<ul>
+<li><code>Apache</code>提供<code>mod_cookies</code>模块对<code>cookie</code>进行支持</li>
+<li><code>Apache</code>提供<code>mod_usertrack</code>模块用来专门控制<code>cookie</code></li>
+<li>在负载均衡时<code>Apache</code>无法保持会话，因此需要将所有主机的<code>CookieName</code>的值保持一致。</li>
+</ul>
+</blockquote>
+<p><strong>启用<code>cookie</code>功能</strong></p>
+<pre class="line-numbers language-apache"><code class="language-apache">CustomLog /var/log/apache/cookie_log "%{cookie}n %r %t"<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><strong><code>mod_usertrack</code>模块</strong></p>
+<ul>
+<li><code>CookieTracking</code>指令用来开启<code>cookie</code>跟踪功能</li>
+<li><code>CookieName</code>指令用于修改<code>cookie</code>名称，<code>cookie</code>默认使用<code>Apache</code>作为名称</li>
+<li><code>CookieExpires</code>指令用于指定<code>cookie</code>的有效时间，单位默认为秒</li>
+<li><code>CookieStyle</code>指令用于设置<code>cookie</code>类型</li>
+<li><code>CookieDomain</code>指令用于设置<code>cookie</code>的作用域</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># 加载模块
+LoadModule usertrack_module lib/apache/mod_usertrack.so
+
+# 开启cookie跟踪功能
+CookieTracking on
+
+# 修改cookie名称
+CookieName .escape.com
+
+# 设置cookie有效时间
+CookieExpires 300
+CookieExpires "3 days"
+
+# 设置cookie类型
+CookieStyle Cookie
+CookieStyle Cookie2
+CookieStyle Netscape
+
+# 设置cookie的作用域
+CookieDomain .escape.com<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-apache"><code class="language-apache"># 日志中记录cookie
+
+# 记录从客户端收到的cookie，使用的cookie类型不同
+CustomLog log/cookies_in.log "%{UNIQUE_ID}e %{Cookie}i"
+CustomLog log/cookies2_in.log "%{UNIQUE_ID}e %{Cookie2}i"
+
+# 记录从服务器发送的cookie，使用的cookie类型不同
+CustomLog log/cookies_out.log "%{UNIQUE_ID}e %{Cookie}i"
+CustomLog log/cookies2_out.log "%{UNIQUE_ID}e %{Cookie2}i"<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h4 id="3-4-7-日志分析软件"><a href="#3-4-7-日志分析软件" class="headerlink" title="3.4.7 日志分析软件"></a>3.4.7 日志分析软件</h4><p><strong><code>Webalizer</code></strong></p>
+<ul>
+<li>介绍<ul>
+<li><code>Webalizer</code>是<code>C</code>语言编写的，能够处理<code>CLF</code>、<code>ECLF</code>、<code>W3C</code>扩展格式的日志分析软件</li>
+</ul>
+</li>
+<li>优点<ul>
+<li>支持中文</li>
+<li>提供大量的配置选项来生成报表</li>
+<li>支持直接以<code>gzip</code>或者<code>bzip2</code>压缩的日志文件</li>
+<li>对于日志没有大小的显示，支持<code>IPv4</code>、<code>IPv6</code>地址和地理定位</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># 编译安装
+$ Webalizer /var/log/apache/access.log<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><strong><code>Awstats</code></strong></p>
+<ul>
+<li>介绍<ul>
+<li><code>Awstats</code>是一套<code>Perl</code>编写的免费日志分析工具，可以为网络、流媒体等服务提供数据统计功能</li>
+</ul>
+</li>
+<li>优点<ul>
+<li>支持中文</li>
+<li>运行速度快</li>
+<li>提供大量的配置选项来生成报表</li>
+<li>可以使用命令行或者是页面的形式查看分析日志</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># 在awstats.conf文件中配置主机名或者IP地址
+SiteDomain=192.168.31.94
+DirDate="/var/lob/awstats"
+
+# 打开awstats分析页面
+http://localhost/awstats/swstats.pl<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h4 id="3-4-8-合并虚拟主机日志"><a href="#3-4-8-合并虚拟主机日志" class="headerlink" title="3.4.8 合并虚拟主机日志"></a>3.4.8 合并虚拟主机日志</h4><ul>
+<li>虚拟主机中配置错误日志和访问日志</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"><VirtualHost 172.16.100.6:80>
+    ServerName www.escape.com
+    DocumentRoot "srv/www"
+    ErrorLog /var/log/apache/error_log_www.escape.com
+    CustomLog /var/log/apache/access_log_www.escape.com
+</VirtualHost><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>合并方法</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># 在httpd.conf配置vhost，在虚拟主机配置中进行引入
+CustomLog "%h %l %u %t \"%r\" %>s %b" vhost<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-5-支持SSL功能"><a href="#3-5-支持SSL功能" class="headerlink" title="3.5 支持SSL功能"></a>3.5 支持<code>SSL</code>功能</h3><blockquote>
+<p>在默认情况下，<code>Apache</code>通常使用明文直接在网络上传输数据，这样虽然可以减轻服务器压力，但是很容易泄露用户信息。为了保证数据在传输的时候不会被改变和监听，我们使用安全套接字层协议(<code>SSL</code>)标准，对通信进行加密。</p>
+<ul>
+<li><code>SSL</code>协议是基于<code>OpenSSL</code>的加密协议，采用公开秘钥进行加密</li>
+<li>所以的传输数据都是加密传输，像<code>FTP</code>、<code>HTTP</code>等协议能透过地建立与<code>SSL</code>协议之上</li>
+<li><code>Apache</code>提供<code>mod_ssl</code>模块提供对于<code>SSL</code>协议的支持</li>
+</ul>
+</blockquote>
+<hr>
+<h4 id="3-5-1-SSL的简单会话过程"><a href="#3-5-1-SSL的简单会话过程" class="headerlink" title="3.5.1 SSL的简单会话过程"></a>3.5.1 <code>SSL</code>的简单会话过程</h4><pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">(</span>1<span class="token punctuation">)</span> 客户端发送可供选择的加密方式，并向服务器请求证书；
+<span class="token punctuation">(</span>2<span class="token punctuation">)</span> 服务器端发送证书以及选定的加密方式给客户端；
+<span class="token punctuation">(</span>3<span class="token punctuation">)</span> 客户端取得证书并进行证书验证：
+  如果信任给其发证书的CA：
+    <span class="token punctuation">(</span>a<span class="token punctuation">)</span> 验正证书来源的合法性；用CA的公钥解密证书上数字签名；
+    <span class="token punctuation">(</span>b<span class="token punctuation">)</span> 验正证书的内容的合法性：完整性验正
+    <span class="token punctuation">(</span>c<span class="token punctuation">)</span> 检查证书的有效期限；
+    <span class="token punctuation">(</span>d<span class="token punctuation">)</span> 检查证书是否被吊销；
+    <span class="token punctuation">(</span>e<span class="token punctuation">)</span> 证书中拥有者的名字，与访问的目标主机要一致；
+<span class="token punctuation">(</span>4<span class="token punctuation">)</span> 客户端生成临时会话密钥（对称密钥），并使用服务器端的公钥加密此数据发送给服务器，完成密钥交换；
+<span class="token punctuation">(</span>5<span class="token punctuation">)</span> 服务用此密钥加密用户请求的资源，响应给客户端；
+注意：SSL会话是基于IP地址创建；所以单IP的主机上，仅可以使用一个https虚拟主机；<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h4 id="3-5-2-安装mod-ssl模块"><a href="#3-5-2-安装mod-ssl模块" class="headerlink" title="3.5.2 安装mod_ssl模块"></a>3.5.2 安装<code>mod_ssl</code>模块</h4><ul>
+<li>在安装<code>mod_ssl</code>模块之前先确认已经安装了<code>OpenSSL</code>库</li>
+<li>在<code>CentOS</code>中，通过<code>yum</code>安装默认都已经编译了<code>ssl</code>功能，只需要启用即可</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 只需要在编译时加上--enable-ssl参数即可启用mod_ssl模块</span>
+$ ./configure --prefix<span class="token operator">=</span>/usr/local/httpd-2.4.21-ssl -enable-sshl
+<span class="token comment" spellcheck="true"># 编译、测试、安装</span>
+$ <span class="token function">make</span>
+$ <span class="token function">make</span> <span class="token function">test</span>
+$ <span class="token function">make</span> <span class="token function">install</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h4 id="3-5-3-签发证书"><a href="#3-5-3-签发证书" class="headerlink" title="3.5.3 签发证书"></a>3.5.3 签发证书</h4><blockquote>
+<p>在启用<code>SSL</code>需要数字证书，这个证书将会用来加密所有使用<code>SSL</code>协议传输的数据。</p>
+<ul>
+<li>推荐使用<code>OpenSSL</code>所提供的<code>CA.pl</code>或<code>CA.sh</code>工具来建立自己的证书，还可以使用<code>OpenSSL</code>命令生成证书</li>
+<li>小范围测试使用<code>OpenSSL</code>，大范围维护大量证书企业使用<a href="https://www.openca.org/projects/openca/" target="_blank" rel="noopener"><code>OpenCA</code>工具</a></li>
+<li>点击获取更多使用信息：<a href="http://www.linuxidc.com/Linux/2016-01/127612.htm" target="_blank" rel="noopener">OpenSSL 实现创建私有 CA、签署证书请求详解</a></li>
+</ul>
+</blockquote>
+<p><strong>证书</strong></p>
+<ul>
+<li>主证书即<strong>顶级<code>CA</code>证书</strong>用于签发服务器和客户端证书</li>
+<li><strong>服务器证书</strong>主要用于标识服务器并加密所有传输的数据</li>
+<li><strong>客户端证书</strong>主要用于对客户端的身份认证</li>
+</ul>
+<p><strong>商业证书机构</strong></p>
+<ul>
+<li>国外<ul>
+<li><a href="http://www.thawte.com/" target="_blank" rel="noopener">Thawte</a></li>
+<li><a href="http://digitalid.verisign.com/" target="_blank" rel="noopener">Verisign</a></li>
+</ul>
+</li>
+<li>国内<ul>
+<li><a href="http://www.imtrust.org/" target="_blank" rel="noopener">万维信安</a></li>
+<li><a href="http://www.cfca.com.cn/" target="_blank" rel="noopener">中国金融认证中心</a></li>
+</ul>
+</li>
+</ul>
+<p><strong><code>OpenSSL</code>配置</strong></p>
+<ul>
+<li>配置文件地址<code>/etc/pki/tls/openssl.cnf</code></li>
+<li>如下所示为<code>openssl.cnf</code>文件配置段内容摘要</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat /etc/pki/tls/openssl.cnf</span>
+<span class="token comment" spellcheck="true"># OpenSSL example configuration file.</span>
+<span class="token comment" spellcheck="true"># This is mostly being used for generation of certificate requests.</span>
+<span class="token comment" spellcheck="true">######################################################################################</span>
+<span class="token punctuation">[</span> ca <span class="token punctuation">]</span>            <span class="token comment" spellcheck="true"># CA相关配置段</span>
+default_ca        <span class="token operator">=</span> CA_default         <span class="token comment" spellcheck="true"># 默认CA在[CA_default]配置</span>
+<span class="token comment" spellcheck="true">######################################################################################</span>
+<span class="token punctuation">[</span> CA_default <span class="token punctuation">]</span>    <span class="token comment" spellcheck="true"># 默认当做CA的工作环境</span>
+<span class="token function">dir</span>               <span class="token operator">=</span> /etc/pki/CA        <span class="token comment" spellcheck="true"># 默认的工作目录，变量形式</span>
+certs             <span class="token operator">=</span> <span class="token variable">$dir</span>/certs         <span class="token comment" spellcheck="true"># 默认的签发的证书位置</span>
+crl_dir           <span class="token operator">=</span> <span class="token variable">$dir</span>/crl           <span class="token comment" spellcheck="true"># 默认的吊销的证书位置</span>
+database          <span class="token operator">=</span> <span class="token variable">$dir</span>/index.txt     <span class="token comment" spellcheck="true"># 默认的颁发过的证书索引文件</span>
+new_certs_dir     <span class="token operator">=</span> <span class="token variable">$dir</span>/newcerts      <span class="token comment" spellcheck="true"># 默认的签署证书位置</span>
+certificate       <span class="token operator">=</span> <span class="token variable">$dir</span>/cacert.pem    <span class="token comment" spellcheck="true"># 指明CA的自签证书</span>
+serial            <span class="token operator">=</span> <span class="token variable">$dir</span>/serial        <span class="token comment" spellcheck="true"># 指明当前证书序列号，第一次要指定</span>
+crlnumber         <span class="token operator">=</span> <span class="token variable">$dir</span>/crlnumber     <span class="token comment" spellcheck="true"># the current crl number</span>
+<span class="token comment" spellcheck="true"># must be commented out to leave a V1 CRL</span>
+crl               <span class="token operator">=</span> <span class="token variable">$dir</span>/crl.pem              <span class="token comment" spellcheck="true"># The current CRL</span>
+private_key       <span class="token operator">=</span> <span class="token variable">$dir</span>/private/cakey.pem    <span class="token comment" spellcheck="true"># CA自己的私钥</span>
+RANDFILE          <span class="token operator">=</span> <span class="token variable">$dir</span>/private/.rand        <span class="token comment" spellcheck="true"># private random number file</span>
+
+x509_extensions   <span class="token operator">=</span> usr_cert                  <span class="token comment" spellcheck="true"># The extentions to add to the cert</span>
+
+<span class="token comment" spellcheck="true"># Comment out the following two lines for the "traditional"</span>
+<span class="token comment" spellcheck="true"># (and highly broken) format.</span>
+name_opt          <span class="token operator">=</span> ca_default                <span class="token comment" spellcheck="true"># Subject Name options</span>
+cert_opt          <span class="token operator">=</span> ca_default                <span class="token comment" spellcheck="true"># Certificate field options</span>
+default_days      <span class="token operator">=</span> 365                       <span class="token comment" spellcheck="true"># 证书的默认有效期</span>
+default_crl_days  <span class="token operator">=</span> 30                        <span class="token comment" spellcheck="true"># 默认声明有效期</span>
+default_md        <span class="token operator">=</span> sha256                    <span class="token comment" spellcheck="true"># 默认的生成算法</span>
+preserve          <span class="token operator">=</span> no                        <span class="token comment" spellcheck="true"># keep passed DN ordering</span>
+<span class="token comment" spellcheck="true">####################################################################</span>
+<span class="token punctuation">[</span> req <span class="token punctuation">]</span>             <span class="token comment" spellcheck="true"># 向CA证书签署发起注册请求相关属性</span>
+default_bits        <span class="token operator">=</span> 2048
+default_md          <span class="token operator">=</span> sha256
+default_keyfile     <span class="token operator">=</span> privkey.pem
+distinguished_name  <span class="token operator">=</span> req_distinguished_name
+attributes          <span class="token operator">=</span> req_attributes
+x509_extensions     <span class="token operator">=</span> v3_ca        <span class="token comment" spellcheck="true"># The extentions to add to the self signed cert</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>（1）生成顶级<code>CA</code>证书(<code>192.168.31.6</code>)</strong></p>
+<ul>
+<li>这里使用<code>OpenSSL</code>命令生成<code>CA</code>证书</li>
+<li>在确定配置为<code>CA</code>的服务器主机上生成一个自签证书，并为<code>CA</code>提供所需要的目录及文件</li>
+<li>在真正的通信过程中<code>CA</code>服务器主机不需要网络参与，只需要参与到签名中，不需要提供服务</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cd /etc/pki/CA</span>
+<span class="token comment" spellcheck="true"># 生成CA私钥，cakey.pem</span>
+<span class="token comment" spellcheck="true"># 因为在默认配置文件中默认配置/etc/pki/CA/private/cakey.pem，所以指定目录和文件名要和配置文件一致</span>
+<span class="token comment" spellcheck="true"># 将umask命令进行包裹起来使其适用范围仅在括号中，生成CA私钥需要有权限规定</span>
+<span class="token comment" spellcheck="true"># 适用des3加密的方式，如果不指定使用默认的加密方式，不需要输入密码短语</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv CA<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># (umask 077; openssl genrsa -des3 -out /etc/pki/CA/private/cakey.pem 2048)</span>
+Generating RSA private key, 1024 bit long modulus
+<span class="token punctuation">..</span>.++++++
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>++++++
+e is 65537 <span class="token punctuation">(</span>0x10001<span class="token punctuation">)</span>
+Enter pass phrase <span class="token keyword">for</span> ca/cakey.key:                <span class="token comment" spellcheck="true"># 输入密码短语</span>
+Verifying - Enter pass phrase <span class="token keyword">for</span> ca/cakey.key:    <span class="token comment" spellcheck="true"># 再次输入密码短语</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 生成CA自签证书，cakey.pem</span>
+<span class="token comment" spellcheck="true"># req:   证书请求及生成工具</span>
+<span class="token comment" spellcheck="true"># -new:  生成新证书签署请求</span>
+<span class="token comment" spellcheck="true"># -x509: 专用于创建私有CA时，生成自签格式证书，非自签无需增加此参数</span>
+<span class="token comment" spellcheck="true"># -key:  指明的是私钥的位置，因为此处会自动抽取出私钥中的公钥</span>
+<span class="token comment" spellcheck="true"># -out:  生成的请求文件路径；如果自签操作将直接生成签署过的证书</span>
+<span class="token comment" spellcheck="true"># -days: 证书的有效时长，单位是day</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv CA<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># openssl req -new -x509 -key /etc/pki/CA/private/cakey.pem -out</span>
+Enter pass phrase <span class="token keyword">for</span> ca/cakey.key:    <span class="token comment" spellcheck="true"># 输入密码短语</span>
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter <span class="token string">'.'</span>, the field will be left blank.
+-----
+Country Name <span class="token punctuation">(</span>2 letter code<span class="token punctuation">)</span> <span class="token punctuation">[</span>XX<span class="token punctuation">]</span>:CN    <span class="token comment" spellcheck="true"># 两个字符表示的国家代码，CN为中国</span>
+State or Province Name <span class="token punctuation">(</span>full name<span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>:Beijing     <span class="token comment" spellcheck="true"># 输入省份名称</span>
+Locality Name <span class="token punctuation">(</span>eg, city<span class="token punctuation">)</span> <span class="token punctuation">[</span>Default City<span class="token punctuation">]</span>:Beijing   <span class="token comment" spellcheck="true"># 输入城市名称</span>
+Organization Name <span class="token punctuation">(</span>eg, company<span class="token punctuation">)</span> <span class="token punctuation">[</span>Default Company Ltd<span class="token punctuation">]</span>:cn  <span class="token comment" spellcheck="true"># 组织机构名称(默认为公司)</span>
+Organizational Unit Name <span class="token punctuation">(</span>eg, section<span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>:cn              <span class="token comment" spellcheck="true"># 组织机构单元名称(eg.部门)</span>
+Common Name <span class="token punctuation">(</span>eg, your name or your server's hostname<span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>:escape  <span class="token comment" spellcheck="true"># 持有者名或者所在服务器主机名，即域名</span>
+Email Address <span class="token punctuation">[</span><span class="token punctuation">]</span>:escape@escape.com    <span class="token comment" spellcheck="true"># 输入电子邮箱地址，可以省略</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 为CA提供所需的目录及文件</span>
+<span class="token comment" spellcheck="true"># /etc/pki/CA/certs为创建签发证书</span>
+<span class="token comment" spellcheck="true"># /etc/pki/CA/crl为吊销证书</span>
+<span class="token comment" spellcheck="true"># /etc/pki/CA/newcerts为新证书目录</span>
+
+<span class="token comment" spellcheck="true"># 创建证书序列号文件、证书索引文件</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv CA<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># touch /etc/pki/CA/index.txt</span>
+
+<span class="token comment" spellcheck="true"># 第一次创建的时候需要给予证书序列号</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv CA<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># echo "01" > /etc/pki/CA/serial</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<p><strong>（2）生成服务器证书(<code>192.168.31.7</code>)</strong></p>
+<ul>
+<li>服务器申请证书签署实现<code>SSL</code>安全通信</li>
+<li>要用到证书进行安全通信的服务器，需要向<code>CA</code>请求签署证书</li>
+<li>需要签署的服务无需和<code>CA</code>证书签署机构主机在同一台服务器上</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 服务器端创建ssl目录</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ssl<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># mkdir /etc/httpd/ssl</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ssl<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cd /etc/httpd/ssl</span>
+
+<span class="token comment" spellcheck="true"># 服务器生成私钥</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ssl<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># (umask 077;openssl genrsa -out /etc/httpd/ssl/httpd.key 2048)</span>
+Generating RSA private key, 2048 bit long modulus
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.+++
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.+++
+e is 65537 <span class="token punctuation">(</span>0x10001<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 服务器生成证书签署请求</span>
+<span class="token comment" spellcheck="true"># *.csr表示证书签署请求文件</span>
+<span class="token comment" spellcheck="true"># 输入内容要保证和签署机构CA签署机构信息一致</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ssl<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># openssl req -new -key /etc/httpd/ssl/httpd.key -out /etc/httpd/ssl/httpd.csr -days 365</span>
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter <span class="token string">'.'</span>, the field will be left blank.
+-----
+Country Name <span class="token punctuation">(</span>2 letter code<span class="token punctuation">)</span> <span class="token punctuation">[</span>XX<span class="token punctuation">]</span>:CN
+State or Province Name <span class="token punctuation">(</span>full name<span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>:Beijing
+Locality Name <span class="token punctuation">(</span>eg, city<span class="token punctuation">)</span> <span class="token punctuation">[</span>Default City<span class="token punctuation">]</span>:Beijing
+Organization Name <span class="token punctuation">(</span>eg, company<span class="token punctuation">)</span> <span class="token punctuation">[</span>Default Company Ltd<span class="token punctuation">]</span>:cn
+Organizational Unit Name <span class="token punctuation">(</span>eg, section<span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>:cn
+Common Name <span class="token punctuation">(</span>eg, your name or your server<span class="token string">'s hostname) []:www.escape.com
+Email Address []:escape@escape.com
+Please enter the following '</span>extra' attributes
+to be sent with your certificate request
+A challenge password <span class="token punctuation">[</span><span class="token punctuation">]</span>:escape
+An optional company name <span class="token punctuation">[</span><span class="token punctuation">]</span>:cn<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将请求通过可靠方式发送给CA主机</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ssl<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp /etc/httpd/ssl/httpd.csr root@192.168.31.6:/tmp/</span>
+
+<span class="token comment" spellcheck="true"># 在CA主机上签署证书</span>
+<span class="token comment" spellcheck="true"># *.crt表示证书文件</span>
+<span class="token comment" spellcheck="true"># 此处需要自己去查看信息是否正确，并确定是否给予签署证书</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># openssl ca -in /tmp/httpd.csr -out /etc/pki/CA/certs/httpd.crt -days 365</span>
+Using configuration from /etc/pki/tls/openssl.cnf
+Check that the request matches the signature
+Signature ok
+Certificate Details:
+        Serial Number: 1 <span class="token punctuation">(</span>0x1<span class="token punctuation">)</span>
+        Validity
+            Not Before: Dec  2 02:57:06 2017 GMT
+            Not After <span class="token keyword">:</span> Dec  2 02:57:06 2018 GMT
+        Subject:
+            countryName               <span class="token operator">=</span> CN
+            stateOrProvinceName       <span class="token operator">=</span> Beijing
+            organizationName          <span class="token operator">=</span> cn
+            organizationalUnitName    <span class="token operator">=</span> cn
+            commonName                <span class="token operator">=</span> www.escape.com
+            emailAddress              <span class="token operator">=</span> esacpe@escape.com
+        X509v3 extensions:
+            X509v3 Basic Constraints:
+                CA:FALSE
+            Netscape Comment:
+                OpenSSL Generated Certificate
+            X509v3 Subject Key Identifier:
+                A6:FF:C8:AC:7F:72:A1:01:81:5E:72:81:33:E2:A1:37:09:A3:4F:CF
+            X509v3 Authority Key Identifier:
+                keyid:E0:F5:88:3F:84:02:CD:C3:CE:14:D7:20:39:63:F8:AC:75:53:C9:7B
+Certificate is to be certified <span class="token keyword">until</span> Dec  2 02:57:06 2018 GMT <span class="token punctuation">(</span>365 days<span class="token punctuation">)</span>
+Sign the certificate? <span class="token punctuation">[</span>y/n<span class="token punctuation">]</span>:y
+1 out of 1 certificate requests certified, commit? <span class="token punctuation">[</span>y/n<span class="token punctuation">]</span>y
+Write out database with 1 new entries
+Data Base Updated
+
+<span class="token comment" spellcheck="true"># 查看所签署的证书信息</span>
+<span class="token comment" spellcheck="true"># 【方式一】查看索引文件</span>
+<span class="token comment" spellcheck="true">#  V表示已经签署的，01表示证书序列号，/C=CN/ST=Beijing/O=… ...表示主题信息(主题标示)</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># cat /etc/pki/CA/index.txt</span>
+V  181202025706Z  01  unknown /C<span class="token operator">=</span>CN/ST<span class="token operator">=</span>Beijng/O<span class="token operator">=</span>cn/OU<span class="token operator">=</span>cn/CN<span class="token operator">=</span>www.escape.com/emailAddress<span class="token operator">=</span>esacpe@escape.com
+<span class="token comment" spellcheck="true"># 【方式二】查看证书中的信息(CA或者服务端均可)</span>
+<span class="token comment" spellcheck="true">#  -serial表示序列号  -subject表示主题信息</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># openssl x509 -in /etc/pki/CA/certs/httpd.crt -noout -serial -subject serial=01</span>
+subject<span class="token operator">=</span>/C<span class="token operator">=</span>CN/ST<span class="token operator">=</span>Beijng/O<span class="token operator">=</span>cn/OU<span class="token operator">=</span>cn/CN<span class="token operator">=</span>www.escape.com/emailAddress<span class="token operator">=</span>esacpe@escape.com
+
+<span class="token comment" spellcheck="true"># 将CA签署机构的.crt证书发送给服务器</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp /etc/pki/CA/certs/httpd.crt root@192.168.31.7:/etc/httpd/ssl</span>
+
+<span class="token comment" spellcheck="true"># 删除服务器和CA主机上签署前的*.csr文件，确保安全</span>
+CA主机    <span class="token operator">==</span><span class="token operator">></span>  <span class="token function">rm</span> -rf /tmp/httpd.csr
+httpd主机 <span class="token operator">==</span><span class="token operator">></span>  <span class="token function">rm</span> -rf /etc/httpd/ssl/httpd.csr<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>（3）生成客户端证书</strong></p>
+<ul>
+<li>签发方式和服务器端的一致，使用上述方式即可获取客户端<code>SSL</code>证书</li>
+<li>为了方便客户端的安装和使用，将客户端<code>client.crt</code>转换为<code>pkcs12</code>格式</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将客户端client.crt转换为pkcs12格式</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># openssl pkcs12 -export -clcerts -in client.crt -inkey client.key -out client.pfx</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<h4 id="3-5-4-配置启用SSL功能"><a href="#3-5-4-配置启用SSL功能" class="headerlink" title="3.5.4 配置启用SSL功能"></a>3.5.4 配置启用<code>SSL</code>功能</h4><pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 配置httpd支持使用ssl功能</span>
+$ yum -y <span class="token function">install</span> mod_ssl
+$ httpd -M <span class="token operator">|</span> <span class="token function">grep</span> ssl
+$ rpm -ql mod_ssl<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-apache"><code class="language-apache"># 修改SSL配置文件，/etc/httpd/conf.d/ssl.conf(二进制安装)
+
+# 全局配置
+Listen 443  # 监听443端口
+AddType application/x-x509-ca-cert .crt  # 定义以.crt后缀的文件为证书文件
+AddType application/x-pkcs7-crl .crl     # 定义以.crl后缀的文件为证书文件
+SSLPassPhraseDialog builtin              # 定义SSL在启动时使用哪种方式对私钥文件进行解密
+
+# 虚拟主机配置
+<VirtualHost *:443>
+  SSLEngine on            # 是否启用
+  SSLProtocol all -SSLv2  # 支持所有SSL协议但是除过SSLv2，因为不安全
+  SSLCertificateFile /etc/httpd/ssl/httpd.crt      # 设置证书文件位置
+  SSLCertificateKeyFile /etc/httpd/ssl/httpd.key   # 设置私钥文件位置
+  DocumentRoot "/vhosts/www/htdocs"  # 提供页面服务的目录
+  ServerName 192.168.31.7        # 设置服务器名称，建议使用IP地址而非域名
+  ServerAdmin escape@escape.com  # 设置邮件地址
+  ErrorLog "/vhosts/www/htdocs/logs/error_log"      # 设置错误日志位置
+  TransferLog "/vhosts/www/htdocs/logs/access_log"  # 设置访问日志位置
+  <Directory "/vhosts/www/htdocs/cgi-bin">
+    SSLOptions +StdEnvVars  # 启动对cgi-bin目录的支持
+  </Directory>
+</VirtualHost><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 重启httpd服务，会需要输入密码短语</span>
+<span class="token comment" spellcheck="true"># 如果客户端连接服务器，提示该网站的安全证书不受信任，这是因为证书使我们自己签发的</span>
+./apachectl restart
+
+<span class="token comment" spellcheck="true"># 测试基于https访问相应的主机；  192.168.31.7</span>
+$ openssl s_client <span class="token punctuation">[</span>-connect host:port<span class="token punctuation">]</span> <span class="token punctuation">[</span>-cert filename<span class="token punctuation">]</span> <span class="token punctuation">[</span>-CApath directory<span class="token punctuation">]</span> <span class="token punctuation">[</span>-CAfile filename<span class="token punctuation">]</span>
+eg: openssl s_client -connect 192.168.31.7:443 -CAfile 192.168.31.7:/etc/pki/CA/cacert.pem<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h4 id="3-5-5-配置使用客户端证书认证"><a href="#3-5-5-配置使用客户端证书认证" class="headerlink" title="3.5.5 配置使用客户端证书认证"></a>3.5.5 配置使用客户端证书认证</h4><p>上节中，我们只是通过<code>Apache</code>服务器来进行数据加密认证的，如果需要对客户身份使用证书验证，则需要在<code>ssl.conf</code>文件中对其进行配置，即可实现<code>SSL</code>的双向认证机制。</p>
+<pre class="line-numbers language-apache"><code class="language-apache"># 配置ssl.conf文件，重启httpd服务
+SSLVerifyClient require
+SSLVerifyDepth 1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="4-身份认证"><a href="#4-身份认证" class="headerlink" title="4. 身份认证"></a>4. 身份认证</h2><blockquote>
+<p><code>Apache</code>在用户认证方面提供了大量的认证模块，有<code>15</code>个之多，提供了很多特性和支持。</p>
+<ul>
+<li><strong>认证类型模块：</strong>提供认证用户身份信息的功能</li>
+<li><strong>认证支持模块：</strong>为服务器使用第三方认证软件的支持</li>
+<li><strong>授权支持模块：</strong>会判断通过认证的用户是否属于特定组而允许或拒绝访问受限文件或目录</li>
+</ul>
+</blockquote>
+<ul>
+<li><strong>身份认证模块分类</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>模块类型</th>
+<th>模块名称</th>
+<th>介绍模块功能</th>
+<th>配置中参数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><strong>认证类型模块</strong></td>
+<td><code>mod_auth_basic</code></td>
+<td>使用明文认证用户身份</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2</td>
+<td>认证类型模块</td>
+<td><strong><code>mod_auth_digest</code></strong></td>
+<td>使用<code>MD5</code>摘要认证身份</td>
+<td>-</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>认证支持模块</strong></td>
+<td><code>mod_authn_alias</code></td>
+<td>为用户别名认证提供支持</td>
+<td>-</td>
+</tr>
+<tr>
+<td>4</td>
+<td>认证支持模块</td>
+<td><code>mod_authn_anon</code></td>
+<td>为匿名用户认证提供支持</td>
+<td>-</td>
+</tr>
+<tr>
+<td>5</td>
+<td>认证支持模块</td>
+<td><strong><code>mod_authn_dbd</code></strong></td>
+<td>为认证提供<code>SQL</code>数据库支持</td>
+<td><code>dbd</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>认证支持模块</td>
+<td><strong><code>mod_authn_dbm</code></strong></td>
+<td>为认证提供<code>DBM</code>数据库支持</td>
+<td><code>dbm</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td>认证支持模块</td>
+<td><strong><code>mod_authn_file</code></strong></td>
+<td>使用纯文本文件未认证提供支持</td>
+<td><code>file</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td>认证支持模块</td>
+<td><code>mod_authn_default</code></td>
+<td>在未正确配置认证模块的情况下拒绝一切认证信息</td>
+<td>-</td>
+</tr>
+<tr>
+<td>9</td>
+<td>认证支持模块</td>
+<td><strong><code>mod_authnz_ldap</code></strong></td>
+<td>为认证提供<code>LDAP</code>服务的支持</td>
+<td><code>ldap</code></td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>授权支持模块</strong></td>
+<td><code>mod_authnz_ldap</code></td>
+<td>为认证提供<code>LDAP</code>服务的支持</td>
+<td>-</td>
+</tr>
+<tr>
+<td>11</td>
+<td>授权支持模块</td>
+<td><code>mod_authz_dbm</code></td>
+<td>使用<code>DBM</code>数据库为组提供认证支持</td>
+<td>-</td>
+</tr>
+<tr>
+<td>12</td>
+<td>授权支持模块</td>
+<td><strong><code>mod_authz_groupfile</code></strong></td>
+<td>使用纯文本为用户组提供认证支持</td>
+<td>-</td>
+</tr>
+<tr>
+<td>13</td>
+<td>授权支持模块</td>
+<td><strong><code>mod_authz_owner</code></strong></td>
+<td>基于文件的所有者进行认证</td>
+<td>-</td>
+</tr>
+<tr>
+<td>14</td>
+<td>授权支持模块</td>
+<td><strong><code>mod_authz_user</code></strong></td>
+<td>为每个用户提供认证支持</td>
+<td>-</td>
+</tr>
+<tr>
+<td>15</td>
+<td>授权支持模块</td>
+<td><code>mod_authz_default</code></td>
+<td>在未正确配置认证模块的情况下拒绝一切授权请求</td>
+<td>-</td>
+</tr>
+<tr>
+<td>16</td>
+<td><strong>基于系统的访问控制</strong></td>
+<td><strong><code>mod_authz_host</code></strong></td>
+<td>基于主机名、<code>IP</code>地址、请求特征的认证提供支持</td>
+<td>-</td>
+</tr>
+</tbody></table>
+<ul>
+<li>如果使用<code>Apache</code>进行基于用户账号的认证/授权时，必须在这三大类中至少选择一个，否则无法正常工作</li>
+</ul>
+<p><img src="/images/linux-apache-server-77.png" alt="Apache服务之httpd2.2服务配置"></p>
+<hr>
+<h3 id="4-1-认证类型模块"><a href="#4-1-认证类型模块" class="headerlink" title="4.1 认证类型模块"></a>4.1 认证类型模块</h3><blockquote>
+<p>在<code>Apache</code>中，<code>mod_auth_digest</code>模块除了可以完成<code>mod_auth_basic</code>模块的认证功能以外，还可以使用<code>MD5</code>摘要认证，更加安全和可靠。</p>
+</blockquote>
+<p><strong><code>mod_auth_basic</code>模块</strong></p>
+<ul>
+<li>介绍<ul>
+<li><code>mod_auth_basic</code>模块需要认证支持模块的协助下才能实现<code>HTTP</code>的基本认证</li>
+<li>对该模块支持的<strong>认证支持模块</strong>有：<code>mod_authn_dbd</code>/<code>mod_authn_dbm</code>/<code>mod_authn_file</code>/<code>mod_authnz_ldap</code></li>
+<li>四种认证支持模块至少选择一种</li>
+</ul>
+</li>
+<li>指令<ul>
+<li><code>AuthBasicProvide</code>指令用于设置该区域的认证方式，即上面提及的四种认证支持模块</li>
+<li><code>AuthBasicAuthoriative</code>指令用于决定由<code>AuthBasicProvide</code>所指的认证方式失败后，是否将认证与授权交由第三方模块进行处理，默认为<code>on</code>表示开启，即当认证失败后禁止访问，如果设置为<code>off</code>则交由第三方模块处理</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># 使用mod_authn_file模块的方式
+<Directory "/docroot">     # 指定需要控制的文件目录
+  Options None
+  AllowOverride None
+  AuthType Basic         # 认证类型
+  AuthName "STRING"      # 认证提示信息
+  AuthBasicProvide file  # 认证支持模块
+  AuthUserFile "/PATH/TO/HTTPD_USER_PASSWD_FILE"    # 用户认证文件
+  Require user username1 username2 ...              # 可选，需要哪些用户可以登录
+</Directory>
+
+# 使用mod_auth_basic模块和mod_authn_dbm模块联合认证
+<Location "/secure">
+  AuthType Basic                        # 认证类型
+  AuthName "STRING"
+  AuthBasicProvide dbm                  # 支持mod_authn_dbm模块作为认证与授权方式
+  AuthDBMType SDBM                      # 定义存放密码的数据库文件为SDBM
+  AuthDBMUserFile /www/etc/dbmpasswd    # 存放位置为/www/etc/dbmpasswd
+  Require valid-user                    # 指定所以用户如果通过认证都可以访问secure目录
+</Location/<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<p><strong><code>mod_auth_digest</code>模块</strong></p>
+<ul>
+<li>介绍<ul>
+<li><code>mod_auth_digest</code>模块需要认证支持模块的协助下才能实现<code>HTTP</code>的基本认证</li>
+<li>对该模块支持的<strong>认证支持模块</strong>有：<code>mod_authn_dbd</code>/<code>mod_authn_dbm</code>/<code>mod_authn_file</code>/<code>mod_authnz_ldap</code></li>
+<li>四种认证支持模块至少选择一种</li>
+</ul>
+</li>
+<li>指令<ul>
+<li><code>AuthDigestDomain</code>指令用于指定一个或多个在同一保护区域中需要进行摘要认证的<code>URI</code></li>
+<li><code>AuthDigestNonceLifetime</code>指令用于设置服务器超时时间，超过时重新认证，推荐<code>60-600</code>之间</li>
+<li><code>AuthDigestProvider</code>指令用于指定认证支持模块</li>
+<li><code>AuthDigestShmemSize</code>指令用于设置服务器在追踪客户端可以使用的共享内存字节数，可以使用<code>KB</code>/<code>MB</code></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># 使用mod_auth_digest模块和mod_authn_file模块联合认证
+<Location "/secure">
+  AuthType Digest                   # 认证类型
+  AuthName "private area"           # 认证提示信息
+  # 指定需要保护的区域为http://mirror.my.dom/secure
+  AuthDigestDomain /secure/ http://mirror.my.dom/secure
+  AuthDigestProvide file            # 支持mod_authn_file模块作为认证与授权方式
+  AuthUserFile /www/etc/password    # 密码存放位置
+  Require valid-user                # 指定所以用户如果通过认证都可以访问secure目录
+</Location/<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="4-2-认证支持模块"><a href="#4-2-认证支持模块" class="headerlink" title="4.2 认证支持模块"></a>4.2 认证支持模块</h3><blockquote>
+<p>这里只对比较重要的认证支持模块进行说明</p>
+</blockquote>
+<p><strong><code>mod_authn_dbd</code>模块</strong></p>
+<ul>
+<li>介绍<ul>
+<li>可以为<code>mod_auth_basic</code>模块和<code>mod_auth_digest</code>模块提供<code>SQL</code>数据库进行身份认证功能</li>
+</ul>
+</li>
+<li>启用需求<ul>
+<li>在<code>mod_auth_basic</code>模块或<code>mod_auth_digest</code>模块中指定使用<code>mod_authn_dbd</code>模块的认证支持</li>
+<li>需要使用<code>mod_dbd</code>模块提供一个后端数据库驱动程序和数据库连接为<code>mod_authn_dbd</code>模块提供支持</li>
+</ul>
+</li>
+<li>指令<ul>
+<li><code>AuthDBDUserPWQuery</code>指令用于设置搜索用户密码的<code>SQL</code>查询语句</li>
+<li><code>AuthDBDUserRealmQuery</code>指令用于同时为用户名和认证区域的密码进行<code>SQL</code>查询，是两个查询</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># AuthDBDUserPWQuery使用范例
+AuthDBDUserPWQuery "SELECT password FORM authn WHERE username = %s"
+
+# AuthDBDUserRealmQuery使用范例
+AuthDBDUserRealmQuery "SELECT password FROM authn WHERE username = %s AND realm = %s"
+
+# 演示效果
+DBDriver pgsql    # 使用的数据库
+DBDParams "dbname=htpasswd user=Apache password=xxxxxx"    # 数据库名称、用户名、密码
+DBDMin 1         # 最小连接数
+DBDMax 10        # 最大连接数
+DBDKeep 2
+DBDExptime 60    # 超时时间
+<Directory "/docroot">
+  AuthType Basic         # 认证类型
+  AuthName "Server"      # 认证提示信息
+  AuthBasicProvide dbd   # 认证支持模块
+  AuthDBDUserPWQuery "SELECT password FORM authn WHERE username = %s"
+  Require valid-user     # 可选，需要哪些用户可以登录
+</Directory><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="4-2-认证支持模块-1"><a href="#4-2-认证支持模块-1" class="headerlink" title="4.2 认证支持模块"></a>4.2 认证支持模块</h3><blockquote>
+<p>这里只对比较重要的认证支持模块进行说明</p>
+</blockquote>
+<p><strong><code>mod_authn_dbd</code>模块</strong></p>
+<ul>
+<li>介绍<ul>
+<li>可以为<code>mod_auth_basic</code>模块和<code>mod_auth_digest</code>模块提供<code>SQL</code>数据库进行身份认证功能</li>
+</ul>
+</li>
+<li>启用需求<ul>
+<li>在<code>mod_auth_basic</code>模块或<code>mod_auth_digest</code>模块中指定使用<code>mod_authn_dbd</code>模块的认证支持</li>
+<li>需要使用<code>mod_dbd</code>模块提供一个后端数据库驱动程序和数据库连接为<code>mod_authn_dbd</code>模块提供支持</li>
+</ul>
+</li>
+<li>指令<ul>
+<li><code>AuthDBDUserPWQuery</code>指令用于设置搜索用户密码的<code>SQL</code>查询语句</li>
+<li><code>AuthDBDUserRealmQuery</code>指令用于同时为用户名和认证区域的密码进行<code>SQL</code>查询，是两个查询</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># 定义存放密码的数据库文件为SDBM
+AuthDBMType SDBM
+
+# 存放位置为/www/etc/dbmpasswd
+AuthDBMUserFile /www/etc/dbmpasswd<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>dbmmanage 程序</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># 增加一个用户
+$ dbmmanage .htpasswd_SDBM adduser escape
+
+# 查看数据库文件内容
+$ dbmmanage .htpasswd_SDBM view
+
+# 更新用户密码
+$ dbmmanage .htpasswd_SDBM update escape
+
+# 从数据库中删除用户
+$ dbmmanage .htpasswd_SDBM delete escape<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<p><strong><code>mod_authn_file</code>模块</strong></p>
+<ul>
+<li>介绍<ul>
+<li>可以为<code>mod_auth_basic</code>模块和<code>mod_auth_digest</code>模块提供纯文本文件的认证方式</li>
+<li>只需要将用户名和密码存储在一个纯文本文件中，就可以使用了</li>
+</ul>
+</li>
+<li>创建工具<ul>
+<li>对于<code>mod_auth_digest</code>模块，可以使用<code>Apache</code>提供的<code>htpasswd</code>程序来创建和修改密码</li>
+<li>对于<code>mod_auth_digest</code>模块，可以使用<code>Apache</code>提供的<code>htdigest</code>程序来创建和修改密码</li>
+</ul>
+</li>
+<li>指令<ul>
+<li><code>AuthUserFile</code>指令用于指定文本文件的路径和名称</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"><Directory "/docroot">     # 指定需要控制的文件目录
+  AuthType Basic         # 认证类型
+  AuthName "file"        # 认证提示信息
+  AuthBasicProvide file  # 认证支持模块
+  AuthUserFile /usr/local/auth/passwd    # 用户认证文件
+  Require user escape bob tom peter      # 可选，需要哪些用户可以登录
+</Directory><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><code>htpasswd</code>程序</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 创建一个新的密码文件并增加一个名为escape的用户</span>
+$ htpasswd -c .htpasswd escape
+
+<span class="token comment" spellcheck="true"># 从.htpasswd文件中删除escape用户</span>
+$ htpasswd -D .htpasswd escape
+
+<span class="token comment" spellcheck="true"># 更新escape用户密码</span>
+$ htpasswd .htpasswd escape
+
+<span class="token comment" spellcheck="true"># 查看文件内容</span>
+$ <span class="token function">cat</span> .htpasswd
+escape:DHOILmkDkQTDs<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><code>htdigest</code>程序</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 创建一个新的密码文件并增加一个名为escape的用户</span>
+$ htdigest -c .htpasswd <span class="token string">"htdocs"</span> escape
+
+<span class="token comment" spellcheck="true"># 更新escape用户密码</span>
+$ htdigest .htpasswd escape
+
+<span class="token comment" spellcheck="true"># 查看文件内容</span>
+$ <span class="token function">cat</span> .htpasswd
+escape:ce5432DHOILmkDkQTDs9992dsx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="4-3-授权支持模块"><a href="#4-3-授权支持模块" class="headerlink" title="4.3 授权支持模块"></a>4.3 授权支持模块</h3><blockquote>
+<p>这里只对比较重要的授权支持模块进行说明</p>
+<ul>
+<li>授权支持模块的作用是为那些通过用户身份认证的用户或组提供访问授权</li>
+<li>授权支持模块必须依赖于之前的身份认证模块进行身份认证</li>
+</ul>
+</blockquote>
+<p><strong><code>mod_authz_dbm</code>模块</strong></p>
+<ul>
+<li>特点<ul>
+<li>通过使用<code>DBM</code>数据库文件为组提供授权支持功能</li>
+<li>可以使用<code>SDBM</code>、<code>GDBM</code>、<code>NDBM</code>、<code>DB</code>四种数据库类型的文件来存放用户组和密码</li>
+<li>数据库文件格式：<code>加密密码 : 组名单</code></li>
+</ul>
+</li>
+<li>指令<ul>
+<li><code>AuthDBMType</code>指令用于设置数据库类型</li>
+<li><code>AuthDBMGroupFile</code>指令用于设置用户组和密码文件的位置</li>
+<li><code>AuthzDBMAuthoritative</code>指令用于设置当认证失败时，是否将授权操作交给更底层的模块来处理，推荐使用<code>on</code>开启禁止传递下去</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># 使用类型
+AuthDBMType SDBM
+
+# 设置用户组文件的位置
+AuthDBMGroupFile /www/userbase
+
+# /www/userbase文件内容
+加密密码:组名单<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<p><strong><code>mod_authz_groupfile</code>模块</strong></p>
+<ul>
+<li>特点<ul>
+<li>类似于<code>mod_authz_dbm</code>模块，但是<code>mod_authz_groupfile</code>模块只能提供基于文本文件的存储方式，文本授权</li>
+</ul>
+</li>
+<li>指令<ul>
+<li><code>AuthGroupFile</code>指令用于设置用户组的纯文本文件位置</li>
+<li><code>AuthzGroupAuthoritative</code>指令用于设置当认证失败时，是否将授权操作交给更底层的模块来处理，推荐使用<code>on</code>开启禁止传递下去</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># 设置用户组文件的位置
+AuthGroupFile /www/groupbase
+
+# /www/groupbase文件内容
+mygroup: bob jery
+admin: escape<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<p><strong><code>mod_authz_owner</code>模块</strong></p>
+<ul>
+<li>特点<ul>
+<li>根据文件所有者的身份来提供相应的授权</li>
+<li><strong>两种授权方式</strong>：一是根据文件所有者的身份授权，二是根据文件所有者的组授权</li>
+</ul>
+</li>
+<li>指令<ul>
+<li><code>AuthzOwnerAuthoritative</code>指令用于设置当认证失败时，是否将授权操作交给更底层的模块来处理，推荐使用<code>on</code>开启禁止传递下去</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 基于文件所有者的身份授权，file-owner</span>
+<span class="token operator">&lt;</span>Directory /home/*/public_html/private<span class="token operator">></span>
+  AuthType Basic
+  AuthName <span class="token string">"My Private Files"</span>
+  AuthBasicProvider dbm
+  AuthDBMUserFile /usr/local/etc/.htdbm-all
+  Satisfy All
+  require file-owner
+<span class="token operator">&lt;</span>/Directory<span class="token operator">></span>
+
+<span class="token comment" spellcheck="true"># 基于文件所有者的组授权，file-group</span>
+<span class="token operator">&lt;</span>Directory /home/*/public_html/private<span class="token operator">></span>
+  AuthType Basic
+  AuthName <span class="token string">"My Private Files"</span>
+  AuthBasicProvider dbm
+  AuthDBMUserFile /usr/local/etc/.htdbm-all
+  AuthDBMGroupFile /usr/local/etc/.htdbm-all
+  Satisfy All
+  require file-group
+<span class="token operator">&lt;</span>/Directory<span class="token operator">></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<p><strong><code>mod_authz_user</code>模块</strong></p>
+<ul>
+<li>特点<ul>
+<li>可以允许或拒绝经过认真的用户访问受保护区域</li>
+<li><strong>两种授权方式</strong>：一是根据在<code>Require user</code>中列出的用户对访问进行控制，二是根据<code>Require valid-user</code>指令简单允许所有成功通过认证的用户进行访问</li>
+</ul>
+</li>
+<li>指令<ul>
+<li><code>AuthzUserAuthoritative</code>指令用于设置当认证失败时，是否将授权操作交给更底层的模块来处理，推荐使用<code>on</code>开启禁止传递下去</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-apache"><code class="language-apache"># 列出的用户可以进行受限资源的访问
+Require user
+
+# 允许所有成功通过认证的用户进行访问
+Require valid-user<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="4-4-mod-authz-host模块"><a href="#4-4-mod-authz-host模块" class="headerlink" title="4.4 mod_authz_host模块"></a>4.4 <code>mod_authz_host</code>模块</h3><blockquote>
+<p><code>mod_authz_host</code>模块是在<code>Apache</code>上使用最多的限制用户访问的模块，由于它实现了基于主机名、<code>IP</code>地址、请求特征的访问控制，因此它不属于三大认证模块的任何一部分。</p>
+<ul>
+<li><code>mod_authz_host</code>模块提供三个指令：<code>Allow</code>指令、<code>Deny</code>指令、<code>Order</code>指令</li>
+<li>提供的指令可以直接在<code>&lt;Directory&gt;</code>、<code>&lt;Files&gt;</code>、<code>&lt;Location&gt;</code>和<code>.htaccess</code>文件中使用</li>
+</ul>
+</blockquote>
+<p><strong>三个指令</strong></p>
+<ul>
+<li><code>Allow</code>指令用于指定那些客户允许访问</li>
+<li><code>Deny</code>指令用于指定那些客户不允许访问</li>
+<li><code>Order</code>指令设置默认的访问状态并配置<code>Allow</code>和<code>Deny</code>指令指令的生效顺序，后者为默认机制</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 允许.com结尾的用户，拒绝192.168.31.111和www.escape.com用户</span>
+Allow from .com
+Deny from 192.168.31.111
+Deny from www.escape.com
+
+<span class="token comment" spellcheck="true"># 使用主机名时，Apache会对每个客户端的IP地址进行两次DNS查询：</span>
+<span class="token comment" spellcheck="true"># 一次正向查询保证IP地址没有伪造</span>
+<span class="token comment" spellcheck="true"># 一次反向查询保证主机名没有伪造</span>
+<span class="token comment" spellcheck="true"># 只有当两次查询结果一致时，才会被允许访问</span>
+<span class="token comment" spellcheck="true"># 如果用户量很大，Apache会花大量时间在DNS查询上，所以不建议使用基于主机名进行访问控制</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 允许使用主机名、IP地址、网络地址、IPv6地址、环境变量等方式</span>
+Allow from 172.16.2.3
+Allow from 10.1.0.0.16
+Deny from 172.16.3.0/255.255.255.128
+
+<span class="token comment" spellcheck="true"># 使用mod_setenvif提供的SetEnvIf指令定义浏览器类型进行过滤</span>
+SetEnvIf User-Agent ^KnockKnock/2\.0 let_me_in
+<span class="token operator">&lt;</span>Directory /docroot<span class="token operator">></span>
+  Order Deny,Allow
+  Deny from All
+  Allow from env<span class="token operator">=</span>let_me_in
+<span class="token operator">&lt;</span>/Directory<span class="token operator">></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 黑名单，先执行Deny在执行Allow，所以172.16.2.3可以访问</span>
+Order Deny,Allow
+Deny from all
+Allow from 172.16.2.3
+
+<span class="token comment" spellcheck="true"># 白名单，先执行Allow在执行Deny，所以172.16.2.3不能访问</span>
+Order Allow,Deny
+Deny from all
+Allow from 172.16.2.3<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="4-5-mod-authnz-ldap模块"><a href="#4-5-mod-authnz-ldap模块" class="headerlink" title="4.5 mod_authnz_ldap模块"></a>4.5 <code>mod_authnz_ldap</code>模块</h3><blockquote>
+<p><code>LDAP</code>是轻量级目录访问协议，它是一种有层次、树形结构的，如电话薄。它是以国家、省份、市区、单位的字母或笔画顺序排列的电话号码所组成。由于<code>LDAP</code>是一种已经指定的数据结构的存储方式，并对查询进行了优化，因此它非常适合用户查询使用或者身份认证。</p>
+<ul>
+<li><code>mod_authnz_ldap</code>模块提供用户的身份认证和授权</li>
+</ul>
+</blockquote>
+<p><strong>身份认证</strong></p>
+<ul>
+<li>(1) 通过客户端提供的用户名与<code>AuthLDAPURL</code>指令以及设置的属性资料进行绑定</li>
+<li>(2) 绑定成功后搜索用户名，如果没有找到直接拒绝访问，如果找到获取<code>DN</code>(一组字符串)和密码</li>
+<li>(3) 使用获得的<code>DN</code>和密码进行第二次绑定，如果绑定成功则认证完成</li>
+</ul>
+<p><strong>授权访问</strong></p>
+<ul>
+<li>(1) <code>LDAP</code>用户名，<code>require ldap-user</code></li>
+<li>(2) <code>LDAP</code>组名，<code>require ldap-group</code></li>
+<li>(3) <code>LDAP DN</code></li>
+<li>(4) <code>LDAP</code>属性</li>
+<li>(5) <code>LDAP</code>过滤器</li>
+</ul>
+<hr>
+<h2 id="5-涉及的命令工具"><a href="#5-涉及的命令工具" class="headerlink" title="5. 涉及的命令工具"></a>5. 涉及的命令工具</h2><h3 id="5-1-curl命令"><a href="#5-1-curl命令" class="headerlink" title="5.1 curl命令"></a>5.1 <code>curl</code>命令</h3><blockquote>
+<p><code>curl</code>是基于<code>URL</code>语法在命令行方式下工作的文件传输工具，它支持<code>FTP</code>, <code>HTTP</code>, <code>HTTPS</code>, , <code>TELNET</code>等等协议，功能十分强大。</p>
+</blockquote>
+<p><strong>格式</strong></p>
+<ul>
+<li><code>curl [options] [URL...]</code></li>
+</ul>
+<p><strong>curl 的常用选项</strong></p>
+<ul>
+<li><code>-A/--user-agent &lt;string&gt;</code>：设置用户代理发送给服务器</li>
+<li><code>-basic</code>：使用<code>HTTP</code>的<code>basic</code>基本认证</li>
+<li><code>--tcp-nodelay</code>：使用<code>TCP_NODELAY</code>选项</li>
+<li><code>-e/--referer &lt;URL&gt;</code>：来源网址</li>
+<li><code>--cacert &lt;file&gt;</code>：<code>CA</code>证书 (<code>SSL</code>)</li>
+<li><code>--compressed</code>：要求返回是压缩的格式</li>
+<li><code>-H/--header &lt;line&gt;</code>：自定义首部信息传递给服务器</li>
+<li><code>-I/--head</code>：只显示响应报文首部信息</li>
+<li><code>--limit-rate &lt;rate&gt;</code>：设置传输速度</li>
+<li><code>-u/--user &lt;user[:password]&gt;</code>：设置服务器的用户和密码</li>
+<li><code>-0/--http1.0</code>：使用 HTTP 1.0</li>
+</ul>
+<hr>
+<h3 id="5-2-压力测试工具"><a href="#5-2-压力测试工具" class="headerlink" title="5.2 压力测试工具"></a>5.2 压力测试工具</h3><blockquote>
+<p><code>tcpcopy</code>是网易开发的一个分布式在线压力测试工具，将站点的请求进行镜像转发，生产环境的<code>copy</code>。</p>
+</blockquote>
+<p><strong>压力测试工具介绍</strong></p>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>工具</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><code>ab</code></td>
+<td>测试效果有限</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>webbench</code></td>
+<td>测试效果有限</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>http_load</code></td>
+<td>测试效果有限</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>jmeter</code></td>
+<td>测试效果很棒，开源软件，需要自行编译执行流程</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>loadrunner</code></td>
+<td>测试效果异常强大，专业级付费工具，需要自行编译执行流程</td>
+</tr>
+</tbody></table>
+<p><strong><code>AB</code>测试服务器性能</strong></p>
+<ul>
+<li>格式<ul>
+<li><code>ab [OPTIONS] URL</code></li>
+</ul>
+</li>
+<li>参数<ul>
+<li><code>-n</code>表示总的请求数</li>
+<li><code>-c</code>表示模拟的并发数</li>
+<li><code>-k</code>表示以持久连接模式测试</li>
+</ul>
+</li>
+<li>注意事项<ul>
+<li>使用时，一般<code>n</code>大于<code>c</code></li>
+<li>如果模拟并发数<code>-c</code>过大，需要调整打开的文件数，使用<code>ulimit -n #</code>命令</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ ab -n 10000 -c 100 http://192.168.31.7/index.html<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -752,12 +2532,12 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/posts/ba1bee22.html">
+                <a href="/posts/d6395dd2.html">
                     <div class="card-image">
                         
-                        <img src="/images/linux-apache-server-70.jpg" class="responsive-img" alt="Apache服务之httpd2.2配置">
+                        <img src="/images/rsync-transfer-file.png" class="responsive-img" alt="搭建rsync服务来同步配置">
                         
-                        <span class="card-title">Apache服务之httpd2.2配置</span>
+                        <span class="card-title">搭建rsync服务来同步配置</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -768,7 +2548,7 @@
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2018-12-15
+                            <i class="far fa-clock fa-fw icon-date"></i>2018-12-16
                         </span>
                         <span class="publish-author">
                             
@@ -787,10 +2567,6 @@
                     
                     <a href="/tags/Linux/">
                         <span class="chip bg-color">Linux</span>
-                    </a>
-                    
-                    <a href="/tags/Apache/">
-                        <span class="chip bg-color">Apache</span>
                     </a>
                     
                 </div>
@@ -1049,7 +2825,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">843.9k</span>&nbsp;字
+                class="white-color">848.7k</span>&nbsp;字
             
             
             

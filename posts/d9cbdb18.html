@@ -1,0 +1,1531 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Apache服务之httpd2.4配置, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Apache服务之httpd2.4配置 | Escape</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Escape</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Escape</div>
+        <div class="logo-desc">
+            
+            听摇滚,但不偏颇;也挺古典,但不安逸
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/EscapeLife" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/EscapeLife" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/linux-apache-server-80.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Apache服务之httpd2.4配置</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Linux/">
+                                <span class="chip bg-color">Linux</span>
+                            </a>
+                        
+                            <a href="/tags/Apache/">
+                                <span class="chip bg-color">Apache</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                Linux运维之路
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2018-12-17
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2020-11-03
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    1.9k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    9 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <blockquote>
+<p><strong>CentOS7 配置 httpd2.4 服务</strong></p>
+</blockquote>
+<p><img src="/images/linux-apache-server-80.jpg" alt="Apache服务之httpd2.4服务配置"></p>
+<hr>
+<h2 id="1-httpd2-4介绍"><a href="#1-httpd2-4介绍" class="headerlink" title="1. httpd2.4介绍"></a>1. <code>httpd2.4</code>介绍</h2><p><strong>新特性</strong></p>
+<ul>
+<li>(1) <code>MPM</code>支持运行<code>DSO</code>机制，以模块形式按需加载</li>
+<li>(2) 正式支持<code>event MPM</code>机制</li>
+<li>(3) 支持异步读写</li>
+<li>(4) 支持每模块及每个目录分别使用各自的日志级别</li>
+<li>(5) 每请求配置，<code>&lt;If&gt;</code>如果某个模块存在、某个文件存在、请求某个文件等触发配置</li>
+<li>(6) 增强版的表达式分析器， 提高正则表达式效率</li>
+<li>(7) 支持毫秒级的<code>keepalive timeout</code></li>
+<li>(8) 基于主机名(<code>FQDN</code>)的虚拟主机不再需要<code>NameVirtualHost</code>指令</li>
+<li>(9) 支持用户自定义变量</li>
+</ul>
+<p><strong>新模块</strong></p>
+<ul>
+<li>(1) <code>mod_proxy_fcgi</code>：提供<code>fastCGI</code>支持</li>
+<li>(2) <code>mod_ratelimit</code>：提供速率限制</li>
+<li>(3) <code>mod_remoteip</code>：提供远端<code>IP</code>控制</li>
+</ul>
+<p><strong>注意事项</strong></p>
+<ul>
+<li>不再支持使用<code>Order</code>, <code>Deny</code>, <code>Allow</code>来做基于 IP 的访问控制，使用<code>Require</code>的方式进行访问控制</li>
+</ul>
+<hr>
+<h2 id="2-httpd2-4安装"><a href="#2-httpd2-4安装" class="headerlink" title="2. httpd2.4安装"></a>2. <code>httpd2.4</code>安装</h2><blockquote>
+<p><code>CentOS6</code>一般通过编译安装<code>httpd2.4</code>版本</p>
+</blockquote>
+<p><strong><code>httpd2.4</code>依赖</strong></p>
+<ul>
+<li><code>httpd2.4</code>依赖于<code>apr-1.4+</code>、<code>apr-util-1.4+</code>以上的版本，<code>apr-icon</code>可选</li>
+<li><strong><code>apr</code></strong>(<code>apache portable runtime apache</code>)表示运行时环境，用于兼容多平台</li>
+</ul>
+<p><strong><code>CentOS6</code>特性</strong></p>
+<ul>
+<li>默认的依赖包为<code>apr-1.3.9</code>、<code>apr-util-1.3.9</code>不符合<code>httpd2.4</code>的要求</li>
+<li>如果冒然升级<code>CentOS6</code>系统自带的<code>apr</code>会导致服务不可用，所以建议保留老版本并且安装新版本的包</li>
+</ul>
+<p><strong>安装编译步骤</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># (1) 安装开发环境，安装pcre-devel</span>
+yum groupinstall <span class="token string">"Development Tools"</span> <span class="token string">"Server Platform Development"</span>
+yum <span class="token function">install</span> pcre-devel
+
+
+<span class="token comment" spellcheck="true"># (2) 下载1.4+版的apr</span>
+<span class="token function">tar</span> -xjvf
+./configure --prefix<span class="token operator">=</span>/usr/local/apr  <span class="token comment" spellcheck="true"># 目录不一样是因为方式和系统的apr冲突</span>
+<span class="token function">make</span> <span class="token operator">&amp;&amp;</span> <span class="token function">make</span> <span class="token function">install</span>
+
+
+<span class="token comment" spellcheck="true"># (3) 下载1.4+版的apr-util</span>
+<span class="token comment" spellcheck="true"># apr-util是apr的扩展，需要针对于apr安装，所以使用with进行依赖安装</span>
+apr-util
+./configure --prefix<span class="token operator">=</span>/usr/local/apr-util --with-apr<span class="token operator">=</span>/usr/local/apr
+<span class="token function">make</span> <span class="token operator">&amp;&amp;</span> <span class="token function">make</span> <span class="token function">install</span>
+
+
+<span class="token comment" spellcheck="true"># (4) 创建用户和属组</span>
+<span class="token function">groupadd</span> -r apache
+<span class="token function">useradd</span> -r -g apache apahce
+yum <span class="token function">install</span> pcre-devel  <span class="token comment" spellcheck="true"># centos6默认不会安装，提供--with-pcre功能</span>
+
+
+<span class="token comment" spellcheck="true"># (5) 编译配置文件</span>
+./configure --prefix<span class="token operator">=</span>/usr/local/apache --sysconf<span class="token operator">=</span>/etc/httpd24 --enable-so --enable-ssl --enable-cgi --enable-rewrite --with-zlib --with-pcre --with-apr<span class="token operator">=</span>/usr/local/apr --with-apr-util<span class="token operator">=</span>/usr/local/apr-util/ --enable-modules<span class="token operator">=</span>most --enable-mpms-shared<span class="token operator">=</span>all --with-mpm<span class="token operator">=</span>prefork
+<span class="token function">make</span> <span class="token operator">&amp;&amp;</span> <span class="token function">make</span> <span class="token function">install</span>
+
+
+<span class="token comment" spellcheck="true"># (6) 启动服务</span>
+<span class="token comment" spellcheck="true"># 首先关闭系统的httpd服务，否则会占用80端口</span>
+/usr/local/apache/bin/apachectl  <span class="token comment" spellcheck="true"># 不要使用rpm包的apachectl命令，应该使用全路径</span>
+
+<span class="token comment" spellcheck="true"># 配置之后可以使用不指定全路径</span>
+vim /etc/profile.d/httpd.sh
+<span class="token function">export</span> PATH<span class="token operator">=</span>/usr/local/apache/bin/apachectl:<span class="token variable">$PATH</span>
+<span class="token keyword">.</span> /etc/profile.d/httpd.sh
+
+<span class="token comment" spellcheck="true"># 自己编译的httpd没有server服务脚本，可以使用apachectl进行启动此外</span>
+<span class="token comment" spellcheck="true"># 服务启动脚本，可以借鉴系统rpm包中的httpd启动脚本</span>
+apachectl<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="3-配置文件"><a href="#3-配置文件" class="headerlink" title="3. 配置文件"></a>3. 配置文件</h2><blockquote>
+<p>这里主要讲的是<code>CentOS7</code>上编译安装的<code>httpd</code>服务配置，如果使用<code>yum</code>进行安装，则和<code>CentOS6</code>配置几乎一致。</p>
+<ul>
+<li>推荐使用<code>yum</code>进行安装，不然自行编译很难进行大规模部署</li>
+<li>如果想使用<code>httpd2.4</code>就直接升级系统到<code>centos7</code>，不建议自行编译安装，除非需要使用新特性</li>
+</ul>
+</blockquote>
+<p><strong>配置文件</strong></p>
+<ul>
+<li><strong>主配置文件</strong><ul>
+<li><code>/etc/httpd/conf/httpd.conf</code></li>
+<li>会加载<code>conf.modules.d</code>下的模块</li>
+</ul>
+</li>
+<li><strong>模块配置文件</strong><ul>
+<li><code>/etc/httpd/conf.modules.d/*.conf</code></li>
+<li>动态模块的存放位置，编号是为了排序</li>
+</ul>
+</li>
+<li><strong>辅助配置文件</strong><ul>
+<li><code>/etc/httpd/conf.d/*.conf</code></li>
+</ul>
+</li>
+</ul>
+<p><strong><code>mpm</code>模式</strong></p>
+<ul>
+<li>在<code>httpd2.4</code>以 DSO 机制提供</li>
+<li>配置文件<code>/etc/httpd/conf.modules.d/00-mpm.conf</code></li>
+</ul>
+<p><strong>服务控制</strong></p>
+<ul>
+<li><code>systemctl {start|stop|restart|status|reload} httpd.service</code></li>
+</ul>
+<hr>
+<h2 id="4-服务配置"><a href="#4-服务配置" class="headerlink" title="4. 服务配置"></a>4. 服务配置</h2><blockquote>
+<p>这里主要讲的是和<code>httpd2.2</code>服务配置不同的地方</p>
+</blockquote>
+<h3 id="3-1-切换使用-MPM"><a href="#3-1-切换使用-MPM" class="headerlink" title="3.1 切换使用 MPM"></a>3.1 切换使用 MPM</h3><pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># （1）切换使用MPM  00-mpm.conf</span>
+
+LoadModule mpm_NAME_module modules/mod_mpm_NAME.so
+    NAME: prefork, event, worker
+    LoadModule 模块名 模块路径<span class="token punctuation">(</span>相对于/usr/lib64/<span class="token punctuation">)</span>
+    httpd -M查看当前MPM模式，使用-l已经没用了<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-2-基于IP的访问控制"><a href="#3-2-基于IP的访问控制" class="headerlink" title="3.2 基于IP的访问控制"></a>3.2 基于<code>IP</code>的访问控制</h3><pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># (2) 基于IP的访问控制法则</span>
+
+httpd2.4中默认没有文件授权，所以不会显示文件列表，拒绝访问
+需要删除或者重命名welcome.conf文件  需要做显示授权才能访问
+    允许所有主机访问：Require all granted
+    拒绝所有主机访问：Require all deny
+
+控制特定IP访问：
+    需要在<span class="token operator">&lt;</span>RequireAll<span class="token operator">></span>中封装起来
+    Require ip IPADDR：授权指定来源地址的主机访问
+    Require not ip IPADDR：拒绝指定来源地址的主机访问
+    IPADDR：
+        IP: 172.16.100.2
+        Network/mask: 172.16.0.0/255.255.0.0
+        Network/Length: 172.16.0.0/16
+        Net: 172.16
+
+控制特定主机（HOSTNAME）访问
+    Require host HOSTNAME
+    Require not host HOSTNAME
+    HOSTNAME:
+        FQDN: 特定主机
+        DOMAIN：指定域内的所有主机
+
+举例说明: 需要使用Directory/RequireAll进行封装才能使用生效
+    <span class="token operator">&lt;</span>RequireAll<span class="token operator">></span>
+        Require all granted
+        Require not ip 10.252.46.165
+    <span class="token operator">&lt;</span>/RequireAll<span class="token operator">></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="4-3-虚拟主机"><a href="#4-3-虚拟主机" class="headerlink" title="4.3 虚拟主机"></a>4.3 虚拟主机</h3><pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># (3) 虚拟主机</span>
+
+模块化配置可以方便自动化运维
+注释主配置main且在conf.d目录中可以配置vhosts.conf或者配置在httpd.conf
+对于centos6编译安装的httpd2.4来说<span class="token punctuation">(</span>/etc/httpd24<span class="token punctuation">)</span>和centos7 rpm包安装的配置文件布局不同
+httpd.conf是主配置文件，而模块化在extra目录中进行配置
+
+基于IP、Port和FQDN都支持；
+基于FQDN的不再需要NameVirtualHost指令；<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="4-4-服务脚本"><a href="#4-4-服务脚本" class="headerlink" title="4.4 服务脚本"></a>4.4 服务脚本</h3><ul>
+<li><code>CentOS 7</code>的服务脚本和<code>CentOS 6</code>不同</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># (4) CentOS 6 服务脚本</span>
+
+<span class="token function">cd</span> /etc/rc.d/init.d/
+<span class="token function">cp</span> httpd httpd24
+
+修改配置文件，可以在改进下
+<span class="token function">chkconfig</span> --add httpd24
+<span class="token function">chkconfig</span> --list httpd24
+<span class="token function">chkconfig</span> httpd24 on
+<span class="token function">service</span> httpd start
+ss -tnl<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>借鉴系统<code>rpm</code>包中的<code>httpd</code>启动脚本</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
+<span class="token comment" spellcheck="true">#</span>
+<span class="token comment" spellcheck="true"># httpd        Startup script for the Apache HTTP Server</span>
+<span class="token comment" spellcheck="true">#</span>
+<span class="token comment" spellcheck="true"># chkconfig: - 85 15</span>
+<span class="token comment" spellcheck="true"># description: The Apache HTTP Server is an efficient and extensible  \</span>
+<span class="token comment" spellcheck="true">#           server implementing the current HTTP standards.</span>
+<span class="token comment" spellcheck="true"># processname: httpd</span>
+<span class="token comment" spellcheck="true"># config: /etc/httpd/conf/httpd.conf</span>
+<span class="token comment" spellcheck="true"># config: /etc/sysconfig/httpd</span>
+<span class="token comment" spellcheck="true"># pidfile: /var/run/httpd/httpd.pid</span>
+<span class="token comment" spellcheck="true">#</span>
+<span class="token comment" spellcheck="true">### BEGIN INIT INFO</span>
+<span class="token comment" spellcheck="true"># Provides: httpd</span>
+<span class="token comment" spellcheck="true"># Required-Start: $local_fs $remote_fs $network $named</span>
+<span class="token comment" spellcheck="true"># Required-Stop: $local_fs $remote_fs $network</span>
+<span class="token comment" spellcheck="true"># Should-Start: distcache</span>
+<span class="token comment" spellcheck="true"># Short-Description: start and stop Apache HTTP Server</span>
+<span class="token comment" spellcheck="true"># Description: The Apache HTTP Server is an extensible server</span>
+<span class="token comment" spellcheck="true">#  implementing the current HTTP standards.</span>
+<span class="token comment" spellcheck="true">### END INIT INFO</span>
+
+<span class="token comment" spellcheck="true"># Source function library.</span>
+<span class="token keyword">.</span> /etc/rc.d/init.d/functions
+
+<span class="token keyword">if</span> <span class="token punctuation">[</span> -f /etc/sysconfig/httpd <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+        <span class="token keyword">.</span> /etc/sysconfig/httpd
+<span class="token keyword">fi</span>
+
+<span class="token comment" spellcheck="true"># Start httpd in the C locale by default.</span>
+HTTPD_LANG<span class="token operator">=</span>$<span class="token punctuation">{</span>HTTPD_LANG-<span class="token string">"C"</span><span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true"># This will prevent initlog from swallowing up a pass-phrase prompt if</span>
+<span class="token comment" spellcheck="true"># mod_ssl needs a pass-phrase from the user.</span>
+INITLOG_ARGS<span class="token operator">=</span><span class="token string">""</span>
+
+<span class="token comment" spellcheck="true"># Set HTTPD=/usr/sbin/httpd.worker in /etc/sysconfig/httpd to use a server</span>
+<span class="token comment" spellcheck="true"># with the thread-based "worker" MPM; BE WARNED that some modules may not</span>
+<span class="token comment" spellcheck="true"># work correctly with a thread-based MPM; notably PHP will refuse to start.</span>
+
+<span class="token comment" spellcheck="true"># Path to the apachectl script, server binary, and short-form for messages.</span>
+<span class="token comment" spellcheck="true"># 配置需要修改的地方</span>
+apachectl<span class="token operator">=</span>/usr/local/apache/bin/apachectl
+httpd<span class="token operator">=</span>/usr/local/apache/bin/httpd
+prog<span class="token operator">=</span>httpd
+pidfile<span class="token operator">=</span><span class="token variable">${PIDFILE-/var/run/httpd/httpd24.pid}</span>
+lockfile<span class="token operator">=</span><span class="token variable">${LOCKFILE-/var/lock/subsys/httpd24}</span>
+RETVAL<span class="token operator">=</span>0
+STOP_TIMEOUT<span class="token operator">=</span><span class="token variable">${STOP_TIMEOUT-10}</span>
+
+<span class="token comment" spellcheck="true"># The semantics of these two functions differ from the way apachectl does</span>
+<span class="token comment" spellcheck="true"># things -- attempting to start while running is a failure, and shutdown</span>
+<span class="token comment" spellcheck="true"># when not running is also a failure.  So we just do it the way init scripts</span>
+<span class="token comment" spellcheck="true"># are expected to behave here.</span>
+start<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">echo</span> -n $<span class="token string">"Starting <span class="token variable">$prog</span>: "</span>
+        LANG<span class="token operator">=</span><span class="token variable">$HTTPD_LANG</span> daemon --pidfile<span class="token operator">=</span><span class="token variable">${pidfile}</span> <span class="token variable">$httpd</span> <span class="token variable">$OPTIONS</span>
+        RETVAL<span class="token operator">=</span><span class="token variable">$?</span>
+        <span class="token keyword">echo</span>
+        <span class="token punctuation">[</span> <span class="token variable">$RETVAL</span> <span class="token operator">=</span> 0 <span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token function">touch</span> <span class="token variable">${lockfile}</span>
+        <span class="token keyword">return</span> <span class="token variable">$RETVAL</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true"># When stopping httpd, a delay (of default 10 second) is required</span>
+<span class="token comment" spellcheck="true"># before SIGKILLing the httpd parent; this gives enough time for the</span>
+<span class="token comment" spellcheck="true"># httpd parent to SIGKILL any errant children.</span>
+stop<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">echo</span> -n $<span class="token string">"Stopping <span class="token variable">$prog</span>: "</span>
+    killproc -p <span class="token variable">${pidfile}</span> -d <span class="token variable">${STOP_TIMEOUT}</span> <span class="token variable">$httpd</span>
+    RETVAL<span class="token operator">=</span><span class="token variable">$?</span>
+    <span class="token keyword">echo</span>
+    <span class="token punctuation">[</span> <span class="token variable">$RETVAL</span> <span class="token operator">=</span> 0 <span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token function">rm</span> -f <span class="token variable">${lockfile}</span> <span class="token variable">${pidfile}</span>
+<span class="token punctuation">}</span>
+reload<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">echo</span> -n $<span class="token string">"Reloading <span class="token variable">$prog</span>: "</span>
+    <span class="token keyword">if</span> <span class="token operator">!</span> LANG<span class="token operator">=</span><span class="token variable">$HTTPD_LANG</span> <span class="token variable">$httpd</span> <span class="token variable">$OPTIONS</span> -t <span class="token operator">></span><span class="token operator">&amp;</span>/dev/null<span class="token punctuation">;</span> <span class="token keyword">then</span>
+        RETVAL<span class="token operator">=</span>6
+        <span class="token keyword">echo</span> $<span class="token string">"not reloading due to configuration syntax error"</span>
+        failure $<span class="token string">"not reloading <span class="token variable">$httpd</span> due to configuration syntax error"</span>
+    <span class="token keyword">else</span>
+        <span class="token comment" spellcheck="true"># Force LSB behaviour from killproc</span>
+        LSB<span class="token operator">=</span>1 killproc -p <span class="token variable">${pidfile}</span> <span class="token variable">$httpd</span> -HUP
+        RETVAL<span class="token operator">=</span><span class="token variable">$?</span>
+        <span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token variable">$RETVAL</span> -eq 7 <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+            failure $<span class="token string">"httpd shutdown"</span>
+        <span class="token keyword">fi</span>
+    <span class="token keyword">fi</span>
+    <span class="token keyword">echo</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true"># See how we were called.</span>
+<span class="token keyword">case</span> <span class="token string">"<span class="token variable">$1</span>"</span> <span class="token keyword">in</span>
+  start<span class="token punctuation">)</span>
+    start
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+  stop<span class="token punctuation">)</span>
+    stop
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+  status<span class="token punctuation">)</span>
+        status -p <span class="token variable">${pidfile}</span> <span class="token variable">$httpd</span>
+    RETVAL<span class="token operator">=</span><span class="token variable">$?</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+  restart<span class="token punctuation">)</span>
+    stop
+    start
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+  condrestart<span class="token operator">|</span>try-restart<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> status -p <span class="token variable">${pidfile}</span> <span class="token variable">$httpd</span> <span class="token operator">></span><span class="token operator">&amp;</span>/dev/null<span class="token punctuation">;</span> <span class="token keyword">then</span>
+        stop
+        start
+    <span class="token keyword">fi</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+  force-reload<span class="token operator">|</span>reload<span class="token punctuation">)</span>
+        reload
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+  graceful<span class="token operator">|</span><span class="token function">help</span><span class="token operator">|</span>configtest<span class="token operator">|</span>fullstatus<span class="token punctuation">)</span>
+    <span class="token variable">$apachectl</span> <span class="token variable">$@</span>
+    RETVAL<span class="token operator">=</span><span class="token variable">$?</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+  *<span class="token punctuation">)</span>
+    <span class="token keyword">echo</span> $<span class="token string">"Usage: <span class="token variable">$prog</span> {start|stop|restart|condrestart|try-restart|force-reload|reload|status|fullstatus|graceful|help|configtest}"</span>
+    RETVAL<span class="token operator">=</span>2
+esac
+
+<span class="token keyword">exit</span> <span class="token variable">$RETVAL</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Escape</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://escapelife.github.io/posts/d9cbdb18.html">https://escapelife.github.io/posts/d9cbdb18.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Escape</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Linux/">
+                                    <span class="chip bg-color">Linux</span>
+                                </a>
+                            
+                                <a href="/tags/Apache/">
+                                    <span class="chip bg-color">Apache</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/posts/9977be3.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/linux-apache-server-90.png" class="responsive-img" alt="Apache服务之CGI和FastCGI">
+                        
+                        <span class="card-title">Apache服务之CGI和FastCGI</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2018-12-19
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                    <a href="/tags/Apache/">
+                        <span class="chip bg-color">Apache</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/posts/d6395dd2.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/rsync-transfer-file.png" class="responsive-img" alt="搭建rsync服务来同步配置">
+                        
+                        <span class="card-title">搭建rsync服务来同步配置</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2018-12-16
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('4'),
+            headingSelector: 'h2, h3, h4, h5'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4, h5').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="764454432"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='none'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">2017</span>
+            <a href="/about" target="_blank">Escape</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">848.7k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2017";
+                    var startMonth = "2";
+                    var startDate = "14";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/EscapeLife" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wenpanhappy@126.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
