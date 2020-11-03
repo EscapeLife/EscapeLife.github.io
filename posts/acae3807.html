@@ -1,0 +1,1475 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Nginx服务之IO模型, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Nginx服务之IO模型 | Escape</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Escape</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Escape</div>
+        <div class="logo-desc">
+            
+            听摇滚,但不偏颇;也挺古典,但不安逸
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/EscapeLife" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/EscapeLife" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/linux-nginx-server-20.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Nginx服务之IO模型</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Linux/">
+                                <span class="chip bg-color">Linux</span>
+                            </a>
+                        
+                            <a href="/tags/Nginx/">
+                                <span class="chip bg-color">Nginx</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                Linux运维之路
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2019-01-07
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2020-11-03
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    5k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    17 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <blockquote>
+<p><strong>纸上得来终觉浅，绝知此事要躬行。</strong></p>
+</blockquote>
+<p><img src="/images/linux-nginx-server-20.jpg" alt="Nginx服务之IO模型"></p>
+<hr>
+<h2 id="1-多路处理模型"><a href="#1-多路处理模型" class="headerlink" title="1. 多路处理模型"></a>1. 多路处理模型</h2><blockquote>
+<p>多路处理模型(<code>MPM</code>)是将模块结构化，针对不同的环境进行优化。</p>
+</blockquote>
+<p><strong>Prefork</strong></p>
+<ul>
+<li>实现了一个非线程型的、预派生的<code>Web</code>服务器。</li>
+<li>一般适合波动比较大的网站，可以将最大进程数调大，应对突发的大访问量。但不能超过服务器的最大负荷，因为派生子进程也会消耗资源，可能会导致服务器的雪崩效应。</li>
+</ul>
+<p><strong>Worker</strong></p>
+<ul>
+<li>使用了多进程，每个进程再派生出多个线程，处理用户请求。</li>
+<li>一般适合波动不大的网站，指定启动的进程数和线程数，因为大访问的时候可能会超过设置的<code>m*n</code>数量导致后续响应无法处理。但是，比较合理的做法是对每个<code>worker</code>分配合理的负荷。</li>
+</ul>
+<p><strong>event</strong></p>
+<ul>
+<li><code>event</code>模型是<code>worker</code>模型的变种，产生多个进程，每个进程响应多个请求。</li>
+<li>它将服务器进程从连接中分离出来，在开启<code>KeepAlive</code>场合下相对于<code>worker</code>模式能够承受更高的并发负载。</li>
+</ul>
+<hr>
+<h2 id="2-常见-I-O-访问模型"><a href="#2-常见-I-O-访问模型" class="headerlink" title="2. 常见 I/O 访问模型"></a>2. 常见 I/O 访问模型</h2><p>当<code>I/O</code>发生的时候就会涉及到对象和步骤的操作，我们这里以网络<code>I/O</code>的<code>read</code>为例。它会涉及到两个系统对象，一个是调用这个<code>I/O</code>操作的进程或线程，另一个就是系统内核。当<code>read</code>操作发生时，第一步会等待数据准备(<strong>磁盘到内核内存</strong>)，第二步会将数据从内核拷贝到进程中去(<strong>内核内存到进程内存</strong>)。</p>
+<p><img src="/images/linux-nginx-server-21.png" alt="Nginx服务之IO模型"></p>
+<hr>
+<h3 id="2-1-古老模型"><a href="#2-1-古老模型" class="headerlink" title="2.1 古老模型"></a>2.1 古老模型</h3><p><strong>阻塞型 I/O 模型</strong></p>
+<p><img src="/images/linux-nginx-server-22.png" alt="Nginx服务之IO模型"></p>
+<ul>
+<li><strong>特点</strong><ul>
+<li>特点就是在<code>I/O</code>执行的两个阶段(等待数据和拷贝数据)中，应用进程都被阻塞。</li>
+</ul>
+</li>
+<li><strong>注意</strong><ul>
+<li>阻塞型<code>I/O</code>中一个进程通常只能处理单路<code>IO</code>请求，而<code>Prefork</code>和<code>Worker</code>则可以处理两路<code>I/O</code>，分别是磁盘<code>I/O</code>和网络<code>I/O</code>。</li>
+</ul>
+</li>
+<li><strong>举例：</strong>去饭馆吃面<ul>
+<li>第一阶段：每个人都需要站着排队等待面做好，啥都干不了。</li>
+<li>第二阶段：面做好了，自己需要端到自己的座位上吃面，依旧阻塞。</li>
+</ul>
+</li>
+</ul>
+<p><strong>非阻塞 I/O 模型</strong></p>
+<p><img src="/images/linux-nginx-server-23.png" alt="Nginx服务之IO模型"></p>
+<ul>
+<li><strong>特点</strong><ul>
+<li>非阻塞型<code>I/O</code>中，应用进程需要不断的主动询问第一阶段(<code>kernel</code>数据准备)是否完成</li>
+</ul>
+</li>
+<li><strong>注意</strong><ul>
+<li>应用进程在第一阶段虽然不用一直阻塞，但是需要不断的主动询问，基本属于忙等待状态。</li>
+<li>所以非阻塞型不一定比阻塞型就好，而且第二阶段还是都需要等待，即第二阶段一直阻塞。</li>
+</ul>
+</li>
+<li><strong>举例：</strong>去饭馆吃面<ul>
+<li>第一阶段：叫面之后，自己还是需要不断地询问面是否已经做好了</li>
+<li>第二阶段：面做好了，自己需要端到自己的座位上吃面，依旧阻塞。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-2-现代模型"><a href="#2-2-现代模型" class="headerlink" title="2.2 现代模型"></a>2.2 现代模型</h3><p><strong>复用 I/O 模型</strong></p>
+<p><img src="/images/linux-nginx-server-24.png" alt="Nginx服务之IO模型"></p>
+<ul>
+<li><strong>特点</strong><ul>
+<li>复用型<code>I/O</code>模型，即多路<code>I/O</code>模型。</li>
+<li>在应用进程和内核中间加一个代理，所有的请求都交给代理去处理，自己只需要等待结果就可以了。</li>
+</ul>
+</li>
+<li><strong>注意</strong><ul>
+<li>这个代理就是我们熟知的<code>select</code>和<code>poll</code>模型，两者基本没有区别，只是开发的厂商不一样而已。</li>
+<li>即使有了代理，依然还是阻塞的，因为有可能会阻塞在代理上，如<code>select</code>和<code>poll</code>。</li>
+<li>有了代理最大的好处是，即使阻塞了但代理还可以接受其他用户请求，第二阶段依旧阻塞。</li>
+<li>对性能没有太大的提升，因为还是阻塞的，只是能够处理其他请求而已。</li>
+</ul>
+</li>
+<li><strong>举例：</strong>去饭馆吃面<ul>
+<li>第一阶段：面馆有老板娘了，想吃面或吃菜都给老板娘说，自己不需要再不断地问了。</li>
+<li>第二阶段：但面或菜做好了，自己需要端到自己的座位上吃，老板娘只是收钱的，依旧阻塞。</li>
+</ul>
+</li>
+</ul>
+<p><strong>事件驱动 IO 模型</strong></p>
+<p><img src="/images/linux-nginx-server-25.png" alt="Nginx服务之IO模型"></p>
+<ul>
+<li><strong>特点</strong><ul>
+<li>在第一阶段中，应用进程只需要通知内核加载磁盘内容，加载完成之后，内核会通知已经完成。</li>
+</ul>
+</li>
+<li><strong>注意</strong><ul>
+<li>在第一阶段中，应用进程还可以响应其他请求，而不怕阻塞在代理上。</li>
+<li>在第二阶段，将数据从内核拷贝到进程中去，依旧处于阻塞的状态。</li>
+<li>可以理解为，一个进程可以响应多个请求，就是<code>event</code>模型能够处理多个请求的原因。</li>
+<li>这里的性能不一定非常好，因为<code>I/O</code>的第二阶段还是处于阻塞的状态。</li>
+</ul>
+</li>
+<li><strong>举例：</strong>去饭馆吃面<ul>
+<li>第一阶段：面馆聘请了多个服务员，想吃面或吃菜都给服务员说，自己等待的时候可以干别的事。</li>
+<li>第二阶段：但面或菜做好了，自己还是需要端到自己的座位上吃，因为服务只负责给后厨通知。</li>
+</ul>
+</li>
+</ul>
+<p><strong>异步 IO 模型</strong></p>
+<p><img src="/images/linux-nginx-server-26.png" alt="Nginx服务之IO模型"></p>
+<ul>
+<li><strong>特点</strong><ul>
+<li>异步<code>I/O</code>模型，应用进程只需要通知内核，内核默默的完成第一和第二阶段，完成之后通知进程已经完成了。</li>
+</ul>
+</li>
+<li><strong>注意</strong><ul>
+<li>真正的实现了不阻塞、不等待的模型。</li>
+<li>一个进程可以响应多个请求，性能极大地提升，如<code>AIO</code>。</li>
+</ul>
+</li>
+<li><strong>触发</strong><ul>
+<li>水平触发：完成之后通知应用进程，如果没有收到，会一直发送，直到处理位置，非常消耗资源。</li>
+<li>边缘触发：完成之后通知应用进程，只通知一次，如果没有处理则存放起来并告诉其位置，比较好的方式。</li>
+</ul>
+</li>
+<li><strong>举例：</strong>去饭馆吃面<ul>
+<li>第一阶段：面馆聘请了多个服务员，想吃面或吃菜都给服务员说，自己等待的时候可以干别的事。</li>
+<li>第二阶段：面或菜做好了，服务员会给你端到自己的座位上，自己只需要吃就可以了。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-3-select-和-epoll"><a href="#2-3-select-和-epoll" class="headerlink" title="2.3 select 和 epoll"></a>2.3 select 和 epoll</h3><ul>
+<li><p><strong><code>select</code>同步模型</strong></p>
+<ul>
+<li>每次调用<code>select</code>都需要把<code>fd</code>(文件句柄)集合从用户态拷贝到内核态，这个开销在<code>fd</code>很多时会很大</li>
+<li>同时每次调用<code>select</code>都需要在内核遍历传递进来的所有 fd，这个开销在 fd 很多时也会很大(自己定期去看)</li>
+<li><code>select</code>支持的文件描述符数量太小了，默认为<code>1024</code>，但可以自行调整，超过<code>1024</code>可能导致性能下降</li>
+</ul>
+</li>
+<li><p><strong><code>epoll</code>异步模型</strong></p>
+<ul>
+<li>支持一个进程打开大数量的<code>socket</code>描述符</li>
+<li><code>I/O</code>效率不随<code>fd</code>数量的增长而线性下降(不用自己定期去看)</li>
+<li>使用<code>mmap</code>加速内核与用户空间的消息传递</li>
+<li>支持边缘处罚和水平触发 080</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/linux-nginx-server-27.png" alt="Nginx服务之IO模型"></p>
+<hr>
+<h2 id="3-知识扩展"><a href="#3-知识扩展" class="headerlink" title="3. 知识扩展"></a>3. 知识扩展</h2><h3 id="3-1-为什么使用-HTTPS-呢？"><a href="#3-1-为什么使用-HTTPS-呢？" class="headerlink" title="3.1 为什么使用 HTTPS 呢？"></a>3.1 为什么使用 HTTPS 呢？</h3><blockquote>
+<p><strong>重点：主要是为了防止网站劫持</strong></p>
+</blockquote>
+<p>使用<code>HTTPS</code>的潮流应该是<code>Google</code>开创的，最初是为了<strong>安全性</strong>，同时会<strong>优先收录和展示</strong><code>HTTPS</code>的页面，于是就推动整个行业都在往<code>HTTPS</code>转换。毕竟<code>Google</code>是最大的流量入口，而且大家也好歹有点技术追求。国内的互联网公司可不是靠<code>Google</code>吃饭的，而是靠百度。而百度也是从<code>2015</code>年初才开始全面使用<code>HTTPS</code>协议。</p>
+<ul>
+<li><strong>防止链路层劫持</strong></li>
+</ul>
+<p>防止自家的<code>App</code>及网页被运营商劫持，被运营商“强行插入”广告甚至是竞争对手的广告。</p>
+<p>运营商劫持有两种，第一类是<strong>域名劫持</strong>或者<strong>污染 DNS</strong>，目标域名会被恶意地错误解析到其他<code>IP</code>地址，显示劫持者自己制定的广告内容或者直接造成用户无法正常使用服务；第二类是<strong>数据劫持</strong>，对于返回的内容会在其中强行插入弹窗或嵌入式广告等其他内容，达到做广告的目的。</p>
+<p>一般来说，各家互联网公司遭遇到的运营商劫持都是第二种，技术原理大致如下所述。通过劫持<code>HTTP</code>来实现，在用户与其目标网络服务所建立的专用数据通道中，监视数据信息进行匹配，就会在目标服务器返回的数据流中插入广告的网络数据报文。最后的结果是用户端程序，无论<code>PC</code>端还是移动端的网页或者客户端，只要是使用<code>HTTP</code>传递的数据都会被插入并以弹出广告的新窗口，然后彻底污染了原有页面。</p>
+<p><img src="/images/linux-nginx-server-27.jpg" alt="Nginx服务之IO模型"></p>
+<p>为了防止这种劫持，各大互联网公司只好选择<code>HTTPS</code>，进行数据加密而防止数据被篡改加入广告。关于<strong>HTTPS 的通信步骤</strong>，可以参考下图中的通信机制。</p>
+<p><img src="/images/linux-nginx-server-28.png" alt="Nginx服务之IO模型"></p>
+<p>既然<code>HTTPS</code>那么好，既安全而且又有这样的好处，为什么现在还有很多网站还是使用<code>HTTP</code>？原因大致有三个：一是开启  <code>HTTPS</code>要申购<code>SSL</code>证书，每年要在证书上花费不菲的费用；二是使用<code>HTTPS</code>服务器端需要占用<code>CPU</code>资源进行加解密操作；三是<code>HTTPS</code>协议的多几次握手，导致网络耗时变长。</p>
+<ul>
+<li><strong>手机和电脑的不断发展</strong></li>
+</ul>
+<p>随着手机和电脑的不断推陈出新，收的网络已经发展到了<code>4G+</code>，而电脑的配置更是不断提高。对于网站的安全做好的很有利的群众基础，使得很容易的支持<code>SSL</code>的加密算法，为用户提供更为安全的服务。</p>
+<hr>
+<h3 id="3-2-长连接好还是短连接好呢"><a href="#3-2-长连接好还是短连接好呢" class="headerlink" title="3.2 长连接好还是短连接好呢"></a>3.2 长连接好还是短连接好呢</h3><blockquote>
+<p><strong>重点：根据业务来决定</strong></p>
+</blockquote>
+<ul>
+<li><strong>HTTP 协议与 TCP/IP 协议的关系</strong></li>
+</ul>
+<p><code>HTTP</code>的长连接和短连接本质上是<code>TCP</code>长连接和短连接。<code>HTTP</code>属于应用层协议，在传输层使用<code>TCP</code>协议，在网络层使用<code>IP</code>协议。<code>IP</code>协议主要解决网络路由和寻址问题，<code>TCP</code>协议主要解决如何在<code>IP</code>层之上可靠的传递数据包，使在网络上的另一端收到发端发出的所有包，并且顺序与发出顺序一致。<code>TCP</code>有可靠，面向连接的特点。</p>
+<ul>
+<li><strong>理解 HTTP 协议是无状态的</strong></li>
+</ul>
+<p><code>HTTP</code>协议是无状态的，指的是协议对于事务处理没有记忆能力，服务器不知道客户端是什么状态。也就是说，打开一个服务器上的网页和你之前打开这个服务器上的网页之间没有任何联系。<code>HTTP</code>是一个无状态的面向连接的协议，无状态不代表<code>HTTP</code>不能保持<code>TCP</code>连接，更不能代表<code>HTTP</code>使用的是<code>UDP</code>协议。</p>
+<ul>
+<li><strong>TCP 连接的两个重要过程</strong></li>
+</ul>
+<p>当网络通信时采用<code>TCP</code>协议时，在真正的读写操作之前，<code>server</code>与<code>client</code>之间必须建立一个连接，当读写操作完成后，双方不再需要这个连接 时它们可以释放这个连接，连接的建立是需要三次握手的，而释放则需要<code>4</code>次握手，所以说每个连接的建立都是需要资源消耗和时间消耗的</p>
+<ul>
+<li><strong>HTTP 协议的长连接和短连接</strong></li>
+</ul>
+<p>在<code>HTTP/1.0</code>中，默认使用的是<strong>短连接</strong>。也就是说，浏览器和服务器每进行一次<code>HTTP</code>操作，就建立一次连接，但任务结束就中断连接。如果客户端浏览器访问的某个<code>HTML</code>或其他类型的<code>Web</code>页中包含有其他的<code>Web</code>资源，如<code>JavaScript</code>文件、图像文件、<code>CSS</code>文件等；当浏览器每遇到这样一个<code>Web</code>资源，就会建立一个<code>HTTP</code>会话。</p>
+<p>但从<code>HTTP/1.1</code>起，默认使用<strong>长连接</strong>，用以保持连接特性。使用长连接的<code>HTTP</code>协议，会在响应头有加入这行代码：</p>
+<pre class="line-numbers language-nginx"><code class="language-nginx">Connection<span class="token punctuation">:</span>keep<span class="token operator">-</span>alive<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>在使用长连接的情况下，当一个网页打开完成后，客户端和服务器之间用于传输<code>HTTP</code>数据的<code>TCP</code>连接不会关闭，如果客户端再次访问这个服务器上的网页，会继续使用这一条已经建立的连接。<code>Keep-Alive</code>不会永久保持连接，它有一个保持时间，可以在不同的服务器软件中设定这个时间。实现长连接要客户端和服务端都支持长连接。</p>
+<p><code>HTTP</code>协议的长连接和短连接，实质上是<code>TCP</code>协议的长连接和短连接。</p>
+<ul>
+<li><strong>TCP 的短连接</strong></li>
+</ul>
+<p><code>TCP</code>短连接的情况，<code>client</code>向<code>server</code>发起连接请求，<code>server</code>接受<code>client</code>的连接请求，双方建立连接。<code>client</code>向<code>server</code>发送消息，<code>server</code>回应<code>client</code>，然后一次读写就完成了，这时候双方任何一个都可以发起<code>close</code>操作，不过一般都是<code>client</code>先发起<code>close</code>操作。</p>
+<p>为什么呢？一般的<code>server</code>不会回复完<code>client</code>后立即关闭连接的，当然不排除有特殊的情况。从上面的描述看，短连接一般只会在<code>client/server</code>间传递一次读写操作。</p>
+<p>短连接的优点在于，管理起来比较简单，存在的连接都是有用的连接，不需要额外的控制手段。</p>
+<ul>
+<li><strong>TCP 的长连接</strong></li>
+</ul>
+<p><code>TCP</code>长连接的情况，<code>client</code>向<code>server</code>发起连接请求，<code>server</code>接受<code>client</code>的连接请求，双方建立连接。<code>client</code>与<code>server</code>完成一次读写之后，它们之间的连接并不会主动关闭，后续的读写操作会继续使用这个连接。</p>
+<p>首先说一下<code>TCP/IP</code>详解上讲到的<strong>TCP 保活</strong>功能，保活功能主要为服务器应用提供，服务器应用希望知道客户主机是否崩溃，从而可以代表客户使用资源。如果客户已经消失，使得服务器上保留一个半开放的连接，而服务器又在等待来自客户端的数据，则服务器将应远等待客户端的数据，保活功能就是试图在服务器端检测到这种半开放的连接。</p>
+<p>如果一个给定的连接在两小时内没有任何的动作，则服务器就向客户发一个探测报文段，客户主机必须处于以下<code>4</code>个状态其中任意的一种：</p>
+<ol>
+<li>客户主机依然正常运行，并且从服务器可达，服务器在两小时后将保活定时器复位。</li>
+<li>客户主机已经崩溃，并且关闭或者正在重新启动。在任何一种情况下，客户的<code>TCP</code>都没有响应。服务端将不能收到对探测的响应，并在<code>75</code>秒后超时。服务器总共发送<code>10</code>个这样的探测 ，每个间隔<code>75</code>秒。如果服务器没有收到一个响应，它就认为客户主机已经关闭并终止连接。</li>
+<li>客户主机崩溃并已经重新启动。服务器将收到一个对其保活探测的响应，这个响应是一个复位，使得服务器终止这个连接。</li>
+<li>客户机正常运行，但是服务器不可达，这种情况与<code>2</code>类似，<code>TCP</code>能发现的就是没有收到探查的响应。</li>
+</ol>
+<p>服务器通过判断客户端是否存活，来保证是否需要关闭保持的<code>TCP</code>连接状态。</p>
+<ul>
+<li><strong>长连接和短连接操作过程</strong></li>
+</ul>
+<p>短连接：建立连接——数据传输——关闭连接…建立连接——数据传输——关闭连接<br>长连接：建立连接——数据传输…（保持连接）…数据传输——关闭连接</p>
+<ul>
+<li><strong>长连接和短连接的优缺点</strong></li>
+</ul>
+<p>长连接可以省去较多的<code>TCP</code>建立和关闭的操作，减少资源的浪费，节约用户访问所消耗的时间。对于频繁请求资源的网站来说，较适用长连接。不过这里存在一个问题，<strong>存活功能</strong>的探测周期太长，还有就是它只是探测<code>TCP</code>连接的存活，属于比较斯文的做法，遇到恶意的连接时，保活功能就不够使了。</p>
+<p>在长连接的应用场景下，<code>client</code>端一般不会主动关闭它们之间的连接，<code>client</code>与<code>server</code>之间的连接如果一直不关闭的话，会存在一个问题，随着客户端连接越来越多，<code>server</code>早晚有扛不住的时候，这时候<code>server</code>端需要采取一些策略，如关闭一些长时间没有读写事件发生的连接，这样可以避免一些恶意连接导致<code>server</code>端服务受损；如果条件再允许就可以以客户端机器为颗粒度，限制每个客户端的最大长连接数，这样可以完全避免某个蛋疼的客户端连累后端服务。</p>
+<p>短连接对于服务器来说管理较为简单，存在的连接都是有用的连接，不需要额外的控制手段。但如果客户请求频繁，将在<code>TCP</code>的建立和关闭操作上浪费时间和带宽。</p>
+<p>长连接多用于操作频繁，点对点的通讯，而且连接数不能太多情况。如数据库的连接用长连接，如果用短连接频繁的通信会造成<code>socket</code>错误，而且频繁的<code>socket</code>创建也是对资源的浪费。而像<code>Web</code>网站的<code>http</code>服务一般都用短链接，因为长连接对于服务端来说会耗费一定的资源，而像<code>Web</code>网站这么频繁的成千上万甚至上亿客户端的连接用短连接会更省一些资源，如果用长连接，而且同时有成千上万的用户，如果每个用户都占用一个连接的话，那可想而知吧。所以并发量大，但每个用户无需频繁操作情况下需用短连好。</p>
+<p>长连接和短连接的产生在于<code>client</code>和<code>server</code>采取的关闭策略，具体的应用场景采用具体的策略，没有十全十美的选择，只有合适的选择。</p>
+<hr>
+<h3 id="3-3-企业带宽和家用带宽的区别？"><a href="#3-3-企业带宽和家用带宽的区别？" class="headerlink" title="3.3 企业带宽和家用带宽的区别？"></a>3.3 企业带宽和家用带宽的区别？</h3><p>带宽分为<strong>上行</strong>和<strong>下行</strong>，家用带宽的上下行不是对等，而且下行远远大于上行，会导致上传速度超级慢。而企业式的带宽，往往都是上下行都是对等，且高峰时期，家庭式的可能网速会减慢，但是企业的都是专线，不会减，但是企业级的费用比较高。</p>
+<p>企业带宽计费方式一般为<strong>去峰值</strong>和<strong>95 线</strong>两种，现在也有不同的计费方式，大同小异而已，都比较高。</p>
+<p><img src="/images/linux-nginx-server-29.png" alt="Nginx服务之IO模型"></p>
+<hr>
+<h3 id="3-4-pv、uv、qps、active-connection"><a href="#3-4-pv、uv、qps、active-connection" class="headerlink" title="3.4 pv、uv、qps、active connection"></a>3.4 pv、uv、qps、active connection</h3><p><strong>PV：页面访问量</strong></p>
+<ul>
+<li>按日计算全站的访问量</li>
+<li>一般指静态的页面，如首页、列表页、详情页</li>
+<li>大型网站一般在<code>1-10</code>亿</li>
+<li>网站一般分为三级分类：首页、列表页、详情页</li>
+</ul>
+<p><strong>UV：用户访问</strong></p>
+<ul>
+<li>独立<code>IP</code>地址</li>
+<li>用于表现网站的活跃度</li>
+<li>一般波动幅度不会很大且有相关性</li>
+</ul>
+<p><strong>active connection：活动连接数</strong></p>
+<ul>
+<li>访问网站页面时请求页面资源而建立的连接数</li>
+<li>这里就要考虑是否使用持久连接机制</li>
+<li>浏览器对用一个域名最大有<code>5-6</code>个并发连接，所有可以使用多域名加速网站</li>
+<li>想要查看网站的活动连接数需要在负载均衡层查看，通过<code>ss -s</code>命令查看</li>
+</ul>
+<p><strong>QPS：每秒的请求数量</strong></p>
+<ul>
+<li>请求一般为新的(<code>NEW</code>)请求，即新建立的请求</li>
+<li>一般日均<code>2</code>亿<code>PV</code>的网站，<code>active connection</code>为<code>100w</code>左右，<code>QPS</code>为<code>1-2w</code>左右</li>
+</ul>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Escape</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://escapelife.github.io/posts/acae3807.html">https://escapelife.github.io/posts/acae3807.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Escape</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Linux/">
+                                    <span class="chip bg-color">Linux</span>
+                                </a>
+                            
+                                <a href="/tags/Nginx/">
+                                    <span class="chip bg-color">Nginx</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/posts/839c90d8.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/linux-nginx-server-30.png" class="responsive-img" alt="Nginx服务之配置文件">
+                        
+                        <span class="card-title">Nginx服务之配置文件</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2019-01-09
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                    <a href="/tags/Nginx/">
+                        <span class="chip bg-color">Nginx</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/posts/689dbabf.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/linux-nginx-server-10.jpg" class="responsive-img" alt="Nginx服务之核心要点">
+                        
+                        <span class="card-title">Nginx服务之核心要点</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2019-01-05
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                    Linux运维之路
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Linux/">
+                        <span class="chip bg-color">Linux</span>
+                    </a>
+                    
+                    <a href="/tags/Nginx/">
+                        <span class="chip bg-color">Nginx</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('4'),
+            headingSelector: 'h2, h3, h4, h5'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4, h5').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="764454432"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='none'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">2017</span>
+            <a href="/about" target="_blank">Escape</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">873.8k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2017";
+                    var startMonth = "2";
+                    var startDate = "14";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/EscapeLife" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wenpanhappy@126.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
