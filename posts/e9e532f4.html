@@ -463,14 +463,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    82
+                    1.6k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    6 分
                 </div>
                 
 
@@ -490,6 +490,265 @@
 </blockquote>
 <p><img src="/images/database-sql-tool-useful-04.jpg" alt="SQL基础之数据更新"></p>
 <hr>
+<h2 id="1-数据的插入-——-insert"><a href="#1-数据的插入-——-insert" class="headerlink" title="1. 数据的插入 —— insert"></a>1. 数据的插入 —— insert</h2><ul>
+<li>使用<code>insert</code>语句插入数据，原则上<code>insert</code>语句每次执行一行数据的插入</li>
+<li>列名和值用逗号隔开，分别括在括号，这种形式称之为清单</li>
+<li>对表中所有列进行<code>insert</code>操作时可以省略表明后的列清单</li>
+<li>插入<code>null</code>时需要<code>valuse</code>自己的值清单中写入<code>null</code></li>
+<li>如果需要在插入的时候使用默认值，就必须在创建表的时候指定默认值，设置<code>default</code>约束来设定</li>
+<li>插入默认值可以通过两种方式实现，指定<code>default</code>关键字或者省略列清单</li>
+<li>使用<code>insert ... select</code>可以从其他表中复制数据</li>
+</ul>
+<hr>
+<h3 id="1-1-语法格式"><a href="#1-1-语法格式" class="headerlink" title="1.1 语法格式"></a>1.1 语法格式</h3><pre class="line-numbers language-sql"><code class="language-sql"><span class="token keyword">insert</span> <span class="token keyword">into</span> <span class="token operator">&lt;</span>表名<span class="token operator">></span> <span class="token punctuation">(</span>列<span class="token number">1</span><span class="token punctuation">,</span> 列<span class="token number">2</span><span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span> <span class="token keyword">values</span> <span class="token punctuation">(</span>值<span class="token number">1</span><span class="token punctuation">,</span> 值<span class="token number">2</span><span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<hr>
+<h3 id="1-2-基本插入方式"><a href="#1-2-基本插入方式" class="headerlink" title="1.2 基本插入方式"></a>1.2 基本插入方式</h3><ul>
+<li>原则上，执行一次<code>insert</code>语句会插入一行数据</li>
+<li>但是，有些关系型数据库中可以进行多行插入</li>
+<li>多行插入就是在 valuse 之后添加多组的值清单，以逗号分割</li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 实例插入数据(列清单和值清单)</span>
+mysql<span class="token operator">></span> <span class="token keyword">insert</span> <span class="token keyword">into</span> Shohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token punctuation">(</span>shohin_id<span class="token punctuation">,</span> shohin_mei<span class="token punctuation">,</span> shohin_bunrui<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> hanbai_tanka<span class="token punctuation">,</span> shiire_tanka<span class="token punctuation">,</span> torokubi<span class="token punctuation">)</span> <span class="token keyword">values</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token punctuation">(</span><span class="token string">'0009'</span><span class="token punctuation">,</span> <span class="token string">'鞋子'</span><span class="token punctuation">,</span> <span class="token string">'衣服'</span><span class="token punctuation">,</span> <span class="token number">1200</span><span class="token punctuation">,</span> <span class="token number">500</span><span class="token punctuation">,</span> <span class="token string">'2010-09-01'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="1-3-列清单省略的插入方式"><a href="#1-3-列清单省略的插入方式" class="headerlink" title="1.3 列清单省略的插入方式"></a>1.3 列清单省略的插入方式</h3><ul>
+<li>只需要将希望的数值进行插入，省略的列默认填充<code>null</code></li>
+<li>但是在定义表的时候，设定为<code>not null</code>的列必须存在</li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 省略列清单</span>
+mysql<span class="token operator">></span> <span class="token keyword">insert</span> <span class="token keyword">into</span> Shohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token punctuation">(</span>shohin_id<span class="token punctuation">,</span> shohin_mei<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> shohin_bunrui<span class="token punctuation">,</span> shiire_tanka<span class="token punctuation">)</span> <span class="token keyword">values</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token punctuation">(</span><span class="token string">'0009'</span><span class="token punctuation">,</span> <span class="token string">'鞋子'</span><span class="token punctuation">,</span> <span class="token string">'衣服'</span><span class="token punctuation">,</span> <span class="token number">500</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="1-4-插入-null"><a href="#1-4-插入-null" class="headerlink" title="1.4 插入 null"></a>1.4 插入 null</h3><ul>
+<li>在插入的时候，对于那些在列清单指定了的列，在<code>valuse</code>中不存在使用<code>null</code>填充</li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 插入null</span>
+mysql<span class="token operator">></span> <span class="token keyword">insert</span> <span class="token keyword">into</span> Shohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token punctuation">(</span>shohin_id<span class="token punctuation">,</span> shohin_mei<span class="token punctuation">,</span> shohin_bunrui<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> hanbai_tanka<span class="token punctuation">,</span> shiire_tanka<span class="token punctuation">,</span> torokubi<span class="token punctuation">)</span> <span class="token keyword">values</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token punctuation">(</span><span class="token string">'0010'</span><span class="token punctuation">,</span> <span class="token string">'鞋子'</span><span class="token punctuation">,</span> <span class="token string">'衣服'</span><span class="token punctuation">,</span> <span class="token boolean">null</span><span class="token punctuation">,</span> <span class="token number">500</span><span class="token punctuation">,</span> <span class="token boolean">null</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="1-5-插入默认值"><a href="#1-5-插入默认值" class="headerlink" title="1.5 插入默认值"></a>1.5 插入默认值</h3><ul>
+<li>通过显示方式设定默认值，使用 default 关键字</li>
+<li>通过隐藏方式插入默认值，对于列的值也进行省略</li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 通过显示方式设定默认值</span>
+mysql<span class="token operator">></span> <span class="token keyword">insert</span> <span class="token keyword">into</span> Shohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token punctuation">(</span>shohin_id<span class="token punctuation">,</span> shohin_mei<span class="token punctuation">,</span> shohin_bunrui<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> hanbai_tanka<span class="token punctuation">,</span> shiire_tanka<span class="token punctuation">,</span> torokubi<span class="token punctuation">)</span> <span class="token keyword">values</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token punctuation">(</span><span class="token string">'0009'</span><span class="token punctuation">,</span> <span class="token string">'鞋子'</span><span class="token punctuation">,</span> <span class="token string">'衣服'</span><span class="token punctuation">,</span> <span class="token keyword">default</span><span class="token punctuation">,</span> <span class="token number">500</span><span class="token punctuation">,</span> <span class="token string">'2010-09-01'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true"># 通过隐藏方式插入默认值</span>
+mysql<span class="token operator">></span> <span class="token keyword">insert</span> <span class="token keyword">into</span> Shohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token punctuation">(</span>shohin_id<span class="token punctuation">,</span> shohin_mei<span class="token punctuation">,</span> shohin_bunrui<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> shiire_tanka<span class="token punctuation">,</span> torokubi<span class="token punctuation">)</span> <span class="token keyword">values</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token punctuation">(</span><span class="token string">'0009'</span><span class="token punctuation">,</span> <span class="token string">'鞋子'</span><span class="token punctuation">,</span> <span class="token string">'衣服'</span><span class="token punctuation">,</span> <span class="token number">500</span><span class="token punctuation">,</span> <span class="token string">'2010-09-01'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="1-6-从其他表中复制数据"><a href="#1-6-从其他表中复制数据" class="headerlink" title="1.6 从其他表中复制数据"></a>1.6 从其他表中复制数据</h3><ul>
+<li><p><strong>格式语法</strong></p>
+<ul>
+<li><code>insert ... select ...</code></li>
+</ul>
+</li>
+<li><p><strong>备份表中数据</strong></p>
+</li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 创建复制表ShohinCopy</span>
+mysql<span class="token operator">></span> <span class="token keyword">create</span> <span class="token keyword">table</span> ShohinCopy<span class="token punctuation">(</span>
+    <span class="token operator">-</span><span class="token operator">></span> shohin_id char<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">)</span> <span class="token operator">not</span> <span class="token boolean">null</span><span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> shohin_mei <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span> <span class="token operator">not</span> <span class="token boolean">null</span><span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> shohin_bunrui <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">)</span> <span class="token operator">not</span> <span class="token boolean">null</span><span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> hanbai_tanka <span class="token keyword">integer</span><span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> shiire_tanka <span class="token keyword">integer</span><span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> torokubi <span class="token keyword">date</span><span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">primary</span> <span class="token keyword">key</span> <span class="token punctuation">(</span>shohin_id<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Query OK<span class="token punctuation">,</span> <span class="token number">0</span> <span class="token keyword">rows</span> affected <span class="token punctuation">(</span><span class="token number">0.01</span> sec<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 复制Shohin中的数据到ShohinCopy表中</span>
+mysql<span class="token operator">></span> <span class="token keyword">insert</span> <span class="token keyword">into</span> ShohinCopy
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token punctuation">(</span>shohin_id<span class="token punctuation">,</span> shohin_mei<span class="token punctuation">,</span> shohin_bunrui<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> hanbai_tanka<span class="token punctuation">,</span> shiire_tanka<span class="token punctuation">,</span> torokubi<span class="token punctuation">)</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">select</span> shohin_id<span class="token punctuation">,</span> shohin_mei<span class="token punctuation">,</span> shohin_bunrui<span class="token punctuation">,</span> hanbai_tanka<span class="token punctuation">,</span>shiire_tanka<span class="token punctuation">,</span> torokubi
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> Shohin<span class="token punctuation">;</span>
+Query OK<span class="token punctuation">,</span> <span class="token number">8</span> <span class="token keyword">rows</span> affected <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span>
+Records: <span class="token number">8</span>  Duplicates: <span class="token number">0</span>  <span class="token keyword">Warnings</span>: <span class="token number">0</span>
+
+<span class="token comment" spellcheck="true"># 使用如下语句进行查询</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> ShohinCopy<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>对数据处理之后存放</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 创建新表</span>
+mysql<span class="token operator">></span> <span class="token keyword">create</span> <span class="token keyword">table</span> ShohinBunrui
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token punctuation">(</span>shohin_bunrui <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">)</span> <span class="token operator">not</span> <span class="token boolean">null</span><span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> sum_hanbai_tanka <span class="token keyword">integer</span><span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> sum_shiire_tanka <span class="token keyword">integer</span><span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">primary</span> <span class="token keyword">key</span> <span class="token punctuation">(</span>shohin_bunrui<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Query OK<span class="token punctuation">,</span> <span class="token number">0</span> <span class="token keyword">rows</span> affected <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 插入数据库</span>
+mysql<span class="token operator">></span> <span class="token keyword">insert</span> <span class="token keyword">into</span> ShohinBunrui <span class="token punctuation">(</span>
+    <span class="token operator">-</span><span class="token operator">></span> shohin_bunrui<span class="token punctuation">,</span> sum_hanbai_tanka<span class="token punctuation">,</span> sum_shiire_tanka<span class="token punctuation">)</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">select</span> shohin_bunrui<span class="token punctuation">,</span> <span class="token function">sum</span><span class="token punctuation">(</span>hanbai_tanka<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">sum</span><span class="token punctuation">(</span>shiire_tanka<span class="token punctuation">)</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> Shohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">group</span> <span class="token keyword">by</span> shohin_bunrui<span class="token punctuation">;</span>
+Query OK<span class="token punctuation">,</span> <span class="token number">3</span> <span class="token keyword">rows</span> affected <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span>
+Records: <span class="token number">3</span>  Duplicates: <span class="token number">0</span>  <span class="token keyword">Warnings</span>: <span class="token number">0</span>
+
+<span class="token comment" spellcheck="true"># 查看结果</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> ShohinBunrui<span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------------+------------------+------------------+</span>
+<span class="token operator">|</span> shohin_bunrui <span class="token operator">|</span> sum_hanbai_tanka <span class="token operator">|</span> sum_shiire_tanka <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------------+------------------+------------------+</span>
+<span class="token operator">|</span> 衣服        <span class="token operator">|</span>             <span class="token number">5000</span> <span class="token operator">|</span>             <span class="token number">3300</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 办公用品  <span class="token operator">|</span>              <span class="token number">600</span> <span class="token operator">|</span>              <span class="token number">320</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 厨房用具  <span class="token operator">|</span>            <span class="token number">11180</span> <span class="token operator">|</span>             <span class="token number">8590</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------------+------------------+------------------+</span>
+<span class="token number">3</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="2-数据的删除-——-drop-和-delete"><a href="#2-数据的删除-——-drop-和-delete" class="headerlink" title="2. 数据的删除 —— drop 和 delete"></a>2. 数据的删除 —— drop 和 delete</h2><h3 id="2-1-数据删除分类"><a href="#2-1-数据删除分类" class="headerlink" title="2.1 数据删除分类"></a>2.1 数据删除分类</h3><ul>
+<li><code>drop</code>语句可以将表完全删除</li>
+<li><code>delete</code>语句会留下表而删除表中的数据</li>
+</ul>
+<hr>
+<h3 id="2-2-delete-基本语法"><a href="#2-2-delete-基本语法" class="headerlink" title="2.2 delete 基本语法"></a>2.2 delete 基本语法</h3><ul>
+<li><strong>语法格式</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token keyword">delete</span> <span class="token keyword">from</span> <span class="token operator">&lt;</span>表名<span class="token operator">></span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ul>
+<li><strong>实例演示</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 我们来删除之前创建的ShohinBunrui的表</span>
+mysql<span class="token operator">></span> <span class="token keyword">delete</span> <span class="token keyword">from</span> ShohinBunrui；
+
+mysql<span class="token operator">></span> <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> ShohinBunrui<span class="token punctuation">;</span>
+Empty <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-3-指定删除对象的-delete-语句"><a href="#2-3-指定删除对象的-delete-语句" class="headerlink" title="2.3 指定删除对象的 delete 语句"></a>2.3 指定删除对象的 delete 语句</h3><ul>
+<li><strong>语法格式</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql">mysql<span class="token operator">></span> <span class="token keyword">delete</span> <span class="token keyword">from</span> <span class="token operator">&lt;</span>表名<span class="token operator">></span> <span class="token keyword">where</span> <span class="token operator">&lt;</span>条件<span class="token operator">></span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ul>
+<li><strong>实例演示</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 删除销售单价大于等于4000的数据</span>
+<span class="token keyword">delete</span> <span class="token keyword">from</span> Shohin <span class="token keyword">where</span> hanbai_tanka <span class="token operator">>=</span> <span class="token number">4000</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="3-数据的更新-——-update"><a href="#3-数据的更新-——-update" class="headerlink" title="3. 数据的更新 —— update"></a>3. 数据的更新 —— update</h2><h3 id="3-1-基本语法"><a href="#3-1-基本语法" class="headerlink" title="3.1 基本语法"></a>3.1 基本语法</h3><ul>
+<li><strong>语法格式</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql">mysql<span class="token operator">></span> <span class="token keyword">update</span> <span class="token operator">&lt;</span>表名<span class="token operator">></span> <span class="token keyword">set</span> <span class="token operator">&lt;</span>列名<span class="token operator">></span> <span class="token operator">=</span> <span class="token operator">&lt;</span>表达式<span class="token operator">></span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ul>
+<li><strong>实例演示</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql">mysql<span class="token operator">></span> <span class="token keyword">update</span> <span class="token operator">&lt;</span>表名<span class="token operator">></span> <span class="token keyword">set</span> <span class="token operator">&lt;</span>列名<span class="token operator">></span> <span class="token operator">=</span> <span class="token operator">&lt;</span>表达式<span class="token operator">></span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<hr>
+<h3 id="3-2-指定条件的-update-语句"><a href="#3-2-指定条件的-update-语句" class="headerlink" title="3.2 指定条件的 update 语句"></a>3.2 指定条件的 update 语句</h3><ul>
+<li><strong>语法格式</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql">mysql<span class="token operator">></span> <span class="token keyword">update</span> <span class="token operator">&lt;</span>表名<span class="token operator">></span> <span class="token keyword">set</span> <span class="token operator">&lt;</span>列名<span class="token operator">></span> <span class="token operator">=</span> <span class="token operator">&lt;</span>表达式<span class="token operator">></span> <span class="token keyword">where</span> <span class="token operator">&lt;</span>条件<span class="token operator">></span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ul>
+<li><strong>实例演示</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 将商品种类为厨房用具的记录的销售单位更新为原本的10倍</span>
+mysql<span class="token operator">></span> <span class="token keyword">update</span> Shohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">set</span> hanbai_tanka <span class="token operator">=</span> hanbai_tanka <span class="token operator">*</span> <span class="token number">10</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> shohin_tanka <span class="token operator">=</span> <span class="token string">'厨房用具'</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-3-使用-null-进行更新"><a href="#3-3-使用-null-进行更新" class="headerlink" title="3.3 使用 null 进行更新"></a>3.3 使用 null 进行更新</h3><ul>
+<li>使用<code>update</code>语句可以将值清空为<code>null</code>，但是只限制于未设置<code>not null</code>的约束列</li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 将商品编号为0008的数据的登记日期更新为null</span>
+mysql<span class="token operator">></span> <span class="token keyword">update</span> Shohin <span class="token keyword">set</span> torokubi <span class="token operator">=</span> <span class="token boolean">null</span> <span class="token keyword">where</span> shohin_id <span class="token operator">=</span> <span class="token string">'0008'</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-4-多列更新"><a href="#3-4-多列更新" class="headerlink" title="3.4 多列更新"></a>3.4 多列更新</h3><pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 能够正确执行的繁杂的update语句</span>
+mysql<span class="token operator">></span> <span class="token keyword">update</span> Shohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">set</span> hanbai_bunrui <span class="token operator">=</span> hanbai_bunrui <span class="token operator">*</span> <span class="token number">10</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> shohin_bunrui <span class="token operator">=</span> <span class="token string">'厨房用具'</span><span class="token punctuation">;</span>
+
+mysql<span class="token operator">></span> <span class="token keyword">update</span> Shohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">set</span> shiire_bunrui <span class="token operator">=</span> shiire_bunrui <span class="token operator">/</span> <span class="token number">2</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> shiire_bunrui <span class="token operator">=</span> <span class="token string">'厨房用具'</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 优化1</span>
+mysql<span class="token operator">></span> <span class="token keyword">update</span> Shohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">set</span> hanbai_bunrui <span class="token operator">=</span> hanbai_bunrui <span class="token operator">*</span> <span class="token number">10</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">set</span> shiire_bunrui <span class="token operator">=</span> shiire_bunrui <span class="token operator">/</span> <span class="token number">2</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> shohin_bunrui <span class="token operator">=</span> <span class="token string">'厨房用具'</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 优化2</span>
+mysql<span class="token operator">></span> <span class="token keyword">update</span> Shohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">set</span> <span class="token punctuation">(</span>hanbai_bunrui<span class="token punctuation">,</span> shiire_bunrui<span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token punctuation">(</span>hanbai_bunrui <span class="token operator">*</span> <span class="token number">10</span><span class="token punctuation">,</span> shiire_bunrui <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">)</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> shohin_bunrui <span class="token operator">=</span> <span class="token string">'厨房用具'</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="4-事务"><a href="#4-事务" class="headerlink" title="4. 事务"></a>4. 事务</h2><ul>
+<li>失误就是需要在同一个处理单元中执行的一系列更新处理的集合</li>
+</ul>
+<h3 id="4-1-创建事务"><a href="#4-1-创建事务" class="headerlink" title="4.1 创建事务"></a>4.1 创建事务</h3><ul>
+<li><p><strong>注意事项</strong></p>
+<ul>
+<li>不用的关系型数据库会没有事务开始语句的，但是结束语句都必须有</li>
+</ul>
+</li>
+<li><p><strong>语法格式</strong></p>
+</li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql">事务开始语句；
+    DML语句<span class="token number">1</span>；
+    DML语句<span class="token number">2</span>；
+    DML语句<span class="token number">3</span>；
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+事务结束语句（<span class="token keyword">commit</span>或者<span class="token keyword">rollback</span>）<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>实例演示</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token keyword">begin</span> <span class="token keyword">transaction</span><span class="token punctuation">;</span>
+    <span class="token keyword">update</span> Shohin
+    <span class="token keyword">set</span> hanbai_bunrui <span class="token operator">=</span> hanbai_bunrui <span class="token operator">*</span> <span class="token number">10</span>
+    <span class="token keyword">where</span> shohin_bunrui <span class="token operator">=</span> <span class="token string">'厨房用具'</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">update</span> Shohin
+    <span class="token keyword">set</span> hanbai_bunrui <span class="token operator">=</span> hanbai_bunrui <span class="token operator">*</span> <span class="token number">10</span>
+    <span class="token keyword">where</span> shohin_bunrui <span class="token operator">=</span> <span class="token string">'厨房用具'</span><span class="token punctuation">;</span>
+<span class="token keyword">commit</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-2-事务结束"><a href="#2-2-事务结束" class="headerlink" title="2.2 事务结束"></a>2.2 事务结束</h3><p><strong>commit</strong></p>
+<ul>
+<li>提交处理</li>
+<li>一旦提交，就无法恢复道是无开始前的状态了</li>
+</ul>
+<p><strong>roolback</strong></p>
+<ul>
+<li>取消处理</li>
+<li>一旦回滚，数据库就会恢复到事务开始之前的状态</li>
+</ul>
+<p><strong>事务处理方式</strong></p>
+<ul>
+<li><strong>方式一</strong>：每条<code>SQL</code>语句就是一个事务（自动提交模式）</li>
+<li><strong>方式二</strong>：知道用户执行<code>commit</code>或者<code>rollback</code>为止算作一个事务</li>
+<li><code>MySQL</code>、<code>SQL Server</code>和<code>PostgreSQL</code>为方式一，<code>Oracle</code>为方式二</li>
+</ul>
+<hr>
+<h3 id="2-3-ACID-特性"><a href="#2-3-ACID-特性" class="headerlink" title="2.3 ACID 特性"></a>2.3 ACID 特性</h3><ul>
+<li><strong>原子性</strong> —— <code>A</code>tomicity<ul>
+<li>原子性是指在事务结束时，其中所包含的更新处理要么全部执行，要么完全不执行的特性</li>
+</ul>
+</li>
+<li><strong>一致性</strong> —— <code>C</code>onsistency<ul>
+<li>一致性指的是事务中包括的处理，要满足数据库提前设置的约束，如主键约束或者<code>not null</code>约束等</li>
+</ul>
+</li>
+<li><strong>隔离性</strong> —— <code>I</code>solation<ul>
+<li>隔离性值的是保证不用食物之间互相不干扰的特性</li>
+</ul>
+</li>
+<li><strong>持久性</strong> —— <code>D</code>urability<ul>
+<li>持久性指的是事务一旦结束，<code>DBMS</code>会保证该时刻点的数据状态得以保存的特性</li>
+</ul>
+</li>
+</ul>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -744,12 +1003,12 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/posts/b6944d64.html">
+                <a href="/posts/74b25851.html">
                     <div class="card-image">
                         
-                        <img src="/images/docker-swarm-cluster.jpg" class="responsive-img" alt="Docker利器之Swarm项目">
+                        <img src="/images/database-sql-tool-useful-05.jpg" class="responsive-img" alt="SQL基础之复杂查询">
                         
-                        <span class="card-title">Docker利器之Swarm项目</span>
+                        <span class="card-title">SQL基础之复杂查询</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -760,14 +1019,14 @@
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2019-02-14
+                            <i class="far fa-clock fa-fw icon-date"></i>2019-02-06
                         </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Docker学习攻略/" class="post-category">
-                                    Docker学习攻略
+                            <a href="/categories/Database浅入浅出/" class="post-category">
+                                    Database浅入浅出
                                 </a>
                             
                             
@@ -777,8 +1036,8 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Docker/">
-                        <span class="chip bg-color">Docker</span>
+                    <a href="/tags/SQL/">
+                        <span class="chip bg-color">SQL</span>
                     </a>
                     
                 </div>
@@ -1033,7 +1292,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">915.2k</span>&nbsp;字
+                class="white-color">919k</span>&nbsp;字
             
             
             
