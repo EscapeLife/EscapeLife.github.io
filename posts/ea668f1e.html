@@ -463,14 +463,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    82
+                    3.1k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    15 分
                 </div>
                 
 
@@ -488,8 +488,821 @@
                 <blockquote>
 <p><strong>本文主要是阅读《SQL 基础教程》这本书总结而来，有需求的话可以阅读原著。</strong></p>
 </blockquote>
-<p><img src="/images/database-sql-tool-useful-08.jpg" alt="SQL基础之函数和谓词"></p>
+<p><img src="/images/database-sql-tool-useful-06.jpg" alt="SQL基础之函数和谓词"></p>
 <hr>
+<h2 id="1-各种各样的函数"><a href="#1-各种各样的函数" class="headerlink" title="1. 各种各样的函数"></a>1. 各种各样的函数</h2><ul>
+<li>算术函数</li>
+<li>字符串函数</li>
+<li>日期函数</li>
+<li>转换函数</li>
+<li>聚合函数</li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 创建数据库</span>
+mysql<span class="token operator">></span> <span class="token keyword">create</span> <span class="token keyword">table</span> SampleMath<span class="token punctuation">(</span>
+    <span class="token operator">-</span><span class="token operator">></span> m <span class="token keyword">numeric</span> <span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> n <span class="token keyword">integer</span><span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> p <span class="token keyword">integer</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Query OK<span class="token punctuation">,</span> <span class="token number">0</span> <span class="token keyword">rows</span> affected <span class="token punctuation">(</span><span class="token number">0.01</span> sec<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 数据库中的内容</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> SampleMath<span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------+------+------+</span>
+<span class="token operator">|</span> m       <span class="token operator">|</span> n    <span class="token operator">|</span> p    <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------+------+------+</span>
+<span class="token operator">|</span> <span class="token number">500.000</span> <span class="token operator">|</span>    <span class="token number">0</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">180.000</span> <span class="token operator">|</span>    <span class="token number">0</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token number">7</span> <span class="token operator">|</span>    <span class="token number">3</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token number">5</span> <span class="token operator">|</span>    <span class="token number">2</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token number">4</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>   <span class="token number">8.000</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token number">3</span> <span class="token operator">|</span>
+<span class="token operator">|</span>   <span class="token number">2.270</span> <span class="token operator">|</span>    <span class="token number">1</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>   <span class="token number">5.555</span> <span class="token operator">|</span>    <span class="token number">2</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token number">1</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>   <span class="token number">8.760</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------+------+------+</span>
+<span class="token number">11</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="1-1-算术函数"><a href="#1-1-算术函数" class="headerlink" title="1.1 算术函数"></a>1.1 算术函数</h3><ul>
+<li><code>+</code> ==&gt; 加法</li>
+<li><code>-</code> ==&gt; 减法</li>
+<li><code>*</code> ==&gt; 乘法</li>
+<li><code>/</code> ==&gt; 除法</li>
+</ul>
+<hr>
+<ul>
+<li><strong><code>abs</code> ==&gt; 绝对值</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 格式</span>
+abs<span class="token punctuation">(</span>数值<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 实例</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> m<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> abs<span class="token punctuation">(</span>m<span class="token punctuation">)</span> <span class="token keyword">as</span> abs_col
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> SampleMath<span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------+---------+</span>
+<span class="token operator">|</span> m       <span class="token operator">|</span> abs_col <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------+---------+</span>
+<span class="token operator">|</span> <span class="token number">500.000</span> <span class="token operator">|</span> <span class="token number">500.000</span> <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">180.000</span> <span class="token operator">|</span> <span class="token number">180.000</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>   <span class="token number">8.000</span> <span class="token operator">|</span>   <span class="token number">8.000</span> <span class="token operator">|</span>
+<span class="token operator">|</span>   <span class="token number">2.270</span> <span class="token operator">|</span>   <span class="token number">2.270</span> <span class="token operator">|</span>
+<span class="token operator">|</span>   <span class="token number">5.555</span> <span class="token operator">|</span>   <span class="token number">5.555</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>   <span class="token number">8.760</span> <span class="token operator">|</span>   <span class="token number">8.760</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------+---------+</span>
+<span class="token number">11</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong><code>mod</code> ==&gt; 求余</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 格式</span>
+mod<span class="token punctuation">(</span>被除数，除数<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 实例</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> n<span class="token punctuation">,</span>p<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> mod<span class="token punctuation">(</span>n<span class="token punctuation">,</span>p<span class="token punctuation">)</span> <span class="token keyword">as</span> mod_col
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> SampleMath<span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------+------+---------+</span>
+<span class="token operator">|</span> n    <span class="token operator">|</span> p    <span class="token operator">|</span> mod_col <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------+------+---------+</span>
+<span class="token operator">|</span>    <span class="token number">0</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token number">0</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token number">7</span> <span class="token operator">|</span>    <span class="token number">3</span> <span class="token operator">|</span>       <span class="token number">1</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token number">5</span> <span class="token operator">|</span>    <span class="token number">2</span> <span class="token operator">|</span>       <span class="token number">1</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token number">4</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token number">3</span> <span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token number">1</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token number">2</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token number">1</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------+------+---------+</span>
+<span class="token number">11</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong><code>round</code> ==&gt; 四舍五入</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 格式</span>
+<span class="token function">round</span><span class="token punctuation">(</span>对象数值，保留小数的位数<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 实例</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> m<span class="token punctuation">,</span>n<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token function">round</span><span class="token punctuation">(</span>m<span class="token punctuation">,</span>n<span class="token punctuation">)</span> <span class="token keyword">as</span> round_col
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> SampleMath<span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------+------+-----------+</span>
+<span class="token operator">|</span> m       <span class="token operator">|</span> n    <span class="token operator">|</span> round_col <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------+------+-----------+</span>
+<span class="token operator">|</span> <span class="token number">500.000</span> <span class="token operator">|</span>    <span class="token number">0</span> <span class="token operator">|</span>   <span class="token number">500.000</span> <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">180.000</span> <span class="token operator">|</span>    <span class="token number">0</span> <span class="token operator">|</span>   <span class="token number">180.000</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>      <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token number">7</span> <span class="token operator">|</span>      <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token number">5</span> <span class="token operator">|</span>      <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token number">4</span> <span class="token operator">|</span>      <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>   <span class="token number">8.000</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>      <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>   <span class="token number">2.270</span> <span class="token operator">|</span>    <span class="token number">1</span> <span class="token operator">|</span>     <span class="token number">2.300</span> <span class="token operator">|</span>
+<span class="token operator">|</span>   <span class="token number">5.555</span> <span class="token operator">|</span>    <span class="token number">2</span> <span class="token operator">|</span>     <span class="token number">5.560</span> <span class="token operator">|</span>
+<span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>    <span class="token number">1</span> <span class="token operator">|</span>      <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span>   <span class="token number">8.760</span> <span class="token operator">|</span> <span class="token boolean">NULL</span> <span class="token operator">|</span>      <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------+------+-----------+</span>
+<span class="token number">11</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="1-2-字符串函数"><a href="#1-2-字符串函数" class="headerlink" title="1.2 字符串函数"></a>1.2 字符串函数</h3><pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 创建数据库</span>
+mysql<span class="token operator">></span> <span class="token keyword">create</span> <span class="token keyword">table</span> SampleStr<span class="token punctuation">(</span>
+    <span class="token operator">-</span><span class="token operator">></span> str1 <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">40</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> str2 <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">40</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> str3 <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">40</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Query OK<span class="token punctuation">,</span> <span class="token number">0</span> <span class="token keyword">rows</span> affected <span class="token punctuation">(</span><span class="token number">0.01</span> sec<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 数据库中的内容</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> SampleStr<span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+--------+--------+</span>
+<span class="token operator">|</span> str1      <span class="token operator">|</span> str2   <span class="token operator">|</span> str3   <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+--------+--------+</span>
+<span class="token operator">|</span> opx       <span class="token operator">|</span> rt     <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">abc</span>       <span class="token operator">|</span> <span class="token number">def</span>    <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span>
+<span class="token operator">|</span> 山田    <span class="token operator">|</span> 太郎 <span class="token operator">|</span> 是我 <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">aaa</span>       <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token boolean">NULL</span>      <span class="token operator">|</span> xyz    <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span>
+<span class="token operator">|</span> @<span class="token operator">!</span><span class="token comment" spellcheck="true">#$%     | NULL   | NULL   |</span>
+<span class="token operator">|</span> ABC       <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span>
+<span class="token operator">|</span> aBC       <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">abc</span>太郎 <span class="token operator">|</span> <span class="token number">abc</span>    <span class="token operator">|</span> ABC    <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">bcdefabc</span>  <span class="token operator">|</span> <span class="token number">abc</span>    <span class="token operator">|</span> ABC    <span class="token operator">|</span>
+<span class="token operator">|</span> micmic    <span class="token operator">|</span> i      <span class="token operator">|</span> I      <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+--------+--------+</span>
+<span class="token number">11</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<ul>
+<li><strong><code>||</code> ==&gt; 拼接</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 语法</span>
+字符串<span class="token number">1</span> <span class="token operator">||</span> 字符串<span class="token number">2</span>
+
+<span class="token comment" spellcheck="true"># 实例</span>
+<span class="token comment" spellcheck="true"># 因为各种数据库中的函数定义的方法也有所不同</span>
+
+<span class="token comment" spellcheck="true"># Mysql</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> str1<span class="token punctuation">,</span> str2<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> concat<span class="token punctuation">(</span>str1<span class="token punctuation">,</span> str2<span class="token punctuation">)</span> <span class="token keyword">as</span> str_concat
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> SampleStr<span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+--------+--------------+</span>
+<span class="token operator">|</span> str1      <span class="token operator">|</span> str2   <span class="token operator">|</span> str_concat   <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+--------+--------------+</span>
+<span class="token operator">|</span> opx       <span class="token operator">|</span> rt     <span class="token operator">|</span> opxrt        <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">abc</span>       <span class="token operator">|</span> <span class="token number">def</span>    <span class="token operator">|</span> <span class="token number">abcdef</span>       <span class="token operator">|</span>
+<span class="token operator">|</span> 山田    <span class="token operator">|</span> 太郎 <span class="token operator">|</span> 山田太郎 <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">aaa</span>       <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>         <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token boolean">NULL</span>      <span class="token operator">|</span> xyz    <span class="token operator">|</span> <span class="token boolean">NULL</span>         <span class="token operator">|</span>
+<span class="token operator">|</span> @<span class="token operator">!</span><span class="token comment" spellcheck="true">#$%     | NULL   | NULL         |</span>
+<span class="token operator">|</span> ABC       <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>         <span class="token operator">|</span>
+<span class="token operator">|</span> aBC       <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>         <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">abc</span>太郎 <span class="token operator">|</span> <span class="token number">abc</span>    <span class="token operator">|</span> <span class="token number">abc</span>太郎<span class="token number">abc</span> <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">bcdefabc</span>  <span class="token operator">|</span> <span class="token number">abc</span>    <span class="token operator">|</span> <span class="token number">bcdefabcabc</span>  <span class="token operator">|</span>
+<span class="token operator">|</span> micmic    <span class="token operator">|</span> i      <span class="token operator">|</span> micmici      <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+--------+--------------+</span>
+<span class="token number">11</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># PostgreSQL/Oracle/DB2</span>
+mysql<span class="token operator">></span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> str1<span class="token punctuation">,</span> str2<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> str1 <span class="token operator">||</span> str2 <span class="token keyword">as</span> str_concat
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> SampleStr<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true"># Mysql</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> str1<span class="token punctuation">,</span> str2<span class="token punctuation">,</span> str3<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> concat<span class="token punctuation">(</span>str1<span class="token punctuation">,</span> str2<span class="token punctuation">,</span> str3<span class="token punctuation">)</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> SampleStr<span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+--------+--------+--------------------------+</span>
+<span class="token operator">|</span> str1      <span class="token operator">|</span> str2   <span class="token operator">|</span> str3   <span class="token operator">|</span> concat<span class="token punctuation">(</span>str1<span class="token punctuation">,</span> str2<span class="token punctuation">,</span> str3<span class="token punctuation">)</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+--------+--------+--------------------------+</span>
+<span class="token operator">|</span> opx       <span class="token operator">|</span> rt     <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>                     <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">abc</span>       <span class="token operator">|</span> <span class="token number">def</span>    <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>                     <span class="token operator">|</span>
+<span class="token operator">|</span> 山田    <span class="token operator">|</span> 太郎 <span class="token operator">|</span> 是我 <span class="token operator">|</span> 山田太郎是我       <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">aaa</span>       <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>                     <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token boolean">NULL</span>      <span class="token operator">|</span> xyz    <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>                     <span class="token operator">|</span>
+<span class="token operator">|</span> @<span class="token operator">!</span><span class="token comment" spellcheck="true">#$%     | NULL   | NULL   | NULL                     |</span>
+<span class="token operator">|</span> ABC       <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>                     <span class="token operator">|</span>
+<span class="token operator">|</span> aBC       <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>                     <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">abc</span>太郎 <span class="token operator">|</span> <span class="token number">abc</span>    <span class="token operator">|</span> ABC    <span class="token operator">|</span> <span class="token number">abc</span>太郎abcABC          <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">bcdefabc</span>  <span class="token operator">|</span> <span class="token number">abc</span>    <span class="token operator">|</span> ABC    <span class="token operator">|</span> bcdefabcabcABC           <span class="token operator">|</span>
+<span class="token operator">|</span> micmic    <span class="token operator">|</span> i      <span class="token operator">|</span> I      <span class="token operator">|</span> micmiciI                 <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+--------+--------+--------------------------+</span>
+<span class="token number">11</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong><code>length</code> ==&gt; 计算字符串长度</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 语法</span>
+length<span class="token punctuation">(</span>字符串<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 实例</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> str1<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> length<span class="token punctuation">(</span>str1<span class="token punctuation">)</span> <span class="token keyword">as</span> len_str
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> SampleStr<span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+---------+</span>
+<span class="token operator">|</span> str1      <span class="token operator">|</span> len_str <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+---------+</span>
+<span class="token operator">|</span> opx       <span class="token operator">|</span>       <span class="token number">3</span> <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">abc</span>       <span class="token operator">|</span>       <span class="token number">3</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 山田    <span class="token operator">|</span>       <span class="token number">6</span> <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">aaa</span>       <span class="token operator">|</span>       <span class="token number">3</span> <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token boolean">NULL</span>      <span class="token operator">|</span>    <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span> @<span class="token operator">!</span><span class="token comment" spellcheck="true">#$%     |       5 |</span>
+<span class="token operator">|</span> ABC       <span class="token operator">|</span>       <span class="token number">3</span> <span class="token operator">|</span>
+<span class="token operator">|</span> aBC       <span class="token operator">|</span>       <span class="token number">3</span> <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">abc</span>太郎 <span class="token operator">|</span>       <span class="token number">9</span> <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">bcdefabc</span>  <span class="token operator">|</span>       <span class="token number">8</span> <span class="token operator">|</span>
+<span class="token operator">|</span> micmic    <span class="token operator">|</span>       <span class="token number">6</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+---------+</span>
+<span class="token number">11</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong><code>lower</code> ==&gt; 小写转换</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 语法</span>
+lower<span class="token punctuation">(</span>字符串<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 实例</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> str1<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> lower<span class="token punctuation">(</span>str1<span class="token punctuation">)</span> <span class="token keyword">as</span> low_str
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> SampleStr<span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+-----------+</span>
+<span class="token operator">|</span> str1      <span class="token operator">|</span> low_str   <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+-----------+</span>
+<span class="token operator">|</span> opx       <span class="token operator">|</span> opx       <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">abc</span>       <span class="token operator">|</span> <span class="token number">abc</span>       <span class="token operator">|</span>
+<span class="token operator">|</span> 山田    <span class="token operator">|</span> 山田    <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">aaa</span>       <span class="token operator">|</span> <span class="token number">aaa</span>       <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token boolean">NULL</span>      <span class="token operator">|</span> <span class="token boolean">NULL</span>      <span class="token operator">|</span>
+<span class="token operator">|</span> @<span class="token operator">!</span><span class="token comment" spellcheck="true">#$%     | @!#$%     |</span>
+<span class="token operator">|</span> ABC       <span class="token operator">|</span> <span class="token number">abc</span>       <span class="token operator">|</span>
+<span class="token operator">|</span> aBC       <span class="token operator">|</span> <span class="token number">abc</span>       <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">abc</span>太郎 <span class="token operator">|</span> <span class="token number">abc</span>太郎 <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">bcdefabc</span>  <span class="token operator">|</span> <span class="token number">bcdefabc</span>  <span class="token operator">|</span>
+<span class="token operator">|</span> micmic    <span class="token operator">|</span> micmic    <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+-----------+</span>
+<span class="token number">11</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 添加where</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> str1<span class="token punctuation">,</span> lower<span class="token punctuation">(</span>str1<span class="token punctuation">)</span> <span class="token keyword">as</span> low_str <span class="token keyword">from</span> SampleStr
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> str1 <span class="token operator">in</span> <span class="token punctuation">(</span><span class="token string">'ABC'</span><span class="token punctuation">,</span> <span class="token string">'aBC'</span><span class="token punctuation">,</span> <span class="token string">'abc'</span><span class="token punctuation">,</span> <span class="token string">'山田'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+---------+</span>
+<span class="token operator">|</span> str1   <span class="token operator">|</span> low_str <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+---------+</span>
+<span class="token operator">|</span> <span class="token number">abc</span>    <span class="token operator">|</span> <span class="token number">abc</span>     <span class="token operator">|</span>
+<span class="token operator">|</span> 山田 <span class="token operator">|</span> 山田  <span class="token operator">|</span>
+<span class="token operator">|</span> ABC    <span class="token operator">|</span> <span class="token number">abc</span>     <span class="token operator">|</span>
+<span class="token operator">|</span> aBC    <span class="token operator">|</span> <span class="token number">abc</span>     <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+---------+</span>
+<span class="token number">4</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong><code>replace</code> ==&gt; 字符串的替换</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 语法</span>
+replace<span class="token punctuation">(</span>对象字符串，替换前的字符串，替换后的字符串<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 实例</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> str1<span class="token punctuation">,</span> str2<span class="token punctuation">,</span> str3<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> replace<span class="token punctuation">(</span>str1<span class="token punctuation">,</span> str2<span class="token punctuation">,</span> str3<span class="token punctuation">)</span> <span class="token keyword">as</span> rep_str
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> SampleStr<span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+--------+--------+-----------+</span>
+<span class="token operator">|</span> str1      <span class="token operator">|</span> str2   <span class="token operator">|</span> str3   <span class="token operator">|</span> rep_str   <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+--------+--------+-----------+</span>
+<span class="token operator">|</span> opx       <span class="token operator">|</span> rt     <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> opx       <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">abc</span>       <span class="token operator">|</span> <span class="token number">def</span>    <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token number">abc</span>       <span class="token operator">|</span>
+<span class="token operator">|</span> 山田    <span class="token operator">|</span> 太郎 <span class="token operator">|</span> 是我 <span class="token operator">|</span> 山田    <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">aaa</span>       <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>      <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token boolean">NULL</span>      <span class="token operator">|</span> xyz    <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>      <span class="token operator">|</span>
+<span class="token operator">|</span> @<span class="token operator">!</span><span class="token comment" spellcheck="true">#$%     | NULL   | NULL   | NULL      |</span>
+<span class="token operator">|</span> ABC       <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>      <span class="token operator">|</span>
+<span class="token operator">|</span> aBC       <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>   <span class="token operator">|</span> <span class="token boolean">NULL</span>      <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">abc</span>太郎 <span class="token operator">|</span> <span class="token number">abc</span>    <span class="token operator">|</span> ABC    <span class="token operator">|</span> ABC太郎 <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">bcdefabc</span>  <span class="token operator">|</span> <span class="token number">abc</span>    <span class="token operator">|</span> ABC    <span class="token operator">|</span> bcdefABC  <span class="token operator">|</span>
+<span class="token operator">|</span> micmic    <span class="token operator">|</span> i      <span class="token operator">|</span> I      <span class="token operator">|</span> mIcmIc    <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+--------+--------+-----------+</span>
+<span class="token number">11</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong><code>substring</code> ==&gt; 字符串截取</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 语法</span>
+substring<span class="token punctuation">(</span>对象字符串 <span class="token keyword">from</span> 截取的初始位置 <span class="token keyword">for</span> 截取的字符数<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 实例</span>
+<span class="token comment" spellcheck="true"># 因为在标识数据库的时候，没有设定语言，所以导致出现问题</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> str1<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> substring<span class="token punctuation">(</span>str1 <span class="token keyword">from</span> <span class="token number">3</span> <span class="token keyword">for</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">as</span> sub_str
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> SampleStr<span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+---------+</span>
+<span class="token operator">|</span> str1      <span class="token operator">|</span> sub_str <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+---------+</span>
+<span class="token operator">|</span> opx       <span class="token operator">|</span> x       <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">abc</span>       <span class="token operator">|</span> <span class="token number">c</span>       <span class="token operator">|</span>
+<span class="token operator">|</span> 山田    <span class="token operator">|</span> ��      <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">aaa</span>       <span class="token operator">|</span> <span class="token number">a</span>       <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token boolean">NULL</span>      <span class="token operator">|</span> <span class="token boolean">NULL</span>    <span class="token operator">|</span>
+<span class="token operator">|</span> @<span class="token operator">!</span><span class="token comment" spellcheck="true">#$%     | #$      |</span>
+<span class="token operator">|</span> ABC       <span class="token operator">|</span> C       <span class="token operator">|</span>
+<span class="token operator">|</span> aBC       <span class="token operator">|</span> C       <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">abc</span>太郎 <span class="token operator">|</span> <span class="token number">c</span>�      <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">bcdefabc</span>  <span class="token operator">|</span> <span class="token number">de</span>      <span class="token operator">|</span>
+<span class="token operator">|</span> micmic    <span class="token operator">|</span> cm      <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------+---------+</span>
+<span class="token number">11</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong><code>upper</code> ==&gt; 大写转换</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 语法</span>
+upper<span class="token punctuation">(</span>字符串<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 实例</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> str1<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> upper<span class="token punctuation">(</span>str1<span class="token punctuation">)</span> <span class="token keyword">as</span> up_str
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> SampleStr
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> str1 <span class="token operator">in</span> <span class="token punctuation">(</span><span class="token string">'ABC'</span><span class="token punctuation">,</span> <span class="token string">'aBC'</span><span class="token punctuation">,</span> <span class="token string">'abc'</span><span class="token punctuation">,</span> <span class="token string">'山田'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+--------+</span>
+<span class="token operator">|</span> str1   <span class="token operator">|</span> up_str <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+--------+</span>
+<span class="token operator">|</span> <span class="token number">abc</span>    <span class="token operator">|</span> ABC    <span class="token operator">|</span>
+<span class="token operator">|</span> 山田 <span class="token operator">|</span> ű�ǔ� <span class="token operator">|</span>
+<span class="token operator">|</span> ABC    <span class="token operator">|</span> ABC    <span class="token operator">|</span>
+<span class="token operator">|</span> aBC    <span class="token operator">|</span> ABC    <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+--------+</span>
+<span class="token number">4</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.01</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="1-3-日期函数"><a href="#1-3-日期函数" class="headerlink" title="1.3 日期函数"></a>1.3 日期函数</h3><ul>
+<li><strong><code>current_date</code> ==&gt; 当前日期</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 语法</span>
+<span class="token keyword">current_date</span>
+
+<span class="token comment" spellcheck="true"># 实例</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> <span class="token keyword">current_date</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------------+</span>
+<span class="token operator">|</span> <span class="token keyword">current_date</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------------+</span>
+<span class="token operator">|</span> <span class="token number">2016</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">-</span><span class="token number">24</span>   <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------------+</span>
+<span class="token number">1</span> <span class="token keyword">row</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.01</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong><code>current_time</code> ==&gt; 当前时间</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 语法</span>
+<span class="token keyword">current_time</span>
+
+<span class="token comment" spellcheck="true"># 实例</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> <span class="token keyword">current_time</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------------+</span>
+<span class="token operator">|</span> <span class="token keyword">current_time</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------------+</span>
+<span class="token operator">|</span> <span class="token number">14</span>:<span class="token number">24</span>:<span class="token number">04</span>     <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------------+</span>
+<span class="token number">1</span> <span class="token keyword">row</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong><code>current_timestamp</code> ==&gt; 当前日期和时间</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 语法</span>
+<span class="token keyword">current_timestamp</span>
+
+<span class="token comment" spellcheck="true"># 实例</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> <span class="token keyword">current_timestamp</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------------------+</span>
+<span class="token operator">|</span> <span class="token keyword">current_timestamp</span>   <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------------------+</span>
+<span class="token operator">|</span> <span class="token number">2016</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">-</span><span class="token number">24</span> <span class="token number">14</span>:<span class="token number">25</span>:<span class="token number">03</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------------------+</span>
+<span class="token number">1</span> <span class="token keyword">row</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong><code>extract</code> ==&gt; 截止日期函数</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 语法</span>
+extract<span class="token punctuation">(</span>日期元素 <span class="token keyword">from</span> 日期<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 实例</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> <span class="token keyword">current_timestamp</span><span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> extract<span class="token punctuation">(</span>year <span class="token keyword">from</span> <span class="token keyword">current_timestamp</span><span class="token punctuation">)</span> <span class="token keyword">as</span> year<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> extract<span class="token punctuation">(</span>month <span class="token keyword">from</span> <span class="token keyword">current_timestamp</span><span class="token punctuation">)</span> <span class="token keyword">as</span> month<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> extract<span class="token punctuation">(</span>day <span class="token keyword">from</span> <span class="token keyword">current_timestamp</span><span class="token punctuation">)</span> <span class="token keyword">as</span> day<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> extract<span class="token punctuation">(</span>hour <span class="token keyword">from</span> <span class="token keyword">current_timestamp</span><span class="token punctuation">)</span> <span class="token keyword">as</span> hour<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> extract<span class="token punctuation">(</span>minute <span class="token keyword">from</span> <span class="token keyword">current_timestamp</span><span class="token punctuation">)</span> <span class="token keyword">as</span> minute<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> extract<span class="token punctuation">(</span>second <span class="token keyword">from</span> <span class="token keyword">current_timestamp</span><span class="token punctuation">)</span> <span class="token keyword">as</span> second<span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------------------+------+-------+------+------+--------+--------+</span>
+<span class="token operator">|</span> <span class="token keyword">current_timestamp</span>   <span class="token operator">|</span> year <span class="token operator">|</span> month <span class="token operator">|</span> day  <span class="token operator">|</span> hour <span class="token operator">|</span> minute <span class="token operator">|</span> second <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------------------+------+-------+------+------+--------+--------+</span>
+<span class="token operator">|</span> <span class="token number">2016</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">-</span><span class="token number">24</span> <span class="token number">14</span>:<span class="token number">30</span>:<span class="token number">43</span> <span class="token operator">|</span> <span class="token number">2016</span> <span class="token operator">|</span>     <span class="token number">5</span> <span class="token operator">|</span>   <span class="token number">24</span> <span class="token operator">|</span>   <span class="token number">14</span> <span class="token operator">|</span>     <span class="token number">30</span> <span class="token operator">|</span>     <span class="token number">43</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------------------+------+-------+------+------+--------+--------+</span>
+<span class="token number">1</span> <span class="token keyword">row</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="1-4-转换函数"><a href="#1-4-转换函数" class="headerlink" title="1.4 转换函数"></a>1.4 转换函数</h3><blockquote>
+<p><strong>数据类型转换</strong> - <strong>数值转换</strong></p>
+</blockquote>
+<ul>
+<li><strong><code>cast</code> ==&gt; 类型转换</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 语法</span>
+cast<span class="token punctuation">(</span>转化前的值 <span class="token keyword">as</span> 想要转换的数据类型<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 实例</span>
+<span class="token comment" spellcheck="true"># 之后可以使用from &lt;表名></span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> cast<span class="token punctuation">(</span><span class="token string">'0001'</span> <span class="token keyword">as</span> signed <span class="token keyword">integer</span><span class="token punctuation">)</span> <span class="token keyword">as</span> int_col<span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------+</span>
+<span class="token operator">|</span> int_col <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------+</span>
+<span class="token operator">|</span>       <span class="token number">1</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------+</span>
+<span class="token number">1</span> <span class="token keyword">row</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span>
+
+mysql<span class="token operator">></span> <span class="token keyword">select</span> cast<span class="token punctuation">(</span><span class="token string">'2009-12-14'</span> <span class="token keyword">as</span> <span class="token keyword">date</span><span class="token punctuation">)</span> <span class="token keyword">as</span> date_col<span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+</span>
+<span class="token operator">|</span> date_col   <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+</span>
+<span class="token operator">|</span> <span class="token number">2009</span><span class="token operator">-</span><span class="token number">12</span><span class="token operator">-</span><span class="token number">14</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+</span>
+<span class="token number">1</span> <span class="token keyword">row</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong><code>coalesce</code> ==&gt; 将 null 转换为其他值</strong><ul>
+<li>该函数会返回可变参数中左侧开始第一个不是<code>null</code>的值</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 语法</span>
+<span class="token keyword">coalesce</span><span class="token punctuation">(</span>数据<span class="token number">1</span>，数据<span class="token number">2</span>，<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 实例</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> <span class="token keyword">coalesce</span><span class="token punctuation">(</span><span class="token boolean">null</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token keyword">as</span> col1<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">coalesce</span><span class="token punctuation">(</span><span class="token boolean">null</span><span class="token punctuation">,</span> <span class="token string">'test'</span><span class="token punctuation">,</span> <span class="token boolean">null</span><span class="token punctuation">)</span> <span class="token keyword">as</span> col2<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">coalesce</span><span class="token punctuation">(</span><span class="token boolean">null</span><span class="token punctuation">,</span> <span class="token boolean">null</span><span class="token punctuation">,</span> <span class="token string">'2009-09-09'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> col3<span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------+------+------------+</span>
+<span class="token operator">|</span> col1 <span class="token operator">|</span> col2 <span class="token operator">|</span> col3       <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------+------+------------+</span>
+<span class="token operator">|</span>    <span class="token number">1</span> <span class="token operator">|</span> test <span class="token operator">|</span> <span class="token number">2009</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">09</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------+------+------------+</span>
+<span class="token number">1</span> <span class="token keyword">row</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="2-谓词"><a href="#2-谓词" class="headerlink" title="2. 谓词"></a>2. 谓词</h2><ul>
+<li>返回值为真值的函数就是谓词</li>
+<li>通常数来，返回值有可能是数字、字符串或者日期等等</li>
+<li>真值包括<code>true</code>、<code>false</code>、<code>unknown</code></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 创建数据库</span>
+mysql<span class="token operator">></span> <span class="token keyword">create</span> <span class="token keyword">table</span> SampleLike
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token punctuation">(</span> strcol <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">)</span> <span class="token operator">not</span> <span class="token boolean">null</span><span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">primary</span> <span class="token keyword">key</span> <span class="token punctuation">(</span>strcol<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Query OK<span class="token punctuation">,</span> <span class="token number">0</span> <span class="token keyword">rows</span> affected <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 数据库内容</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> SampleLike<span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+</span>
+<span class="token operator">|</span> strcol <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+</span>
+<span class="token operator">|</span> <span class="token number">abcdd</span>  <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">abcddd</span> <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">abddc</span>  <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">ddabc</span>  <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">dddabc</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+</span>
+<span class="token number">5</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h4 id="2-1-like-gt-字符串的部分一致查询"><a href="#2-1-like-gt-字符串的部分一致查询" class="headerlink" title="2.1 like ==> 字符串的部分一致查询"></a>2.1 <code>like</code> ==&gt; 字符串的部分一致查询</h4><ul>
+<li>前方一致</li>
+<li>中间一致</li>
+<li>后方一致</li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 实例 - 前方一致</span>
+<span class="token comment" spellcheck="true"># % 标识匹配零个字符以上的任何字符</span>
+<span class="token comment" spellcheck="true"># - 标识任意一个字符</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> SampleLike
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> strcol <span class="token operator">like</span> <span class="token string">'ddd%'</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+</span>
+<span class="token operator">|</span> strcol <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+</span>
+<span class="token operator">|</span> <span class="token number">dddabc</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+</span>
+<span class="token number">1</span> <span class="token keyword">row</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span>
+
+mysql<span class="token operator">></span> <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> SampleLike <span class="token keyword">where</span> strcol <span class="token operator">like</span> <span class="token string">'abc___'</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+</span>
+<span class="token operator">|</span> strcol <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+</span>
+<span class="token operator">|</span> <span class="token number">abcddd</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+</span>
+<span class="token number">1</span> <span class="token keyword">row</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span>
+
+mysql<span class="token operator">></span> <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> SampleLike <span class="token keyword">where</span> strcol <span class="token operator">like</span> <span class="token string">'dd%'</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+</span>
+<span class="token operator">|</span> strcol <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+</span>
+<span class="token operator">|</span> <span class="token number">ddabc</span>  <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">dddabc</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+</span>
+<span class="token number">2</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 实例 - 中间一致</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> SampleLike <span class="token keyword">where</span> strcol <span class="token operator">like</span> <span class="token string">'%ddd%'</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+</span>
+<span class="token operator">|</span> strcol <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+</span>
+<span class="token operator">|</span> <span class="token number">abcddd</span> <span class="token operator">|</span>
+<span class="token operator">|</span> <span class="token number">dddabc</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+</span>
+<span class="token number">2</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 实例 - 后方一致</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> SampleLike <span class="token keyword">where</span> strcol <span class="token operator">like</span> <span class="token string">'%ddd'</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+</span>
+<span class="token operator">|</span> strcol <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+</span>
+<span class="token operator">|</span> <span class="token number">abcddd</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">--------+</span>
+<span class="token number">1</span> <span class="token keyword">row</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-2-betweent-gt-范围查询"><a href="#2-2-betweent-gt-范围查询" class="headerlink" title="2.2 betweent ==> 范围查询"></a>2.2 <code>betweent</code> ==&gt; 范围查询</h3><ul>
+<li><code>betweent</code>匹配的时候，会将边界也算在内</li>
+<li>如果不想使用边界中的值，可以使用<code>&lt;</code>和<code>&gt;</code></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql">mysql<span class="token operator">></span> <span class="token keyword">select</span> shohin_mei<span class="token punctuation">,</span> hanbai_tanka
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> Shohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> hanbai_tanka <span class="token operator">between</span> <span class="token number">100</span> <span class="token operator">and</span> <span class="token number">1000</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> shohin_mei <span class="token operator">|</span> hanbai_tanka <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> T恤衫    <span class="token operator">|</span>         <span class="token number">1000</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 打孔器  <span class="token operator">|</span>          <span class="token number">500</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 叉子     <span class="token operator">|</span>          <span class="token number">500</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 切菜板  <span class="token operator">|</span>          <span class="token number">880</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 圆珠笔  <span class="token operator">|</span>          <span class="token number">100</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token number">5</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span>
+
+mysql<span class="token operator">></span> <span class="token keyword">select</span> shohin_mei<span class="token punctuation">,</span> hanbai_tanka
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> Shohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> hanbai_tanka <span class="token operator">></span> <span class="token number">100</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token operator">and</span> hanbai_tanka <span class="token operator">&lt;</span> <span class="token number">1000</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> shohin_mei <span class="token operator">|</span> hanbai_tanka <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> 打孔器  <span class="token operator">|</span>          <span class="token number">500</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 叉子     <span class="token operator">|</span>          <span class="token number">500</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 切菜板  <span class="token operator">|</span>          <span class="token number">880</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token number">3</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-3-is-null-is-not-null-gt-判断是否为-null"><a href="#2-3-is-null-is-not-null-gt-判断是否为-null" class="headerlink" title="2.3 is null, is not null ==> 判断是否为 null"></a>2.3 <code>is null, is not null</code> ==&gt; 判断是否为 null</h3><pre class="line-numbers language-sql"><code class="language-sql">mysql<span class="token operator">></span> <span class="token keyword">select</span> shohin_mei<span class="token punctuation">,</span> shiire_tanka
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> Shohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> shiire_tanka <span class="token operator">is</span> <span class="token boolean">null</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> shohin_mei <span class="token operator">|</span> shiire_tanka <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> 叉子     <span class="token operator">|</span>         <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 圆珠笔  <span class="token operator">|</span>         <span class="token boolean">NULL</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token number">2</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span>
+
+mysql<span class="token operator">></span> <span class="token keyword">select</span> shohin_mei<span class="token punctuation">,</span> shiire_tanka
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> Shohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> shiire_tanka <span class="token operator">is</span> <span class="token operator">not</span> <span class="token boolean">null</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> shohin_mei <span class="token operator">|</span> shiire_tanka <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> T恤衫    <span class="token operator">|</span>          <span class="token number">500</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 打孔器  <span class="token operator">|</span>          <span class="token number">320</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 运动T恤 <span class="token operator">|</span>         <span class="token number">2800</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 菜刀     <span class="token operator">|</span>         <span class="token number">2800</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 高压锅  <span class="token operator">|</span>         <span class="token number">5000</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 切菜板  <span class="token operator">|</span>          <span class="token number">790</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 印章     <span class="token operator">|</span>           <span class="token number">10</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token number">7</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-4-in-gt-or-的简便实用"><a href="#2-4-in-gt-or-的简便实用" class="headerlink" title="2.4 in ==> or 的简便实用"></a>2.4 <code>in</code> ==&gt; or 的简便实用</h3><ul>
+<li>使用<code>in</code>简化操作</li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql">mysql<span class="token operator">></span> <span class="token keyword">select</span> shohin_mei<span class="token punctuation">,</span> shiire_tanka
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> Shohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> shiire_tanka <span class="token operator">=</span> <span class="token number">320</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token operator">or</span> shiire_tanka <span class="token operator">=</span> <span class="token number">500</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token operator">or</span> shiire_tanka <span class="token operator">=</span> <span class="token number">5000</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> shohin_mei <span class="token operator">|</span> shiire_tanka <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> T恤衫    <span class="token operator">|</span>          <span class="token number">500</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 打孔器  <span class="token operator">|</span>          <span class="token number">320</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 高压锅  <span class="token operator">|</span>         <span class="token number">5000</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token number">3</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span>
+
+mysql<span class="token operator">></span> <span class="token keyword">select</span> shohin_mei<span class="token punctuation">,</span> shiire_tanka
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> Shohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> shiire_tanka <span class="token operator">in</span> <span class="token punctuation">(</span><span class="token number">320</span><span class="token punctuation">,</span> <span class="token number">500</span><span class="token punctuation">,</span> <span class="token number">5000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> shohin_mei <span class="token operator">|</span> shiire_tanka <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> T恤衫    <span class="token operator">|</span>          <span class="token number">500</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 打孔器  <span class="token operator">|</span>          <span class="token number">320</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 高压锅  <span class="token operator">|</span>         <span class="token number">5000</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token number">3</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-5-使用子查询作为-in-谓语参数"><a href="#2-5-使用子查询作为-in-谓语参数" class="headerlink" title="2.5 使用子查询作为 in 谓语参数"></a>2.5 使用子查询作为 in 谓语参数</h3><pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 创建数据库</span>
+mysql<span class="token operator">></span> <span class="token keyword">create</span> <span class="token keyword">table</span> TenpoShohin<span class="token punctuation">(</span>
+    <span class="token operator">-</span><span class="token operator">></span> tenpo_id char<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">)</span> <span class="token operator">not</span> <span class="token boolean">null</span><span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> tenpo_mei <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">)</span> <span class="token operator">not</span> <span class="token boolean">null</span><span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> shohin_id char<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">)</span> <span class="token operator">not</span> <span class="token boolean">null</span><span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> suiyo <span class="token keyword">integer</span> <span class="token operator">not</span> <span class="token boolean">null</span><span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">primary</span> <span class="token keyword">key</span> <span class="token punctuation">(</span>tenpo_id<span class="token punctuation">,</span> shohin_id<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Query OK<span class="token punctuation">,</span> <span class="token number">0</span> <span class="token keyword">rows</span> affected <span class="token punctuation">(</span><span class="token number">0.01</span> sec<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 数据库内容</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> TenpoShohin<span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">----------+-----------+-----------+-------+</span>
+<span class="token operator">|</span> tenpo_id <span class="token operator">|</span> tenpo_mei <span class="token operator">|</span> shohin_id <span class="token operator">|</span> suiyo <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">----------+-----------+-----------+-------+</span>
+<span class="token operator">|</span> 000A     <span class="token operator">|</span> 东京    <span class="token operator">|</span> <span class="token number">0001</span>      <span class="token operator">|</span>    <span class="token number">30</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 000A     <span class="token operator">|</span> 东京    <span class="token operator">|</span> <span class="token number">0002</span>      <span class="token operator">|</span>    <span class="token number">50</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 000A     <span class="token operator">|</span> 东京    <span class="token operator">|</span> <span class="token number">0003</span>      <span class="token operator">|</span>    <span class="token number">15</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 000B     <span class="token operator">|</span> 名古屋 <span class="token operator">|</span> <span class="token number">0002</span>      <span class="token operator">|</span>    <span class="token number">30</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 000B     <span class="token operator">|</span> 名古屋 <span class="token operator">|</span> <span class="token number">0003</span>      <span class="token operator">|</span>   <span class="token number">120</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 000B     <span class="token operator">|</span> 名古屋 <span class="token operator">|</span> <span class="token number">0004</span>      <span class="token operator">|</span>    <span class="token number">20</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 000B     <span class="token operator">|</span> 名古屋 <span class="token operator">|</span> <span class="token number">0006</span>      <span class="token operator">|</span>    <span class="token number">10</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 000B     <span class="token operator">|</span> 名古屋 <span class="token operator">|</span> <span class="token number">0007</span>      <span class="token operator">|</span>    <span class="token number">40</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 000C     <span class="token operator">|</span> 大阪    <span class="token operator">|</span> <span class="token number">0003</span>      <span class="token operator">|</span>    <span class="token number">20</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 000C     <span class="token operator">|</span> 大阪    <span class="token operator">|</span> <span class="token number">0004</span>      <span class="token operator">|</span>    <span class="token number">50</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 000C     <span class="token operator">|</span> 大阪    <span class="token operator">|</span> <span class="token number">0006</span>      <span class="token operator">|</span>    <span class="token number">90</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 000C     <span class="token operator">|</span> 大阪    <span class="token operator">|</span> <span class="token number">0007</span>      <span class="token operator">|</span>    <span class="token number">70</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 000D     <span class="token operator">|</span> 福冈    <span class="token operator">|</span> <span class="token number">0001</span>      <span class="token operator">|</span>   <span class="token number">100</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">----------+-----------+-----------+-------+</span>
+<span class="token number">13</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong><code>in</code>和子查询</strong><ul>
+<li><code>in</code>谓语或者是<code>not in</code>谓语具有其他谓语所没有的使用方法，那就是可以使用子查询作为其参数来使用</li>
+<li>子查询就是 SQL 内部生成的表，所以可以说成是，能够将视图作为 in 的参数</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql">mysql<span class="token operator">></span> <span class="token keyword">select</span> shohin_mei<span class="token punctuation">,</span> hanbai_tanka
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> Shohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> shohin_id <span class="token operator">in</span> <span class="token punctuation">(</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">select</span> shohin_id <span class="token keyword">from</span> TenpoShohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> tenpo_id <span class="token operator">=</span> <span class="token string">'000C'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> shohin_mei <span class="token operator">|</span> hanbai_tanka <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> 运动T恤 <span class="token operator">|</span>         <span class="token number">4000</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 菜刀     <span class="token operator">|</span>         <span class="token number">3000</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 叉子     <span class="token operator">|</span>          <span class="token number">500</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 切菜板  <span class="token operator">|</span>          <span class="token number">880</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token number">4</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong><code>not in</code>和子查询</strong></li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql">mysql<span class="token operator">></span> <span class="token keyword">select</span> shohin_mei<span class="token punctuation">,</span> hanbai_tanka
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> Shohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> shohin_id <span class="token operator">not</span> <span class="token operator">in</span> <span class="token punctuation">(</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">select</span> shohin_id <span class="token keyword">from</span> TenpoShohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> tenpo_id <span class="token operator">=</span> <span class="token string">'000A'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> shohin_mei <span class="token operator">|</span> hanbai_tanka <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> 菜刀     <span class="token operator">|</span>         <span class="token number">3000</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 高压锅  <span class="token operator">|</span>         <span class="token number">6800</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 叉子     <span class="token operator">|</span>          <span class="token number">500</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 切菜板  <span class="token operator">|</span>          <span class="token number">880</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 圆珠笔  <span class="token operator">|</span>          <span class="token number">100</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 印章     <span class="token operator">|</span>           <span class="token number">95</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token number">6</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-6-exist谓语"><a href="#2-6-exist谓语" class="headerlink" title="2.6 exist谓语"></a>2.6 <code>exist</code>谓语</h3><ul>
+<li><code>exist</code>的使用方法与之前的都不相同</li>
+<li>语法理解起来比较困难</li>
+<li>实际上即使不使用<code>exist</code>，基本上也都可以使用<code>in</code>或者是<code>not in</code>来代替</li>
+</ul>
+<p><strong>exist 谓语的使用方式</strong></p>
+<ul>
+<li>作用就是，判断是否存在满足某种条件的记录</li>
+<li><code>exist</code>的参数<ul>
+<li>因为<code>exist</code>是只有一个参数的谓词</li>
+<li><code>exist</code>只需要在右侧书写一个参数</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 使用exist选取出‘大阪店’(000C)在销售品(shohin_id)的销售单价(hanbai_tanka)</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> shohin_mei<span class="token punctuation">,</span> hanbai_tanka
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> Shohin <span class="token keyword">as</span> S
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> <span class="token keyword">exists</span> <span class="token punctuation">(</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> TenpoShohin <span class="token keyword">as</span> TS
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> TS<span class="token punctuation">.</span>tenpo_id <span class="token operator">=</span> <span class="token string">'000C'</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token operator">and</span> TS<span class="token punctuation">.</span>shohin_id <span class="token operator">=</span> S<span class="token punctuation">.</span>shohin_id<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> shohin_mei <span class="token operator">|</span> hanbai_tanka <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> 运动T恤 <span class="token operator">|</span>         <span class="token number">4000</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 菜刀     <span class="token operator">|</span>         <span class="token number">3000</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 叉子     <span class="token operator">|</span>          <span class="token number">500</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 切菜板  <span class="token operator">|</span>          <span class="token number">880</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token number">4</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>子查询中的<code>select *</code></strong></p>
+<ul>
+<li><code>exist</code>只关心记录是否存在，所以返回哪些列都是没有关系</li>
+<li><code>exist</code>用来判断是否存在满足子查询中<code>where</code>子句指定条件的记录，只有存在记录时才返回真的谓语</li>
+</ul>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 使用exist选取出‘大阪店’(000C)在销售品(shohin_id)的销售单价(hanbai_tanka)</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> shohin_mei<span class="token punctuation">,</span> hanbai_tanka
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> Shohin <span class="token keyword">as</span> S
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> <span class="token keyword">exists</span> <span class="token punctuation">(</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">select</span> <span class="token number">1</span> <span class="token keyword">from</span> TenpoShohin <span class="token keyword">as</span> TS
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> TS<span class="token punctuation">.</span>tenpo_id <span class="token operator">=</span> <span class="token string">'000C'</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token operator">and</span> TS<span class="token punctuation">.</span>shohin_id <span class="token operator">=</span> S<span class="token punctuation">.</span>shohin_id<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> shohin_mei <span class="token operator">|</span> hanbai_tanka <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> 运动T恤 <span class="token operator">|</span>         <span class="token number">4000</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 菜刀     <span class="token operator">|</span>         <span class="token number">3000</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 叉子     <span class="token operator">|</span>          <span class="token number">500</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 切菜板  <span class="token operator">|</span>          <span class="token number">880</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token number">4</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>使用<code>not exist</code>替代<code>not in</code></strong></p>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 使用exist选取出非‘大阪店’(000C)在销售品(shohin_id)的销售单价(hanbai_tanka)</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> shohin_mei<span class="token punctuation">,</span> hanbai_tanka
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> Shohin <span class="token keyword">as</span> S
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> <span class="token operator">not</span> <span class="token keyword">exists</span> <span class="token punctuation">(</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">select</span> <span class="token number">1</span> <span class="token keyword">from</span> TenpoShohin <span class="token keyword">as</span> TS
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">where</span> TS<span class="token punctuation">.</span>tenpo_id <span class="token operator">=</span> <span class="token string">'000C'</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token operator">and</span> TS<span class="token punctuation">.</span>shohin_id <span class="token operator">=</span> S<span class="token punctuation">.</span>shohin_id<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> shohin_mei <span class="token operator">|</span> hanbai_tanka <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token operator">|</span> T恤衫    <span class="token operator">|</span>         <span class="token number">1000</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 打孔器  <span class="token operator">|</span>          <span class="token number">500</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 高压锅  <span class="token operator">|</span>         <span class="token number">6800</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 圆珠笔  <span class="token operator">|</span>          <span class="token number">100</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 印章     <span class="token operator">|</span>           <span class="token number">95</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">------------+--------------+</span>
+<span class="token number">5</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="3-case-表达式"><a href="#3-case-表达式" class="headerlink" title="3. case 表达式"></a>3. case 表达式</h2><ul>
+<li><code>case</code>表达式分为简单<code>case</code>表达式和搜索<code>case</code>表达式</li>
+<li>搜索<code>case</code>表达式包含简答<code>case</code>表达式的全部功能</li>
+<li><code>case</code>表达式中的<code>end</code>不能省略</li>
+<li>使用<code>case</code>表达式能够将<code>select</code>语句的结果进行组合</li>
+</ul>
+<hr>
+<h3 id="3-1-case-表达式的使用方式"><a href="#3-1-case-表达式的使用方式" class="headerlink" title="3.1 case 表达式的使用方式"></a>3.1 case 表达式的使用方式</h3><pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 什么是case表达式</span>
+case表达式是一种进行运算的功能<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 语法</span>
+<span class="token keyword">case</span> <span class="token keyword">when</span> <span class="token operator">&lt;</span>判断表达式<span class="token operator">></span> <span class="token keyword">then</span> <span class="token operator">&lt;</span>表达式<span class="token operator">></span>
+     <span class="token keyword">when</span> <span class="token operator">&lt;</span>判断表达式<span class="token operator">></span> <span class="token keyword">then</span> <span class="token operator">&lt;</span>表达式<span class="token operator">></span>
+     <span class="token keyword">when</span> <span class="token operator">&lt;</span>判断表达式<span class="token operator">></span> <span class="token keyword">then</span> <span class="token operator">&lt;</span>表达式<span class="token operator">></span>
+     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+     <span class="token keyword">else</span> <span class="token operator">&lt;</span>表达式<span class="token operator">></span>
+<span class="token keyword">end</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 实例-Mysql</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> shohin_mei
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">case</span> <span class="token keyword">when</span> shohin_bunrui <span class="token operator">=</span> <span class="token string">'衣服'</span> <span class="token keyword">then</span> concat<span class="token punctuation">(</span><span class="token string">'A '</span><span class="token punctuation">,</span> shohin_bunrui<span class="token punctuation">)</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">when</span> shohin_bunrui <span class="token operator">=</span> <span class="token string">'办公用品'</span> <span class="token keyword">then</span> concat<span class="token punctuation">(</span><span class="token string">'B '</span><span class="token punctuation">,</span> shohin_bunrui<span class="token punctuation">)</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">when</span> shohin_bunrui <span class="token operator">=</span> <span class="token string">'厨房用具'</span> <span class="token keyword">then</span> concat<span class="token punctuation">(</span><span class="token string">'C '</span><span class="token punctuation">,</span> shohin_bunrui<span class="token punctuation">)</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">else</span> <span class="token boolean">null</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">end</span> <span class="token keyword">as</span> abc_shohin_bunrui
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> Shohin<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true"># 实例-ProgressSQL</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> shohin_mei<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">case</span> <span class="token keyword">when</span> shohin_bunrui <span class="token operator">=</span> <span class="token string">'衣服'</span> <span class="token keyword">then</span> <span class="token string">'A '</span> <span class="token operator">||</span> shohin_bunrui
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">when</span> shohin_bunrui <span class="token operator">=</span> <span class="token string">'办公用品'</span> <span class="token keyword">then</span> <span class="token string">'B '</span> <span class="token operator">||</span> shohin_bunrui
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">when</span> shohin_bunrui <span class="token operator">=</span> <span class="token string">'厨房用具'</span> <span class="token keyword">then</span> <span class="token string">'C '</span> <span class="token operator">||</span> shohin_bunrui
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">else</span> <span class="token boolean">null</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">end</span> <span class="token keyword">as</span> abc_shohin_bunrui
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> Shohin<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="3-2-case-表达式的书写位置"><a href="#3-2-case-表达式的书写位置" class="headerlink" title="3.2 case 表达式的书写位置"></a>3.2 case 表达式的书写位置</h3><pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true"># 需要将下列数据纵向输出，group by只能横向输出</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> shohin_bunrui<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token function">sum</span><span class="token punctuation">(</span>hanbai_tanka<span class="token punctuation">)</span> <span class="token keyword">as</span> sum_tanka
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> Shohin
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">group</span> <span class="token keyword">by</span> shohin_bunrui<span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------------+-----------+</span>
+<span class="token operator">|</span> shohin_bunrui <span class="token operator">|</span> sum_tanka <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------------+-----------+</span>
+<span class="token operator">|</span> 衣服        <span class="token operator">|</span>      <span class="token number">5000</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 办公用品  <span class="token operator">|</span>       <span class="token number">695</span> <span class="token operator">|</span>
+<span class="token operator">|</span> 厨房用具  <span class="token operator">|</span>     <span class="token number">11180</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">---------------+-----------+</span>
+<span class="token number">3</span> <span class="token keyword">rows</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 使用case表达式实现</span>
+mysql<span class="token operator">></span> <span class="token keyword">select</span> <span class="token function">sum</span><span class="token punctuation">(</span><span class="token keyword">case</span> <span class="token keyword">when</span> shohin_bunrui <span class="token operator">=</span> <span class="token string">'衣服'</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">then</span> hanbai_tanka <span class="token keyword">else</span> <span class="token number">0</span> <span class="token keyword">end</span><span class="token punctuation">)</span> <span class="token keyword">as</span> sum_tanka_ihuku<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token function">sum</span><span class="token punctuation">(</span><span class="token keyword">case</span> <span class="token keyword">when</span> shohin_bunrui <span class="token operator">=</span> <span class="token string">'厨房用具'</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">then</span> hanbai_tanka <span class="token keyword">else</span> <span class="token number">0</span> <span class="token keyword">end</span><span class="token punctuation">)</span> <span class="token keyword">as</span> sum_tanka_kitchen<span class="token punctuation">,</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token function">sum</span><span class="token punctuation">(</span><span class="token keyword">case</span> <span class="token keyword">when</span> shohin_bunrui <span class="token operator">=</span> <span class="token string">'办公用品'</span>
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">then</span> hanbai_tanka <span class="token keyword">else</span> <span class="token number">0</span> <span class="token keyword">end</span><span class="token punctuation">)</span> <span class="token keyword">as</span> sum_tanka_jumu
+    <span class="token operator">-</span><span class="token operator">></span> <span class="token keyword">from</span> Shohin<span class="token punctuation">;</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------------+-------------------+----------------+</span>
+<span class="token operator">|</span> sum_tanka_ihuku <span class="token operator">|</span> sum_tanka_kitchen <span class="token operator">|</span> sum_tanka_jumu <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------------+-------------------+----------------+</span>
+<span class="token operator">|</span>            <span class="token number">5000</span> <span class="token operator">|</span>             <span class="token number">11180</span> <span class="token operator">|</span>            <span class="token number">695</span> <span class="token operator">|</span>
+<span class="token operator">+</span><span class="token comment" spellcheck="true">-----------------+-------------------+----------------+</span>
+<span class="token number">1</span> <span class="token keyword">row</span> <span class="token operator">in</span> <span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token number">0.00</span> sec<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -744,12 +1557,12 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/posts/b6944d64.html">
+                <a href="/posts/4cf8d31f.html">
                     <div class="card-image">
                         
-                        <img src="/images/docker-swarm-cluster.jpg" class="responsive-img" alt="Docker利器之Swarm项目">
+                        <img src="/images/database-sql-tool-useful-07.png" class="responsive-img" alt="SQL基础之集合运算">
                         
-                        <span class="card-title">Docker利器之Swarm项目</span>
+                        <span class="card-title">SQL基础之集合运算</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -760,14 +1573,14 @@
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2019-02-14
+                            <i class="far fa-clock fa-fw icon-date"></i>2019-02-08
                         </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Docker学习攻略/" class="post-category">
-                                    Docker学习攻略
+                            <a href="/categories/Database浅入浅出/" class="post-category">
+                                    Database浅入浅出
                                 </a>
                             
                             
@@ -777,8 +1590,8 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Docker/">
-                        <span class="chip bg-color">Docker</span>
+                    <a href="/tags/SQL/">
+                        <span class="chip bg-color">SQL</span>
                     </a>
                     
                 </div>
@@ -1033,7 +1846,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">919k</span>&nbsp;字
+                class="white-color">924k</span>&nbsp;字
             
             
             
