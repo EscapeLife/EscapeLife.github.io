@@ -463,7 +463,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    696
+                    872
                 </div>
                 
 
@@ -530,6 +530,30 @@ Compiled with protoc 2.5.0
 From <span class="token function">source</span> with checksum 302899e86485742c090f626a828b28
 This <span class="token function">command</span> was run using /opt/cloudera/parcels/CDH-5.14.2-1.cdh5.14.2.p0.3/jars/hadoop-common-2.6.0-cdh5.14.2.jar
 You have new mail <span class="token keyword">in</span> /var/spool/mail/ci<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="3-Yarn-构建包已存在"><a href="#3-Yarn-构建包已存在" class="headerlink" title="3. Yarn 构建包已存在"></a>3. Yarn 构建包已存在</h2><ul>
+<li><strong>[问题起因]</strong> 前端构建的时候，执行 <code>yarn</code> 安装对应软件包依赖的时候，提示如下错误。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">+ yarn <span class="token function">install</span>
+yarn <span class="token function">install</span> v1.21.1
+<span class="token punctuation">[</span>1/4<span class="token punctuation">]</span> Resolving packages<span class="token punctuation">..</span>.
+<span class="token punctuation">[</span>2/4<span class="token punctuation">]</span> Fetching packages<span class="token punctuation">..</span>.
+error http://xxx.xxx.com:xxx/xxx/-/xxx-2.xx.0.tgz: <span class="token string">"EEXIST: file already exists ..."</span>
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+info Visit https://yarnpkg.com/en/docs/cli/install <span class="token keyword">for</span> documentation about this command.
+warning xxx-xxx@2.0.0: Invalid bin field <span class="token keyword">for</span> <span class="token string">"xxx-xxx"</span><span class="token keyword">.</span>
+<span class="token punctuation">[</span>go<span class="token punctuation">]</span> Task status: failed, took: 12.984s, exited: 1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方式]</strong> 上面提示的原因，主要是因为本地的缓存包和需要下载的包，有冲突导致。执行下面三板斧，即可解决！</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 删除缓存</span>
+$ yarn cache clean
+
+<span class="token comment" spellcheck="true"># 删除本地下载的依赖</span>
+$ <span class="token function">rm</span> -rf node_modules
+
+<span class="token comment" spellcheck="true"># 再次构建</span>
+yarn <span class="token function">install</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -1073,7 +1097,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">908.2k</span>&nbsp;字
+                class="white-color">908.4k</span>&nbsp;字
             
             
             
