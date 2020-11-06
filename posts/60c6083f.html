@@ -460,14 +460,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-10-30
+                    2020-11-06
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    5.5k
+                    5.6k
                 </div>
                 
 
@@ -573,18 +573,36 @@ $ docker run -p 8089:8089 --name<span class="token operator">=</span>Locust \
 
 <span class="token key atrule">services</span><span class="token punctuation">:</span>
   <span class="token key atrule">master</span><span class="token punctuation">:</span>
+    <span class="token key atrule">container_name</span><span class="token punctuation">:</span> locust_master
     <span class="token key atrule">image</span><span class="token punctuation">:</span> locustio/locust
     <span class="token key atrule">ports</span><span class="token punctuation">:</span>
       <span class="token punctuation">-</span> <span class="token string">"8089:8089"</span>
     <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
-      <span class="token punctuation">-</span> ./<span class="token punctuation">:</span>/mnt/locust
-    <span class="token key atrule">command</span><span class="token punctuation">:</span> <span class="token punctuation">-</span>f /mnt/locust/locustfile.py <span class="token punctuation">-</span><span class="token punctuation">-</span>master <span class="token punctuation">-</span>H http<span class="token punctuation">:</span>//master<span class="token punctuation">:</span><span class="token number">8089</span>
+      <span class="token punctuation">-</span> ./locust_trident.py<span class="token punctuation">:</span>/home/locust/locust_trident.py
+    <span class="token key atrule">command</span><span class="token punctuation">:</span> <span class="token punctuation">-</span>f /home/locust/locust_trident.py <span class="token punctuation">-</span><span class="token punctuation">-</span>master <span class="token punctuation">-</span><span class="token punctuation">-</span>host 'http<span class="token punctuation">:</span>//test.escapelife.site<span class="token punctuation">:</span>9000' <span class="token punctuation">-</span>u 400 <span class="token punctuation">-</span>r 20 <span class="token punctuation">-</span><span class="token punctuation">-</span>run<span class="token punctuation">-</span>time 2m <span class="token punctuation">-</span><span class="token punctuation">-</span>headless
+    <span class="token key atrule">networks</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> locust_network
 
-  <span class="token key atrule">worker</span><span class="token punctuation">:</span>
+  <span class="token key atrule">worker1</span><span class="token punctuation">:</span>
+    <span class="token key atrule">container_name</span><span class="token punctuation">:</span> locust_worker1
     <span class="token key atrule">image</span><span class="token punctuation">:</span> locustio/locust
     <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
-      <span class="token punctuation">-</span> ./<span class="token punctuation">:</span>/mnt/locust
-    <span class="token key atrule">command</span><span class="token punctuation">:</span> <span class="token punctuation">-</span>f /mnt/locust/locustfile.py <span class="token punctuation">-</span><span class="token punctuation">-</span>worker <span class="token punctuation">-</span><span class="token punctuation">-</span>master<span class="token punctuation">-</span>host master<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+      <span class="token punctuation">-</span> ./locust_trident.py<span class="token punctuation">:</span>/home/locust/locust_trident.py
+    <span class="token key atrule">command</span><span class="token punctuation">:</span> <span class="token punctuation">-</span>f /home/locust/locust_trident.py <span class="token punctuation">-</span><span class="token punctuation">-</span>worker <span class="token punctuation">-</span><span class="token punctuation">-</span>master<span class="token punctuation">-</span>host master
+    <span class="token key atrule">networks</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> locust_network
+
+  <span class="token key atrule">worker2</span><span class="token punctuation">:</span>
+    <span class="token key atrule">container_name</span><span class="token punctuation">:</span> locust_worker2
+    <span class="token key atrule">image</span><span class="token punctuation">:</span> locustio/locust
+    <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> ./locust_trident.py<span class="token punctuation">:</span>/home/locust/locust_trident.py
+    <span class="token key atrule">command</span><span class="token punctuation">:</span> <span class="token punctuation">-</span>f /home/locust/locust_trident.py <span class="token punctuation">-</span><span class="token punctuation">-</span>worker <span class="token punctuation">-</span><span class="token punctuation">-</span>master<span class="token punctuation">-</span>host master
+    <span class="token key atrule">networks</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> locust_network
+
+<span class="token key atrule">networks</span><span class="token punctuation">:</span>
+  locust_network<span class="token punctuation">:</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><img src="../images/locust-performance-test-tool-4.png" alt="Locust压测工具 - 官网图片"></p>
 <hr>
 <h2 id="3-快速上手"><a href="#3-快速上手" class="headerlink" title="3. 快速上手"></a>3. 快速上手</h2><blockquote>
@@ -1917,7 +1935,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">942.5k</span>&nbsp;字
+                class="white-color">942.6k</span>&nbsp;字
             
             
             
