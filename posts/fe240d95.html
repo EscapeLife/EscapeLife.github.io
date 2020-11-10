@@ -467,14 +467,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.9k
+                    3.3k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    11 分
+                    13 分
                 </div>
                 
 
@@ -700,9 +700,12 @@ CacheInfo<span class="token punctuation">(</span>hits<span class="token operator
 <p>请注意，当条目过期时，此装饰器如何清除与该函数关联的整个缓存。生存期适用于整个缓存，而不适用于单个项目。此策略的更复杂实现将根据条目的单个生存期将其逐出。</p>
 <p>在我们的程序中，如果想要实现不同缓存策略，可以查看 <a href="https://github.com/tkem/cachetools/" target="_blank" rel="noopener">cachetools</a> 这个库。该库提供了几个集合和修饰符，涵盖了一些最流行的缓存策略。</p>
 <hr>
-<h2 id="5-官方实现"><a href="#5-官方实现" class="headerlink" title="5. 官方实现"></a>5. 官方实现</h2><blockquote>
+<h2 id="5-官方实现方式"><a href="#5-官方实现方式" class="headerlink" title="5. 官方实现方式"></a>5. 官方实现方式</h2><blockquote>
 <p><strong>以下是官方 <code>@lru_cache</code> 装饰器的实现方式，可以学习下！</strong></p>
 </blockquote>
+<ul>
+<li>简单理解的话，其实就是一个装饰器。</li>
+</ul>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">lru_cache</span><span class="token punctuation">(</span>maxsize<span class="token operator">=</span><span class="token number">128</span><span class="token punctuation">,</span> typed<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token keyword">if</span> isinstance<span class="token punctuation">(</span>maxsize<span class="token punctuation">,</span> int<span class="token punctuation">)</span><span class="token punctuation">:</span>
         <span class="token keyword">if</span> maxsize <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">:</span>
@@ -717,13 +720,108 @@ CacheInfo<span class="token punctuation">(</span>hits<span class="token operator
     <span class="token keyword">def</span> <span class="token function">decorating_function</span><span class="token punctuation">(</span>user_function<span class="token punctuation">)</span><span class="token punctuation">:</span>
         wrapper <span class="token operator">=</span> _lru_cache_wrapper<span class="token punctuation">(</span>user_function<span class="token punctuation">,</span> maxsize<span class="token punctuation">,</span> typed<span class="token punctuation">,</span> _CacheInfo<span class="token punctuation">)</span>
         <span class="token keyword">return</span> update_wrapper<span class="token punctuation">(</span>wrapper<span class="token punctuation">,</span> user_function<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> decorating_function<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python">_CacheInfo <span class="token operator">=</span> namedtuple<span class="token punctuation">(</span><span class="token string">"CacheInfo"</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token string">"hits"</span><span class="token punctuation">,</span> <span class="token string">"misses"</span><span class="token punctuation">,</span> <span class="token string">"maxsize"</span><span class="token punctuation">,</span> <span class="token string">"currsize"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
 
-    <span class="token keyword">return</span> decorating_function<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token keyword">def</span> <span class="token function">_lru_cache_wrapper</span><span class="token punctuation">(</span>user_function<span class="token punctuation">,</span> maxsize<span class="token punctuation">,</span> typed<span class="token punctuation">,</span> _CacheInfo<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    sentinel <span class="token operator">=</span> object<span class="token punctuation">(</span><span class="token punctuation">)</span>          <span class="token comment" spellcheck="true"># unique object used to signal cache misses</span>
+    make_key <span class="token operator">=</span> _make_key         <span class="token comment" spellcheck="true"># build a key from the function arguments</span>
+    PREV<span class="token punctuation">,</span> NEXT<span class="token punctuation">,</span> KEY<span class="token punctuation">,</span> RESULT <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">3</span>   <span class="token comment" spellcheck="true"># names for the link fields</span>
+
+    cache <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>  <span class="token comment" spellcheck="true"># 存储也使用的字典</span>
+    hits <span class="token operator">=</span> misses <span class="token operator">=</span> <span class="token number">0</span>
+    full <span class="token operator">=</span> <span class="token boolean">False</span>
+    cache_get <span class="token operator">=</span> cache<span class="token punctuation">.</span>get
+    cache_len <span class="token operator">=</span> cache<span class="token punctuation">.</span>__len__
+    lock <span class="token operator">=</span> RLock<span class="token punctuation">(</span><span class="token punctuation">)</span>                      <span class="token comment" spellcheck="true"># 因为双向链表的更新不是线程安全的所以需要加锁</span>
+    root <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>                           <span class="token comment" spellcheck="true"># 双向链表</span>
+    root<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">[</span>root<span class="token punctuation">,</span> root<span class="token punctuation">,</span> None<span class="token punctuation">,</span> None<span class="token punctuation">]</span>  <span class="token comment" spellcheck="true"># 初始化双向链表</span>
+
+    <span class="token keyword">if</span> maxsize <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+        <span class="token keyword">def</span> <span class="token function">wrapper</span><span class="token punctuation">(</span><span class="token operator">*</span>args<span class="token punctuation">,</span> <span class="token operator">**</span>kwds<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token comment" spellcheck="true"># No caching -- just a statistics update</span>
+            nonlocal misses
+            misses <span class="token operator">+=</span> <span class="token number">1</span>
+            result <span class="token operator">=</span> user_function<span class="token punctuation">(</span><span class="token operator">*</span>args<span class="token punctuation">,</span> <span class="token operator">**</span>kwds<span class="token punctuation">)</span>
+            <span class="token keyword">return</span> result
+
+    <span class="token keyword">elif</span> maxsize <span class="token keyword">is</span> None<span class="token punctuation">:</span>
+        <span class="token keyword">def</span> <span class="token function">wrapper</span><span class="token punctuation">(</span><span class="token operator">*</span>args<span class="token punctuation">,</span> <span class="token operator">**</span>kwds<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token comment" spellcheck="true"># Simple caching without ordering or size limit</span>
+            nonlocal hits<span class="token punctuation">,</span> misses
+            key <span class="token operator">=</span> make_key<span class="token punctuation">(</span>args<span class="token punctuation">,</span> kwds<span class="token punctuation">,</span> typed<span class="token punctuation">)</span>
+            result <span class="token operator">=</span> cache_get<span class="token punctuation">(</span>key<span class="token punctuation">,</span> sentinel<span class="token punctuation">)</span>
+            <span class="token keyword">if</span> result <span class="token keyword">is</span> <span class="token operator">not</span> sentinel<span class="token punctuation">:</span>
+                hits <span class="token operator">+=</span> <span class="token number">1</span>
+                <span class="token keyword">return</span> result
+            misses <span class="token operator">+=</span> <span class="token number">1</span>
+            result <span class="token operator">=</span> user_function<span class="token punctuation">(</span><span class="token operator">*</span>args<span class="token punctuation">,</span> <span class="token operator">**</span>kwds<span class="token punctuation">)</span>
+            cache<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> result
+            <span class="token keyword">return</span> result
+
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        <span class="token keyword">def</span> <span class="token function">wrapper</span><span class="token punctuation">(</span><span class="token operator">*</span>args<span class="token punctuation">,</span> <span class="token operator">**</span>kwds<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token comment" spellcheck="true"># Size limited caching that tracks accesses by recency</span>
+            nonlocal root<span class="token punctuation">,</span> hits<span class="token punctuation">,</span> misses<span class="token punctuation">,</span> full
+            key <span class="token operator">=</span> make_key<span class="token punctuation">(</span>args<span class="token punctuation">,</span> kwds<span class="token punctuation">,</span> typed<span class="token punctuation">)</span>
+            <span class="token keyword">with</span> lock<span class="token punctuation">:</span>
+                link <span class="token operator">=</span> cache_get<span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+                <span class="token keyword">if</span> link <span class="token keyword">is</span> <span class="token operator">not</span> None<span class="token punctuation">:</span>
+                    <span class="token comment" spellcheck="true"># Move the link to the front of the circular queue</span>
+                    link_prev<span class="token punctuation">,</span> link_next<span class="token punctuation">,</span> _key<span class="token punctuation">,</span> result <span class="token operator">=</span> link
+                    link_prev<span class="token punctuation">[</span>NEXT<span class="token punctuation">]</span> <span class="token operator">=</span> link_next
+                    link_next<span class="token punctuation">[</span>PREV<span class="token punctuation">]</span> <span class="token operator">=</span> link_prev
+                    last <span class="token operator">=</span> root<span class="token punctuation">[</span>PREV<span class="token punctuation">]</span>
+                    last<span class="token punctuation">[</span>NEXT<span class="token punctuation">]</span> <span class="token operator">=</span> root<span class="token punctuation">[</span>PREV<span class="token punctuation">]</span> <span class="token operator">=</span> link
+                    link<span class="token punctuation">[</span>PREV<span class="token punctuation">]</span> <span class="token operator">=</span> last
+                    link<span class="token punctuation">[</span>NEXT<span class="token punctuation">]</span> <span class="token operator">=</span> root
+                    hits <span class="token operator">+=</span> <span class="token number">1</span>
+                    <span class="token keyword">return</span> result
+                misses <span class="token operator">+=</span> <span class="token number">1</span>
+            result <span class="token operator">=</span> user_function<span class="token punctuation">(</span><span class="token operator">*</span>args<span class="token punctuation">,</span> <span class="token operator">**</span>kwds<span class="token punctuation">)</span>
+            <span class="token keyword">with</span> lock<span class="token punctuation">:</span>
+                <span class="token keyword">if</span> key <span class="token keyword">in</span> cache<span class="token punctuation">:</span>
+                    <span class="token keyword">pass</span>
+                <span class="token keyword">elif</span> full<span class="token punctuation">:</span>
+                    oldroot <span class="token operator">=</span> root
+                    oldroot<span class="token punctuation">[</span>KEY<span class="token punctuation">]</span> <span class="token operator">=</span> key
+                    oldroot<span class="token punctuation">[</span>RESULT<span class="token punctuation">]</span> <span class="token operator">=</span> result
+                    root <span class="token operator">=</span> oldroot<span class="token punctuation">[</span>NEXT<span class="token punctuation">]</span>
+                    oldkey <span class="token operator">=</span> root<span class="token punctuation">[</span>KEY<span class="token punctuation">]</span>
+                    oldresult <span class="token operator">=</span> root<span class="token punctuation">[</span>RESULT<span class="token punctuation">]</span>
+                    root<span class="token punctuation">[</span>KEY<span class="token punctuation">]</span> <span class="token operator">=</span> root<span class="token punctuation">[</span>RESULT<span class="token punctuation">]</span> <span class="token operator">=</span> None
+                    <span class="token keyword">del</span> cache<span class="token punctuation">[</span>oldkey<span class="token punctuation">]</span>
+                    cache<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> oldroot
+                <span class="token keyword">else</span><span class="token punctuation">:</span>
+                    last <span class="token operator">=</span> root<span class="token punctuation">[</span>PREV<span class="token punctuation">]</span>
+                    link <span class="token operator">=</span> <span class="token punctuation">[</span>last<span class="token punctuation">,</span> root<span class="token punctuation">,</span> key<span class="token punctuation">,</span> result<span class="token punctuation">]</span>
+                    last<span class="token punctuation">[</span>NEXT<span class="token punctuation">]</span> <span class="token operator">=</span> root<span class="token punctuation">[</span>PREV<span class="token punctuation">]</span> <span class="token operator">=</span> cache<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> link
+                    full <span class="token operator">=</span> <span class="token punctuation">(</span>cache_len<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">>=</span> maxsize<span class="token punctuation">)</span>
+            <span class="token keyword">return</span> result
+
+    <span class="token keyword">def</span> <span class="token function">cache_info</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token triple-quoted-string string">"""Report cache statistics"""</span>
+        <span class="token keyword">with</span> lock<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> _CacheInfo<span class="token punctuation">(</span>hits<span class="token punctuation">,</span> misses<span class="token punctuation">,</span> maxsize<span class="token punctuation">,</span> cache_len<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">cache_clear</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token triple-quoted-string string">"""Clear the cache and cache statistics"""</span>
+        nonlocal hits<span class="token punctuation">,</span> misses<span class="token punctuation">,</span> full
+        <span class="token keyword">with</span> lock<span class="token punctuation">:</span>
+            cache<span class="token punctuation">.</span>clear<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            root<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">[</span>root<span class="token punctuation">,</span> root<span class="token punctuation">,</span> None<span class="token punctuation">,</span> None<span class="token punctuation">]</span>
+            hits <span class="token operator">=</span> misses <span class="token operator">=</span> <span class="token number">0</span>
+            full <span class="token operator">=</span> <span class="token boolean">False</span>
+
+    wrapper<span class="token punctuation">.</span>cache_info <span class="token operator">=</span> cache_info
+    wrapper<span class="token punctuation">.</span>cache_clear <span class="token operator">=</span> cache_clear
+    <span class="token keyword">return</span> wrapper<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="6-参考链接"><a href="#6-参考链接" class="headerlink" title="6. 参考链接"></a>6. 参考链接</h2><blockquote>
 <p><strong>送人玫瑰，手有余香！</strong></p>
 </blockquote>
 <ul>
+<li><a href="https://github.com/python/cpython/blob/3.9/Lib/functools.py" target="_blank" rel="noopener">cpython3.9 - Lib/functools.py</a></li>
 <li><a href="https://realpython.com/lru-cache-python/" target="_blank" rel="noopener">Caching in Python Using the LRU Cache Strategy</a></li>
 </ul>
 <script>
@@ -1273,7 +1371,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">945.5k</span>&nbsp;字
+                class="white-color">945.9k</span>&nbsp;字
             
             
             
