@@ -460,14 +460,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-11-10
+                    2020-11-11
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.6k
+                    1.8k
                 </div>
                 
 
@@ -513,7 +513,7 @@ $ <span class="token function">sudo</span> <span class="token function">cp</span
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># The syntax of makeself is the following</span>
 $ makeself.sh <span class="token punctuation">[</span>args<span class="token punctuation">]</span> archive_dir file_name label startup_script <span class="token punctuation">[</span>script_args<span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[1] ARGS - 打包的可选参数</strong></li>
+<li><strong>[1] makeself 打包命令可选参数</strong></li>
 </ul>
 <table>
 <thead>
@@ -528,7 +528,7 @@ $ makeself.sh <span class="token punctuation">[</span>args<span class="token pun
 </tr>
 <tr>
 <td align="left"><strong><code>--gzip</code></strong></td>
-<td align="left">默认使用<code>gzip</code>工具进行压缩(默认)</td>
+<td align="left">默认使用<code>gzip</code>工具进行压缩</td>
 </tr>
 <tr>
 <td align="left"><strong><code>--pigz</code></strong></td>
@@ -567,24 +567,44 @@ $ makeself.sh <span class="token punctuation">[</span>args<span class="token pun
 <td align="left">使用<code>openssl aes-256-cbc -a -salt</code>加密归档文件，需要输入密码</td>
 </tr>
 <tr>
+<td align="left"><strong><code>--compress</code></strong></td>
+<td align="left">使用<code>UNIX系统的</code>compress`命令压缩数据(在没有 gzip 时默认)</td>
+</tr>
+<tr>
 <td align="left"><strong><code>--nocomp</code></strong></td>
 <td align="left">不对存档文件进行压缩，默认是一个<code>tar</code>包</td>
 </tr>
 <tr>
 <td align="left"><strong><code>--complevel</code></strong></td>
-<td align="left">指定压缩级别，默认使用<code>9</code></td>
+<td align="left">指定压缩级别，默认使用<code>9</code>级别</td>
 </tr>
 <tr>
 <td align="left"><strong><code>--notemp</code></strong></td>
-<td align="left">生成的归档文件不会将文件解压缩到临时目录，而解压到当前目录中创建的新目录中</td>
+<td align="left">生成的归档文件不会将文件解压缩到临时目录，而解压到当前目录创建的新目录中</td>
+</tr>
+<tr>
+<td align="left"><strong><code>--current</code></strong></td>
+<td align="left">文件将被提取到当前目录，而不是子目录中(同<code>--notemp</code>一样)</td>
 </tr>
 <tr>
 <td align="left"><strong><code>--follow</code></strong></td>
 <td align="left">存储指向的文件而不是链接本身</td>
 </tr>
 <tr>
-<td align="left"><strong><code>--append</code></strong></td>
+<td align="left"><strong><code>--append file</code></strong></td>
 <td align="left">将数据追加到现有存档中，而不是创建新文件</td>
+</tr>
+<tr>
+<td align="left"><strong><code>--header file</code></strong></td>
+<td align="left">使用指定的脚本来代替默认的<code>makeself-header.sh</code>文件(默认与<code>makeself</code>文件同级)</td>
+</tr>
+<tr>
+<td align="left"><strong><code>--cleanup file</code></strong></td>
+<td align="left">指定在执行中断或成功完成时运行的脚本</td>
+</tr>
+<tr>
+<td align="left"><strong><code>--nomd5/--nocrc</code></strong></td>
+<td align="left">禁止检查存档文件的<code>MD5</code>或<code>CRC</code>校验和</td>
 </tr>
 <tr>
 <td align="left"><strong><code>--tar-extra opt</code></strong></td>
@@ -675,7 +695,7 @@ $ makeself.sh --notemp makeself makeself.run \
 </tr>
 <tr>
 <td align="left"><strong><code>--target dir</code></strong></td>
-<td align="left">允许在任意指定目录解压 run 包</td>
+<td align="left">允许在任意指定目录解压<code>run</code>包</td>
 </tr>
 <tr>
 <td align="left"><strong><code>--confirm</code></strong></td>
@@ -683,7 +703,7 @@ $ makeself.sh --notemp makeself makeself.run \
 </tr>
 <tr>
 <td align="left"><strong><code>--info</code></strong></td>
-<td align="left">打印出有关 run 包的常规信息</td>
+<td align="left">打印出有关<code>run</code>包的常规信息</td>
 </tr>
 <tr>
 <td align="left"><strong><code>--list</code></strong></td>
@@ -694,12 +714,24 @@ $ makeself.sh --notemp makeself makeself.run \
 <td align="left">校验和检查归档文件的完整性</td>
 </tr>
 <tr>
+<td align="left"><strong><code>--nochown</code></strong></td>
+<td align="left">默认情况下提取后在目标目录上运行<code>chown -R</code>命令以便所有文件都属于当前用户</td>
+</tr>
+<tr>
+<td align="left"><strong><code>--tar</code></strong></td>
+<td align="left">使用以下参数作为<code>tar</code>命令的参数</td>
+</tr>
+<tr>
 <td align="left"><strong><code>--noexec</code></strong></td>
 <td align="left">提取后不要运行嵌入式脚本</td>
 </tr>
 <tr>
 <td align="left"><strong><code>--nodiskspace</code></strong></td>
 <td align="left">在提取之前不检查可用的磁盘空间</td>
+</tr>
+<tr>
+<td align="left"><strong><code>--noexec-cleanup</code></strong></td>
+<td align="left">在提取之前不支持指定的删除脚本</td>
 </tr>
 </tbody></table>
 <pre class="line-numbers language-bash"><code class="language-bash">root@ele:/data/<span class="token comment" spellcheck="true"># bash redis_latest.run --help</span>
@@ -1316,7 +1348,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">948.3k</span>&nbsp;字
+                class="white-color">948.4k</span>&nbsp;字
             
             
             
