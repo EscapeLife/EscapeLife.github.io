@@ -456,21 +456,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-11-10
+                    2020-11-12
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    6.1k
+                    6.4k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    24 分
+                    25 分
                 </div>
                 
 
@@ -1028,6 +1028,30 @@ docker <span class="token function">exec</span> -it <span class="token operator"
 <ul>
 <li><strong>[解决方法]</strong> 得到的结论就是，因为 <code>Compose</code> 解析 <code>yaml</code> 配置文件，发现引号也进行了解释包装。这就导致原本的 <code>TESTVAR="test"</code> 被解析成了 <code>'TESTVAR="test"'</code>，所以我们在引用的时候就无法获取到对应的值。现在解决方法就是，不管是我们直接在配置文件添加环境变量或者使用 <code>env_file</code> 配置文件，能不使用引号就不适用引号。</li>
 </ul>
+<hr>
+<h2 id="16-Docker-删除镜像报错"><a href="#16-Docker-删除镜像报错" class="headerlink" title="16. Docker 删除镜像报错"></a>16. Docker 删除镜像报错</h2><blockquote>
+<p><strong>无法删除镜像，归根到底还是有地方用到了！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 清理服器磁盘空间的时候，删除某个镜像的时候提示如下信息。提示需要强制删除，但是发现及时执行了强制删除依旧没有效果。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 删除镜像</span>
+$ docker rmi 3ccxxxx2e862
+Error response from daemon: conflict: unable to delete 3ccxxxx2e862 <span class="token punctuation">(</span>cannot be forced<span class="token punctuation">)</span> - image has dependent child images
+
+<span class="token comment" spellcheck="true"># 强制删除</span>
+$ dcoker rmi -f 3ccxxxx2e862
+Error response from daemon: conflict: unable to delete 3ccxxxx2e862 <span class="token punctuation">(</span>cannot be forced<span class="token punctuation">)</span> - image has dependent child images<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 后来才发现，出现这个原因主要是因为 <code>TAG</code>，即存在其他镜像引用了这个镜像。这里我们可以使用如下命令查看对应镜像文件的依赖关系，然后根据对应 <code>TAG</code> 来删除镜像。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查询依赖 - image_id表示镜像名称</span>
+$ docker image inspect --format<span class="token operator">=</span><span class="token string">'{{.RepoTags}} {{.Id}} {{.Parent}}'</span> <span class="token variable"><span class="token variable">$(</span>docker images <span class="token function">ls</span> -q --filter since<span class="token operator">=</span><span class="token operator">&lt;</span>image_id<span class="token operator">></span><span class="token variable">)</span></span>
+
+<span class="token comment" spellcheck="true"># 根据TAG删除镜像</span>
+$ docker rmi -f c565xxxxc87f<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 删除悬空镜像</span>
+$ docker rmi <span class="token punctuation">$(</span>docker images --filter <span class="token string">"dangling=true"</span> -q --no-trunc<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -1315,12 +1339,12 @@ docker <span class="token function">exec</span> -it <span class="token operator"
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Git/">
-                        <span class="chip bg-color">Git</span>
-                    </a>
-                    
                     <a href="/tags/Github/">
                         <span class="chip bg-color">Github</span>
+                    </a>
+                    
+                    <a href="/tags/Git/">
+                        <span class="chip bg-color">Git</span>
                     </a>
                     
                 </div>
@@ -1575,7 +1599,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">950.4k</span>&nbsp;字
+                class="white-color">950.6k</span>&nbsp;字
             
             
             
