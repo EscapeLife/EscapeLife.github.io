@@ -463,14 +463,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    6.4k
+                    6.7k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    25 分
+                    27 分
                 </div>
                 
 
@@ -1052,6 +1052,46 @@ $ docker image inspect --format<span class="token operator">=</span><span class=
 $ docker rmi -f c565xxxxc87f<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 删除悬空镜像</span>
 $ docker rmi <span class="token punctuation">$(</span>docker images --filter <span class="token string">"dangling=true"</span> -q --no-trunc<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="17-Docker-普通用户切换"><a href="#17-Docker-普通用户切换" class="headerlink" title="17. Docker 普通用户切换"></a>17. Docker 普通用户切换</h2><blockquote>
+<p><strong>切换 Docker 启动用户的话，还是需要注意下权限问题的！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 我们都知道在 <code>Docker</code> 容器里面使用 <code>root</code> 用户的话，是不安全的，很容易出现越权的安全问题，所以一般情况下，我们都会使用普通用户来代替 <code>root</code> 进行服务的启动和管理的。今天给一个服务切换用户的时候，发现 <code>Nginx</code> 服务一直无法启动，提示如下权限问题。因为对应的配置文件也没有配置 <code>var</code> 相关的目录，无奈 🤷‍♀ ！️</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Nginx报错信息</span>
+nginx: <span class="token punctuation">[</span>alert<span class="token punctuation">]</span> could not <span class="token function">open</span> error log file: open<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token string">"/var/log/nginx/error.log"</span> failed <span class="token punctuation">(</span>13: Permission denied<span class="token punctuation">)</span>
+2020/11/12 15:25:47 <span class="token punctuation">[</span>emerg<span class="token punctuation">]</span> 23<span class="token comment" spellcheck="true">#23: mkdir() "/var/cache/nginx/client_temp" failed (13: Permission denied)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 后来发现还是 <code>nginx.conf</code> 配置文件，配置的有问题，需要将 <code>Nginx</code> 服务启动时候需要的文件都配置到一个无权限的目录，即可解决。</li>
+</ul>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">user</span>  www<span class="token operator">-</span>data<span class="token punctuation">;</span>
+<span class="token keyword">worker_processes</span>  <span class="token number">1</span><span class="token punctuation">;</span>
+
+<span class="token keyword">error_log</span>  <span class="token operator">/</span>data<span class="token operator">/</span>logs<span class="token operator">/</span>master_error<span class="token punctuation">.</span>log warn<span class="token punctuation">;</span>
+<span class="token keyword">pid</span>        <span class="token operator">/</span>dev<span class="token operator">/</span>shm<span class="token operator">/</span>nginx<span class="token punctuation">.</span><span class="token keyword">pid</span><span class="token punctuation">;</span>
+
+<span class="token keyword">events</span> <span class="token punctuation">{</span>
+    <span class="token keyword">worker_connections</span>  <span class="token number">1024</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">http</span> <span class="token punctuation">{</span>
+    <span class="token keyword">include</span>       <span class="token operator">/</span>etc<span class="token operator">/</span>nginx<span class="token operator">/</span>mime<span class="token punctuation">.</span><span class="token keyword">types</span><span class="token punctuation">;</span>
+    <span class="token keyword">default_type</span>  application<span class="token operator">/</span>octet<span class="token operator">-</span>stream<span class="token punctuation">;</span>
+
+    <span class="token keyword">gzip</span>               on<span class="token punctuation">;</span>
+    <span class="token keyword">sendfile</span>           on<span class="token punctuation">;</span>
+    <span class="token keyword">tcp_nopush</span>         on<span class="token punctuation">;</span>
+    <span class="token keyword">keepalive_timeout</span>  <span class="token number">65</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">client_body_temp_path</span>  <span class="token operator">/</span>tmp<span class="token operator">/</span>client_body<span class="token punctuation">;</span>
+    <span class="token keyword">fastcgi_temp_path</span>      <span class="token operator">/</span>tmp<span class="token operator">/</span>fastcgi_temp<span class="token punctuation">;</span>
+    <span class="token keyword">proxy_temp_path</span>        <span class="token operator">/</span>tmp<span class="token operator">/</span>proxy_temp<span class="token punctuation">;</span>
+    scgi_temp_path         <span class="token operator">/</span>tmp<span class="token operator">/</span>scgi_temp<span class="token punctuation">;</span>
+    uwsgi_temp_path        <span class="token operator">/</span>tmp<span class="token operator">/</span>uwsgi_temp<span class="token punctuation">;</span>
+
+    <span class="token keyword">include</span> <span class="token operator">/</span>etc<span class="token operator">/</span>nginx<span class="token operator">/</span>conf<span class="token punctuation">.</span>d<span class="token operator">/</span><span class="token operator">*</span><span class="token punctuation">.</span>conf<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -1599,7 +1639,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">950.6k</span>&nbsp;字
+                class="white-color">950.9k</span>&nbsp;字
             
             
             
