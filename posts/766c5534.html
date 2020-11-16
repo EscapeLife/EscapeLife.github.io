@@ -460,21 +460,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-11-11
+                    2020-11-16
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.9k
+                    2.3k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    8 分
+                    9 分
                 </div>
                 
 
@@ -495,7 +495,59 @@
 <p><code>Makeself</code> 是一个小巧而精致的 <code>Shell</code> 工具，用于将程序或者镜像文件(其实你可以做的更多)等打包成为一个可执行的 <code>.run</code> 包，来便捷的安装或者导入。</p>
 <p><img src="../images/docker-2-run.jpg" alt="用Makeself工具打包镜像"></p>
 <hr>
-<h2 id="1-工具介绍"><a href="#1-工具介绍" class="headerlink" title="1. 工具介绍"></a>1. 工具介绍</h2><blockquote>
+<h2 id="1-自解原理"><a href="#1-自解原理" class="headerlink" title="1. 自解原理"></a>1. 自解原理</h2><blockquote>
+<p><strong>使用 SHELL 来理解自解压工具的原理！</strong></p>
+</blockquote>
+<p>在 <code>Linux</code> 系统下，使用最为基本的几个 <code>Shell</code> 命令就可以完成一个简陋的自解压工具。而其原理就是，利用 <code>cat</code> 命令或追加的方式(<code>&gt;&gt;</code>)将两个文件连接起来，前者是一个 <code>Shell</code> 脚本，负责执行解压和安装的操作，而后者则是一个压缩包文件，其包含需要解压和安装的程序本身。这样这个拼接起来的新文件(前面是解压脚本，后面是压缩包)就具有自动解压和安装的功能了。这里比较重要的一点，就是如何知道执行脚本文件和压缩包文件的分割点，这样才能完整的执行了脚本而且不会损害压缩包文件内容(这里可以通过 <code>tail -n</code> 命令简单实现)。</p>
+<p>新的自解压程序的执行逻辑，如下所示：</p>
+<ol>
+<li>执行自解压程序中的 <code>Shell</code> 脚本</li>
+<li>把自解压程序后面的部分进行解压和安装等操作</li>
+<li>完毕之后退出程序</li>
+</ol>
+<p>下面，我们就通过自制一个建议的自解压程序来了解其运作过程和原理吧！</p>
+<ul>
+<li><strong><code>prefix.sh</code></strong> -&gt; 引导脚本</li>
+<li><strong><code>install.sh</code></strong> -&gt; 解压脚本</li>
+<li><strong><code>nginx.tar.gz</code></strong> -&gt; 压缩包文件</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># ----------------------</span>
+<span class="token comment" spellcheck="true"># prefix.sh</span>
+<span class="token comment" spellcheck="true"># ----------------------</span>
+
+<span class="token comment" spellcheck="true">#!/bin/bash</span>
+<span class="token keyword">echo</span> <span class="token string">"Nginx Tool Self Extracting Installer"</span>
+
+<span class="token function">export</span> CUR_DIR<span class="token operator">=</span><span class="token variable"><span class="token variable">$(</span><span class="token function">pwd</span><span class="token variable">)</span></span>
+<span class="token function">export</span> TMP_DIR<span class="token operator">=</span><span class="token variable"><span class="token variable">$(</span>mktemp -d /tmp/selfextract.XXXXXX<span class="token variable">)</span></span>
+
+ARCHIVE_LINE<span class="token operator">=</span><span class="token punctuation">$(</span>awk <span class="token string">'/^__ARCHIVE_BELOW__/ {print NR + 1; exit 0; }'</span> <span class="token string">"<span class="token variable">$0</span>"</span><span class="token punctuation">)</span>
+<span class="token function">tail</span> -n+<span class="token variable">${ARCHIVE_LINE}</span> <span class="token string">"<span class="token variable">$0</span>"</span> <span class="token operator">|</span> <span class="token function">tar</span> -zvx -C <span class="token variable">${TMPDIR}</span> <span class="token operator">&amp;</span><span class="token operator">></span> /dev/null
+
+<span class="token function">cd</span> <span class="token variable">${TMP_DIR}</span>
+./install.sh
+<span class="token function">cd</span> <span class="token variable">${CUR_DIR}</span>
+<span class="token function">rm</span> -rf <span class="token variable">${TMP_DIR}</span>
+
+<span class="token keyword">exit</span> 0
+
+__ARCHIVE_BELOW__
+<span class="token comment" spellcheck="true">#BB!!!#���-@Q#B!!!Q#���-@p�</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># ----------------------</span>
+<span class="token comment" spellcheck="true"># __ARCHIVE_BELOW__</span>
+<span class="token comment" spellcheck="true"># ----------------------</span>
+
+$ tree <span class="token keyword">.</span>
+    <span class="token operator">|</span>_ ./README
+    <span class="token operator">|</span>_ ./install.sh
+    <span class="token operator">|</span>_ ./nginx.xxx.xxx.rpm
+    <span class="token operator">|</span>_ <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 制作安装包</span>
+<span class="token comment" spellcheck="true"># 使用cat命令把两个文件拼接在一起</span>
+$ <span class="token function">cat</span> install.sh nginx.tar.gz <span class="token operator">></span> nginx_installer.run
+$ <span class="token function">chmod</span> +x nginx_installer.run<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="2-工具介绍"><a href="#2-工具介绍" class="headerlink" title="2. 工具介绍"></a>2. 工具介绍</h2><blockquote>
 <p><strong>Make self-extractable archives on Unix.</strong></p>
 </blockquote>
 <p><strong><code>makeself.sh</code></strong> 是一个从目录生成自解压压缩 <code>tar</code> 存档的小工具，通常使用 <code>.run</code> 作为默认后缀。<code>makeself.sh</code> 按照如下方式运行：归档文件将解压缩到临时目录(默认是 <code>/tmp</code> 目录)，并执行可选的任意命令或者脚本(通常会是安装脚本)。 这与 <code>Windows</code> 中常用的 <code>WinZip</code> 自解压缩工具的生成的存档非常类似。<code>Makeself</code> 存档还包括完整性自我验证(<code>CRC</code>/<code>MD5</code>/<code>SHA256</code>)的校验和。</p>
@@ -507,7 +559,7 @@ $ <span class="token function">wget</span> https://github.com/megastep/makeself/
 $ <span class="token function">bash</span> makeself-2.4.2.run<span class="token punctuation">;</span> <span class="token function">cd</span> makeself-2.4.2
 $ <span class="token function">sudo</span> <span class="token function">cp</span> makeself.sh /usr/bin/makeself<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="2-语法格式"><a href="#2-语法格式" class="headerlink" title="2. 语法格式"></a>2. 语法格式</h2><blockquote>
+<h2 id="3-语法格式"><a href="#3-语法格式" class="headerlink" title="3. 语法格式"></a>3. 语法格式</h2><blockquote>
 <p><strong>主要介绍 makeself 工具的使用方式和常用参数介绍！</strong></p>
 </blockquote>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># The syntax of makeself is the following</span>
@@ -769,7 +821,7 @@ Makeself version 2.2.0
   --tar arg1 <span class="token punctuation">[</span>arg2 <span class="token punctuation">..</span>.<span class="token punctuation">]</span> Access the contents of the archive through the <span class="token function">tar</span> <span class="token function">command</span>
   --                    Following arguments will be passed to the embedded script<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="3-实例说明"><a href="#3-实例说明" class="headerlink" title="3. 实例说明"></a>3. 实例说明</h2><blockquote>
+<h2 id="4-实例说明"><a href="#4-实例说明" class="headerlink" title="4. 实例说明"></a>4. 实例说明</h2><blockquote>
 <p><strong><a href="https://github.com/EscapeLife/awesome-builder/blob/master/Scripts/image2run.sh" target="_blank" rel="noopener">源代码地址 =&gt; <code>Github/EscapeLife</code></a></strong></p>
 </blockquote>
 <ul>
@@ -783,7 +835,7 @@ $ makeself --gzip --follow /tmp/<span class="token variable">${archive_dir}</spa
     <span class="token string">"<span class="token variable">${commit_message}</span>"</span> ./<span class="token variable">${install_name}</span>
 <span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="4-并行优化"><a href="#4-并行优化" class="headerlink" title="4. 并行优化"></a>4. 并行优化</h2><blockquote>
+<h2 id="5-并行优化"><a href="#5-并行优化" class="headerlink" title="5. 并行优化"></a>5. 并行优化</h2><blockquote>
 <p><strong>在 <code>v2.4.2</code> 这个版本中，新增了关于解压缩多线程的支持！</strong></p>
 </blockquote>
 <ul>
@@ -1119,12 +1171,12 @@ esac<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/posts/f47eb431.html">
+                <a href="/posts/42b3a8f3.html">
                     <div class="card-image">
                         
-                        <img src="/images/database-mysql-tool-useful.png" class="responsive-img" alt="MySQL工具之入门介绍">
+                        <img src="/images/pandoc-tools.png" class="responsive-img" alt="Pandoc文档格式转换工具">
                         
-                        <span class="card-title">MySQL工具之入门介绍</span>
+                        <span class="card-title">Pandoc文档格式转换工具</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -1141,8 +1193,8 @@ esac<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Database浅入浅出/" class="post-category">
-                                    Database浅入浅出
+                            <a href="/categories/Tools工具分享/" class="post-category">
+                                    Tools工具分享
                                 </a>
                             
                             
@@ -1152,8 +1204,8 @@ esac<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/MySQL/">
-                        <span class="chip bg-color">MySQL</span>
+                    <a href="/tags/Tools/">
+                        <span class="chip bg-color">Tools</span>
                     </a>
                     
                 </div>
@@ -1360,7 +1412,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">952.4k</span>&nbsp;字
+                class="white-color">952.8k</span>&nbsp;字
             
             
             
