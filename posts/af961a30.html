@@ -456,7 +456,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-03-06
+                    2020-11-23
                 </div>
                 
 
@@ -496,7 +496,9 @@
 </ul>
 <p><img src="../images/nginx-stream-proxy.png" alt="使用Nginx实现TCP反向代理"></p>
 <ul>
-<li><p>下图是 <code>nginx upstream keepalive</code> 长连接的实现原理。首先每个进程需要一个 <code>connection pool</code>，里面都是长连接，多进程之间是不需要共享这个连接池的。 一旦与后端服务器建立连接，则在当前请求连接结束之后不会立即关闭连接，而是把用完的连接保存在一个 <code>keepalive connection pool</code> 里面，以后每次需要建立向后连接的时候，只需要从这个连接池里面找。如果找到合适的连接的话，就可以直接来用这个连接，不需要重新创建 <code>socket</code> 或者发起 <code>connect()</code>。这样既省下建立连接时在握手的时间消耗，又可以避免 <code>TCP</code> 连接的 <code>slow start</code> 慢启动。如果在 <code>keepalive</code> 连接池找不到合适的连接，那就按照原来的步骤重新建立连接。</p>
+<li><p>下图是 <code>nginx upstream keepalive</code> 长连接的实现原理。首先每个进程需要一个 <code>connection pool</code>，里面都是长连接，多进程之间是不需要共享这个连接池的。 一旦与后端服务器建立连接，则在当前请求连接结束之后不会立即关闭连接，而是把用完的连接保存在一个 <code>keepalive connection pool</code> 里面，以后每次需要建立向后连接的时候，只需要从这个连接池里面找。</p>
+</li>
+<li><p>如果找到合适的连接的话，就可以直接来用这个连接，不需要重新创建 <code>socket</code> 或者发起 <code>connect()</code>。这样既省下建立连接时在握手的时间消耗，又可以避免 <code>TCP</code> 连接的 <code>slow start</code> 慢启动。如果在 <code>keepalive</code> 连接池找不到合适的连接，那就按照原来的步骤重新建立连接。</p>
 </li>
 <li><p>如果你的连接池的数控制在 <code>128</code> 个，总共线程池内的线程数是 <code>128 * nginx worker</code> 个，但因为你要应对更多的并发请求，所以临时又加了很多的连接，但这临时的连接是短连接和长连接要看你的 <code>Nginx</code> 版本。那他如何被收回，两地保证，一点是他会主动去释放，另一点是 <code>keepalive timeout</code> 的时间。</p>
 </li>
@@ -535,7 +537,10 @@ yum <span class="token function">install</span> -y gcc glibc gcc-c++ prce-devel 
 <p><strong>以下的配置就是 TCP 转发的最简配置</strong></p>
 </blockquote>
 <ul>
-<li>我们能很明显的发现，<code>stream</code> 模块的配置其实跟 <code>http</code> 模块很类似。但实际上 <code>stream</code> 模块与 <code>http</code> 模块上完全是两套不同的处理流程。用最简单的说法就是，<code>http</code> 模块是基于 <code>Layer7</code> 层的应用层处理流程，而 <code>Stream</code> 仅在 <code>Layer4</code> 层上对连接进行处理。所以 <code>stream</code> 模块无法像 <code>http</code> 模块那样能区分 <code>vhost</code> 主机名，然而这 <code>stream</code> 模块在引入了 <code>ssl</code> 配置之后又能支持了。而且 <code>stream</code> 模块还能引入 <code>ssl/tls</code> 来对 <code>TCP</code> 连接进行加密。由于 <code>TLS</code> 标准内对 <code>SNI</code> 提供了支持，所以又能识别主机名了。在理论上，<code>stream</code> 模块的端口转发效率实际上相比 <code>http</code> 模块的反向代理效率更高。</li>
+<li><p>我们能很明显的发现，<code>stream</code> 模块的配置其实跟 <code>http</code> 模块很类似。但实际上 <code>stream</code> 模块与 <code>http</code> 模块上完全是两套不同的处理流程。用最简单的说法就是，<code>http</code> 模块是基于 <code>Layer7</code> 层的应用层处理流程，而 <code>Stream</code> 仅在 <code>Layer4</code> 层上对连接进行处理。</p>
+</li>
+<li><p>所以 <code>stream</code> 模块无法像 <code>http</code> 模块那样能区分 <code>vhost</code> 主机名，然而这 <code>stream</code> 模块在引入了 <code>ssl</code> 配置之后又能支持了。而且 <code>stream</code> 模块还能引入 <code>ssl/tls</code> 来对 <code>TCP</code> 连接进行加密。由于 <code>TLS</code> 标准内对 <code>SNI</code> 提供了支持，所以又能识别主机名了。在理论上，<code>stream</code> 模块的端口转发效率实际上相比 <code>http</code> 模块的反向代理效率更高。</p>
+</li>
 </ul>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">user</span>  nginx<span class="token punctuation">;</span>
 <span class="token keyword">worker_processes</span>  <span class="token number">1</span><span class="token punctuation">;</span>
@@ -546,25 +551,27 @@ yum <span class="token function">install</span> -y gcc glibc gcc-c++ prce-devel 
 
 stream <span class="token punctuation">{</span>
     <span class="token comment" spellcheck="true"># 全局配置</span>
-    preread_timeout 120s<span class="token punctuation">;</span>
-    <span class="token keyword">proxy_connect_timeout</span> 120s<span class="token punctuation">;</span>
+    preread_timeout        120s<span class="token punctuation">;</span>
+    <span class="token keyword">proxy_connect_timeout</span>  120s<span class="token punctuation">;</span>
     proxy_protocol_timeout 120s<span class="token punctuation">;</span>
-    <span class="token keyword">resolver_timeout</span> 120s<span class="token punctuation">;</span>
-    <span class="token keyword">proxy_timeout</span> 120s<span class="token punctuation">;</span>
-    <span class="token keyword">tcp_nodelay</span> on<span class="token punctuation">;</span>
+    <span class="token keyword">resolver_timeout</span>       120s<span class="token punctuation">;</span>
+    <span class="token keyword">proxy_timeout</span>          120s<span class="token punctuation">;</span>
+    <span class="token keyword">tcp_nodelay</span>            on<span class="token punctuation">;</span>
 
     <span class="token comment" spellcheck="true"># 设置日志格式</span>
     <span class="token keyword">log_format</span> <span class="token keyword">proxy</span> <span class="token string">'$remote_addr [$time_local] '</span>
-                 <span class="token string">'$protocol $status $bytes_sent $bytes_received '</span>
-                 <span class="token string">'$session_time "$upstream_addr" '</span>
-                 <span class="token string">'"$upstream_bytes_sent" "$upstream_bytes_received" "$upstream_connect_time"'</span><span class="token punctuation">;</span>
+                  <span class="token string">'$protocol $status $bytes_sent $bytes_received '</span>
+                  <span class="token string">'$session_time "$upstream_addr" "$upstream_bytes_sent"'</span>
+                  <span class="token string">'"$upstream_bytes_received" "$upstream_connect_time"'</span><span class="token punctuation">;</span>
 
     <span class="token keyword">access_log</span> <span class="token operator">/</span>var<span class="token operator">/</span>log<span class="token operator">/</span>nginx<span class="token operator">/</span>stream<span class="token punctuation">.</span>access<span class="token punctuation">.</span>log <span class="token keyword">proxy</span><span class="token punctuation">;</span>
-    <span class="token keyword">error_log</span> <span class="token operator">/</span>var<span class="token operator">/</span>log<span class="token operator">/</span>nginx<span class="token operator">/</span>stream<span class="token punctuation">.</span>error<span class="token punctuation">.</span>log error<span class="token punctuation">;</span>
+    <span class="token keyword">error_log</span>  <span class="token operator">/</span>var<span class="token operator">/</span>log<span class="token operator">/</span>nginx<span class="token operator">/</span>stream<span class="token punctuation">.</span>error<span class="token punctuation">.</span>log error<span class="token punctuation">;</span>
 
     <span class="token keyword">upstream</span> app_pg <span class="token punctuation">{</span>
         hash <span class="token variable">$remote_addr</span> consistent<span class="token punctuation">;</span>
         <span class="token keyword">server</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">100.60</span><span class="token punctuation">:</span><span class="token number">5432</span><span class="token punctuation">;</span>
+        <span class="token keyword">server</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">100.61</span><span class="token punctuation">:</span><span class="token number">5432</span><span class="token punctuation">;</span>
+        <span class="token keyword">server</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">100.62</span><span class="token punctuation">:</span><span class="token number">5432</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span>
 
     <span class="token keyword">server</span> <span class="token punctuation">{</span>
@@ -576,7 +583,8 @@ stream <span class="token punctuation">{</span>
     <span class="token keyword">server</span><span class="token punctuation">{</span>
         <span class="token comment" spellcheck="true"># keepalive的可配置参数差不多有以下几个：keepidle，keepintvl，keepcnt</span>
         <span class="token comment" spellcheck="true"># keepidle为连接保持时间；keepintvl为连接的间隔时间；keepcnt是连接的个数</span>
-              <span class="token comment" spellcheck="true"># 表示将idle超时设置为30分钟，将探测间隔保留为系统默认值，并将探测计数设置为10个探测器</span>
+
+        <span class="token comment" spellcheck="true"># 下示将idle超时设置为30分钟，探测间隔为系统默认值，并将探测计数设置为10个探测器</span>
         <span class="token comment" spellcheck="true"># 实际配置的格式为：so_keepalive=on|off|[keepidle]:[keepintvl]:[keepcnt]</span>
         <span class="token keyword">listen</span> <span class="token operator">*</span><span class="token punctuation">:</span><span class="token number">3306</span> <span class="token keyword">so_keepalive</span><span class="token operator">=</span>30m<span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token number">10</span><span class="token punctuation">;</span>
         <span class="token keyword">proxy_connect_timeout</span> 10s<span class="token punctuation">;</span>
@@ -584,10 +592,11 @@ stream <span class="token punctuation">{</span>
         <span class="token keyword">proxy_buffer_size</span> 512k<span class="token punctuation">;</span>
         <span class="token keyword">proxy_pass</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">100.60</span><span class="token punctuation">:</span><span class="token number">8000</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 实现SSH转发</span>
-
-<span class="token keyword">user</span>  nginx<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>实现 SSH 转发</strong></li>
+</ul>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">user</span>  nginx<span class="token punctuation">;</span>
 <span class="token keyword">worker_processes</span>  <span class="token number">1</span><span class="token punctuation">;</span>
 
 <span class="token keyword">events</span> <span class="token punctuation">{</span>
@@ -604,7 +613,7 @@ stream <span class="token punctuation">{</span>
         <span class="token keyword">listen</span> <span class="token number">2222</span><span class="token punctuation">;</span>
         <span class="token keyword">proxy_pass</span> ssh<span class="token punctuation">;</span>
        <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="3-UDP-转发"><a href="#3-UDP-转发" class="headerlink" title="3. UDP 转发"></a>3. UDP 转发</h2><blockquote>
 <p><strong>以下的配置就是 UDP 转发的最简配置</strong></p>
@@ -1207,7 +1216,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">955.6k</span>&nbsp;字
+                class="white-color">955.7k</span>&nbsp;字
             
             
             

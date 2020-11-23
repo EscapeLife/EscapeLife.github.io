@@ -456,14 +456,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-03-06
+                    2020-11-23
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.1k
+                    1.2k
                 </div>
                 
 
@@ -486,14 +486,14 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <blockquote>
-<p><code>HTTPS</code> 在 <code>HTTP</code> 的基础上增加了 <code>SSL/TLS</code> 加密，提供了更加安全的传输协议，俨然已经属于各大网站的标配。<code>HTTPS</code> 在原有 <code>HTTP</code> 握手的基础上，增加了证书的验证，进行了加密，解决的问题包括<strong>运营商劫持</strong>、<strong>中间人攻击</strong>、<strong>钓鱼网站</strong>、<strong>提升 SEO</strong>等。</p>
+<p><strong><code>HTTPS</code> 在 <code>HTTP</code> 的基础上增加了 <code>SSL/TLS</code> 加密，提供了更加安全的传输协议，俨然已经属于各大网站的标配。<code>HTTPS</code> 在原有 <code>HTTP</code> 握手的基础上，增加了证书的验证，进行了加密，解决的问题包括运营商劫持、中间人攻击、钓鱼网站、提升 SEO 等。</strong></p>
 </blockquote>
 <p><img src="../images/https_cors_http.png" alt="HTTPS跨越问题处理方法"></p>
 <hr>
 <h2 id="1-起因"><a href="#1-起因" class="headerlink" title="1. 起因"></a>1. 起因</h2><ul>
 <li>因为公司有一个产品需要在网站内部引入外部文档，提供的是 <code>HTTP</code> 的地址。我们测试环境使用的也是 <code>HTTP</code> 的网址，所以测试不存在问题，可以正常显示外部文档内容。但是更新到正式环境之后，发现原本能够访问的文档不能访问。后来发现我们正式环境使用的是 <code>HTTPS</code> 的域名，因为浏览器同源策略的问题导致无法访问。</li>
 </ul>
-<p><img src="../images/https_cors_http_1.png" alt="HTTPS跨越问题处理方法"></p>
+<p><img src="../images/https_cors_http_1.png" alt="HTTPS跨越问题处理方法 - 浏览器同源策略"></p>
 <hr>
 <h2 id="2-经过"><a href="#2-经过" class="headerlink" title="2. 经过"></a>2. 经过</h2><ul>
 <li>因为浏览器同源策略的问题，导致在 <code>HTTPS</code> 的网站中无法引用 <code>HTTP</code> 网站的资源。所以，只能配置 <code>Nginx</code> 使访问的时候，间接的通过代理的方式来访问对应的资源。</li>
@@ -519,20 +519,19 @@
     <span class="token punctuation">}</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li>但是配置之后发现还是无法正常显示引用的外部文档，通过浏览器自带的控制台，发现基本和之前的情况是一样的，还是显示是因为同源策略导致的。后来，通过 <code>curl</code> 测试发现，在访问的时候，经过了一次 <code>302</code> 跳转。很奇怪，为什么还需要跳转呢？</li>
+<li><p>但是配置之后发现还是无法正常显示引用的外部文档，通过浏览器自带的控制台，发现基本和之前的情况是一样的，还是显示是因为同源策略导致的。后来，通过 <code>curl</code> 测试发现，在访问的时候，经过了一次 <code>302</code> 跳转。很奇怪，为什么还需要跳转呢？</p>
+</li>
+<li><p>通过浏览器自带的控制台，再次对请求进行分析，发现 <code>proxy_pass</code> 代理的 <code>http://www.xxx.xxx</code> 网站 <code>302</code> 到了 <code>http://www3.xxx.xxx</code> 上面，这时候才真正的得到了 <code>200</code> 的文件内容。所以，对 <code>Nginx</code> 配置进行了调整。将 <code>proxy_pass</code> 的地址改到了真正的服务域名上面，即可。</p>
+</li>
 </ul>
-<p><img src="../images/https_cors_http_2.png" alt="HTTPS跨越问题处理方法"></p>
-<ul>
-<li>通过浏览器自带的控制台，再次对请求进行分析，发现 <code>proxy_pass</code> 代理的 <code>http://www.xxx.xxx</code> 网站 <code>302</code> 到了 <code>http://www3.xxx.xxx</code> 上面，这时候才真正的得到了 <code>200</code> 的文件内容。所以，对 <code>Nginx</code> 配置进行了调整。</li>
-</ul>
-<pre class="line-numbers language-bash"><code class="language-bash">location /xxx/xxx/ <span class="token punctuation">{</span>
-    proxy_pass_header Server<span class="token punctuation">;</span>
-    proxy_set_header Host <span class="token variable">$http_host</span><span class="token punctuation">;</span>
-    proxy_set_header X-Real-IP <span class="token variable">$remote_addr</span><span class="token punctuation">;</span>
-    proxy_set_header X-Scheme <span class="token variable">$scheme</span><span class="token punctuation">;</span>
-    proxy_set_header Referer <span class="token string">"http://www.xxx.xxx"</span><span class="token punctuation">;</span>
-    proxy_http_version 1.1<span class="token punctuation">;</span>
-    proxy_pass http://www3.xxx.xxx<span class="token punctuation">;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span>xxx<span class="token operator">/</span>xxx<span class="token operator">/</span> <span class="token punctuation">{</span>
+    <span class="token keyword">proxy_pass_header</span> <span class="token keyword">Server</span><span class="token punctuation">;</span>
+    <span class="token keyword">proxy_set_header</span> Host <span class="token variable">$http_host</span><span class="token punctuation">;</span>
+    <span class="token keyword">proxy_set_header</span> X<span class="token operator">-</span>Real<span class="token operator">-</span>IP <span class="token variable">$remote_addr</span><span class="token punctuation">;</span>
+    <span class="token keyword">proxy_set_header</span> X<span class="token operator">-</span>Scheme <span class="token variable">$scheme</span><span class="token punctuation">;</span>
+    <span class="token keyword">proxy_set_header</span> Referer <span class="token string">"http://www.xxx.xxx"</span><span class="token punctuation">;</span>
+    <span class="token keyword">proxy_http_version</span> <span class="token number">1.1</span><span class="token punctuation">;</span>
+    <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>www3<span class="token punctuation">.</span>xxx<span class="token punctuation">.</span>xxx<span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>重载配置文件，访问内容，正常了。后来发现是数据库中存储的就是一个假地址，很是尴尬。</li>
@@ -584,9 +583,8 @@ http://www.domain2.com/b.js        不同域名                         不允�
 <li><code>WebSocket</code>协议跨域</li>
 </ol>
 <hr>
-<h2 id="4-结果"><a href="#4-结果" class="headerlink" title="4. 结果"></a>4. 结果</h2><ul>
-<li>比如你有 <code>API</code> 等对外服务，早期开放了 <code>HTTP</code> 调用的接口。那么很遗憾，当我们升级到 <code>HTTPS</code>的时候，能做的事情是通过公告、邮件等方式告知第三方，我们在特定时间后就不在支持 <code>HTTP</code>服务，希望第三方支持 <code>HTTPS</code> 调用。或者如果安全性不重要的话，那么就同时支持 <code>HTTP/HTTPS</code> 调用。苹果 <code>HTTPS</code> 的公告 <code>App Transport Security</code> 就是很好的例子，而实际上 <code>App</code> 内部还是留了开启 <code>HTTP</code> 请求的设置。</li>
-</ul>
+<h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a>4. 总结</h2><p>比如你有 <code>API</code> 等对外服务，早期开放了 <code>HTTP</code> 调用的接口。那么很遗憾，当我们升级到 <code>HTTPS</code>的时候，能做的事情是通过公告、邮件等方式告知第三方，我们在特定时间后就不在支持 <code>HTTP</code>服务，希望第三方支持 <code>HTTPS</code> 调用。或者如果安全性不重要的话，那么就同时支持 <code>HTTP/HTTPS</code> 调用。</p>
+<p>苹果 <code>HTTPS</code> 的公告 <code>App Transport Security</code> 就是很好的例子，而实际上 <code>App</code> 内部还是留了开启 <code>HTTP</code> 请求的设置。</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -1130,7 +1128,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">955.6k</span>&nbsp;字
+                class="white-color">955.7k</span>&nbsp;字
             
             
             

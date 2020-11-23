@@ -365,14 +365,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-03-06
+                    2020-11-23
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    607
+                    622
                 </div>
                 
 
@@ -406,7 +406,7 @@
     listen       80<span class="token punctuation">;</span>
     server_name  gameid.escape.com<span class="token punctuation">;</span>
 
-    access_log /var/log/nginx/gameid.nginx.access.log  netdata<span class="token punctuation">;</span>
+    access_log /var/log/nginx/gameid.nginx.access.log  main<span class="token punctuation">;</span>
     error_log  /var/log/nginx/gameid.nginx.error.log   error<span class="token punctuation">;</span>
 
     location / <span class="token punctuation">{</span>
@@ -423,21 +423,21 @@
 <pre class="line-numbers language-bash"><code class="language-bash">nginx: <span class="token punctuation">[</span>emerg<span class="token punctuation">]</span> <span class="token string">"proxy_pass"</span> cannot have URI part <span class="token keyword">in</span> location given by regular expression, \
 or inside named location, or inside “if” statement, or inside “limit_except” block <span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
-<li>经过不断的尝试也分析了一下原因，发现是因为路径中的 <code>?</code> 导致的 <code>rewrite</code> 的匹配规则并没有生效。后来，在谷歌帮助下才发现原来问号在 <code>nginx</code> 中是有特殊逻辑处理的。</li>
-</ul>
-<ol>
-<li><code>nginx</code> 在进行 <code>rewrite</code> 的正则表达式中只会将 <code>url</code> 中 <code>?</code> 前面的部分拿出来匹配</li>
-<li>匹配完成后，将 <code>?</code> 后面的内容将自动追加到 <code>url</code> 中(包含 <code>?</code> 在内)</li>
-<li>如果要 <code>?</code> 后面的内容，则请使用 <code>$query_string</code> 字段获取</li>
-</ol>
+<li><p>经过不断的尝试也分析了一下原因，发现是因为路径中的 <code>?</code> 导致的 <code>rewrite</code> 的匹配规则并没有生效。后来，在谷歌帮助下才发现原来问号在 <code>nginx</code> 中是有特殊逻辑处理的。</p>
 <ul>
-<li>这样就好办了，换个方式匹配一下就好了，仅为此做个笔记。</li>
+<li>[1] <code>Nginx</code> 在进行 <code>rewrite</code> 正则匹配的时候，只会将 <code>url</code> 中 <code>?</code> 前面的部分拿出来匹配</li>
+<li>[2] 匹配完成后，将 <code>?</code> 后面的内容将自动追加到 <code>url</code> 中(包含 <code>?</code> 字符在内)</li>
+<li>[3] 如果需要匹配 <code>?</code> 后面的内容，则请使用 <code>$query_string</code> 字段变量来进行正则匹配</li>
+</ul>
+</li>
+<li><p>这样就好办了，换个方式匹配一下就好了，仅为此做个笔记。</p>
+</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash">server <span class="token punctuation">{</span>
     listen       80<span class="token punctuation">;</span>
     server_name  gameid.escape.com<span class="token punctuation">;</span>
 
-    access_log /var/log/nginx/gameid.nginx.access.log  netdata<span class="token punctuation">;</span>
+    access_log /var/log/nginx/gameid.nginx.access.log  main<span class="token punctuation">;</span>
     error_log  /var/log/nginx/gameid.nginx.error.log   error<span class="token punctuation">;</span>
 
     location / <span class="token punctuation">{</span>
@@ -452,8 +452,8 @@ or inside named location, or inside “if” statement, or inside “limit_excep
         proxy_http_version 1.1<span class="token punctuation">;</span>
         <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$request_uri</span> ~* <span class="token string">"/api/v1/game/data\?id=(.*)"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
             <span class="token keyword">set</span> <span class="token variable">$id</span> <span class="token variable">$1</span><span class="token punctuation">;</span>
-            rewrite .* /api/v1/new_game/<span class="token variable">$id</span> <span class="token keyword">break</span><span class="token punctuation">;</span>
-            proxy_pass http://gameid.escape.com<span class="token punctuation">;</span>
+            rewrite     .*  /api/v1/new_game/<span class="token variable">$id</span>  <span class="token keyword">break</span><span class="token punctuation">;</span>
+            proxy_pass  http://gameid.escape.com<span class="token punctuation">;</span>
         <span class="token punctuation">}</span>
     <span class="token punctuation">}</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
@@ -918,7 +918,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">955.6k</span>&nbsp;字
+                class="white-color">955.7k</span>&nbsp;字
             
             
             
