@@ -467,14 +467,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    12.1k
+                    12.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    47 分
+                    48 分
                 </div>
                 
 
@@ -521,11 +521,14 @@
 </ul>
 </li>
 <li>默认值<ul>
-<li><code>pid nginx.pid;</code></li>
+<li><code>pid /run/nginx.pid;</code></li>
 </ul>
 </li>
 </ul>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">pid</span> <span class="token operator">/</span>var<span class="token operator">/</span>run<span class="token operator">/</span>nginx<span class="token operator">/</span>nginx<span class="token punctuation">.</span><span class="token keyword">pid</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 文件里面包含对应的PID值</span>
+$ <span class="token function">cat</span> /var/run/nginx/nginx.pid
+2743<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <p><strong>【3】<code>worker_rlimit_nofile number;</code></strong></p>
 <ul>
 <li>作用域<ul>
@@ -588,8 +591,15 @@ thread_pool wsescape threads<span class="token operator">=</span><span class="to
 </ul>
 </li>
 </ul>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">include</span> mime<span class="token punctuation">.</span><span class="token keyword">types</span><span class="token punctuation">;</span>
-<span class="token keyword">include</span> vhosts<span class="token operator">/</span><span class="token operator">*</span><span class="token punctuation">.</span>conf<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># main</span>
+<span class="token keyword">include</span> <span class="token operator">/</span>etc<span class="token operator">/</span>nginx<span class="token operator">/</span>modules<span class="token operator">-</span>enabled<span class="token operator">/</span><span class="token operator">*</span><span class="token punctuation">.</span>conf<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true"># http</span>
+<span class="token keyword">include</span> <span class="token operator">/</span>etc<span class="token operator">/</span>nginx<span class="token operator">/</span>mime<span class="token punctuation">.</span><span class="token keyword">types</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true"># http</span>
+<span class="token keyword">include</span> <span class="token operator">/</span>etc<span class="token operator">/</span>nginx<span class="token operator">/</span>conf<span class="token punctuation">.</span>d<span class="token operator">/</span><span class="token operator">*</span><span class="token punctuation">.</span>conf<span class="token punctuation">;</span>
+<span class="token keyword">include</span> <span class="token operator">/</span>etc<span class="token operator">/</span>nginx<span class="token operator">/</span>sites<span class="token operator">-</span>enabled<span class="token operator">/</span><span class="token operator">*</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><strong>【7】<code>env variable[=value];</code></strong></p>
 <ul>
 <li>作用域<ul>
@@ -652,7 +662,7 @@ thread_pool wsescape threads<span class="token operator">=</span><span class="to
 
 <span class="token comment" spellcheck="true"># 如果位数不够表示了，可以使用更多的位数</span>
 <span class="token keyword">worker_processes</span>    <span class="token number">6</span><span class="token punctuation">;</span>
-<span class="token keyword">worker_cpu_affinity</span> <span class="token number">00000001</span> <span class="token number">00000010</span> <span class="token number">00000100</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token keyword">worker_cpu_affinity</span> <span class="token number">00000001</span> <span class="token number">00000010</span> <span class="token number">00000100</span> <span class="token number">00001000</span> <span class="token number">00010000</span> <span class="token number">00100000</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 适合于超线程的机器</span>
 <span class="token comment" spellcheck="true"># 将每个工作进程分别绑定至不同的CPU</span>
 <span class="token comment" spellcheck="true"># 将第一个工作进程绑定至CPU0/CPU2，将第二个工作进程绑定至CPU1/CPU3</span>
@@ -807,7 +817,10 @@ thread_pool wsescape threads<span class="token operator">=</span><span class="to
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">lock_file</span> <span class="token operator">/</span>etc<span class="token operator">/</span>nginx<span class="token operator">/</span>lock<span class="token operator">/</span>nginx<span class="token punctuation">.</span>lock<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p><strong>【5】<code>multi_accept on|off;</code></strong></p>
 <ul>
-<li>作用域 -<code>events</code></li>
+<li>作用域<ul>
+<li><code>events</code></li>
+</ul>
+</li>
 <li>含义解释<ul>
 <li>是否允许一次性地响应多个用户请求，默认为<code>off</code>模式</li>
 <li>使用<code>kqueue</code>事件模式时，可忽略这条指令，因为 kqueue 可以报告有多少新连接等待接入</li>
@@ -871,7 +884,7 @@ thread_pool wsescape threads<span class="token operator">=</span><span class="to
 <pre class="line-numbers language-nginx"><code class="language-nginx">worker_aio_requests <span class="token number">64</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <hr>
 <h3 id="1-4-调试-定位相关的配置"><a href="#1-4-调试-定位相关的配置" class="headerlink" title="1.4 调试/定位相关的配置"></a>1.4 调试/定位相关的配置</h3><blockquote>
-<p>需要在编译<code>nginx</code>时使用了<code>--with-debug</code>选项才有效</p>
+<p><strong>部分参数设置需要在编译<code>nginx</code>时使用了<code>--with-debug</code>选项才有效</strong></p>
 </blockquote>
 <p><strong>【1】<code>daemon on|off;</code></strong></p>
 <ul>
@@ -1058,7 +1071,11 @@ FreeBSD和Mac的操作系统下，backlog的默认值是<span class="token opera
 指示在Linux系统使用延迟的<span class="token function">accept</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 
 <span class="token comment" spellcheck="true"># (8) bind参数</span>
-指示nginx为设置的address<span class="token punctuation">:</span>port单独调用一次<span class="token function">bind</span><span class="token punctuation">(</span><span class="token punctuation">)</span>。这是因为当有多条<span class="token keyword">listen</span>指令监听不同地址下的相同端口，而其中一条<span class="token keyword">listen</span>指令监听了这个端口的所有地址<span class="token punctuation">(</span><span class="token operator">*</span><span class="token punctuation">:</span>port<span class="token punctuation">)</span>时，nginx只会为<span class="token operator">*</span><span class="token punctuation">:</span>port调用一次<span class="token function">bind</span><span class="token punctuation">(</span><span class="token punctuation">)</span>绑定套接字。需要留意的是，这种情况下，nginx会调用<span class="token function">getsockname</span><span class="token punctuation">(</span><span class="token punctuation">)</span>系统调用来确定接受请求的套接字地址。 如果为某个address<span class="token punctuation">:</span>port定义了参数backlog、rcvbuf、 sndbuf、accept_filter、deferred或者<span class="token keyword">so_keepalive</span>， nginx总会为这个地址单独调用一次<span class="token function">bind</span><span class="token punctuation">(</span><span class="token punctuation">)</span>绑定套接字。
+指示nginx为设置的address<span class="token punctuation">:</span>port单独调用一次<span class="token function">bind</span><span class="token punctuation">(</span><span class="token punctuation">)</span>。这是因为当有多条<span class="token keyword">listen</span>指令监听不同地址下的
+相同端口，而其中一条<span class="token keyword">listen</span>指令监听了这个端口的所有地址<span class="token punctuation">(</span><span class="token operator">*</span><span class="token punctuation">:</span>port<span class="token punctuation">)</span>时，nginx只会为<span class="token operator">*</span><span class="token punctuation">:</span>port调用一次
+<span class="token function">bind</span><span class="token punctuation">(</span><span class="token punctuation">)</span>绑定套接字。需要留意的是，这种情况下，nginx会调用<span class="token function">getsockname</span><span class="token punctuation">(</span><span class="token punctuation">)</span>系统调用来确定接受请求的
+套接字地址。 如果为某个address<span class="token punctuation">:</span>port定义了参数backlog、rcvbuf、 sndbuf、accept_filter、
+deferred或者<span class="token keyword">so_keepalive</span>， nginx总会为这个地址单独调用一次<span class="token function">bind</span><span class="token punctuation">(</span><span class="token punctuation">)</span>绑定套接字。
 
 <span class="token comment" spellcheck="true"># (9) ipv6only=on|off参数</span>
 这个参数<span class="token punctuation">(</span><span class="token number">0.7</span><span class="token punctuation">.</span><span class="token number">42</span><span class="token punctuation">)</span>决定监听在通配地址<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">]</span>上的IPv6套接字是只支持IPv6连接，还是同时支持IPv6和IPv4连接
@@ -1072,7 +1089,7 @@ FreeBSD和Mac的操作系统下，backlog的默认值是<span class="token opera
 <span class="token comment" spellcheck="true"># (11) so_keepalive=on|off|[keepidle]:[keepintvl]:[keepcnt]参数</span>
 这个参数<span class="token punctuation">(</span><span class="token number">1.1</span><span class="token punctuation">.</span><span class="token number">11</span><span class="token punctuation">)</span>为监听套接字配置“TCP <span class="token keyword">keepalive</span>”行为，如果省略此参数设置将对此端口生效
 如果参数值设置为on，监听套接字的<span class="token keyword">SO_KEEPALIVE</span>属性将被开启
-如果参数值设置为off，监听套接字的<span class="token keyword">SO_KEEPALIVE</span>属性将被关闭<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+如果参数值设置为off，监听套接字的<span class="token keyword">SO_KEEPALIVE</span>属性将被关闭<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><strong>【4】<code>server_name name ...;</code></strong></p>
 <ul>
 <li>作用域<ul>
@@ -1958,9 +1975,6 @@ FreeBSD和Mac的操作系统下，backlog的默认值是<span class="token opera
 <hr>
 <h2 id="3-高级配置相关"><a href="#3-高级配置相关" class="headerlink" title="3. 高级配置相关"></a>3. 高级配置相关</h2><blockquote>
 <p><code>Nginx</code>的高级配置会涉及到虚拟主机配置、访问控制、用户认证等。</p>
-<ul>
-<li>1-4：访问控制</li>
-</ul>
 </blockquote>
 <h3 id="3-1-基于-IP-地址的访问控制"><a href="#3-1-基于-IP-地址的访问控制" class="headerlink" title="3.1 基于 IP 地址的访问控制"></a>3.1 基于 IP 地址的访问控制</h3><p><strong>主要事项</strong></p>
 <ul>
@@ -2020,20 +2034,21 @@ FreeBSD和Mac的操作系统下，backlog的默认值是<span class="token opera
 </li>
 </ul>
 <p><strong>实例演示</strong></p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 用户名/密码文件存储格式</span>
-name1<span class="token punctuation">:</span>password1
-name2<span class="token punctuation">:</span>password2<span class="token punctuation">:</span>comment
-name3<span class="token punctuation">:</span>password3
-<span class="token comment" spellcheck="true"># 配置如下</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 用户名/密码文件存储格式</span>
+name1:password1
+name2:password2:comment
+name3:password3<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 配置如下</span>
 <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
     <span class="token keyword">auth_basic</span>           <span class="token string">"closed site"</span><span class="token punctuation">;</span>
     <span class="token keyword">auth_basic_user_file</span> conf<span class="token operator">/</span>htpasswd<span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
+
 <span class="token keyword">location</span> <span class="token operator">/</span>admin<span class="token operator">/</span> <span class="token punctuation">{</span>
     <span class="token keyword">root</span> <span class="token operator">/</span>www<span class="token operator">/</span>b<span class="token punctuation">.</span>org<span class="token punctuation">;</span>
     <span class="token keyword">auth_basic</span> <span class="token string">"admin area"</span><span class="token punctuation">;</span>
     <span class="token keyword">auth_basic_user_file</span> <span class="token operator">/</span>etc<span class="token operator">/</span>nginx<span class="token operator">/</span><span class="token punctuation">.</span>htpasswd<span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="3-3-根据-JWT-的客户端授权"><a href="#3-3-根据-JWT-的客户端授权" class="headerlink" title="3.3 根据 JWT 的客户端授权"></a>3.3 根据 JWT 的客户端授权</h3><p><strong>主要事项</strong></p>
 <ul>
@@ -2180,7 +2195,7 @@ name3<span class="token punctuation">:</span>password3
     <span class="token punctuation">}</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h3 id="3-6-状态页面"><a href="#3-6-状态页面" class="headerlink" title="3.6 状态页面"></a>3.6 状态页面</h3><p><strong>主要事项</strong></p>
+<h3 id="3-6-服务连接的状态页面"><a href="#3-6-服务连接的状态页面" class="headerlink" title="3.6 服务连接的状态页面"></a>3.6 服务连接的状态页面</h3><p><strong>主要事项</strong></p>
 <ul>
 <li><code>ngx_http_stub_status_module</code>模块提供对基本状态信息的访问</li>
 <li>该模块默认情况下不安装，需要启用<code>--with-http_stub_status_module</code>参数</li>
@@ -2196,18 +2211,21 @@ name3<span class="token punctuation">:</span>password3
 </ul>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 当前所有处于打开状态的活动连接数</span>
 Active connections<span class="token punctuation">:</span> <span class="token number">6</span>
+
 <span class="token comment" spellcheck="true"># 共处理了x个连接，成功建立了x个握手，总共处理了x个请求</span>
 <span class="token keyword">server</span> accepts handled request
 <span class="token number">241</span> <span class="token number">241</span> <span class="token number">431</span>
+
 <span class="token comment" spellcheck="true"># Reading: 正处于接受请求状态的连接数</span>
 <span class="token comment" spellcheck="true"># Writing: 请求已经接受完成，正处于处理请求或发送响应过程中的连接数</span>
 <span class="token comment" spellcheck="true"># Waiting: 持久连接模式且处于活动状态的连接数，意思就是nginx已经处理正在等待下一次请求指令的驻留连接，开启keep-alive时，该值等于active-(reading+writing)</span>
-Reading<span class="token punctuation">:</span> <span class="token number">0</span> Writing<span class="token punctuation">:</span> <span class="token number">1</span> Waiting<span class="token punctuation">:</span> <span class="token number">5</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+Reading<span class="token punctuation">:</span> <span class="token number">0</span> Writing<span class="token punctuation">:</span> <span class="token number">1</span> Waiting<span class="token punctuation">:</span> <span class="token number">5</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><strong>实例演示</strong></p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 配置状态页面</span>
 <span class="token keyword">server</span> <span class="token punctuation">{</span>
-    <span class="token keyword">listen</span>  <span class="token operator">*</span><span class="token punctuation">:</span><span class="token number">80</span> default_server<span class="token punctuation">;</span>
+    <span class="token keyword">listen</span>      <span class="token operator">*</span><span class="token punctuation">:</span><span class="token number">80</span> default_server<span class="token punctuation">;</span>
     <span class="token keyword">server_name</span> wsescape<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
+
     <span class="token keyword">location</span> <span class="token operator">/</span>ngx_status
     <span class="token punctuation">{</span>
         <span class="token keyword">stub_status</span><span class="token punctuation">;</span>
@@ -2216,15 +2234,17 @@ Reading<span class="token punctuation">:</span> <span class="token number">0</sp
         <span class="token comment" spellcheck="true">#deny all;</span>
     <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
+
 <span class="token comment" spellcheck="true"># 重启服务</span>
 service nginx restart
+
 <span class="token comment" spellcheck="true"># 查看状态页面</span>
 Active connections<span class="token punctuation">:</span> <span class="token number">11921</span>
 <span class="token keyword">server</span> accepts handled requests
  <span class="token number">11989</span> <span class="token number">11989</span> <span class="token number">11991</span>
-Reading<span class="token punctuation">:</span> <span class="token number">0</span> Writing<span class="token punctuation">:</span> <span class="token number">7</span> Waiting<span class="token punctuation">:</span> <span class="token number">42</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+Reading<span class="token punctuation">:</span> <span class="token number">0</span> Writing<span class="token punctuation">:</span> <span class="token number">7</span> Waiting<span class="token punctuation">:</span> <span class="token number">42</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h3 id="3-7-URL-重写"><a href="#3-7-URL-重写" class="headerlink" title="3.7 URL 重写"></a>3.7 URL 重写</h3><p><strong>主要事项</strong></p>
+<h3 id="3-7-设置-URL-页面重定向"><a href="#3-7-设置-URL-页面重定向" class="headerlink" title="3.7 设置 URL 页面重定向"></a>3.7 设置 URL 页面重定向</h3><p><strong>主要事项</strong></p>
 <ul>
 <li>用来执行<code>URL</code>重定向，该机制用于去掉恶意访问的<code>URL</code>而且有利于搜索引擎优化</li>
 <li><code>ngx_http_rewrite_module</code>模块允许正则替换<code>URI</code>，返回页面重定向和按条件选择配置</li>
@@ -2250,7 +2270,6 @@ Reading<span class="token punctuation">:</span> <span class="token number">0</sp
 </ul>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># condition条件类型</span>
 <span class="token number">1</span><span class="token punctuation">.</span> 变量名
-
 变量值为空串或以<span class="token number">0</span>开始，则为<span class="token boolean">false</span>，其余均为<span class="token boolean">true</span>
 
 <span class="token number">2</span><span class="token punctuation">.</span> 比较表达式
@@ -2270,7 +2289,7 @@ Reading<span class="token punctuation">:</span> <span class="token number">0</sp
 <span class="token operator">-</span>e、<span class="token operator">!</span><span class="token operator">-</span>e
 
 <span class="token number">7</span><span class="token punctuation">.</span> 检测文件是否又可执行权限
-<span class="token operator">-</span>x<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token operator">-</span>x<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>rewrite</strong><ul>
 <li>语法格式：<code>rewrite regex replacement [flag];</code></li>
@@ -2319,11 +2338,11 @@ Reading<span class="token punctuation">:</span> <span class="token number">0</sp
 </tr>
 <tr>
 <td>`</td>
-<td>`</td>
+<td>` 匹配之前和之后的字符串</td>
 </tr>
 <tr>
 <td><code>()</code></td>
-<td>分组，`^(hello</td>
+<td>分组；<code>^(hello)(world)\$</code>分组捕获结果，<code>\$1</code>为 hello，<code>\$2</code>为 world</td>
 </tr>
 </tbody></table>
 <ul>
@@ -2664,18 +2683,6 @@ server <span class="token punctuation">{</span>
 
 <span class="token comment" spellcheck="true"># 重新加载配置文件</span>
 nginx -s reload<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -3223,7 +3230,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">955.5k</span>&nbsp;字
+                class="white-color">955.6k</span>&nbsp;字
             
             
             
