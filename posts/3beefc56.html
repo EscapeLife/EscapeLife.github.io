@@ -564,8 +564,9 @@ yum groupinstall -y <span class="token string">"Server Platform Deveopment"</spa
   --http-uwsgi-temp-path<span class="token operator">=</span>/usr/local/nginx/uwsgi \
   --http-scgi-temp-path<span class="token operator">=</span>/usr/local/nginx/scgi \
   --with-pcre
+
 <span class="token comment" spellcheck="true"># 最后进行安装</span>
-<span class="token function">make</span> <span class="token operator">&amp;&amp;</span> <span class="token function">make</span> <span class="token function">install</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token function">make</span> <span class="token operator">&amp;&amp;</span> <span class="token function">make</span> <span class="token function">install</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="2-2-额外优化操作"><a href="#2-2-额外优化操作" class="headerlink" title="2.2 额外优化操作"></a>2.2 额外优化操作</h3><ul>
 <li><p><strong>加速内存分配</strong></p>
@@ -575,7 +576,7 @@ yum groupinstall -y <span class="token string">"Server Platform Deveopment"</spa
 </li>
 <li><p><strong>添加额外组件</strong></p>
 <ul>
-<li>如果想使用<code>Nginx</code>的<code>perl</code>模块，可以通过为<code>configure</code>脚本添加<code>--with-http_perl_module</code>选项来实现。</li>
+<li>如果想使用<code>Nginx</code>的<code>perl</code>模块，可以为<code>configure</code>脚本添加<code>--with-http_perl_module</code>选项来实现。</li>
 <li>如果想使用基于<code>nginx</code>的<code>cgi</code>功能，也可以基于<code>FCGI</code>来实现，具体实现方法请参照网上的文档。</li>
 </ul>
 </li>
@@ -723,7 +724,8 @@ esac<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span
 <p>在<code>nginx</code>内部，进程间的通信是通过模块的<code>pipeline</code>或<code>chain</code>实现的。换句话说，每一个功能或操作都由一个模块来实现。例如，压缩、通过<code>FastCGI</code>或<code>uwsgi</code>协议与<code>upstream</code>服务器通信，以及与<code>memcached</code>建立会话等。</p>
 <p><code>Nginx</code>的核心模块为<code>Main</code>和<code>Events</code>，此外还包括标准<code>HTTP</code>模块、可选<code>HTTP</code>模块和邮件模块，其还可以支持诸多第三方模块。<code>Main</code>用于配置错误日志、进程及权限等相关的参数，<code>Events</code>用于配置<code>IO</code>模型，如<code>epoll</code>、<code>kqueue</code>、<code>select</code>或<code>poll</code>等，它们是必备模块。</p>
 <p><code>Nginx</code>的主配置文件由几个段组成，这个段通常也被称为<code>nginx</code>的上下文，每个段的定义格式如下所示。需要注意的是，其每一个指令都必须使用分号(<code>;</code>)结束，否则为语法错误。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx">main
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">user</span>
+<span class="token keyword">worker_processes</span>
 <span class="token keyword">error_log</span>
 <span class="token keyword">pid</span>
 
@@ -743,7 +745,7 @@ esac<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span
         <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
         <span class="token punctuation">}</span>
     <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="3-2-配置-main-模块"><a href="#3-2-配置-main-模块" class="headerlink" title="3.2 配置 main 模块"></a>3.2 配置 main 模块</h3><blockquote>
 <p>下面说明<code>main</code>模块中的几个关键参数。</p>
@@ -754,23 +756,24 @@ esac<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 用于配置错误日志，可用于main、http、server及location上下文中</span>
 
 <span class="token comment" spellcheck="true"># 语法格式</span>
-<span class="token keyword">error_log</span> file <span class="token operator">|</span> stderr <span class="token punctuation">[</span> debug <span class="token operator">|</span> info <span class="token operator">|</span> notice <span class="token operator">|</span> warn <span class="token operator">|</span> error <span class="token operator">|</span> crit <span class="token operator">|</span> alert <span class="token operator">|</span> emerg <span class="token punctuation">]</span>
+<span class="token keyword">error_log</span> file <span class="token operator">|</span> stderr <span class="token punctuation">[</span>debug<span class="token operator">|</span>info<span class="token operator">|</span>notice<span class="token operator">|</span>warn<span class="token operator">|</span>error<span class="token operator">|</span>crit<span class="token operator">|</span>alert<span class="token operator">|</span>emerg<span class="token punctuation">]</span>
 
 <span class="token comment" spellcheck="true"># 如果在编译nginx时使用了--with-debug选项，还可以使用如下格式打开调试功能。</span>
-<span class="token keyword">error_log</span> LOGFILE <span class="token punctuation">[</span>debug_core <span class="token operator">|</span> debug_alloc <span class="token operator">|</span> debug_mutex <span class="token operator">|</span> debug_event <span class="token operator">|</span> debug_http <span class="token operator">|</span> debug_imap<span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token keyword">error_log</span> LOGFILE <span class="token punctuation">[</span>debug_core<span class="token operator">|</span>debug_alloc<span class="token operator">|</span>debug_mutex<span class="token operator">|</span>debug_event<span class="token operator">|</span>debug_http<span class="token operator">|</span>debug_imap<span class="token punctuation">]</span><span class="token punctuation">;</span>
 
 <span class="token comment" spellcheck="true"># 要禁用错误日志，不能使用“error_log off;”，而要使用类似如下选项：</span>
 <span class="token keyword">error_log</span> <span class="token operator">/</span>dev<span class="token operator">/</span>null crit<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>timer_resolution</strong></li>
 </ul>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 用于降低gettimeofday()系统调用的次数。默认情况下，每次从kevent()、epoll、/dev/poll、select()或poll()返回时都会执行此系统调用。</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 用于降低gettimeofday()系统调用的次数。</span>
+<span class="token comment" spellcheck="true"># 默认情况下，每次从kevent()、epoll、/dev/poll、select()或poll()返回时都会执行此系统调用。</span>
 
 <span class="token comment" spellcheck="true"># 语法格式</span>
 <span class="token keyword">timer_resolution</span> interval
 
 <span class="token comment" spellcheck="true"># 例如</span>
-<span class="token keyword">timer_resolution</span>  100ms<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token keyword">timer_resolution</span>  100ms<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>worker_cpu_affinity</strong></li>
 </ul>
@@ -781,7 +784,7 @@ esac<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span
 
 <span class="token comment" spellcheck="true"># 例如</span>
 <span class="token keyword">worker_processes</span>     <span class="token number">4</span><span class="token punctuation">;</span>
-<span class="token keyword">worker_cpu_affinity</span> <span class="token number">0001</span> <span class="token number">0010</span> <span class="token number">0100</span> <span class="token number">1000</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token keyword">worker_cpu_affinity</span>  <span class="token number">0001</span> <span class="token number">0010</span> <span class="token number">0100</span> <span class="token number">1000</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>worker_priority</strong></li>
 </ul>
@@ -792,11 +795,12 @@ esac<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span
 <ul>
 <li><strong>worker_processes</strong></li>
 </ul>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># worker进程是单线程进程。如果Nginx用于CPU密集型的场景中，如SSL或gzip，且主机上的CPU个数至少有2个，那么应该将此参数值设定为与CPU核心数相同；</span>
-<span class="token comment" spellcheck="true"># 如果Nginx用于大量静态文件访问的场景中，且所有文件的总大小大于可用内存时，应该将此参数的值设定得足够大以充分利用磁盘带宽。</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># worker进程是单线程进程。如果Nginx用于CPU密集型的场景中，如SSL或gzip，且主机上的CPU个数至</span>
+<span class="token comment" spellcheck="true"># 少有2个，那么应该将此参数值设定为与CPU核心数相同；如果Nginx用于大量静态文件访问的场景中，且</span>
+<span class="token comment" spellcheck="true"># 所有文件的总大小大于可用内存时，应该将此参数的值设定得足够大以充分利用磁盘带宽。</span>
 
 <span class="token comment" spellcheck="true"># 此参数与Events上下文中的work_connections变量一起决定了maxclient的值</span>
-maxclients <span class="token operator">=</span> work_processes <span class="token operator">*</span> work_connections<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+maxclients <span class="token operator">=</span> work_processes <span class="token operator">*</span> work_connections<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>worker_rlimit_nofile</strong></li>
 </ul>
@@ -808,18 +812,21 @@ maxclients <span class="token operator">=</span> work_processes <span class="tok
 <h3 id="3-3-配置-events-模块"><a href="#3-3-配置-events-模块" class="headerlink" title="3.3 配置 events 模块"></a>3.3 配置 events 模块</h3><ul>
 <li><strong>worker_connections</strong></li>
 </ul>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 设定每个worker所处理的最大连接数，它与来自main上下文的worker_processes一起决定了maxclients的值。</span>
-max clients <span class="token operator">=</span> <span class="token keyword">worker_processes</span> <span class="token operator">*</span> <span class="token keyword">worker_connections</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 设定每个worker所处理的最大连接数</span>
+<span class="token comment" spellcheck="true"># 它与来自main上下文的worker_processes一起决定了maxclients的值</span>
+max_clients <span class="token operator">=</span> <span class="token keyword">worker_processes</span> <span class="token operator">*</span> <span class="token keyword">worker_connections</span>
 
-<span class="token comment" spellcheck="true"># 而在反向代理场景中，其计算方法与上述公式不同，因为默认情况下浏览器将打开2个连接，而nginx会为每一个连接打开2个文件描述符，因此，其maxclients的计算方法为：</span>
-max clients <span class="token operator">=</span> <span class="token keyword">worker_processes</span> <span class="token operator">*</span> <span class="token keyword">worker_connections</span><span class="token operator">/</span><span class="token number">4</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token comment" spellcheck="true"># 而在反向代理场景中，其计算方法与上述公式不同，因为默认情况下浏览器将打开2个</span>
+<span class="token comment" spellcheck="true"># 连接，而nginx会为每一个连接打开2个文件描述符，因此，其maxclients的计算方法为</span>
+max_clients <span class="token operator">=</span> <span class="token keyword">worker_processes</span> <span class="token operator">*</span> <span class="token keyword">worker_connections</span> <span class="token operator">/</span> <span class="token number">4</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>use</strong></li>
 </ul>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 在有着多于一个的事件模型IO的应用场景中，可以使用此指令设定nginx所使用的IO机制，默认为./configure脚本选定的各机制中最适用当前OS的版本。</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 在有着多于一个的事件模型IO的应用场景中，可以使用此指令设定nginx所使用的IO机制</span>
+<span class="token comment" spellcheck="true"># 默认为./configure脚本选定的各机制中最适用当前OS的版本</span>
 
 <span class="token comment" spellcheck="true"># 语法格式</span>
-<span class="token keyword">use</span> <span class="token punctuation">[</span> kqueue <span class="token operator">|</span> rtsig <span class="token operator">|</span> epoll <span class="token operator">|</span> <span class="token operator">/</span>dev<span class="token operator">/</span>poll <span class="token operator">|</span> select <span class="token operator">|</span> poll <span class="token operator">|</span> eventport <span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token keyword">use</span> <span class="token punctuation">[</span>kqueue<span class="token operator">|</span>rtsig<span class="token operator">|</span>epoll<span class="token operator">|</span><span class="token operator">/</span>dev<span class="token operator">/</span>poll<span class="token operator">|</span>select<span class="token operator">|</span>poll<span class="token operator">|</span>eventport<span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="3-4-一个配置示例"><a href="#3-4-一个配置示例" class="headerlink" title="3.4 一个配置示例"></a>3.4 一个配置示例</h3><pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">user</span> nginx<span class="token punctuation">;</span>
 <span class="token keyword">worker_processes</span> <span class="token number">16</span><span class="token punctuation">;</span>
@@ -903,7 +910,7 @@ max clients <span class="token operator">=</span> <span class="token keyword">wo
     <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>www<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token punctuation">:</span><span class="token number">8080</span><span class="token operator">/</span>newuri<span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li>不过，这种处理机制中有两个例外。一个是如果<code>location</code>的<code>URI</code>是通过模式匹配定义的，其<code>URI</code>将直接被传递至上游服务器，而不能为其指定转换的另一个<code>URI</code>。例如下面示例中的<code>/forum</code>将被代理为<code>http://www.escapelife.com/forum</code>。</li>
+<li>不过，这种处理机制中有两个例外。一个是如果<code>location</code>的<code>URI</code>是通过模式匹配定义的，其<code>URI</code>将直接被传递至上游服务器，而不能为其指定转换的另一个<code>URI</code>。</li>
 </ul>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">~</span> <span class="token operator">^</span><span class="token operator">/</span>bbs <span class="token punctuation">{</span>
     <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>www<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
@@ -987,8 +994,7 @@ max clients <span class="token operator">=</span> <span class="token keyword">wo
   <span class="token keyword">server</span> www<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com weight<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">;</span>
   <span class="token keyword">server</span> www2<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token punctuation">:</span><span class="token number">8080</span>       max_fails<span class="token operator">=</span><span class="token number">3</span>  fail_timeout<span class="token operator">=</span>30s<span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p><code>upstream</code>模块的负载均衡算法主要有三种，<strong>轮调</strong>(<code>round-robin</code>)、<strong>ip 哈希</strong>(<code>ip_hash</code>)和<strong>最少连接</strong>(<code>least_conn</code>)三种。</p>
-<p>此外，<code>upstream</code>模块也能为非<code>http</code>类的应用实现负载均衡，如下面的示例定义了<code>nginx</code>为<code>memcached</code>服务实现负载均衡之目的。</p>
+<p><code>upstream</code>模块的负载均衡算法主要有三种，<strong>轮调</strong>(<code>round-robin</code>)、<strong>ip 哈希</strong>(<code>ip_hash</code>)和<strong>最少连接</strong>(<code>least_conn</code>)三种。此外，<code>upstream</code>模块也能为非<code>http</code>类的应用实现负载均衡，如下面的示例定义了<code>nginx</code>为<code>memcached</code>服务实现负载均衡之目的。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">upstream</span> memcachesrvs <span class="token punctuation">{</span>
     <span class="token keyword">server</span> <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.6</span><span class="token punctuation">:</span><span class="token number">11211</span><span class="token punctuation">;</span>
     <span class="token keyword">server</span> <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.7</span><span class="token punctuation">:</span><span class="token number">11211</span><span class="token punctuation">;</span>
@@ -1011,7 +1017,7 @@ max clients <span class="token operator">=</span> <span class="token keyword">wo
 </ul>
 <p>在<code>location</code>中使用<code>if</code>语句可以实现条件判断，其通常有一个<code>return</code>语句，且一般与有着<code>last</code>或<code>break</code>标记的<code>rewrite</code>规则一同使用。但其也可以按需要使用在多种场景下，需要注意的是，不当的使用可能会导致不可预料的后果。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$request_method</span> <span class="token operator">==</span> “PUT”<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$request_method</span> <span class="token operator">==</span> <span class="token string">"PUT"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>upload<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token punctuation">:</span><span class="token number">8080</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span>
 
@@ -1143,7 +1149,8 @@ X<span class="token operator">-</span>Accel<span class="token operator">-</span>
 </li>
 </ul>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 其格式为</span>
-<span class="token keyword">proxy_cache_use_stale</span> error <span class="token operator">|</span> <span class="token keyword">timeout</span> <span class="token operator">|</span> invalid_header <span class="token operator">|</span> updating <span class="token operator">|</span> http_500 <span class="token operator">|</span> http_502 <span class="token operator">|</span> http_503 <span class="token operator">|</span> http_504 <span class="token operator">|</span> http_404 <span class="token operator">|</span> off<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<span class="token keyword">proxy_cache_use_stale</span> error<span class="token operator">|</span><span class="token keyword">timeout</span><span class="token operator">|</span>invalid_header<span class="token operator">|</span>updating
+<span class="token keyword">proxy_cache_use_stale</span> http_500<span class="token operator">|</span>http_502<span class="token operator">|</span>http_503<span class="token operator">|</span>http_504<span class="token operator">|</span>http_404<span class="token operator">|</span>off<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><p><strong>proxy_cache_valid [ code …] time</strong></p>
 <ul>
@@ -1187,9 +1194,17 @@ X<span class="token operator">-</span>Accel<span class="token operator">-</span>
     <span class="token keyword">gzip</span> on<span class="token punctuation">;</span>
     <span class="token keyword">gzip_http_version</span> <span class="token number">1.0</span><span class="token punctuation">;</span>
     <span class="token keyword">gzip_comp_level</span> <span class="token number">2</span><span class="token punctuation">;</span>
-    <span class="token keyword">gzip_types</span> text<span class="token operator">/</span>plain text<span class="token operator">/</span>css application<span class="token operator">/</span>x<span class="token operator">-</span>javascript text<span class="token operator">/</span>xml application<span class="token operator">/</span>xml application<span class="token operator">/</span>xml<span class="token operator">+</span>rss text<span class="token operator">/</span>javascript application<span class="token operator">/</span>javascript application<span class="token operator">/</span>json<span class="token punctuation">;</span>
+    <span class="token keyword">gzip_types</span> text<span class="token operator">/</span>plain
+        text<span class="token operator">/</span>css
+        application<span class="token operator">/</span>x<span class="token operator">-</span>javascript
+        text<span class="token operator">/</span>xml
+        application<span class="token operator">/</span>xml
+        application<span class="token operator">/</span>xml<span class="token operator">+</span>rss
+        text<span class="token operator">/</span>javascript
+        application<span class="token operator">/</span>javascript
+        application<span class="token operator">/</span>json<span class="token punctuation">;</span>
     <span class="token keyword">gzip_disable</span> msie6<span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><code>gzip_proxied</code>指令可以定义对客户端请求哪类对象启用压缩功能，如<code>“expired”</code>表示对由于使用了<code>expire</code>首部定义而无法缓存的对象启用压缩功能，其它可接受的值还有<code>“no-cache”</code>、<code>“no-store”</code>、<code>“private”</code>、<code>“no_last_modified”</code>、<code>“no_etag”</code>和<code>“auth”</code>等，而<code>“off”</code>则表示关闭压缩功能。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token operator">^</span><span class="token operator">~</span> <span class="token operator">/</span>test
 <span class="token keyword">rewrite</span> a<span class="token punctuation">.</span>jpg   a<span class="token punctuation">.</span>css  last<span class="token punctuation">;</span>
@@ -1216,8 +1231,7 @@ X<span class="token operator">-</span>Accel<span class="token operator">-</span>
         <span class="token punctuation">}</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>此例中，对<code>http://www.escapelife.com/bbs/</code>的请求将被转发至<code>http://172.16.100.11/</code>这个<code>URL</code>，切记最后的<code>/</code>不应该省去；而<code>/</code>匹配的<code>URL</code>中请求方法为<code>“PUT”时</code>，将被转发至<code>http://172.16.100.12/</code>这个<code>URL</code>。</p>
-<p>另外，<code>add_header</code>用于让<code>nginx</code>在响应给用户的报文中构造自定义首部，其使用格式为<code>“add_header NAME VALUE”</code>。</p>
-<p>可以使用<code>curl</code>命令对配置好的服务进行请求，以验正其效果。如：</p>
+<p>另外，<code>add_header</code>用于让<code>nginx</code>在响应给用户的报文中构造自定义首部，其使用格式为<code>“add_header NAME VALUE”</code>。可以使用<code>curl</code>命令对配置好的服务进行请求，以验正其效果。如：</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># curl -I http://www.escapelife.com/bbs/</span>
 <span class="token keyword">HTTP</span><span class="token operator">/</span><span class="token number">1.1</span> <span class="token number">200</span> OK
 <span class="token keyword">Server</span><span class="token punctuation">:</span> nginx<span class="token operator">/</span><span class="token number">1.4</span><span class="token punctuation">.</span><span class="token number">1</span>
@@ -1264,16 +1278,21 @@ X<span class="token operator">-</span>Via<span class="token punctuation">:</span
 <span class="token operator">&lt;</span><span class="token operator">/</span>body<span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>html<span class="token operator">></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="6-2-启用缓存"><a href="#6-2-启用缓存" class="headerlink" title="6.2 启用缓存"></a>6.2 启用缓存</h3><pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">http</span> <span class="token punctuation">{</span>
-    <span class="token keyword">include</span>       mime<span class="token punctuation">.</span><span class="token keyword">types</span><span class="token punctuation">;</span>
-    <span class="token keyword">default_type</span>  application<span class="token operator">/</span>octet<span class="token operator">-</span>stream<span class="token punctuation">;</span>
-    <span class="token keyword">sendfile</span>        on<span class="token punctuation">;</span>
+    <span class="token keyword">include</span>            mime<span class="token punctuation">.</span><span class="token keyword">types</span><span class="token punctuation">;</span>
+    <span class="token keyword">default_type</span>       application<span class="token operator">/</span>octet<span class="token operator">-</span>stream<span class="token punctuation">;</span>
+    <span class="token keyword">sendfile</span>           on<span class="token punctuation">;</span>
     <span class="token keyword">keepalive_timeout</span>  <span class="token number">65</span><span class="token punctuation">;</span>
 
-    <span class="token keyword">proxy_cache_path</span> <span class="token operator">/</span>nginx<span class="token operator">/</span>cache<span class="token operator">/</span>first  levels<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token number">2</span>   keys_zone<span class="token operator">=</span>first<span class="token punctuation">:</span>10m max_size<span class="token operator">=</span>512m<span class="token punctuation">;</span>
+    <span class="token keyword">proxy_cache_path</span>  <span class="token operator">/</span>nginx<span class="token operator">/</span>cache<span class="token operator">/</span>escapelife
+                      levels<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token number">2</span>
+                      keys_zone<span class="token operator">=</span>first<span class="token punctuation">:</span>10m
+                      max_size<span class="token operator">=</span>10g
+                      inactive<span class="token operator">=</span>60m
+                      use_temp_path<span class="token operator">=</span>off<span class="token punctuation">;</span>
 
     <span class="token keyword">server</span> <span class="token punctuation">{</span>
         <span class="token keyword">listen</span>       <span class="token number">80</span><span class="token punctuation">;</span>
-        <span class="token keyword">server_name</span>  www<span class="token punctuation">.</span>magedu<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
+        <span class="token keyword">server_name</span>  www<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
 
         <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
             <span class="token keyword">root</span>   html<span class="token punctuation">;</span>
@@ -1285,14 +1304,14 @@ X<span class="token operator">-</span>Via<span class="token punctuation">:</span
         <span class="token punctuation">}</span>
 
         <span class="token keyword">location</span> <span class="token operator">/</span>bbs <span class="token punctuation">{</span>
-            <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.11</span><span class="token operator">/</span><span class="token punctuation">;</span>
-            <span class="token keyword">proxy_cache</span> first<span class="token punctuation">;</span>
-            <span class="token keyword">proxy_cache_valid</span> <span class="token number">200</span> 1d<span class="token punctuation">;</span>
-            <span class="token keyword">proxy_cache_valid</span> <span class="token number">301</span> <span class="token number">302</span> 10m<span class="token punctuation">;</span>
-            <span class="token keyword">proxy_cache_valid</span> any 1m<span class="token punctuation">;</span>
+            <span class="token keyword">proxy_pass</span>         <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.11</span><span class="token operator">/</span><span class="token punctuation">;</span>
+            <span class="token keyword">proxy_cache</span>        first<span class="token punctuation">;</span>
+            <span class="token keyword">proxy_cache_valid</span>  <span class="token number">200</span> 1d<span class="token punctuation">;</span>
+            <span class="token keyword">proxy_cache_valid</span>  <span class="token number">301</span> <span class="token number">302</span> 10m<span class="token punctuation">;</span>
+            <span class="token keyword">proxy_cache_valid</span>  any 1m<span class="token punctuation">;</span>
         <span class="token punctuation">}</span>
     <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="6-3-使用-upstream"><a href="#6-3-使用-upstream" class="headerlink" title="6.3 使用 upstream"></a>6.3 使用 upstream</h3><ul>
 <li><strong>upstream 不启用缓存</strong></li>

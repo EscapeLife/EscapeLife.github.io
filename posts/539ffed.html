@@ -500,12 +500,12 @@
 <p>这里说明的是，应用层(<code>DDos</code>)的攻击特征</p>
 </blockquote>
 <p>应用层(通常为第<code>7</code>层的<code>HTTP</code>服务)的<code>DDoS</code>攻击是由软件程序发动的，并且可以根据具体的系统漏洞发动最佳的攻击。例如，对于无法处理大量并发连接的系统，只需要建立大量的连接并定期发送少量流量保持连接的存活，这样就可以耗尽系统的资源。其他的攻击都可以通过发送大量或超大量的请求来完成。因为发动这些攻击不是真实用户而是机器人，所以攻击者可以很轻松的产生大量的连接并非常快速的发送连接请求。</p>
-<ul>
-<li>（1）流量通常来源于一组用于攻击的<code>IP</code>地址，其结果就是每一个<code>IP</code>地址都请求建立大量远超正常用户的需求连接。</li>
-<li>（2）因为流量是由机器人产生的，且其目标就是让服务器瘫痪，所以产生流量的速度远超正常用户可能产生的速度。</li>
-<li>（3）通常头部<code>User-Agent</code>字段通常为非标准值。</li>
-<li>（4）通常头部<code>Referer</code>字段有时会设置为与攻击相关的值。</li>
-</ul>
+<ol>
+<li>流量通常来源于一组用于攻击的<code>IP</code>地址，其结果就是每一个<code>IP</code>地址都请求建立大量远超正常用户的需求连接。</li>
+<li>因为流量是由机器人产生的，且其目标就是让服务器瘫痪，所以产生流量的速度远超正常用户可能产生的速度。</li>
+<li>通常头部<code>User-Agent</code>字段通常为非标准值。</li>
+<li>通常头部<code>Referer</code>字段有时会设置为与攻击相关的值。</li>
+</ol>
 <p>了解<code>DDoS</code>攻击的特征(不意味这是一份完整的特征列表)可以帮助缓解受到危害。但是这里非常注意的是，不要认为这种流量模式就一定代表是<code>DDoS</code>攻击。使用代理转发也可能产生这种流量，因为代理会为其用户产生大量真实的连接请求。然而，来自代理的连接请求数通常也比来自<code>DDoS</code>攻击的少很多。</p>
 <hr>
 <h3 id="1-2-识别攻击"><a href="#1-2-识别攻击" class="headerlink" title="1.2 识别攻击"></a>1.2 识别攻击</h3><p>到目前为止，我们主要关注了如何配置<code>NGINX</code>和<code>NGINX Plus</code>缓解<code>DDoS</code>攻击带来的影响。但是如何使用<code>NGINX</code>和<code>NGINX Plus</code>帮助发现<code>DDoS</code>攻击呢？<a href="http://nginx.org/en/docs/http/ngx_http_status_module.html?_ga=1.236255941.557360466.1452496218" target="_blank" rel="noopener">NGINX Plus 状态模块</a>提供了详细的指标描述了当前链路的负载均衡状况，可以使用这个模块帮助发现不寻常的流量模式。<code>NGINX Plus</code>也提供了一个展示状态仪表盘的网页，可以实时的描述当前<code>NGINX Plus</code>系统的运行状态(演示地址：<code>demo.nginx.com</code>)。同样的指标也可以通过<code>API</code>进行读取，使用自定义的或第三方监控系统都可以获取到这些指标，之后可以自己根据数据分析历史趋势并发现异常流量进行报警。</p>
@@ -515,37 +515,39 @@
 <p><code>NGINX</code>和<code>NGINX Plus</code>含有一些功能，对照上述<code>DDoS</code>攻击特征，可以缓解<code>DDoS</code>攻击。这些功能通过调节<strong>传入流量</strong>和控制来自<strong>代理或后端服务器的流量</strong>来处理<code>DDoS</code>攻击。</p>
 </blockquote>
 <ul>
-<li><strong>限制请求的速率</strong></li>
+<li><strong>[1] 限制请求的速率</strong></li>
 </ul>
 <p>可以通过<code>NGINX</code>和<code>NGINX Plus</code>设置将来自真实用户的请求速率限制在一个正常值内。例如，你可能认为一个真实用户进入登录页面至少会每两秒产生一次请求。这样你就可以设置<code>NGINX</code>和<code>NGINX Plus</code>要求一个客户端的<code>IP</code>每隔两秒才能产生一次登录请求(相当于每分钟<code>30</code>次)。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 本例中为客户端IP地址为$binary_remote_addr变量</span>
 <span class="token comment" spellcheck="true"># limit_req_zone指令配置一个共享内存区域称为one且大小为10m，用于存储请求指定项的状态</span>
 <span class="token comment" spellcheck="true"># limit_req指令指定location为/login.html的页面使用这块共享内存区域</span>
 <span class="token keyword">limit_req_zone</span> <span class="token variable">$binary_remote_addr</span> zone<span class="token operator">=</span>one<span class="token punctuation">:</span>10m rate<span class="token operator">=</span>30r<span class="token operator">/</span>m<span class="token punctuation">;</span>
+
 <span class="token keyword">server</span> <span class="token punctuation">{</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
     <span class="token keyword">location</span> <span class="token operator">/</span>login<span class="token punctuation">.</span>html <span class="token punctuation">{</span>
         <span class="token keyword">limit_req</span> zone<span class="token operator">=</span>one<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
     <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>限制请求的连接数</strong></li>
+<li><strong>[2] 限制请求的连接数</strong></li>
 </ul>
 <p>可以限制来自单独客户端<code>IP</code>的连接数为一个正常用户适用的值。例如，允许每个客户端<code>IP</code>跟网站的<code>/store</code>区域同时最多建立<code>10</code>个连接。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 本例中为客户端IP地址为$binary_remote_addr变量</span>
 <span class="token comment" spellcheck="true"># limit_conn_zone指令配置一个共享内存区域称为addr且大小为10m，用于存储请求指定项的状态</span>
 <span class="token comment" spellcheck="true"># limit_conn指令指定location为/store的页面使用这块共享内存区域，并且限制每个客户端IP的最大连接数为10个</span>
 <span class="token keyword">limit_conn_zone</span> <span class="token variable">$binary_remote_addr</span> zone<span class="token operator">=</span>addr<span class="token punctuation">:</span>10m<span class="token punctuation">;</span>
+
 <span class="token keyword">server</span> <span class="token punctuation">{</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
     <span class="token keyword">location</span> <span class="token operator">/</span>store<span class="token operator">/</span> <span class="token punctuation">{</span>
         <span class="token keyword">limit_conn</span> addr <span class="token number">10</span><span class="token punctuation">;</span>
         <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
     <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>关闭慢速连接</strong></li>
+<li><strong>[3] 关闭慢速连接</strong></li>
 </ul>
 <p>可以关闭那些请求数据非常稀少的连接，这些连接通常试图保持尽可能长的时间以消耗服务器资源。<code>Slowloris</code>攻击就是这种类型。<code>client_body_timeout</code>指令控制<code>NGINX</code>在两次用户体写之间等待多长时间，<code>client_header_timeout</code>指令控制<code>NGINX</code>在两次用户头部写之间等待多长时间。这两个指令默认值均为<code>60</code>秒。下面为示例配置<code>NGINX</code>在两次用户体或头部写之间最多等待 5 秒。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
@@ -554,7 +556,7 @@
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>设置 IP 地址黑名单</strong></li>
+<li><strong>[4] 设置 IP 地址黑名单</strong></li>
 </ul>
 <p>如果你可以识别出用于攻击的<code>IP</code>地址，就可以使用<code>deny</code>指令将其加入黑名单中，这样<code>NGINX</code>和<code>NGINX Plus</code>会拒绝来着这个<code>IP</code>的任何连接或请求。例如，如果你确定攻击来自地址<code>123.123.123.1~123.123.123.16</code>。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
@@ -569,7 +571,7 @@
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>IP 地址白名单</strong></li>
+<li><strong>[5] IP 地址白名单</strong></li>
 </ul>
 <p>如果网站或应用只允许来自指定<code>IP</code>地址的连接，则可以同时使用<code>allow</code>和<code>deny</code>指令来设置只允许指定<code>IP</code>访问网站或应用。例如，限制只允许来自本地网络的连接。这里的  <code>deny all</code>指令禁止所有来自<code>allow</code>指定范围之外<code>IP</code>的连接。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
@@ -578,7 +580,7 @@
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>使用缓存来平滑流量峰值</strong></li>
+<li><strong>[6] 使用缓存来平滑流量峰值</strong></li>
 </ul>
 <p>可以配置<code>NGINX</code>和<code>NGINX Plus</code>使其承受更多来自攻击产生的流量峰值，通过启用缓存并配置相关参数使其暂存后续的请求。下面是一些有用的配置：</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># proxy_cache_use_stale</span>
@@ -587,16 +589,14 @@
 <span class="token comment" spellcheck="true"># proxy_cache_key</span>
 2. proxy_cache_key指令定义的关键字包含内置变量<span class="token punctuation">(</span>默认关键字有三个，<span class="token variable">$scheme</span><span class="token variable">$proxy_host</span><span class="token variable">$request_uri</span><span class="token punctuation">)</span>。如果包含<span class="token variable">$query_string</span>变量，那么攻击者可以发送大量随机的请求字符串从而导致缓存更新过渡频繁。不建议在关键字中包含<span class="token variable">$query_string</span>变量除非你有什么特别的理由。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>设置阻塞请求</strong></li>
+<li><strong>[7] 设置阻塞请求</strong></li>
 </ul>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 可以配置NGINX和NGINX Plus阻塞多种请求</span>
 <span class="token number">1</span><span class="token punctuation">.</span> 极具指向性针对指定URL的请求
 <span class="token number">2</span><span class="token punctuation">.</span> 请求头部中的<span class="token keyword">User</span><span class="token operator">-</span>Agent字段为非正常值
 <span class="token number">3</span><span class="token punctuation">.</span> 请求头部中的Referer字段为与攻击相关的值
 <span class="token number">4</span><span class="token punctuation">.</span> 请求头部中其他字段含有与攻击相关的值<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>例如，如果确定<code>DDoS</code>攻击的目标<code>URL</code>为<code>/foo.php</code>，则可以设置阻塞所有对于该页面的请求。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>或者发现来自<code>DDoS</code>攻击的请求头部<code>User-Agent</code>字段值为<code>foo</code>或<code>bar</code>，则可以设置阻塞这些请求。</p>
+<p>例如，如果确定<code>DDoS</code>攻击的目标<code>URL</code>为<code>/foo.php</code>，则可以设置阻塞所有对于该页面的请求。或者发现来自<code>DDoS</code>攻击的请求头部<code>User-Agent</code>字段值为<code>foo</code>或<code>bar</code>，则可以设置阻塞这些请求。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
     <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$http_user_agent</span> <span class="token operator">~</span><span class="token operator">*</span> foo<span class="token operator">|</span>bar<span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token keyword">return</span> <span class="token number">403</span><span class="token punctuation">;</span>
@@ -604,7 +604,7 @@
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>限制后端服务器的连接</strong></li>
+<li><strong>[8] 限制后端服务器的连接</strong></li>
 </ul>
 <p><code>NGINX</code>和<code>NGINX Plus</code>由于负载均衡，所以经常同时处理比后端服务器更大量的连接。对于<code>NGINX Plus</code>可以限制每个后端服务器的连接数。例如，如果希望<code>NGINX Plus</code>限制每个网站<code>upstream</code>组内后端服务器最多建立<code>200</code>个连接。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># max_conns参数为每个服务器指定最大连接数</span>
@@ -616,7 +616,7 @@
     queue <span class="token number">10</span> <span class="token keyword">timeout</span><span class="token operator">=</span>30s<span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>处理基于 Range 字段的攻击</strong></li>
+<li><strong>[9] 处理基于 Range 字段的攻击</strong></li>
 </ul>
 <p>攻击的另一种方法就是通过发送一个头部中<code>Range</code>字段具有非常大的数值，从而导致服务器的溢出。具体关于如何配置  <code>NGINX</code>和<code>NGINX Plus</code>缓解这种攻击可以参见一个案例，如何配置<code>NGINX</code>和<code>NGINX Plus</code>抵御<code>CVE-2015-1635</code>。</p>
 <ul>
@@ -796,12 +796,12 @@ NGINX_STATIS_LOG<span class="token operator">=</span>/opt/logs/nginx/statis/log
 <li><strong>日志切割配置</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 安装服务之后，需要生成logrotate脚本文件</span>
-yum <span class="token function">install</span> logrotate
+$ yum <span class="token function">install</span> logrotate
 
 <span class="token comment" spellcheck="true"># nginx日志路径在/home/wwwlogs/</span>
 <span class="token comment" spellcheck="true"># nginx进程PID路径在/usr/local/nginx/logs/nginx.pid</span>
 <span class="token comment" spellcheck="true"># 自动在/etc/cron.daily/下生成个logrotate脚本文件</span>
-vim nginx
+$ vim nginx
 /home/wwwlogs/*log <span class="token punctuation">{</span>
     <span class="token function">su</span> root www
     create 600 www www
@@ -820,7 +820,8 @@ vim nginx
 <span class="token punctuation">}</span>
 
 <span class="token comment" spellcheck="true"># 设置计划任务(/etc/crontab)</span>
-59 23 * * * root <span class="token punctuation">(</span> /usr/sbin/logrotate -f /PATH/TO/nginx-log-rotate<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">crontab</span> -e
+59 23 * * * root <span class="token punctuation">(</span> /usr/sbin/logrotate -f /PATH/TO/nginx-log-rotate<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <ul>
 <li><strong>问题解决</strong></li>
