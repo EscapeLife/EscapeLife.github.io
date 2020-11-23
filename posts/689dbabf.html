@@ -606,15 +606,15 @@ $ <span class="token function">sudo</span> nginx -g <span class="token string">"
 53<span class="token punctuation">)</span> SIGRTMAX-11 54<span class="token punctuation">)</span> SIGRTMAX-10 55<span class="token punctuation">)</span> SIGRTMAX-9  56<span class="token punctuation">)</span> SIGRTMAX-8  57<span class="token punctuation">)</span> SIGRTMAX-7
 58<span class="token punctuation">)</span> SIGRTMAX-6  59<span class="token punctuation">)</span> SIGRTMAX-5  60<span class="token punctuation">)</span> SIGRTMAX-4  61<span class="token punctuation">)</span> SIGRTMAX-3  62<span class="token punctuation">)</span> SIGRTMAX-2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="2-设置哈希表"><a href="#2-设置哈希表" class="headerlink" title="2. 设置哈希表"></a>2. 设置哈希表</h2><p>为了快速处理静态的数据集合，诸如虚拟主机名、 <code>map</code>指令的值、 <code>MIME</code>类型和请求头的字段名，<code>nginx</code>使用了哈希表。</p>
-<p>在<code>nginx</code>启动和更新配置的过程中，它会尽可能为哈希表选择最小的容量， 同时使每个哈希桶的长度不超过设置的配置参数。这些桶用于保存键和对应的哈希值。 整个哈希表的容量以哈希桶的数量来定义。</p>
-<p><code>nginx</code>不断调整哈希表直到哈希表容量超过配置的最大值。 大部分哈希表都有对应的指令，允许修改这些配置参数。 比如，针对虚拟主机名的哈希表，有<code>server_names_hash_max_size</code>和<code>server_names_hash_bucket_size</code>两条指令。</p>
-<p>哈希桶大小的参数会对齐到处理器缓存线长度的<strong>整数倍</strong>。 这将加速哈希表中的键查找，因为在现代的处理器上，这可以减少内存访问的次数。</p>
-<p>如果哈希桶大小等于处理器的缓存线长度，那么在最坏情况下，键查找时的内存访问次数是两次—— 第一次是计算哈希桶的地址，第二次是在哈希桶内进行键查找。 因此，如果<code>nginx</code>提示需要增大哈希表容量或者哈希桶大小时，应优先增大前者。</p>
+<h2 id="2-设置哈希表"><a href="#2-设置哈希表" class="headerlink" title="2. 设置哈希表"></a>2. 设置哈希表</h2><p>为了快速处理静态的数据集合，诸如虚拟主机名、<code>map</code> 指令的值、<code>MIME</code> 类型和请求头的字段名，<code>Nginx</code> 使用了哈希表。</p>
+<p>在 <code>Nginx</code> 启动和更新配置的过程中，它会尽可能为哈希表选择最小的容量，同时使每个哈希桶的长度不超过设置的配置参数。这些桶用于保存键和对应的哈希值。整个哈希表的容量以哈希桶的数量来定义。</p>
+<p><code>Nginx</code> 不断调整哈希表直到哈希表容量超过配置的最大值。大部分哈希表都有对应的指令，允许修改这些配置参数。比如，针对虚拟主机名的哈希表，有 <code>server_names_hash_max_size</code> 和 <code>server_names_hash_bucket_size</code> 两条指令。</p>
+<p>哈希桶大小的参数会对齐到处理器缓存线长度的<strong>整数倍</strong>。这将加速哈希表中的键查找，因为在现代的处理器上，这可以减少内存访问的次数。</p>
+<p>如果哈希桶大小等于处理器的缓存线长度，那么在最坏情况下，键查找时的内存访问次数是两次。第一次是计算哈希桶的地址，第二次是在哈希桶内进行键查找。因此，如果 <code>Nginx</code> 提示需要增大哈希表容量或者哈希桶大小时，应优先增大前者。</p>
 <hr>
-<h2 id="3-调试日志"><a href="#3-调试日志" class="headerlink" title="3. 调试日志"></a>3. 调试日志</h2><p>要开启调试日志，必须在编译<code>Nginx</code>时打开调试功能。</p>
+<h2 id="3-调试日志"><a href="#3-调试日志" class="headerlink" title="3. 调试日志"></a>3. 调试日志</h2><p>要开启调试日志，必须在编译 <code>Nginx</code> 时打开调试功能。</p>
 <pre class="line-numbers language-bash"><code class="language-bash">./configure --with-debug <span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>然后在配置文件中进行设置才能使用，设置<code>error_log</code>的日志级别为<code>debug</code>。注意，重新定义错误日志时，如过没有指定<code>debug</code>级别，调试日志会被屏蔽。</p>
+<p>然后在配置文件中进行设置才能使用，设置 <code>error_log</code> 的日志级别为 <code>debug</code>。注意，重新定义错误日志时，如过没有指定 <code>debug</code> 级别，调试日志会被屏蔽。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">error_log</span> <span class="token operator">/</span>path<span class="token operator">/</span>to<span class="token operator">/</span>log debug<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>可以通过<code>debug_connection</code>，设置只针对选定的客户端地址开启调试日志。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">error_log</span>  <span class="token operator">/</span>path<span class="token operator">/</span>to<span class="token operator">/</span>log<span class="token punctuation">;</span>
@@ -626,7 +626,7 @@ $ <span class="token function">sudo</span> nginx -g <span class="token string">"
 <p>当然，还可以设置日志的轮转缓冲区大小。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">error_log</span> memory<span class="token punctuation">:</span>32m debug<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <hr>
-<h2 id="4-syslog日志"><a href="#4-syslog日志" class="headerlink" title="4. syslog日志"></a>4. <code>syslog</code>日志</h2><p><code>Nginx</code>支持将<strong>访问日志</strong>(<code>access</code>)和<strong>错误日志</strong>(<code>error</code>)使用<code>syslog</code>记录。</p>
+<h2 id="4-syslog-日志"><a href="#4-syslog-日志" class="headerlink" title="4. syslog 日志"></a>4. syslog 日志</h2><p><code>Nginx</code> 支持将 <strong>访问日志</strong>(<code>access</code>) 和 <strong>错误日志</strong>(<code>error</code>) 使用 <code>syslog</code> 记录。</p>
 <table>
 <thead>
 <tr>
@@ -663,7 +663,7 @@ $ <span class="token function">sudo</span> nginx -g <span class="token string">"
 <span class="token keyword">access_log</span> syslog<span class="token punctuation">:</span><span class="token keyword">server</span><span class="token operator">=</span><span class="token punctuation">[</span><span class="token number">2001</span><span class="token punctuation">:</span>db8<span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token number">12345</span><span class="token punctuation">,</span>facility<span class="token operator">=</span>local7<span class="token punctuation">,</span>tag<span class="token operator">=</span>nginx<span class="token punctuation">,</span>severity<span class="token operator">=</span>info combined<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="5-处理用户请求"><a href="#5-处理用户请求" class="headerlink" title="5. 处理用户请求"></a>5. 处理用户请求</h2><ul>
-<li><strong>基于名字的虚拟主机</strong></li>
+<li><strong>[1] 基于名字的虚拟主机</strong></li>
 </ul>
 <p>在这个配置中，<code>Nginx</code>仅仅检查请求的<code>Host</code>头以决定该请求应由哪个虚拟主机来处理。如果<code>Host</code>头没有匹配任意一个虚拟主机，或者请求中根本没有包含<code>Host</code>头，那<code>Nginx</code>会将请求分发到定义在此端口上的默认虚拟主机。</p>
 <p><strong>注释：</strong><code>default_server</code>参数从<code>0.8.21</code>版开始可用，在之前的版本中，应该使用<code>default</code>参数代替。</p>
@@ -685,19 +685,19 @@ $ <span class="token function">sudo</span> nginx -g <span class="token string">"
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>防止处理未定义主机名的请求</strong></li>
+<li><strong>[2] 防止处理未定义主机名的请求</strong></li>
 </ul>
-<p>如果不允许请求中缺少<code>Host</code>头，可以定义如下主机，丢弃这些请求。</p>
-<p>在这里，我们设置主机名为空字符串以匹配未定义<code>Host</code>头的请求，而且返回了一个<code>Nginx</code>特有的非<code>HTTP</code>标准的返回码<code>444</code>，它可以用来关闭连接。</p>
+<p>如果不允许请求中缺少 <code>Host</code> 头，可以定义如下主机，丢弃这些请求。</p>
+<p>在这里，我们设置主机名为空字符串以匹配未定义 <code>Host</code> 头的请求，而且返回了一个 <code>Nginx</code> 特有的非 <code>HTTP</code> 标准的返回码 <code>444</code>，它可以用来关闭连接。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
     <span class="token keyword">listen</span>       <span class="token number">80</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span>  <span class="token string">""</span><span class="token punctuation">;</span>
     <span class="token keyword">return</span>       <span class="token number">444</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>基于域名和 IP 混合的虚拟主机</strong></li>
+<li><strong>[3] 基于域名和 IP 混合的虚拟主机</strong></li>
 </ul>
-<p>这个配置中，<code>Nginx</code>首先测试请求的 IP 地址和端口是否匹配某个<code>server</code>配置块中的<code>listen</code>指令配置。接着<code>Nginx</code>继续测试请求的<code>Host</code>头是否匹配这个 server 块中的某个<code>server_name</code>的值。如果主机名没有找到，<code>Nginx</code>将把这个请求交给默认虚拟主机处理。</p>
+<p>这个配置中，<code>Nginx</code> 首先测试请求的 <code>IP</code> 地址和端口是否匹配某个 <code>server</code> 配置块中的 <code>listen</code> 指令配置。接着 <code>Nginx</code> 继续测试请求的 <code>Host</code> 头是否匹配这个 <code>server</code> 块中的某个 <code>server_name</code> 的值。如果主机名没有找到，<code>Nginx</code>将把这个请求交给默认虚拟主机处理。</p>
 <p>默认服务器是监听端口的属性，所以不同的监听端口可以设置不同的默认服务器。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
     <span class="token keyword">listen</span>      <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">1.1</span><span class="token punctuation">:</span><span class="token number">80</span><span class="token punctuation">;</span>
@@ -717,10 +717,10 @@ $ <span class="token function">sudo</span> nginx -g <span class="token string">"
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>简单 PHP 站点配置</strong></li>
+<li><strong>[4] 简单 PHP 站点配置</strong></li>
 </ul>
-<p>首先，<code>Nginx</code>使用前缀匹配找出最准确的<code>location</code>，这一步<code>Nginx</code>会忽略<code>location</code>在配置文件出现的顺序。</p>
-<p>上面的配置中，唯一的前缀匹配<code>location</code>是<code>"/"</code>，而且因为它可以匹配任意的请求，所以被作为最后一个选择。接着，<code>Nginx</code>继续按照配置中的顺序依次匹配正则表达式的<code>location</code>，匹配到第一个正则表达式后停止搜索。匹配到的<code>location</code>将被使用。如果没有匹配到正则表达式的<code>location</code>，则使用刚刚找到的最准确的前缀匹配的<code>location</code>。</p>
+<p>首先，<code>Nginx</code> 使用前缀匹配找出最准确的 <code>location</code>，这一步 <code>Nginx</code> 会忽略 <code>location</code> 在配置文件出现的顺序。</p>
+<p>上面的配置中，唯一的前缀匹配 <code>location</code> 是 <code>"/"</code>，而且因为它可以匹配任意的请求，所以被作为最后一个选择。接着，<code>Nginx</code> 继续按照配置中的顺序依次匹配正则表达式的 <code>location</code>，匹配到第一个正则表达式后停止搜索。匹配到的 <code>location</code> 将被使用。如果没有匹配到正则表达式的 <code>location</code>，则使用刚刚找到的最准确的前缀匹配的 <code>location</code>。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
     <span class="token keyword">listen</span>      <span class="token number">80</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span> example<span class="token punctuation">.</span>org www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>org<span class="token punctuation">;</span>
@@ -736,37 +736,59 @@ $ <span class="token function">sudo</span> nginx -g <span class="token string">"
 
     <span class="token keyword">location</span> <span class="token operator">~</span> \<span class="token punctuation">.</span>php$ <span class="token punctuation">{</span>
         <span class="token keyword">fastcgi_pass</span>  localhost<span class="token punctuation">:</span><span class="token number">9000</span><span class="token punctuation">;</span>
-        <span class="token keyword">fastcgi_param</span> SCRIPT_FILENAME
-                      <span class="token variable">$document_root</span><span class="token variable">$fastcgi_script_name</span><span class="token punctuation">;</span>
+        <span class="token keyword">fastcgi_param</span> SCRIPT_FILENAME <span class="token variable">$document_root</span><span class="token variable">$fastcgi_script_name</span><span class="token punctuation">;</span>
         <span class="token keyword">include</span>       fastcgi_params<span class="token punctuation">;</span>
     <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li>请注意所有<code>location</code>匹配测试只使用请求的<code>URI</code>部分，而不使用参数部分，这是因为写参数的方法很多。除此以外，任何人在请求串中都可以随意添加字符串。</li>
+<li>请注意所有 <code>location</code> 匹配测试只使用请求的 <code>URI</code> 部分，而不使用参数部分，这是因为写参数的方法很多。除此以外，任何人在请求串中都可以随意添加字符串。</li>
 </ul>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token operator">/</span><span class="token keyword">index</span><span class="token punctuation">.</span>php<span class="token operator">?</span><span class="token keyword">user</span><span class="token operator">=</span>john<span class="token operator">&amp;</span>page<span class="token operator">=</span><span class="token number">1</span>
 <span class="token operator">/</span><span class="token keyword">index</span><span class="token punctuation">.</span>php<span class="token operator">?</span>page<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword">user</span><span class="token operator">=</span>john
 <span class="token operator">/</span><span class="token keyword">index</span><span class="token punctuation">.</span>php<span class="token operator">?</span>page<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>something<span class="token operator">+</span>else<span class="token operator">&amp;</span><span class="token keyword">user</span><span class="token operator">=</span>john<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="6-处理-TCP-UDP-会话"><a href="#6-处理-TCP-UDP-会话" class="headerlink" title="6. 处理 TCP/UDP 会话"></a>6. 处理 TCP/UDP 会话</h2><blockquote>
-<p><code>Nginx</code>处理客户端的<code>TCP/UDP</code>会话(<code>session</code>)的连续的几个阶段</p>
+<p><code>Nginx</code> 处理客户端的 <code>TCP/UDP</code> 会话(<code>session</code>)的连续的几个阶段</p>
 </blockquote>
-<p>-<strong>Post-accept</strong></p>
 <ul>
-<li>接受客户端连接的一个阶段；<code>ngx_stream_realip_module</code>模块会在这个阶段调用到 -<strong>Pre-access</strong></li>
-<li>访问的初步检查；<code>ngx_stream_limit_conn_module</code>模块会在这个阶段调用到 -<strong>Access</strong></li>
-<li>客户端访问到实际的数据处理过程；<code>ngx_stream_access_module</code>模块会在这个阶段调用到 -<strong>SSL</strong></li>
-<li><code>TLS/SSL</code>过程；<code>ngx_stream_ssl_module</code>模块会在这个阶段调用到 -<strong>Preread</strong></li>
-<li>阅读原始字节的数据到预读缓冲区允许模块；如果<code>ngx_stream_ssl_preread_module</code>分析数据前处理<ul>
-<li><strong>Content</strong></li>
+<li><strong>Post-accept</strong><ul>
+<li>接受客户端连接的一个阶段</li>
+<li><code>ngx_stream_realip_module</code>模块会在这个阶段调用到</li>
 </ul>
 </li>
-<li>数据的时间封装阶段；通常为代理的<code>upstream</code>服务器或者提供指定返回值给客户端 -<strong>Log</strong></li>
-<li>最后阶段，客户端会话记录处理的结果到日志中；<code>ngx_stream_log_module</code>模块会在这个阶段调用到</li>
+<li><strong>Pre-access</strong><ul>
+<li>访问的初步检查</li>
+<li><code>ngx_stream_limit_conn_module</code>模块会在这个阶段调用到</li>
+</ul>
+</li>
+<li><strong>Access</strong><ul>
+<li>客户端访问到实际的数据处理过程</li>
+<li><code>ngx_stream_access_module</code>模块会在这个阶段调用到</li>
+</ul>
+</li>
+<li><strong>SSL</strong><ul>
+<li><code>TLS/SSL</code>过程</li>
+<li><code>ngx_stream_ssl_module</code>模块会在这个阶段调用到</li>
+</ul>
+</li>
+<li><strong>Preread</strong><ul>
+<li>阅读原始字节的数据到预读缓冲区允许模块</li>
+<li>如果<code>ngx_stream_ssl_preread_module</code>分析数据前处理</li>
+</ul>
+</li>
+<li><strong>Content</strong><ul>
+<li>数据的时间封装阶段</li>
+<li>通常为代理的<code>upstream</code>服务器或者提供指定返回值给客户端</li>
+</ul>
+</li>
+<li><strong>Log</strong><ul>
+<li>最后阶段，客户端会话记录处理的结果到日志中</li>
+<li><code>ngx_stream_log_module</code>模块会在这个阶段调用到</li>
+</ul>
+</li>
 </ul>
 <hr>
-<h2 id="7-虚拟主机名"><a href="#7-虚拟主机名" class="headerlink" title="7. 虚拟主机名"></a>7. 虚拟主机名</h2><p>虚拟主机名使用<code>server_name</code>指令定义，用于决定由某台虚拟主机来处理请求。虚拟主机名可以使用确切的名字、通配符和正则表达式来定义。</p>
-<p><code>Nginx</code>以名字查找虚拟主机时，如果名字可以匹配多于一个主机名定义，比如同时匹配了通配符的名字和正则表达式的名字，那么<code>Nginx</code>按照下面的优先级别进行查找，并选中第一个匹配的虚拟主机。</p>
+<h2 id="7-虚拟主机名"><a href="#7-虚拟主机名" class="headerlink" title="7. 虚拟主机名"></a>7. 虚拟主机名</h2><p>虚拟主机名使用<code>server_name</code>指令定义，用于决定由某台虚拟主机来处理请求。虚拟主机名可以使用确切的名字、通配符和正则表达式来定义。<code>Nginx</code> 以名字查找虚拟主机时，如果名字可以匹配多于一个主机名定义，比如同时匹配了通配符的名字和正则表达式的名字，那么 <code>Nginx</code> 按照下面的优先级别进行查找，并选中第一个匹配的虚拟主机。</p>
 <ol>
 <li>确切的名字</li>
 <li>最长的以星号起始的通配符名字：<code>*.example.org</code></li>
