@@ -583,11 +583,15 @@
 <li><strong>[6] 使用缓存来平滑流量峰值</strong></li>
 </ul>
 <p>可以配置<code>NGINX</code>和<code>NGINX Plus</code>使其承受更多来自攻击产生的流量峰值，通过启用缓存并配置相关参数使其暂存后续的请求。下面是一些有用的配置：</p>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># proxy_cache_use_stale</span>
-1. proxy_cache_use_stale指令的updating参数告诉NGINX当它需要获取一个过期缓存对象的更新时，它应当发送一个更新请求，并在此期间使用更新前的对象继续服务于请求的用户。如果攻击就是在不停的重复请求某个文件，这样可以大大减小对后端服务器的请求数量。
+<ol>
+<li><p><strong><code>proxy_cache_use_stale</code></strong> 指令的 updating 参数告诉 NGINX 当它需要获取一个过期缓存对象的更新时，它应当发送一个更新请求，并在此期间使用更新前的对象继续服务于请求的用户。如果攻击就是在不停的重复请求某个文件，这样可以大大减小对后端服务器的请求数量。</p>
+</li>
+<li><p><strong><code>proxy_cache_key</code></strong> 指令定义的内置变量(默认关键字有三个，<code>$scheme$proxy_host$request_uri</code>)。如果包含 <code>$query_string</code> 变量，那么攻击者可以发送大量随机的请求字符串从而导致缓存更新过渡频繁。不建议在关键字中包含 <code>$query_string</code> 变量除非你有什么特别的理由。</p>
+</li>
+</ol>
+<pre class="line-numbers language-bash"><code class="language-bash">proxy_cache_use_stale
 
-<span class="token comment" spellcheck="true"># proxy_cache_key</span>
-2. proxy_cache_key指令定义的关键字包含内置变量<span class="token punctuation">(</span>默认关键字有三个，<span class="token variable">$scheme</span><span class="token variable">$proxy_host</span><span class="token variable">$request_uri</span><span class="token punctuation">)</span>。如果包含<span class="token variable">$query_string</span>变量，那么攻击者可以发送大量随机的请求字符串从而导致缓存更新过渡频繁。不建议在关键字中包含<span class="token variable">$query_string</span>变量除非你有什么特别的理由。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+proxy_cache_key<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[7] 设置阻塞请求</strong></li>
 </ul>
@@ -620,7 +624,7 @@
 </ul>
 <p>攻击的另一种方法就是通过发送一个头部中<code>Range</code>字段具有非常大的数值，从而导致服务器的溢出。具体关于如何配置  <code>NGINX</code>和<code>NGINX Plus</code>缓解这种攻击可以参见一个案例，如何配置<code>NGINX</code>和<code>NGINX Plus</code>抵御<code>CVE-2015-1635</code>。</p>
 <ul>
-<li><strong>处理高负荷</strong></li>
+<li><strong>[10] 处理高负荷</strong></li>
 </ul>
 <p><code>DDoS</code>攻击通常都会导致高负荷。关于如何调整<code>NGINX</code>和<code>NGINX Plus</code>以及操作系统处理高负荷可以参见调整<code>NGINX</code>性能。</p>
 <hr>
@@ -854,11 +858,11 @@ logrotate在对status未记录的文件进行转储时，会在status添加一�
     endscript
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="3-获取用户真实-IP-地址"><a href="#3-获取用户真实-IP-地址" class="headerlink" title="3. 获取用户真实 IP 地址"></a>3. 获取用户真实 IP 地址</h2><p>如果你的<code>Web</code>服务器前端有代理服务器或<code>CDN</code>时，在日志中的<code>$remote_addr</code>可能就不是客户端的真实<code>IP</code>了。比较常用的解决方法有以下三几种，这里我们将主要介绍如何使用<code>Nginx</code>自带<code>realip</code>模块来解决这一问题。</p>
+<h2 id="3-获取用户真实-IP-地址"><a href="#3-获取用户真实-IP-地址" class="headerlink" title="3. 获取用户真实 IP 地址"></a>3. 获取用户真实 IP 地址</h2><p>如果你的 <code>Web</code> 服务器前端有代理服务器或 <code>CDN</code> 时，在日志中的 <code>$remote_addr</code> 可能就不是客户端的真实 <code>IP</code> 了。比较常用的解决方法有以下三几种，这里我们将主要介绍如何使用 <code>Nginx</code> 自带 <code>realip</code> 模块来解决这一问题。</p>
 <ul>
-<li>使用<code>CDN</code>自定义 IP 头来获取</li>
-<li>通过<code>HTTP_X_FORWARDED_FOR</code>获取<code>IP</code>地址</li>
-<li>使用<code>Nginx</code>自带模块<code>realip</code>获取用户<code>IP</code>地址</li>
+<li>使用 <code>CDN</code> 自定义 <code>IP</code> 头来获取</li>
+<li>通过 <code>HTTP_X_FORWARDED_FOR</code> 获取 <code>IP</code> 地址</li>
+<li>使用 <code>Nginx</code> 自带模块 <code>realip</code> 获取用户 <code>IP</code> 地址</li>
 </ul>
 <hr>
 <h3 id="3-1-模块介绍"><a href="#3-1-模块介绍" class="headerlink" title="3.1 模块介绍"></a>3.1 模块介绍</h3><p><code>ngx_realip</code>模块究竟有什么实际用途呢？为什么我们需要去改写请求的来源地址呢？答案就是，当<code>Nginx</code>处理的请求经过了某个<code>HTTP</code>代理服务器的转发时，这个模块就变得特别有用。</p>

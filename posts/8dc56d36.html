@@ -456,7 +456,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-10-31
+                    2020-11-23
                 </div>
                 
 
@@ -1156,13 +1156,13 @@ $ yum -y <span class="token function">install</span> vsftpd mysql-server mysql-d
 首先请确保mysql服务已经正常启动。而后，按需要建立存储虚拟用户的数据库即可，这里将其创建为vsftpd数据库
 mysql<span class="token operator">></span> create database vsftpd<span class="token punctuation">;</span>
 
-授权vsftpd用户可以通过localhost主机操作select权限vsftpd库的所有表，密码为www.magedu.com
-mysql<span class="token operator">></span> grant <span class="token keyword">select</span> on vsftpd.* to vsftpd@localhost identified by <span class="token string">'www.magedu.com'</span><span class="token punctuation">;</span>
-mysql<span class="token operator">></span> grant <span class="token keyword">select</span> on vsftpd.* to vsftpd@127.0.0.1 identified by <span class="token string">'www.magedu.com'</span><span class="token punctuation">;</span>
+授权vsftpd用户可以通过localhost主机操作select权限vsftpd库的所有表，密码为www.escapelife.com
+mysql<span class="token operator">></span> grant <span class="token keyword">select</span> on vsftpd.* to vsftpd@localhost identified by <span class="token string">'www.escapelife.com'</span><span class="token punctuation">;</span>
+mysql<span class="token operator">></span> grant <span class="token keyword">select</span> on vsftpd.* to vsftpd@127.0.0.1 identified by <span class="token string">'www.escapelife.com'</span><span class="token punctuation">;</span>
 mysql<span class="token operator">></span> flush privileges<span class="token punctuation">;</span>
 
 （这里是本机安装所有授权localhost主机，如果不同需要使用不同的主机地址）
-（mysql<span class="token operator">></span> grant <span class="token keyword">select</span> on vsftpd.* to vsftpd@<span class="token string">'192.168.31.%'</span> identified by <span class="token string">'www.magedu.com'</span><span class="token punctuation">;</span>）
+（mysql<span class="token operator">></span> grant <span class="token keyword">select</span> on vsftpd.* to vsftpd@<span class="token string">'192.168.31.%'</span> identified by <span class="token string">'www.escapelife.com'</span><span class="token punctuation">;</span>）
 （mysql<span class="token operator">></span> flush privileges<span class="token punctuation">;</span>）
 
 创建相关表
@@ -1176,8 +1176,8 @@ mysql<span class="token operator">></span> create table <span class="token funct
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 2、添加测试的虚拟用户</span>
 
 根据需要添加所需要的用户，需要说明的是，这里将其密码为了安全起见应该使用PASSWORD函数加密后存储
-mysql<span class="token operator">></span> INSERT INTO users<span class="token punctuation">(</span>name, password<span class="token punctuation">)</span> VALUES<span class="token punctuation">(</span><span class="token string">'tom'</span>, password<span class="token punctuation">(</span><span class="token string">'magedu'</span><span class="token punctuation">))</span><span class="token punctuation">;</span>
-mysql<span class="token operator">></span> INSERT INTO users<span class="token punctuation">(</span>name, password<span class="token punctuation">)</span> VALUES<span class="token punctuation">(</span><span class="token string">'bob'</span>, password<span class="token punctuation">(</span><span class="token string">'magedu'</span><span class="token punctuation">))</span><span class="token punctuation">;</span>
+mysql<span class="token operator">></span> INSERT INTO users<span class="token punctuation">(</span>name, password<span class="token punctuation">)</span> VALUES<span class="token punctuation">(</span><span class="token string">'tom'</span>, password<span class="token punctuation">(</span><span class="token string">'escapelife'</span><span class="token punctuation">))</span><span class="token punctuation">;</span>
+mysql<span class="token operator">></span> INSERT INTO users<span class="token punctuation">(</span>name, password<span class="token punctuation">)</span> VALUES<span class="token punctuation">(</span><span class="token string">'bob'</span>, password<span class="token punctuation">(</span><span class="token string">'escapelife'</span><span class="token punctuation">))</span><span class="token punctuation">;</span>
 SELETC * FROM user<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>第三步：<strong>配置 vsftpd</strong></li>
@@ -1188,11 +1188,11 @@ $ <span class="token function">vi</span> /etc/pam.d/vsftpd.mysql
 添加如下两行，主要32位和64位库文件的不同位置，模块路径可不写表示pam模块路径
 指定用户、密码、主机、数据库、表、用户名字段、密码字段、密码的加密方式
 密码的加密方式可以通过安装的pam_mysql的文档查看，/usr/share/doc/pam_mysql-0.7/README   rpm -ql pam_mysql
-auth required /lib64/security/pam_mysql.so user<span class="token operator">=</span>vsftpd passwd<span class="token operator">=</span>www.magedu.com host<span class="token operator">=</span>localhost db<span class="token operator">=</span>vsftpd table<span class="token operator">=</span>users usercolumn<span class="token operator">=</span>name passwdcolumn<span class="token operator">=</span>password crypt<span class="token operator">=</span>2
-account required /lib64/security/pam_mysql.so user<span class="token operator">=</span>vsftpd passwd<span class="token operator">=</span>www.magedu.com host<span class="token operator">=</span>localhost db<span class="token operator">=</span>vsftpd table<span class="token operator">=</span>users usercolumn<span class="token operator">=</span>name passwdcolumn<span class="token operator">=</span>password crypt<span class="token operator">=</span>2
+auth required /lib64/security/pam_mysql.so user<span class="token operator">=</span>vsftpd passwd<span class="token operator">=</span>www.escapelife.com host<span class="token operator">=</span>localhost db<span class="token operator">=</span>vsftpd table<span class="token operator">=</span>users usercolumn<span class="token operator">=</span>name passwdcolumn<span class="token operator">=</span>password crypt<span class="token operator">=</span>2
+account required /lib64/security/pam_mysql.so user<span class="token operator">=</span>vsftpd passwd<span class="token operator">=</span>www.escapelife.com host<span class="token operator">=</span>localhost db<span class="token operator">=</span>vsftpd table<span class="token operator">=</span>users usercolumn<span class="token operator">=</span>name passwdcolumn<span class="token operator">=</span>password crypt<span class="token operator">=</span>2
 
-（auth required /lib64/security/pam_mysql.so user<span class="token operator">=</span>vsftp passwd<span class="token operator">=</span>www.magedu.com host<span class="token operator">=</span>192.168.31.71 db<span class="token operator">=</span>vsftpd table<span class="token operator">=</span>users usercolumn<span class="token operator">=</span>name passwdcolumn<span class="token operator">=</span>password crypt<span class="token operator">=</span>2）
-（account required /lib64/security/pam_mysql.so user<span class="token operator">=</span>vsftp passwd<span class="token operator">=</span>www.magedu.com host<span class="token operator">=</span>192.168.31.71 db<span class="token operator">=</span>vsftpd table<span class="token operator">=</span>users usercolumn<span class="token operator">=</span>name passwdcolumn<span class="token operator">=</span>password crypt<span class="token operator">=</span>2）
+（auth required /lib64/security/pam_mysql.so user<span class="token operator">=</span>vsftp passwd<span class="token operator">=</span>www.escapelife.com host<span class="token operator">=</span>192.168.31.71 db<span class="token operator">=</span>vsftpd table<span class="token operator">=</span>users usercolumn<span class="token operator">=</span>name passwdcolumn<span class="token operator">=</span>password crypt<span class="token operator">=</span>2）
+（account required /lib64/security/pam_mysql.so user<span class="token operator">=</span>vsftp passwd<span class="token operator">=</span>www.escapelife.com host<span class="token operator">=</span>192.168.31.71 db<span class="token operator">=</span>vsftpd table<span class="token operator">=</span>users usercolumn<span class="token operator">=</span>name passwdcolumn<span class="token operator">=</span>password crypt<span class="token operator">=</span>2）
 
 注意：由于mysql的安装方式不同，pam_mysql.so基于unix sock连接mysql服务器时可能会出问题，此时，建议授权一个可远程连接的mysql并访问vsftpd数据库的用户。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 2.修改vsftpd的配置文件，使其适应mysql认证</span>
