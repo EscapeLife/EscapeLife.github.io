@@ -424,8 +424,12 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/Linux/">
-                                <span class="chip bg-color">Linux</span>
+                            <a href="/tags/Bug/">
+                                <span class="chip bg-color">Bug</span>
+                            </a>
+                        
+                            <a href="/tags/Supervisor/">
+                                <span class="chip bg-color">Supervisor</span>
                             </a>
                         
                     </div>
@@ -456,14 +460,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-03-06
+                    2020-11-24
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.9k
+                    2k
                 </div>
                 
 
@@ -507,7 +511,7 @@ Traceback <span class="token punctuation">(</span>most recent call last<span cla
 OSError: <span class="token punctuation">[</span>Errno 24<span class="token punctuation">]</span> Too many <span class="token function">open</span> files<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="2-处理经过"><a href="#2-处理经过" class="headerlink" title="2. 处理经过"></a>2. 处理经过</h2><ul>
-<li>从堆栈提示信息(<code>Too many open files</code>)中，我们可以看出大概率是因为导出数据的时候，并发数量太大使程序打开的文件句柄数量大多导致的。随即，查看了一下系统文件句柄数量的设置和使用情况。</li>
+<li>从堆栈提示信息(<code>Too many open files</code>)中，我们可以看到出现这种情况，大概率是因为导出数据的时候，并发数量太大使程序打开的文件句柄数量过多导致的。随即，查看了一下系统文件句柄数量的设置和使用情况。</li>
 </ul>
 <table>
 <thead>
@@ -518,44 +522,44 @@ OSError: <span class="token punctuation">[</span>Errno 24<span class="token punc
 </tr>
 </thead>
 <tbody><tr>
-<td>单个进程打开 fb 过多</td>
+<td>单个进程打开 <code>fb</code> 过多</td>
 <td><code>/etc/security/limits.conf</code></td>
-<td>修改文件或使用<code>prlimit</code>命令</td>
+<td>修改文件或使用 <code>prlimit</code> 命令</td>
 </tr>
 <tr>
-<td>操作系统打开的 fb 过多</td>
+<td>操作系统打开的 <code>fb</code> 过多</td>
 <td><code>/proc/sys/fs/file-max</code></td>
-<td>直接<code>echo</code>写入即可</td>
+<td>直接 <code>echo</code> 写入即可</td>
 </tr>
 <tr>
-<td>Systemd 对进程限制</td>
+<td><code>Systemd</code> 对进程限制</td>
 <td><code>LimitNOFILE=20480000</code></td>
-<td>通常在/etc/systemd/system/目录下</td>
+<td>通常在 <code>/etc/systemd/system/</code> 目录下</td>
 </tr>
 <tr>
-<td>Supervisor 对进程限制</td>
+<td><code>Supervisor</code> 对进程限制</td>
 <td><code>minfds</code></td>
-<td>通常在/etc/supervisor/conf.d/目录下</td>
+<td>通常在 <code>/etc/supervisor/conf.d/</code> 目录下</td>
 </tr>
 <tr>
-<td>Inotify 达到上限</td>
-<td><code>sysctl -p</code>/<code>/etc/sysctl.conf</code></td>
-<td>该机制受到<code>2</code>个内核参数的影响</td>
+<td><code>Inotify</code> 达到上限</td>
+<td><code>sysctl -p</code> 或 <code>/etc/sysctl.conf</code></td>
+<td>该机制受到 <code>2</code> 个内核参数的影响</td>
 </tr>
 </tbody></table>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true">###############</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true">########################</span>
 <span class="token comment" spellcheck="true"># 1.Shell级限制</span>
-<span class="token comment" spellcheck="true">###############</span>
+<span class="token comment" spellcheck="true">########################</span>
 
-<span class="token comment" spellcheck="true"># 当前shell的当前用户所有进程能打开的最大文件数量</span>
-<span class="token comment" spellcheck="true"># 这就意味着root用户和escape用户能够打开的最大文件数量有可能不同</span>
+<span class="token comment" spellcheck="true"># 当前shell的当前用户所有进程能打开的最大文件句柄数量</span>
+<span class="token comment" spellcheck="true"># 这就意味着root用户和escape用户能够打开的最大文件数量可能会有所不同</span>
 <span class="token comment" spellcheck="true"># 非root用户只能越设置越小，而root用户不受限制</span>
 <span class="token comment" spellcheck="true"># 在ulimit命令里的最大文件打开数量的默认值是1024个</span>
-<span class="token comment" spellcheck="true"># 如果limits.con有设置，则默认值以limits.conf为准</span>
+<span class="token comment" spellcheck="true"># 如果limits.conf有设置，则默认值以limits.conf文件设置为准</span>
 <span class="token comment" spellcheck="true"># 修改后立即生效，重新登录进来后失效，因为被重置为limits.conf里的设定值</span>
 $ <span class="token function">ulimit</span> -n
 65535
-$ <span class="token function">ulimit</span> -a<span class="token operator">|</span><span class="token function">grep</span> <span class="token function">open</span>
+$ <span class="token function">ulimit</span> -a <span class="token operator">|</span> <span class="token function">grep</span> <span class="token function">open</span>
 <span class="token function">open</span>    files    <span class="token punctuation">(</span>-n<span class="token punctuation">)</span> 65535
 
 <span class="token comment" spellcheck="true"># 临时设置方法</span>
@@ -563,18 +567,18 @@ $ <span class="token function">ulimit</span> -n 10240
 
 <span class="token comment" spellcheck="true"># 永久生效</span>
 $ vim /etc/security/limits.conf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true">###############</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true">########################</span>
 <span class="token comment" spellcheck="true"># 2.用户级限制</span>
-<span class="token comment" spellcheck="true">###############</span>
+<span class="token comment" spellcheck="true">########################</span>
 
 <span class="token comment" spellcheck="true"># 一个用户可能同时连接多个shell到系统，所以还有针对用户的限制</span>
 <span class="token comment" spellcheck="true"># 这里是通过修改/etc/security/limits.conf文件实现限制控制的</span>
 <span class="token comment" spellcheck="true"># 表示escape用户不管开启多少个shell终端所能打开的最大文件数量为65535个</span>
 escape  soft  nofile  65535  <span class="token comment" spellcheck="true"># 软限制</span>
 escape  hard  nofile  10240  <span class="token comment" spellcheck="true"># 硬限制</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true">###############</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true">########################</span>
 <span class="token comment" spellcheck="true"># 3.系统级限制</span>
-<span class="token comment" spellcheck="true">###############</span>
+<span class="token comment" spellcheck="true">########################</span>
 
 <span class="token comment" spellcheck="true"># 当前内核可以打开的最大的文件句柄数</span>
 <span class="token comment" spellcheck="true"># 系统会计算内存资源给出的建议值，一般为内存大小(KB)的10%来计算</span>
@@ -593,18 +597,18 @@ $ <span class="token function">cat</span> /proc/sys/fs/file-nr
 8056    0    3283446<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[1] 这里我们先区分好两个概念: 文件描述符和文件句柄</strong><ul>
-<li>简单来说，每个进程都有一个打开的文件表(<code>fdtable</code>)。表中的每一项是 <code>struct file</code> 类型，包含了打开文件的一些属性比如偏移量，读写访问模式等，这是真正意义上的文件句柄。</li>
+<li>简单来说，每个进程都有一个打开的文件表(<code>fdtable</code>)。表中的每一项是 <code>struct file</code> 类型，包含了打开文件的一些属性，比如偏移量，读写访问模式等，这才是真正意义上的文件句柄。</li>
 <li>而文件描述符则是一个整数，它代表 <code>fdtable</code> 在操作系统中存储的索引位置(下标)，指向具体的 <code>struct file</code>，即文件句柄。</li>
 <li>其中 <code>file-nr</code> 文件里面的第一个字段代表的是内核分配的 <code>struct file</code> 的个数，也就是文件句柄个数，而不是文件描述符。</li>
 </ul>
 </li>
-<li><strong>[2] 哪些地方会分配文件句柄</strong><ul>
-<li>open 系统调用打开文件 - (<code>path_openat</code>内核函数)</li>
+<li><strong>[2] 操作系统的哪些地方需要分配文件句柄</strong><ul>
+<li>系统调用 <code>open</code> 打开文件 - (<code>path_openat</code>内核函数)</li>
 <li>打开一个目录 - (<code>dentry_open</code>函数)</li>
-<li>共享内存 attach - (<code>do_shmat</code>函数）</li>
-<li>socket 套接字 - (<code>sock_alloc_file</code>函数）</li>
+<li>共享内存 <code>attach</code> - (<code>do_shmat</code>函数）</li>
+<li><code>socket</code> 套接字 - (<code>sock_alloc_file</code>函数）</li>
 <li>管道 - (<code>create_pipe_files</code>函数）</li>
-<li>epoll/inotify/signalfd 等功能用到的匿名 inode 文件系统 - (<code>anon_inode_getfile</code>函数)</li>
+<li><code>epoll/inotify/signalfd</code> 等功能用到的匿名 <code>inode</code> 文件系统 - (<code>anon_inode_getfile</code>函数)</li>
 </ul>
 </li>
 </ul>
@@ -673,9 +677,17 @@ $ <span class="token function">lsof</span> -p pid <span class="token operator">|
 <span class="token comment" spellcheck="true"># 查看某个目录，文件被什么进程占用</span>
 $ <span class="token function">lsof</span> path<span class="token punctuation">(</span>file<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li>我们使用 <code>supervisord</code> 来管理 <code>python</code> 进程的，默认每个进程分配的文件句柄的默认值 <code>1024</code>个。通过上面的命令，查看到对应进程打开的文件数据超过了这个限制了，所以导致出现文件句柄不足的问题。通过在 <code>[supervisord]</code> 段中配置 <code>minfds</code> 参数可以解决。</li>
+<li>而我们使用 <code>supervisord</code> 工具来管理 <code>python</code> 进程的话，默认每个进程分配的文件句柄数量，默认值为 <code>1024</code>个。通过上面的命令，查看到对应进程打开的文件数据超过了这个限制了，所以导致出现文件句柄不足的问题。通过在 <code>[supervisord]</code> 段中配置 <code>minfds</code> 参数可以解决。</li>
 </ul>
 <p><img src="../images/use-supervisor-minfds-1.png" alt="supervisor"></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>supervisord<span class="token punctuation">]</span>
+logfile<span class="token operator">=</span>/var/log/supervisor/supervisord.log
+nodaemon<span class="token operator">=</span>false
+minfds<span class="token operator">=</span>50000
+minprocs<span class="token operator">=</span>50000
+loglevel<span class="token operator">=</span>info
+logfile_backups<span class="token operator">=</span>10
+logfile_maxbytes<span class="token operator">=</span>50MB<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="3-结果总结"><a href="#3-结果总结" class="headerlink" title="3. 结果总结"></a>3. 结果总结</h2><blockquote>
 <p><a href="https://juejin.im/entry/5b56f9045188251b157bb645" target="_blank" rel="noopener"><strong>参考文章地址: 点击即可</strong></a></p>
@@ -769,8 +781,12 @@ $ <span class="token function">cat</span> /proc/sys/fs/file-nr
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/Linux/">
-                                    <span class="chip bg-color">Linux</span>
+                                <a href="/tags/Bug/">
+                                    <span class="chip bg-color">Bug</span>
+                                </a>
+                            
+                                <a href="/tags/Supervisor/">
+                                    <span class="chip bg-color">Supervisor</span>
                                 </a>
                             
                         </div>

@@ -424,8 +424,12 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/Linux/">
-                                <span class="chip bg-color">Linux</span>
+                            <a href="/tags/Bug/">
+                                <span class="chip bg-color">Bug</span>
+                            </a>
+                        
+                            <a href="/tags/Supervisor/">
+                                <span class="chip bg-color">Supervisor</span>
                             </a>
                         
                     </div>
@@ -456,7 +460,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-03-06
+                    2020-11-24
                 </div>
                 
 
@@ -490,13 +494,13 @@
 </blockquote>
 <p><img src="/images/use-supervisor-hup.png" alt="Supervisor不中断重启服务"></p>
 <hr>
-<h2 id="1-起因"><a href="#1-起因" class="headerlink" title="1. 起因"></a>1. 起因</h2><ul>
+<h2 id="1-问题起因"><a href="#1-问题起因" class="headerlink" title="1. 问题起因"></a>1. 问题起因</h2><ul>
 <li>我们常常使用 <code>supervisor</code> 来管理服务进程，因为其能够提供很好且很健全的便捷支持，比如服务异常退出之后可以自动重新启动等。同样，在部署服务的时候也是可以使用其来管理的。为了不中断服务对产品进行更新，我们通常会使用信号量来不中断的重启服务。当然，我们的 <code>supervisor</code> 是支持接收 <code>HUP</code> 信号量的。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用方式</span>
 $ <span class="token function">sudo</span> supervisorctl signal hup app-test:*<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
-<li>但是，在使用过程中发现，在使用 <code>HUP</code> 的时候，会发生进程并没有重启的情况。如下所示，我们使用 <code>supervisor</code> 管理了一个产品的服务，一个是 <code>web</code> 服务，另一个是对应的 <code>worker</code> 服务，其中 <code>worker</code> 服务启动的是一个 <code>celery</code> 服务。</li>
+<li>但是，我们在使用的过程中发现，在使用 <code>HUP</code> 的时候，会发生进程并没有重启的异常情况。如下所示，我们使用 <code>supervisor</code> 管理了一个产品的服务，一个是 <code>web</code> 服务，另一个是对应的 <code>worker</code> 服务，其中 <code>worker</code> 服务启动的是一个 <code>celery</code> 服务。</li>
 </ul>
 <p><img src="/images/use-supervisor-hup-1.png" alt="Supervisor不中断重启服务"></p>
 <pre class="line-numbers language-bash"><code class="language-bash">root      1     0  00:00:17 /usr/bin/python /usr/bin/supervisord -n -c /etc/supervisor/supervisord.conf
@@ -519,7 +523,7 @@ root  20691 20309  00:00:00 /usr/bin/python3 -c from multiprocessing.semaphore_t
 root  20694 20309  00:00:00 /usr/bin/python3 /usr/local/bin/celery -A remarkable.worker.app worker -n norm-%n@%h -l debug -c 2 -Q celery
 root  20695 20309  00:00:00 /usr/bin/python3 /usr/local/bin/celery -A remarkable.worker.app worker -n norm-%n@%h -l debug -c 2 -Q celery<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="2-经过"><a href="#2-经过" class="headerlink" title="2. 经过"></a>2. 经过</h2><ul>
+<h2 id="2-排除经过"><a href="#2-排除经过" class="headerlink" title="2. 排除经过"></a>2. 排除经过</h2><ul>
 <li>那么，我们看下是什么原因导致上述问题的出现呢？通过阅读 <code>celery</code> 的官方文档得知，其实它是支持 <code>HUP</code> 信号量，虽然是处理试用阶段并不推荐用于正式环境。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash">Other than stopping, <span class="token keyword">then</span> starting the worker to restart, you can also restart
@@ -532,7 +536,7 @@ Restarting by HUP only works <span class="token keyword">if</span> the worker is
 daemon <span class="token punctuation">(</span>it doesn’t have a controlling terminal<span class="token punctuation">)</span>.
 HUP is disabled on macOS because of a limitation on that platform.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li>再看看，我们可以看到启动时候调用的是 <code>Python</code> 系统自带的多进程库 <code>multiprocessing</code> 中的 <code>semaphore_tracker</code> 函数，但是在其定义中并没有处理接受 <code>HUP</code> 信号量的程序。</li>
+<li>我们可以看到，启动时候调用的是 <code>Python</code> 系统自带的多进程库 <code>multiprocessing</code> 中的 <code>semaphore_tracker</code> 函数，但是在其定义的源代码中并没有发现处理和接受 <code>HUP</code> 信号量的响应代码程序。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash">def main<span class="token punctuation">(</span>fd<span class="token punctuation">)</span>:
     <span class="token string">''</span><span class="token string">'Run semaphore tracker.'</span><span class="token string">''</span>
@@ -543,50 +547,49 @@ HUP is disabled on macOS because of a limitation on that platform.<span aria-hid
         signal.pthread_sigmask<span class="token punctuation">(</span>signal.SIG_UNBLOCK, _IGNORED_SIGNALS<span class="token punctuation">)</span>
 <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="3-结果"><a href="#3-结果" class="headerlink" title="3. 结果"></a>3. 结果</h2><ul>
-<li>很多天后，我在 <code>stackoverflow</code> 中看到有个人提了一个问题: <strong>在 docker 中使用 python 多进程库 multiprocessing 系统就奔溃了</strong>。</li>
+<h2 id="3-结果总结"><a href="#3-结果总结" class="headerlink" title="3. 结果总结"></a>3. 结果总结</h2><ul>
+<li>咳咳咳，很多天后，无意间我在 <code>stackoverflow</code> 中看到有个人提了一个问题: <strong>在 docker 中使用 python 多进程库 multiprocessing 系统就奔溃了</strong>。</li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># mp.py</span>
-<span class="token function">import</span> multiprocessing as mp
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># mp.py</span>
+<span class="token keyword">import</span> multiprocessing <span class="token keyword">as</span> mp
 
-def do_something<span class="token punctuation">(</span><span class="token punctuation">)</span>:
-    print<span class="token punctuation">(</span><span class="token string">'something'</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">do_something</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'something'</span><span class="token punctuation">)</span>
 
-<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token keyword">:</span>
-    ctx <span class="token operator">=</span> mp.get_context<span class="token punctuation">(</span><span class="token string">"spawn"</span><span class="token punctuation">)</span>
-    p <span class="token operator">=</span> ctx.Process<span class="token punctuation">(</span>target<span class="token operator">=</span>do_something, args<span class="token operator">=</span>tuple<span class="token punctuation">(</span><span class="token punctuation">))</span>
-    p.start<span class="token punctuation">(</span><span class="token punctuation">)</span>
-    p.join<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash">version: <span class="token string">'3.6'</span>
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
+    ctx <span class="token operator">=</span> mp<span class="token punctuation">.</span>get_context<span class="token punctuation">(</span><span class="token string">"spawn"</span><span class="token punctuation">)</span>
+    p <span class="token operator">=</span> ctx<span class="token punctuation">.</span>Process<span class="token punctuation">(</span>target<span class="token operator">=</span>do_something<span class="token punctuation">,</span> args<span class="token operator">=</span>tuple<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    p<span class="token punctuation">.</span>start<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    p<span class="token punctuation">.</span>join<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-dockerfile"><code class="language-dockerfile">version: '3.6'
 
 services:
   bug:
     build:
-      context: <span class="token keyword">.</span>
+      context: .
     environment:
-      - PYTHONUNBUFFERED<span class="token operator">=</span>1
-    command: <span class="token function">su</span> -c <span class="token string">"python3.6 forever.py"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash">from <span class="token function">time</span> <span class="token function">import</span> <span class="token function">sleep</span>
+      - PYTHONUNBUFFERED=1
+    command: su -c "python3.6 forever.py"<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> time <span class="token keyword">import</span> sleep
 
-<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token keyword">:</span>
-    i <span class="token operator">=</span> 0
-    <span class="token keyword">while</span> True:
-        sleep<span class="token punctuation">(</span>1.0<span class="token punctuation">)</span>
-        i +<span class="token operator">=</span> 1
-        print<span class="token punctuation">(</span>f<span class="token string">'hello {i:3}'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
+    i <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+        sleep<span class="token punctuation">(</span><span class="token number">1.0</span><span class="token punctuation">)</span>
+        i <span class="token operator">+=</span> <span class="token number">1</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">'hello {i:3}'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># To reproduce bug run in first terminal:</span>
 docker-compose build <span class="token operator">&amp;&amp;</span> docker-compose up
 
 <span class="token comment" spellcheck="true"># In the second one</span>
 docker <span class="token function">exec</span> -it downloadmovies_bug_1 python3 mp.py<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><p>通过阅读 <code>georgexsh</code> 大神的回答得知，如果我们在使用 <code>multiprocessing</code> 模块的时候使用了 <code>spawn</code> 模式，<code>Python</code> 默认会启动一个<strong>信号跟踪器进程</strong>(<code>semaphore_tracker</code>)来防止信号量泄露。这个进程是由 <code>mp.py</code> 启动得来的，但是在 <code>mp.py</code> 退出之后才退出，所以不会被 <code>mp.py</code> 捕获到，而是由系统的 <code>init</code> 进程接管。问题在于容器中 <code>PID</code> 为 <code>1</code> 的进程并不是传统意义上的 <code>init</code> 进程，而是我们通过 <code>entrypoint</code> 或 <code>cmd</code> 传入的命令，所以这里 <code>PID</code> 为 <code>1</code> 的进程是 <code>su -c</code> 命令。因此<strong>信号跟踪器进程</strong>(<code>semaphore_tracker</code>)传递给了 <code>su</code> 命令，但是它却并不识别。<code>su</code> 认为子进程是命令进程(<code>forever.py</code>)错误，没有检查关系直接退出了。当 <code>PID</code> 为 <code>1</code> 进程退出时，内核杀死容器中的所有其他进程，包括 <code>forever.py</code>。</p>
+<li><p>通过阅读 <code>georgexsh</code> 同学的回答得知，如果我们在使用 <code>multiprocessing</code> 模块的时候使用了 <code>spawn</code> 模式，<code>Python</code> 默认会启动一个<strong>信号跟踪器进程</strong>(<code>semaphore_tracker</code>)来防止信号量泄露。这个进程是由 <code>mp.py</code> 启动得来的，但是在 <code>mp.py</code> 退出之后才退出，所以不会被 <code>mp.py</code> 捕获到，而是由系统的 <code>init</code> 进程接管。问题在于容器中 <code>PID</code> 为 <code>1</code> 的进程并不是传统意义上的 <code>init</code> 进程，而是我们通过 <code>entrypoint</code> 或 <code>cmd</code> 传入的命令，所以这里 <code>PID</code> 为 <code>1</code> 的进程是 <code>su -c</code> 命令。因此<strong>信号跟踪器进程</strong>(<code>semaphore_tracker</code>)传递给了 <code>su</code> 命令，但是它却并不识别。<code>su</code> 认为子进程是命令进程(<code>forever.py</code>)错误，没有检查关系直接退出了。当 <code>PID</code> 为 <code>1</code> 进程退出时，内核杀死容器中的所有其他进程，包括 <code>forever.py</code>。</p>
 </li>
 <li><p>我自己测试的时候，发现通过另一个终端执行 <code>python3 mp.py</code>(27) 命令会启动两个进程。当命令执行完成之后，<code>semaphore_tracker</code>(28) 会交给 <code>python3</code>(27) 来处理进行终止。</p>
 </li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 容器内部执行</span>
-<span class="token comment" spellcheck="true"># ps -ef</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 容器内部执行 ps -ef 命令</span>
 UID        PID  PPID  C STIME TTY          TIME CMD
 root         1     0  0 07:28 ?        00:00:00 <span class="token function">su</span> -c python3.6 forever.py
 root         7     1  0 07:28 ?        00:00:00 python3.6 forever.py
@@ -597,14 +600,15 @@ root        28    27  1 07:30 pts/0    00:00:00 /usr/local/bin/python3 -c from m
 root        29    27  2 07:30 pts/0    00:00:00 <span class="token punctuation">[</span>python3<span class="token punctuation">]</span> <span class="token operator">&lt;</span>defunct<span class="token operator">></span>
 
 root        20     0  0 07:29 pts/1    00:00:00 <span class="token function">bash</span>
-root        30    20  0 07:30 pts/1    00:00:00 <span class="token function">ps</span> -ef<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+root        30    20  0 07:30 pts/1    00:00:00 <span class="token function">ps</span> -ef<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="4-参考文档"><a href="#4-参考文档" class="headerlink" title="4. 参考文档"></a>4. 参考文档</h2><blockquote>
+<p><strong>送人玫瑰，手有余香！</strong></p>
+</blockquote>
 <ul>
-<li>参考文章链接地址<ul>
 <li><a href="http://docs.celeryproject.org/en/latest/userguide/workers.html#restarting-the-worker" target="_blank" rel="noopener">Restarting the worker</a></li>
 <li><a href="https://github.com/python/cpython/blob/master/Lib/multiprocessing/semaphore_tracker.py#L128" target="_blank" rel="noopener">cpython/Lib/multiprocessing/semaphore_tracker.py</a>)</li>
 <li><a href="https://stackoverflow.com/questions/54650904/python-multiprocessing-crashes-docker-container" target="_blank" rel="noopener">Python multiprocessing crashes docker container</a></li>
-</ul>
-</li>
 </ul>
 <script>
         document.querySelectorAll('.github-emoji')
@@ -687,8 +691,12 @@ root        30    20  0 07:30 pts/1    00:00:00 <span class="token function">ps<
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/Linux/">
-                                    <span class="chip bg-color">Linux</span>
+                                <a href="/tags/Bug/">
+                                    <span class="chip bg-color">Bug</span>
+                                </a>
+                            
+                                <a href="/tags/Supervisor/">
+                                    <span class="chip bg-color">Supervisor</span>
                                 </a>
                             
                         </div>
