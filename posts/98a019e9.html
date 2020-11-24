@@ -428,6 +428,10 @@
                                 <span class="chip bg-color">Linux</span>
                             </a>
                         
+                            <a href="/tags/Supervisor/">
+                                <span class="chip bg-color">Supervisor</span>
+                            </a>
+                        
                             <a href="/tags/Command/">
                                 <span class="chip bg-color">Command</span>
                             </a>
@@ -467,7 +471,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    4.9k
+                    5k
                 </div>
                 
 
@@ -490,8 +494,9 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <blockquote>
-<p>我们在日常开发的过程中，使用的 <code>Supervisord</code> 是用 <code>Python</code> 实现的一款进程管理工具，要求被管理的程序是非守护进程的程序，其会帮你把它转成守护进程程序。它是一个 <code>C/S</code> 系统，其提供 <code>WEB</code> 接口给用户查询和控制, 并允许用户去监控和控制在类 <code>UNIX</code> 系统的进程。它的目标与 <code>launchd</code>、<code>daemontools</code> 和 <code>runit</code> 有些相似，但是与它们不一样的是, 它不是作为 <code>init</code>(进程号 pid 是 1)运行。它是被用来控制进程，并且它在启动的时候和一般程序并无二致。</p>
+<p><strong>Supervisor 工具：管理服务程序的利器！</strong></p>
 </blockquote>
+<p>我们在日常开发的过程中，使用的 <code>Supervisord</code> 是用 <code>Python</code> 实现的一款进程管理工具，要求被管理的程序是非守护进程的程序，其会帮你把它转成守护进程程序。它是一个 <code>C/S</code> 系统，其提供 <code>WEB</code> 接口给用户查询和控制, 并允许用户去监控和控制在类 <code>UNIX</code> 系统的进程。它的目标与 <code>launchd</code>、<code>daemontools</code> 和 <code>runit</code> 有些相似，但是与它们不一样的是, 它不是作为 <code>init</code>(进程号 pid 是 1)运行。它是被用来控制进程，并且它在启动的时候和一般程序并无二致。</p>
 <p><img src="../images/supervisord-server.png" alt="Supervisor工具的使用"></p>
 <ul>
 <li><strong>[1] 简单</strong></li>
@@ -555,7 +560,7 @@ $ pip <span class="token function">install</span> supervisor<span aria-hidden="t
 <p><strong>参考来自<a href="https://cloud.tencent.com/developer/article/1027384" target="_blank" rel="noopener">《进程管理利器-supervisor 部署记录》</a> =&gt; 侵权删除</strong></p>
 </blockquote>
 <ul>
-<li>安装之后是没有配置文件的，需要我们自己生成默认配置文件 <code>/etc/supervisord.conf</code> 和 <code>/etc/supervisord.d</code> 目录，如果没有则自行创建。</li>
+<li>当我们通过上述方式安装工具之后，对应的目录下面并没有我们需要的配置文件目录和文件，所以这就需要我们自行创建默认 <code>/etc/supervisord.d</code> 目录和 <code>/etc/supervisord.conf</code> 配置文件，即如果没有则自行创建。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 创建默认配置文件</span>
 $ echo_supervisord_conf <span class="token operator">></span> /etc/supervisord.conf
@@ -572,7 +577,7 @@ $ <span class="token function">ps</span> aux <span class="token operator">|</spa
 $ <span class="token function">mkdir</span> -pv /etc/supervisord.d/conf
 $ <span class="token function">mkdir</span> -pv /etc/supervisord.d/log<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li>修改 <code>/etc/supervisord.conf</code> 的 <code>[include]</code> 部分，即启动服务的时候自动帮我们载入 <code>/etc/supervisord.d/conf</code> 目录下的所有配置。</li>
+<li>修改 <code>/etc/supervisord.conf</code> 的 <code>[include]</code> 部分，将我们需要的服务配置文件的目录添加到其中，即启动服务的时候自动帮我们载入 <code>/etc/supervisord.d/conf</code> 目录下的所有配置。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># CentOS系统的配置文件</span>
 $ vim /etc/supervisord.conf
@@ -661,8 +666,8 @@ files <span class="token operator">=</span> /etc/supervisor/conf.d/*.conf<span a
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># program</span>
 <span class="token punctuation">;</span><span class="token punctuation">[</span>program:theprogramname<span class="token punctuation">]</span>      <span class="token punctuation">;</span> 必填选项，其格式为<span class="token punctuation">[</span>program:应用名称<span class="token punctuation">]</span>
 <span class="token punctuation">;</span>command<span class="token operator">=</span>/bin/cat              <span class="token punctuation">;</span> 启动命令，可以使用参数，不能是守护进程
-<span class="token punctuation">;</span>process_name<span class="token operator">=</span>%<span class="token punctuation">(</span>program_name<span class="token punctuation">)</span>s <span class="token punctuation">;</span> 当numprocs为1时,process_name<span class="token operator">=</span>%<span class="token punctuation">(</span>program_name<span class="token punctuation">)</span>s<span class="token punctuation">;</span>
- 当numprocs<span class="token operator">>=</span>2时,%<span class="token punctuation">(</span>program_name<span class="token punctuation">)</span>s_%<span class="token punctuation">(</span>process_num<span class="token punctuation">)</span>02d
+<span class="token punctuation">;</span>process_name<span class="token operator">=</span>%<span class="token punctuation">(</span>program_name<span class="token punctuation">)</span>s <span class="token punctuation">;</span> 当numprocs为1时，process_name<span class="token operator">=</span>%<span class="token punctuation">(</span>program_name<span class="token punctuation">)</span>s<span class="token punctuation">;</span>
+                                 当numprocs<span class="token operator">>=</span>2时，%<span class="token punctuation">(</span>program_name<span class="token punctuation">)</span>s_%<span class="token punctuation">(</span>process_num<span class="token punctuation">)</span>02d
 <span class="token punctuation">;</span>numprocs<span class="token operator">=</span>1                    <span class="token punctuation">;</span> 启动的进程数量，默认为1个，类似进程池的概念
 <span class="token punctuation">;</span>directory<span class="token operator">=</span>/tmp                <span class="token punctuation">;</span> 程序的执行目录
 <span class="token punctuation">;</span>umask<span class="token operator">=</span>022                     <span class="token punctuation">;</span> 指定掩码，默认为None
@@ -674,13 +679,13 @@ files <span class="token operator">=</span> /etc/supervisor/conf.d/*.conf<span a
 <span class="token punctuation">;</span>exitcodes<span class="token operator">=</span>0,2                 <span class="token punctuation">;</span> 当退出码是0和2时，执行重启，默认值0和2
 <span class="token punctuation">;</span>stopsignal<span class="token operator">=</span>HUP                <span class="token punctuation">;</span> 进程停止信号，默认为TERM，TERM/HUP/INT/QUIT/KILL等
 <span class="token punctuation">;</span>stopwaitsecs<span class="token operator">=</span>10               <span class="token punctuation">;</span> 当向子进程发送stopsignal信号后，到系统返回信息给supervisord
- 服务所等待的最大时间。超过这个时间，supervisord会向该子进程发
- 送一个强制kill的信号
+                                 服务所等待的最大时间。超过这个时间，supervisord会向该子进程发
+                                 送一个强制kill的信号
 <span class="token punctuation">;</span>stopasgroup<span class="token operator">=</span>false             <span class="token punctuation">;</span> 主要用于supervisord管理的子进程，这个子进程本身还有子进程。
- 那么我们如果仅仅干掉supervisord的子进程的话，子进程的子进程
- 有可能会变成孤儿进程。设置这个选项，把整个该子进程的整个进程组
- 都干掉。设置为true的话，一般killasgroup也会被设置为true的。
- 需要注意的是，该选项发送的是stop信号
+                                 那么我们如果仅仅干掉supervisord的子进程的话，子进程的子进程
+                                 有可能会变成孤儿进程。设置这个选项，把整个该子进程的整个进程组
+                                 都干掉。设置为true的话，一般killasgroup也会被设置为true的。
+                                 需要注意的是，该选项发送的是stop信号
 <span class="token punctuation">;</span>killasgroup<span class="token operator">=</span>false             <span class="token punctuation">;</span> 和上面的stopasgroup类似，不过发送的是kill信号
 <span class="token punctuation">;</span>user<span class="token operator">=</span>escape                   <span class="token punctuation">;</span> 用哪个用户启动
 <span class="token punctuation">;</span>redirect_stderr<span class="token operator">=</span>true          <span class="token punctuation">;</span> 如果为true，则stderr的日志会被写入stdout日志文件中，默认false
@@ -688,11 +693,11 @@ files <span class="token operator">=</span> /etc/supervisor/conf.d/*.conf<span a
 <span class="token punctuation">;</span>stdout_logfile_maxbytes<span class="token operator">=</span>1MB   <span class="token punctuation">;</span> stdout日志文件大小，默认50MB
 <span class="token punctuation">;</span>stdout_logfile_backups<span class="token operator">=</span>10     <span class="token punctuation">;</span> stdout日志文件备份数，默认10次
 <span class="token punctuation">;</span>stdout_capture_maxbytes<span class="token operator">=</span>1MB   <span class="token punctuation">;</span> 设定capture管道的大小，当值不为0时，子进程可以从stdout
- 发送信息，而supervisor可以根据信息，发送相应的event。
- 默认为0，为0的时候表达关闭管道。
+                                 发送信息，而supervisor可以根据信息，发送相应的event。
+                                 默认为0，为0的时候表达关闭管道。
 <span class="token punctuation">;</span>stdout_events_enabled<span class="token operator">=</span>false   <span class="token punctuation">;</span> 当设置为ture的时候，当子进程由stdout向文件描述符中写日志的时
- 候，将触发supervisord发送PROCESS_LOG_STDOUT类型的event，
- 默认为false。
+                                 候，将触发supervisord发送PROCESS_LOG_STDOUT类型的event，
+                                 默认为false。
 <span class="token punctuation">;</span>stderr_logfile<span class="token operator">=</span>/a/path        <span class="token punctuation">;</span> stderr日志文件路径
 <span class="token punctuation">;</span>stderr_logfile_maxbytes<span class="token operator">=</span>1MB   <span class="token punctuation">;</span> stderr日志文件大小，默认50MB
 <span class="token punctuation">;</span>stderr_logfile_backups<span class="token operator">=</span>10     <span class="token punctuation">;</span> stderr日志文件备份数，默认10次
@@ -1162,6 +1167,10 @@ password<span class="token operator">=</span>1234         <span class="token pun
                                     <span class="chip bg-color">Linux</span>
                                 </a>
                             
+                                <a href="/tags/Supervisor/">
+                                    <span class="chip bg-color">Supervisor</span>
+                                </a>
+                            
                                 <a href="/tags/Command/">
                                     <span class="chip bg-color">Command</span>
                                 </a>
@@ -1628,7 +1637,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">955.7k</span>&nbsp;字
+                class="white-color">955.8k</span>&nbsp;字
             
             
             
