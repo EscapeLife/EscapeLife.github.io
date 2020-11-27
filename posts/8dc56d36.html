@@ -463,7 +463,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    5.9k
+                    5.8k
                 </div>
                 
 
@@ -873,9 +873,9 @@ Password:此处敲击回车即可
 230 Login successful.
 Remote system <span class="token function">type</span> is UNIX.
 Using binary mode to transfer files.
-ftp<span class="token operator">&gt;</span> <span class="token function">cd</span> pub
+ftp<span class="token operator">></span> <span class="token function">cd</span> pub
 250 Directory successfully changed.
-ftp<span class="token operator">&gt;</span> <span class="token function">mkdir</span> files
+ftp<span class="token operator">></span> <span class="token function">mkdir</span> files
 550 Permission denied.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 系统显示拒绝创建目录，这是为什么呢？</span>
 <span class="token comment" spellcheck="true"># 查看该目录的权限得知，只有root管理员才有写入权限，开放ftp用户权限(该账户在系统中已经存在)</span>
@@ -888,41 +888,41 @@ drwxr-xr-x. 3 <span class="token function">ftp</span> root 16 Jul 13 14:38 /var/
 
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ftp 192.168.10.10</span>
 ………………省略部分输出信息………………
-ftp<span class="token operator">&gt;</span> <span class="token function">mkdir</span> files
+ftp<span class="token operator">></span> <span class="token function">mkdir</span> files
 550 Create directory operation failed.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 我们发现还是无法创建目录，发现是SELinux服务在捣乱了</span>
 <span class="token comment" spellcheck="true"># 使用getsebool命令查看与FTP相关的SELinux域策略都有哪些</span>
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># getsebool -a | grep ftp</span>
-ftp_home_dir --<span class="token operator">&gt;</span> off
-ftpd_anon_write --<span class="token operator">&gt;</span> off
-ftpd_connect_all_unreserved --<span class="token operator">&gt;</span> off
-ftpd_connect_db --<span class="token operator">&gt;</span> off
-ftpd_full_access --<span class="token operator">&gt;</span> off
-ftpd_use_cifs --<span class="token operator">&gt;</span> off
-ftpd_use_fusefs --<span class="token operator">&gt;</span> off
-ftpd_use_nfs --<span class="token operator">&gt;</span> off
-ftpd_use_passive_mode --<span class="token operator">&gt;</span> off
-httpd_can_connect_ftp --<span class="token operator">&gt;</span> off
-httpd_enable_ftp_server --<span class="token operator">&gt;</span> off
-sftpd_anon_write --<span class="token operator">&gt;</span> off
-sftpd_enable_homedirs --<span class="token operator">&gt;</span> off
-sftpd_full_access --<span class="token operator">&gt;</span> off
-sftpd_write_ssh_home --<span class="token operator">&gt;</span> off
-tftp_anon_write --<span class="token operator">&gt;</span> off
-tftp_home_dir --<span class="token operator">&gt;</span> off
+ftp_home_dir --<span class="token operator">></span> off
+ftpd_anon_write --<span class="token operator">></span> off
+ftpd_connect_all_unreserved --<span class="token operator">></span> off
+ftpd_connect_db --<span class="token operator">></span> off
+ftpd_full_access --<span class="token operator">></span> off
+ftpd_use_cifs --<span class="token operator">></span> off
+ftpd_use_fusefs --<span class="token operator">></span> off
+ftpd_use_nfs --<span class="token operator">></span> off
+ftpd_use_passive_mode --<span class="token operator">></span> off
+httpd_can_connect_ftp --<span class="token operator">></span> off
+httpd_enable_ftp_server --<span class="token operator">></span> off
+sftpd_anon_write --<span class="token operator">></span> off
+sftpd_enable_homedirs --<span class="token operator">></span> off
+sftpd_full_access --<span class="token operator">></span> off
+sftpd_write_ssh_home --<span class="token operator">></span> off
+tftp_anon_write --<span class="token operator">></span> off
+tftp_home_dir --<span class="token operator">></span> off
 
-<span class="token comment" spellcheck="true"># 根据经验和策略的名称判断出是ftpd_full_access--&gt; off策略规则导致了操作失败</span>
+<span class="token comment" spellcheck="true"># 根据经验和策略的名称判断出是ftpd_full_access--> off策略规则导致了操作失败</span>
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># setsebool -P ftpd_full_access=on</span>
 
 <span class="token comment" spellcheck="true"># 此时，匿名用户就可以正常使用FTP服务了</span>
 <span class="token punctuation">[</span>root@linuxprobe ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ftp 192.168.10.10</span>
 ………………省略部分输出信息………………
-ftp<span class="token operator">&gt;</span> <span class="token function">mkdir</span> files
+ftp<span class="token operator">></span> <span class="token function">mkdir</span> files
 257 <span class="token string">"/pub/files"</span> created
-ftp<span class="token operator">&gt;</span> <span class="token function">rename</span> files database
+ftp<span class="token operator">></span> <span class="token function">rename</span> files database
 350 Ready <span class="token keyword">for</span> RNTO.
 250 Rename successful.
-ftp<span class="token operator">&gt;</span> <span class="token keyword">exit</span>
+ftp<span class="token operator">></span> <span class="token keyword">exit</span>
 221 Goodbye.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="3-2-本地用户模式"><a href="#3-2-本地用户模式" class="headerlink" title="3.2 本地用户模式"></a>3.2 本地用户模式</h3><blockquote>
@@ -958,7 +958,7 @@ Connected to 192.168.10.10 <span class="token punctuation">(</span>192.168.10.10
 Name <span class="token punctuation">(</span>192.168.10.10:root<span class="token punctuation">)</span>: root
 530 Permission denied.
 Login failed.
-ftp<span class="token operator">&gt;</span>
+ftp<span class="token operator">></span>
 
 <span class="token comment" spellcheck="true"># 这是因为，为了系统的安全，默认禁止root等用户登录FTP服务被系统拒绝访问</span>
 <span class="token comment" spellcheck="true"># 因为vsftpd服务程序所在的目录中，默认存放着两个名为用户名单的文件，ftpusers和user_list</span>
@@ -1088,23 +1088,23 @@ anon_other_write_enable<span class="token operator">=</span>YES<span aria-hidden
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># setsebool -P ftpd_full_access=on</span>
 
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># getsebool -a | grep ftp</span>
-ftp_home_dir –<span class="token operator">&gt;</span> off
-ftpd_anon_write –<span class="token operator">&gt;</span> off
-ftpd_connect_all_unreserved –<span class="token operator">&gt;</span> off
-ftpd_connect_db –<span class="token operator">&gt;</span> off
-ftpd_full_access –<span class="token operator">&gt;</span> off
-ftpd_use_cifs –<span class="token operator">&gt;</span> off
-ftpd_use_fusefs –<span class="token operator">&gt;</span> off
-ftpd_use_nfs –<span class="token operator">&gt;</span> off
-ftpd_use_passive_mode –<span class="token operator">&gt;</span> off
-httpd_can_connect_ftp –<span class="token operator">&gt;</span> off
-httpd_enable_ftp_server –<span class="token operator">&gt;</span> off
-sftpd_anon_write –<span class="token operator">&gt;</span> off
-sftpd_enable_homedirs –<span class="token operator">&gt;</span> off
-sftpd_full_access –<span class="token operator">&gt;</span> on
-sftpd_write_ssh_home –<span class="token operator">&gt;</span> off
-tftp_anon_write –<span class="token operator">&gt;</span> off
-tftp_home_dir –<span class="token operator">&gt;</span> off<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+ftp_home_dir –<span class="token operator">></span> off
+ftpd_anon_write –<span class="token operator">></span> off
+ftpd_connect_all_unreserved –<span class="token operator">></span> off
+ftpd_connect_db –<span class="token operator">></span> off
+ftpd_full_access –<span class="token operator">></span> off
+ftpd_use_cifs –<span class="token operator">></span> off
+ftpd_use_fusefs –<span class="token operator">></span> off
+ftpd_use_nfs –<span class="token operator">></span> off
+ftpd_use_passive_mode –<span class="token operator">></span> off
+httpd_can_connect_ftp –<span class="token operator">></span> off
+httpd_enable_ftp_server –<span class="token operator">></span> off
+sftpd_anon_write –<span class="token operator">></span> off
+sftpd_enable_homedirs –<span class="token operator">></span> off
+sftpd_full_access –<span class="token operator">></span> on
+sftpd_write_ssh_home –<span class="token operator">></span> off
+tftp_anon_write –<span class="token operator">></span> off
+tftp_home_dir –<span class="token operator">></span> off<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>第七步：<strong>使用虚拟 FTP 用户访问测试</strong></li>
 </ul>
@@ -1117,9 +1117,9 @@ Password:此处输入虚拟用户的密码
 230 Login successful.
 Remote system <span class="token function">type</span> is UNIX.
 Using binary mode to transfer files.
-ftp<span class="token operator">&gt;</span> <span class="token function">mkdir</span> files
+ftp<span class="token operator">></span> <span class="token function">mkdir</span> files
 550 Permission denied.
-ftp<span class="token operator">&gt;</span> <span class="token keyword">exit</span>
+ftp<span class="token operator">></span> <span class="token keyword">exit</span>
 221 Goodbye.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ftp 192.168.10.10</span>
 Connected to 192.168.10.10 <span class="token punctuation">(</span>192.168.10.10<span class="token punctuation">)</span>.
@@ -1130,14 +1130,14 @@ Password:此处输入虚拟用户的密码
 230 Login successful.
 Remote system <span class="token function">type</span> is UNIX.
 Using binary mode to transfer files.
-ftp<span class="token operator">&gt;</span> <span class="token function">mkdir</span> files
+ftp<span class="token operator">></span> <span class="token function">mkdir</span> files
 257 <span class="token string">"/files"</span> created
-ftp<span class="token operator">&gt;</span> <span class="token function">rename</span> files database
+ftp<span class="token operator">></span> <span class="token function">rename</span> files database
 350 Ready <span class="token keyword">for</span> RNTO.
 250 Rename successful.
-ftp<span class="token operator">&gt;</span> <span class="token function">rmdir</span> database
+ftp<span class="token operator">></span> <span class="token function">rmdir</span> database
 250 Remove directory operation successful.
-ftp<span class="token operator">&gt;</span> <span class="token keyword">exit</span>
+ftp<span class="token operator">></span> <span class="token keyword">exit</span>
 221 Goodbye.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="3-4-虚拟用户模式-MySQL-数据库"><a href="#3-4-虚拟用户模式-MySQL-数据库" class="headerlink" title="3.4 虚拟用户模式(MySQL 数据库)"></a>3.4 虚拟用户模式(MySQL 数据库)</h3><blockquote>
@@ -1154,30 +1154,30 @@ $ yum -y <span class="token function">install</span> vsftpd mysql-server mysql-d
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 1、准备数据库及相关表</span>
 
 首先请确保mysql服务已经正常启动。而后，按需要建立存储虚拟用户的数据库即可，这里将其创建为vsftpd数据库
-mysql<span class="token operator">&gt;</span> create database vsftpd<span class="token punctuation">;</span>
+mysql<span class="token operator">></span> create database vsftpd<span class="token punctuation">;</span>
 
 授权vsftpd用户可以通过localhost主机操作select权限vsftpd库的所有表，密码为www.escapelife.com
-mysql<span class="token operator">&gt;</span> grant <span class="token keyword">select</span> on vsftpd.* to vsftpd@localhost identified by <span class="token string">'www.escapelife.com'</span><span class="token punctuation">;</span>
-mysql<span class="token operator">&gt;</span> grant <span class="token keyword">select</span> on vsftpd.* to vsftpd@127.0.0.1 identified by <span class="token string">'www.escapelife.com'</span><span class="token punctuation">;</span>
-mysql<span class="token operator">&gt;</span> flush privileges<span class="token punctuation">;</span>
+mysql<span class="token operator">></span> grant <span class="token keyword">select</span> on vsftpd.* to vsftpd@localhost identified by <span class="token string">'www.escapelife.com'</span><span class="token punctuation">;</span>
+mysql<span class="token operator">></span> grant <span class="token keyword">select</span> on vsftpd.* to vsftpd@127.0.0.1 identified by <span class="token string">'www.escapelife.com'</span><span class="token punctuation">;</span>
+mysql<span class="token operator">></span> flush privileges<span class="token punctuation">;</span>
 
 （这里是本机安装所有授权localhost主机，如果不同需要使用不同的主机地址）
-（mysql<span class="token operator">&gt;</span> grant <span class="token keyword">select</span> on vsftpd.* to vsftpd@<span class="token string">'192.168.31.%'</span> identified by <span class="token string">'www.escapelife.com'</span><span class="token punctuation">;</span>）
-（mysql<span class="token operator">&gt;</span> flush privileges<span class="token punctuation">;</span>）
+（mysql<span class="token operator">></span> grant <span class="token keyword">select</span> on vsftpd.* to vsftpd@<span class="token string">'192.168.31.%'</span> identified by <span class="token string">'www.escapelife.com'</span><span class="token punctuation">;</span>）
+（mysql<span class="token operator">></span> flush privileges<span class="token punctuation">;</span>）
 
 创建相关表
-mysql<span class="token operator">&gt;</span> use vsftpd<span class="token punctuation">;</span>
-mysql<span class="token operator">&gt;</span> create table <span class="token function">users</span> <span class="token punctuation">(</span>
-    -<span class="token operator">&gt;</span> <span class="token function">id</span> INT UNSIGNED AUTO_INCREMENT NOT NULL,
-    -<span class="token operator">&gt;</span> name VARCHAR<span class="token punctuation">(</span>50<span class="token punctuation">)</span> BINARY NOT NULL,
-    -<span class="token operator">&gt;</span> password char<span class="token punctuation">(</span>48<span class="token punctuation">)</span> BINARY NOT NULL,
-    -<span class="token operator">&gt;</span> PRIMARY KEY<span class="token punctuation">(</span>id<span class="token punctuation">)</span>
-    -<span class="token operator">&gt;</span> <span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+mysql<span class="token operator">></span> use vsftpd<span class="token punctuation">;</span>
+mysql<span class="token operator">></span> create table <span class="token function">users</span> <span class="token punctuation">(</span>
+    -<span class="token operator">></span> <span class="token function">id</span> INT UNSIGNED AUTO_INCREMENT NOT NULL,
+    -<span class="token operator">></span> name VARCHAR<span class="token punctuation">(</span>50<span class="token punctuation">)</span> BINARY NOT NULL,
+    -<span class="token operator">></span> password char<span class="token punctuation">(</span>48<span class="token punctuation">)</span> BINARY NOT NULL,
+    -<span class="token operator">></span> PRIMARY KEY<span class="token punctuation">(</span>id<span class="token punctuation">)</span>
+    -<span class="token operator">></span> <span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 2、添加测试的虚拟用户</span>
 
 根据需要添加所需要的用户，需要说明的是，这里将其密码为了安全起见应该使用PASSWORD函数加密后存储
-mysql<span class="token operator">&gt;</span> INSERT INTO users<span class="token punctuation">(</span>name, password<span class="token punctuation">)</span> VALUES<span class="token punctuation">(</span><span class="token string">'tom'</span>, password<span class="token punctuation">(</span><span class="token string">'escapelife'</span><span class="token punctuation">))</span><span class="token punctuation">;</span>
-mysql<span class="token operator">&gt;</span> INSERT INTO users<span class="token punctuation">(</span>name, password<span class="token punctuation">)</span> VALUES<span class="token punctuation">(</span><span class="token string">'bob'</span>, password<span class="token punctuation">(</span><span class="token string">'escapelife'</span><span class="token punctuation">))</span><span class="token punctuation">;</span>
+mysql<span class="token operator">></span> INSERT INTO users<span class="token punctuation">(</span>name, password<span class="token punctuation">)</span> VALUES<span class="token punctuation">(</span><span class="token string">'tom'</span>, password<span class="token punctuation">(</span><span class="token string">'escapelife'</span><span class="token punctuation">))</span><span class="token punctuation">;</span>
+mysql<span class="token operator">></span> INSERT INTO users<span class="token punctuation">(</span>name, password<span class="token punctuation">)</span> VALUES<span class="token punctuation">(</span><span class="token string">'bob'</span>, password<span class="token punctuation">(</span><span class="token string">'escapelife'</span><span class="token punctuation">))</span><span class="token punctuation">;</span>
 SELETC * FROM user<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>第三步：<strong>配置 vsftpd</strong></li>
@@ -1791,7 +1791,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">971k</span>&nbsp;字
+                class="white-color">964.4k</span>&nbsp;字
             
             
             

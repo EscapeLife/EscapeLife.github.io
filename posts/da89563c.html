@@ -456,21 +456,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-11-26
+                    2020-11-28
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    4.1k
+                    5.4k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    16 分
+                    21 分
                 </div>
                 
 
@@ -815,6 +815,101 @@ $ <span class="token function">watch</span> -n 1 -d tree .git<span aria-hidden="
 <p>现在，我们已经基本理解了文件如何在工作区、暂存区以及代码仓库之间进行状态的跟踪和同步。在 <code>Git</code> 的操作中，文件的可能状态有哪些，以及如何进行状态切换的，我们这里一起总结一下！</p>
 <p><img src="../images/intro-basic-principles-git-20.png" alt="Git 基本原理介绍 - 文件的生命周期状态"></p>
 <p><img src="../images/intro-basic-principles-git-21.png" alt="Git 基本原理介绍 - 文件的生命周期状态"></p>
+<hr>
+<h2 id="8-Branch-和-HEAD-的意义"><a href="#8-Branch-和-HEAD-的意义" class="headerlink" title="8. Branch 和 HEAD 的意义"></a>8. Branch 和 HEAD 的意义</h2><blockquote>
+<p><strong>执行完成了 <code>git branch</code> 命令，究竟做了什么呢？</strong></p>
+</blockquote>
+<p>到底什么是分支？分支切换又是怎么一回事？我们通过查看 <code>Git</code> 的官方文档，就可以得到，分支就是一个有名字的(<code>master</code>/<code>dev</code>)指向 <code>commit</code> 对象的一个指针。</p>
+<p>我们在初始化仓库的时候，提供会默认给我们分配一个叫做 <code>master</code> 的分支(在最新的版本默认仓库已经变更为<code>main</code>了)，而 <code>master</code> 分支就是指向最新的一次提交。为什么需要给分支起名字呢？就是为了方便我们使用和记忆，可以简单理解为 <code>alias</code> 命令的意义一致。</p>
+<p><a href="../images/intro-basic-principles-git-22.png">Git 基本原理介绍 - Branch 和 HEAD 的意义</a></p>
+<p>有了上述基础，我们就需要考虑下，分支到底是如何实现和工作的。要实现一个分支，我们最基本需要解决两个问题，第一个就是需要存储每一个分支指向的 <code>commit</code>，第二个问题就是在切换分支的时候帮助我们标识当前分支。</p>
+<p>在 <code>git</code> 中，它有一个非常特殊的 <code>HEAD</code> 文件。而 <code>HEAD</code> 文件是一个指针，其有一个特性就是总会指向当前分支的最新的一个 <code>commit</code> 对象。而这个 <code>HEAD</code> 文件正好，解决了我们上面提出的两个问题。</p>
+<p>当我们从 <code>master</code> 切换分支到 <code>dev</code> 的时候，<code>HEAD</code> 文件也会随即切换，即指向 <code>dev</code> 这个指针。设计就是这么美丽，不愧是鬼才，好脑袋。</p>
+<p><a href="../images/intro-basic-principles-git-23.png">Git 基本原理介绍 - Branch 和 HEAD 的意义</a></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 左边执行</span>
+$ <span class="token function">cat</span> .git/HEAD
+$ <span class="token function">cat</span> .git/refs/heads/master
+$ <span class="token function">git</span> cat-file -t 1711e01
+
+<span class="token comment" spellcheck="true"># 右边执行</span>
+$ glo <span class="token operator">=</span> <span class="token function">git</span> log<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><a href="../images/intro-basic-principles-git-24.png">Git 基本原理介绍 - Branch 和 HEAD 的意义</a></p>
+<hr>
+<h2 id="9-分支操作的背后逻辑"><a href="#9-分支操作的背后逻辑" class="headerlink" title="9. 分支操作的背后逻辑"></a>9. 分支操作的背后逻辑</h2><blockquote>
+<p><strong>执行完成了 <code>git branch</code> 命令，究竟做了什么呢？</strong></p>
+</blockquote>
+<p>这里我们可以看到分支切换之后，<code>HEAD</code> 指向发生变动了。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 左边执行</span>
+$ <span class="token function">git</span> branch
+$ <span class="token function">git</span> branch dev
+$ ll .git/refs/heads
+$ <span class="token function">cat</span> .git/refs/heads/master
+$ <span class="token function">cat</span> .git/refs/heads/dev
+$ <span class="token function">cat</span> .git/HEAD
+$ <span class="token function">git</span> checkout dev
+$ <span class="token function">cat</span> .git/HEAD
+
+<span class="token comment" spellcheck="true"># 右边执行</span>
+$ glo <span class="token operator">=</span> <span class="token function">git</span> log<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><a href="../images/intro-basic-principles-git-25.png">Git 基本原理介绍 - 分支操作的背后逻辑</a></p>
+<p>这里需要注意的是，即使我们删除了分支，但是该分支上一些特有的对象并不会被删除的。这些对象其实就是我们俗称的垃圾对象，还有我们多次使用 <code>add</code> 命令所产生的也有垃圾对象，而这些垃圾对象怎么清除和回收呢？后续，我们会涉及到的。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 左边执行</span>
+$ <span class="token keyword">echo</span> <span class="token string">"dev"</span> <span class="token operator">></span> dev.txt
+$ <span class="token function">git</span> add dev.txt
+$ <span class="token function">git</span> commit -m <span class="token string">"1st commit from dev branch"</span>
+$ <span class="token function">git</span> checkout master
+$ <span class="token function">git</span> branch -d dev
+$ <span class="token function">git</span> branch -D dev
+$ <span class="token function">git</span> cat-file -t 861832c
+$ <span class="token function">git</span> cat-file -p 861832c
+$ <span class="token function">git</span> cat-file -p 680f6e9
+$ <span class="token function">git</span> cat-file -p 38f8e88
+
+<span class="token comment" spellcheck="true"># 右边执行</span>
+$ glo <span class="token operator">=</span> <span class="token function">git</span> log<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><a href="../images/intro-basic-principles-git-26.png">Git 基本原理介绍 - 分支操作的背后逻辑</a></p>
+<hr>
+<h2 id="10-checkout-和-commit-操作"><a href="#10-checkout-和-commit-操作" class="headerlink" title="10. checkout 和 commit 操作"></a>10. checkout 和 commit 操作</h2><blockquote>
+<p><strong>我们一起聊一聊，checkout 和 commit 的操作！</strong></p>
+</blockquote>
+<p>我们执行 <code>checkout</code> 命令的时候，其不光可以切换分支，而且可以切换到指定的 <code>commit</code> 上面，即 <code>HEAD</code> 文件会指向某个 <code>commit</code> 对象。在 <code>Git</code> 里面，将 <code>HEAD</code> 文件没有指向 <code>master</code> 的这个现象称之为 <code>detached HEAD</code>。</p>
+<p>这里不管 <code>HEAD</code> 文件指向的是分支名称也好，是 <code>commit</code> 对象也罢，其实本质都是一样的，因为分支名称也是指向某个 <code>commit</code> 对象的。</p>
+<p><a href="../images/intro-basic-principles-git-27.png">Git 基本原理介绍 - checkout 和 commit 操作</a></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 左边执行</span>
+$ <span class="token function">git</span> checkout 6e4a700
+$ <span class="token function">git</span> log
+
+<span class="token comment" spellcheck="true"># 右边执行</span>
+$ glo <span class="token operator">=</span> <span class="token function">git</span> log<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><a href="../images/intro-basic-principles-git-28.png">Git 基本原理介绍 - checkout 和 commit 操作</a></p>
+<p>当我们切换到指定的 <code>commit</code> 的时候，如果需要在对应的 <code>commit</code> 上继续修改代码提交的话，可以使用上述图片中提及的 <code>swtich</code> 命令创建新分支，再进行提交。但是，通常我们都不会着玩，都会使用 <code>checkout</code> 命令来创建新分支的。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">git</span> checkout -b tmp
+$ <span class="token function">git</span> log<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>即使可以这样操作，我们也很少使用。还记得我们上一章节创建的 <code>dev</code> 分支吗？我们创建了该分支并有了一个新的提交，但是没有合并到 <code>master</code> 分支就直接删除了。现在再使用 <code>log</code> 命令查看的话，是看不到了。</p>
+<p>实际，真的看不到了吗？大家要记住，在 <code>Git</code> 里面任何的操作，比如分支的删除。它只是删除了指向某个特定 <code>commit</code> 的指针引用而已，而那个 <code>commit</code> 本身并不会被删除，即 <code>dev</code> 分支的那个 <code>commit</code> 提交还是在的。</p>
+<p>那我们怎么找到这个 <code>commit</code> 呢？找到之后，我们就可以在上面继续工作，或者找到之前的文件数据等。</p>
+<ul>
+<li>第一种方法<ul>
+<li>[费劲不太好，下下策]</li>
+<li>在 <code>objects</code> 目录下面，自己一个一个看，然后切换过去。</li>
+</ul>
+</li>
+<li>第二种方法<ul>
+<li>[推荐的操作方式]</li>
+<li>使用 <code>Git</code> 提供的 <code>git reflog</code> 专用命令来查找。</li>
+<li>该命令的作用就是用于将我们之前的所有操作都记录下来。</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 左边执行</span>
+$ <span class="token function">git</span> reflog
+$ <span class="token function">git</span> checkout 9fb7a14
+$ <span class="token function">git</span> checkout -b dev
+
+<span class="token comment" spellcheck="true"># 右边执行</span>
+$ glo <span class="token operator">=</span> <span class="token function">git</span> log<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><a href="../images/intro-basic-principles-git-29.png">Git 基本原理介绍 - checkout 和 commit 操作</a></p>
+<p><a href="../images/intro-basic-principles-git-30.png">Git 基本原理介绍 - checkout 和 commit 操作</a></p>
 <hr>
 <script>
         document.querySelectorAll('.github-emoji')
@@ -1363,7 +1458,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">971k</span>&nbsp;字
+                class="white-color">964.4k</span>&nbsp;字
             
             
             
