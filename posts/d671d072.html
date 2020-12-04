@@ -456,7 +456,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-06-01
+                    2020-12-04
                 </div>
                 
 
@@ -493,8 +493,8 @@
 <h2 id="1-Rebase：产生意义"><a href="#1-Rebase：产生意义" class="headerlink" title="1. Rebase：产生意义"></a>1. Rebase：产生意义</h2><blockquote>
 <p><strong>主要讲述其主要的用途和产生的作用</strong></p>
 </blockquote>
-<p>在 <code>Git</code> 中整合来自不同分支的修改主要有两种方法：<code>merge</code> 以及 <code>rebase</code>。对应 <code>merge</code> 操作来说，想必我们都已经使用过很多次了，而 <code>rebase</code> 又是用在哪里呢？已经其正确的使用方式。</p>
-<p>我们使用 <code>Git</code> 进行产品开发的代码管理，势必是会存在多人在同一个分支上协同工作的，这样就很容易出现冲突。而遇到冲突的时候，一般情况都是已经有人在该分支上面提交代码了，我们不得不先将其他的提交 <code>pull</code> 到本地，然后在本地合并(如果有冲突的话)，最后才能 <code>push</code> 成功。</p>
+<p>在 <code>Git</code> 中整合来自不同分支的修改主要有两种方法：<code>merge</code> 以及 <code>rebase</code>。对应 <code>merge</code> 操作来说，想必我们都已经使用过很多次了，而 <code>rebase</code> 又是用在哪里呢？已经其正确的使用方式，到底是什么呢？</p>
+<p>我们使用 <code>Git</code> 进行产品开发的代码管理，势必是会存在多人在同一个分支上协同工作的问题，这样就很容易出现冲突。而遇到冲突的时候，一般情况都是已经有人在该分支上面提交代码了，我们不得不先将其他的提交 <code>pull</code> 到本地，然后在本地合并(如果有冲突的话)，最后才能 <code>push</code> 成功。</p>
 <pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">git</span> push origin master
 To github.com:xxx/xxx.git
  <span class="token operator">!</span> <span class="token punctuation">[</span>rejected<span class="token punctuation">]</span>        master -<span class="token operator">></span> master <span class="token punctuation">(</span>fetch first<span class="token punctuation">)</span>
@@ -504,8 +504,8 @@ hint: not have locally. This is usually caused by another repository pushing
 hint: to the same ref. You may want to first integrate the remote changes
 hint: <span class="token punctuation">(</span>e.g., <span class="token string">'git pull ...'</span><span class="token punctuation">)</span> before pushing again.
 hint: See the <span class="token string">'Note about fast-forwards'</span> <span class="token keyword">in</span> <span class="token string">'git push --help'</span> <span class="token keyword">for</span> details.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>但是我们会发现提交记录会变得有点嘎里嘎气的，强迫症的你可能需要一条干净的直线，因为太多无用的 <code>commit</code> 很让人不舒服。这样会导致不利于每天的 <code>code review</code> 代码检视，同时也会污染分支提价记录。</p>
-<p>使用 <code>rebase</code> 操作可以把本地未 <code>push</code> 的分叉提交历史整理成直线；<code>rebase</code> 的目的是使得我们在查看历史提交的变化时更容易，因为分叉的提交需要三方对比。</p>
+<p>但是我们会发现提交记录会变得有点嘎里嘎气的，强迫症的你可能需要一条干净的直线，因为太多无用的 <code>commit</code> 很让人不舒服。而且不利于每天下午的 <code>code review</code> 代码检视，同时也会污染分支提交记录。</p>
+<p>如果使用 <code>rebase</code> 操作的话，可以把本地未 <code>push</code> 的分叉提交历史整理成直线。<code>rebase</code> 的目的是使得我们在查看历史提交的变化时更容易，因为分叉的提交需要三方对比。</p>
 <pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">git</span> log --graph --pretty<span class="token operator">=</span>oneline --abbrev-commit
 *   e0ea545 <span class="token punctuation">(</span>HEAD -<span class="token operator">></span> master<span class="token punctuation">)</span> Merge branch <span class="token string">'master'</span> of github.com:xxx/xxx
 <span class="token operator">|</span>\
@@ -516,7 +516,7 @@ hint: See the <span class="token string">'Note about fast-forwards'</span> <span
 * d1be385 init hello repo
 <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="2-Rebase：合并纪录"><a href="#2-Rebase：合并纪录" class="headerlink" title="2. Rebase：合并纪录"></a>2. Rebase：合并纪录</h2><p>这个时候，就该 <code>rebase</code> 上场了。原本分叉的提交现在变成一条直线了！这种神奇的操作，其实原理非常简单。注意观察，<code>Git</code> 把我们本地的提交“挪动”了位置，放到了 <code>f005ed4</code> 之后，这样，整个提交历史就成了一条直线。rebase 操作前后，最终的提交内容是一致的，但是，我们本地的 <code>commit</code> 修改内容已经变化了，它们的修改不再基于 <code>d1be385</code>，而是基于 <code>f005ed4</code>，但最后的提交 <code>7e61ed4</code> 内容是一致的。</p>
+<h2 id="2-Rebase：合并纪录"><a href="#2-Rebase：合并纪录" class="headerlink" title="2. Rebase：合并纪录"></a>2. Rebase：合并纪录</h2><p>这个时候，就该 <code>rebase</code> 上场了，其会使原本分叉的提交立马变成一条直线！这种神奇的操作，其实原理非常简单。注意观察，<code>Git</code> 把我们本地的提交“挪动”了位置，放到了 <code>f005ed4</code> 之后，这样，整个提交历史就成了一条直线。<code>rebase</code> 操作前后，最终的提交内容是一致的，但是，我们本地的 <code>commit</code> 修改内容已经变化了，它们的修改不再基于 <code>d1be385</code>，而是基于 <code>f005ed4</code>，但最后的提交 <code>7e61ed4</code> 内容是一致的。</p>
 <pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">git</span> rebase
 First, rewinding <span class="token function">head</span> to replay your work on <span class="token function">top</span> of it<span class="token punctuation">..</span>.
 Applying: add comment
