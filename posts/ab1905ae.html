@@ -436,8 +436,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Python成长之途/" class="post-category">
-                                Python成长之途
+                            <a href="/categories/Python入门基础/" class="post-category">
+                                Python入门基础
                             </a>
                         
                     </div>
@@ -456,7 +456,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-03-06
+                    2020-12-08
                 </div>
                 
 
@@ -534,44 +534,44 @@
 </blockquote>
 <p><strong>阻塞和非阻塞</strong></p>
 <ul>
-<li>阻塞与非阻塞的概念是针对<code>IO</code>状态而言的，关注程序在等待IO调用返回这段时间的状态。当线程或进程调用每一个函数的时候，如果需要等待<code>I/O</code>请求等待竞争资源的时候，操作系统就绪将其阻塞起来，避免浪费更多的<code>CPU</code>资源。等待完成之后，将其转换为就绪状态继续运行。</li>
+<li>阻塞与非阻塞的概念是针对<code>IO</code>状态而言的，关注程序在等待 IO 调用返回这段时间的状态。当线程或进程调用每一个函数的时候，如果需要等待<code>I/O</code>请求等待竞争资源的时候，操作系统就绪将其阻塞起来，避免浪费更多的<code>CPU</code>资源。等待完成之后，将其转换为就绪状态继续运行。</li>
 <li>阻塞和非阻塞，以及同步和异步，完全是两组概念且之间并没有一个必然的联系。也就是<strong>阻塞并不等于同步，非阻塞并不等于异步</strong>。</li>
 </ul>
 <p><img src="../images/python-task-coron5.png" alt="Python异步编程和事件驱动"></p>
 <p><img src="../images/python-task-coron6.png" alt="Python异步编程和事件驱动"></p>
 <hr>
-<h2 id="2-IO编程模型"><a href="#2-IO编程模型" class="headerlink" title="2. IO编程模型"></a>2. IO编程模型</h2><blockquote>
-<p><strong>该编程模型是为了解决I/O比较慢而产生的，熟悉和理解该模型有利于我们自己编写异步非阻塞的代码</strong></p>
+<h2 id="2-IO-编程模型"><a href="#2-IO-编程模型" class="headerlink" title="2. IO 编程模型"></a>2. IO 编程模型</h2><blockquote>
+<p><strong>该编程模型是为了解决 I/O 比较慢而产生的，熟悉和理解该模型有利于我们自己编写异步非阻塞的代码</strong></p>
 </blockquote>
-<p><strong>什么是IO模型</strong></p>
+<p><strong>什么是 IO 模型</strong></p>
 <ul>
 <li>当<code>I/O</code>发生的时候就会涉及到对象和步骤的操作，我们这里以网络<code>I/O</code>的<code>read</code>为例。它会涉及到两个系统对象，一个是调用这个<code>I/O</code>操作的进程或线程，另一个就是系统内核。当<code>read</code>操作发生时，第一步会等待数据准备(<strong>磁盘到内核内存</strong>)，第二步会将数据从内核拷贝到进程中去(<strong>内核内存到进程内存</strong>)。</li>
 <li>而在<code>Python</code>编程中，第一阶段是准备数据阶段，第二阶段是返回计算结果阶段。所以对于下面的模型说明，需要我们自行对照理解。</li>
 </ul>
 <p><img src="../images/python-task-coron7.png" alt="Python异步编程和事件驱动"></p>
-<p><strong>[1] 阻塞型I/O模型</strong></p>
+<p><strong>[1] 阻塞型 I/O 模型</strong></p>
 <ul>
 <li>在<code>I/O</code>执行的两个阶段中，应用进程都被阻塞状态，即准备数据阶段和返回计算结果都是处于等待的状态中，消耗<code>CPU</code>性能。</li>
 </ul>
 <p><img src="../images/python-task-coron8.png" alt="Python异步编程和事件驱动"></p>
-<p><strong>[2] 非阻塞I/O模型</strong></p>
+<p><strong>[2] 非阻塞 I/O 模型</strong></p>
 <ul>
 <li>非阻塞型<code>I/O</code>中，应用进程需要不断的主动询问第一阶段是否已经完成了。应用进程在第一阶段虽然不用一直阻塞，但是需要不断的主动询问，基本属于忙等状态，所以非阻塞型不一定比阻塞型就好。</li>
 </ul>
 <p><img src="../images/python-task-coron9.png" alt="Python异步编程和事件驱动"></p>
-<p><strong>[3] 复用I/O模型</strong></p>
+<p><strong>[3] 复用 I/O 模型</strong></p>
 <ul>
 <li>在应用进程和内核中间加一个代理，所有的请求都交给代理去处理，自己只需要等待结果就可以了。这个代理就是我们熟知的<code>select</code>和<code>poll</code>模型，两者基本没有区别。</li>
 <li>即使有了代理，依然还是阻塞的，因为有可能会阻塞在代理上，如<code>select</code>和<code>poll</code>。有了代理最大的好处是，即使阻塞了但代理还可以接受其他用户请求。对性能没有太大的提升，因为还是阻塞的，只是能够处理其他请求而已。</li>
 </ul>
 <p><img src="../images/python-task-coron10.png" alt="Python异步编程和事件驱动"></p>
-<p><strong>[4] 信号驱动式IO模型</strong></p>
+<p><strong>[4] 信号驱动式 IO 模型</strong></p>
 <ul>
 <li>在第一阶段中，应用进程只需要通知内核加载磁盘内容，加载完成之后，内核会通知已经完成。应用进程还可以响应其他请求，而不怕阻塞在代理上。</li>
 <li>可以理解为，一个进程可以响应多个请求，这里的性能不一定非常好，因为<code>I/O</code>的第二阶段还是处于阻塞的状态。</li>
 </ul>
 <p><img src="../images/python-task-coron11.png" alt="Python异步编程和事件驱动"></p>
-<p><strong>[5] 异步IO模型</strong></p>
+<p><strong>[5] 异步 IO 模型</strong></p>
 <ul>
 <li>五种<code>I/O</code>模型里面，除了异步<code>IO</code>模型以外，都是同步的。所以，再次验证了阻塞并不等于同步，非阻塞并不等于异步。</li>
 <li>异步<code>I/O</code>模型，应用进程只需要通知内核，内核默默的完成第一和第二阶段，完成之后通知进程已经完成了。真正的实现了不阻塞、不等待的模型。一个进程可以响应多个请求，性能极大地提升。</li>
@@ -875,8 +875,8 @@
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Python成长之途/" class="post-category">
-                                    Python成长之途
+                            <a href="/categories/Python入门基础/" class="post-category">
+                                    Python入门基础
                                 </a>
                             
                             
@@ -923,8 +923,8 @@
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Python成长之途/" class="post-category">
-                                    Python成长之途
+                            <a href="/categories/Python入门基础/" class="post-category">
+                                    Python入门基础
                                 </a>
                             
                             
