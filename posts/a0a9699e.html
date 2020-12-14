@@ -302,7 +302,7 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/images/extend-install-with-appimage.png')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/use-vagrant-tool-tourist.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
@@ -467,14 +467,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    4k
+                    4.6k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    17 分
+                    20 分
                 </div>
                 
 
@@ -616,9 +616,11 @@ $ vagrant <span class="token function">ssh</span>
 
 <span class="token comment" spellcheck="true"># 退出连接</span>
 $ <span class="token keyword">exit</span>
+$ <span class="token function">logout</span>
+$ CTRL+D
 
 <span class="token comment" spellcheck="true"># 销毁虚拟机</span>
-$ vagrant destroy<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ vagrant destroy<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[4] 自定义打包</strong></li>
 </ul>
@@ -725,20 +727,19 @@ Bringing machine <span class="token string">'default'</span> up with <span class
 <h2 id="5-相关配置"><a href="#5-相关配置" class="headerlink" title="5. 相关配置"></a>5. 相关配置</h2><blockquote>
 <p><strong>介绍 Vagrantfile 配置文件的相关常用配置！</strong></p>
 </blockquote>
-<pre class="line-numbers language-bash"><code class="language-bash">➜ vagrant ssh-config --help
-Usage: vagrant ssh-config <span class="token punctuation">[</span>options<span class="token punctuation">]</span> <span class="token punctuation">[</span>name<span class="token operator">|</span>id<span class="token punctuation">]</span>
-
-Options:
-
-        --host NAME                  Name the host <span class="token keyword">for</span> the config
-        --<span class="token punctuation">[</span>no-<span class="token punctuation">]</span>color                 Enable or disable color output
-        --machine-readable           Enable machine readable output
-    -v, --version                    Display Vagrant version
-        --debug                      Enable debug output
-        --timestamp                  Enable timestamps on log output
-        --debug-timestamp            Enable debug output with timestamps
-        --no-tty                     Enable non-interactive output
-    -h, --help                       Print this <span class="token function">help</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><a href="https://www.vagrantup.com/docs/vagrantfile/machine_settings" target="_blank" rel="noopener">config.vm</a></li>
+<li><a href="https://www.vagrantup.com/docs/vagrantfile/ssh_settings" target="_blank" rel="noopener">config.ssh</a></li>
+<li><a href="https://www.vagrantup.com/docs/vagrantfile/winrm_settings" target="_blank" rel="noopener">config.winrm</a></li>
+<li><a href="https://www.vagrantup.com/docs/vagrantfile/winssh_settings" target="_blank" rel="noopener">config.winssh</a></li>
+<li><a href="https://www.vagrantup.com/docs/vagrantfile/vagrant_settings" target="_blank" rel="noopener">config.vagrant</a></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 配置文件查找顺序</span>
+/home/escape/projects/foo/Vagrantfile
+/home/escape/projects/Vagrantfile
+/home/escape/Vagrantfile
+/home/Vagrantfile
+/Vagrantfile<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <ul>
 <li><strong>[1] 配置共享目录</strong></li>
@@ -750,19 +751,85 @@ Options:
     create<span class="token punctuation">:</span> <span class="token keyword">true</span><span class="token punctuation">,</span> owner<span class="token punctuation">:</span> <span class="token string">"root"</span><span class="token punctuation">,</span> group<span class="token punctuation">:</span> <span class="token string">"root"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
 <p>如果我们在虚拟机上面安装和配置了一个 <code>Nginx</code> 的 <code>Web</code> 服务器，此时需要在我们本机打开虚拟机对应的网站，或者提供给整个网络的其他设备上面也可以访问的话，这就需要我们配置虚拟机网络了。在 <code>vagrant</code> 上面提供了，三种网络的配置方式，分别是私有网络、公有网络和端口转发。</p>
-<p><strong>私有网络</strong>，就是给虚拟机在配置文件中手动指定一个 <code>IP</code> 地址，通过配置的这个 <code>IP</code> 地址，我们本机和虚拟机进行通讯。需要注意的时候，只能在我们这台电脑进行访问。</p>
-<p><strong>公有网络</strong>，会把虚拟机配置成一台可以在同一网络里面访问的设备，即我们局域网中所有的服务器都可以与虚拟机进行通讯和互联。需要注意的是，我们需要登录虚拟机来查看路由器给其分配的 <code>IP</code> 地址。</p>
 <p><strong>端口转发</strong>，顾名思义，就是将虚拟机中的端口端口映射到本地上，比如将虚拟机中的 <code>8080</code> 端口，转发到本机的 <code>80</code> 端口上，这时就可以通过访问本机的 <code>80</code> 端口来访问虚拟机中的 <code>Web</code> 服务了。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">Vagrant.configure<span class="token punctuation">(</span><span class="token string">"2"</span><span class="token punctuation">)</span> <span class="token keyword">do</span> <span class="token operator">|</span>config<span class="token operator">|</span>
+  config.vm.network <span class="token string">"forwarded_port"</span>, guest: 80, host: 8080
+
+  config.vm.network <span class="token string">"forwarded_port"</span>, guest: 2003, host: 12003, protocol: <span class="token string">"tcp"</span>
+  config.vm.network <span class="token string">"forwarded_port"</span>, guest: 2003, host: 12003, protocol: <span class="token string">"udp"</span>
+
+  config.vm.network <span class="token string">"forwarded_port"</span>, guest: 80, host: 8080, auto_correct: <span class="token boolean">true</span>
+
+  config.vm.usable_port_range <span class="token operator">=</span> 8000<span class="token punctuation">..</span>8999
+end<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[2] 私有网络 - host-only</strong></li>
 </ul>
+<p><strong>私有网络</strong>，就是给虚拟机在配置文件中手动指定一个 <code>IP</code> 地址，通过配置的这个 <code>IP</code> 地址，我们本机和虚拟机进行通讯。需要注意的时候，只能在我们这台电脑进行访问。</p>
 <p><img src="../images/use-vagrant-tool-tourist-05.png" alt="Vagrant工具使用教程 - 私有网络"></p>
-<pre class="line-numbers language-ruby"><code class="language-ruby">  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>network <span class="token string">"private_network"</span><span class="token punctuation">,</span> ip<span class="token punctuation">:</span> "<span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">33.10</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-ruby"><code class="language-ruby"><span class="token constant">Vagrant</span><span class="token punctuation">.</span><span class="token function">configure</span><span class="token punctuation">(</span><span class="token string">"2"</span><span class="token punctuation">)</span> <span class="token keyword">do</span> <span class="token operator">|</span>config<span class="token operator">|</span>
+  <span class="token comment" spellcheck="true"># DHCP</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>network <span class="token string">"private_network"</span><span class="token punctuation">,</span> type<span class="token punctuation">:</span> <span class="token string">"dhcp"</span>
+
+  <span class="token comment" spellcheck="true"># Static IP</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>network <span class="token string">"private_network"</span><span class="token punctuation">,</span> ip<span class="token punctuation">:</span> <span class="token string">"192.168.33.10"</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>network <span class="token string">"private_network"</span><span class="token punctuation">,</span> ip<span class="token punctuation">:</span> <span class="token string">"192.168.33.10"</span><span class="token punctuation">,</span> auto_config<span class="token punctuation">:</span> <span class="token keyword">false</span>
+
+  <span class="token comment" spellcheck="true"># IPv6</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>network <span class="token string">"private_network"</span><span class="token punctuation">,</span> ip<span class="token punctuation">:</span> <span class="token string">"fde4:8dba:82e1::c4"</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>network <span class="token string">"private_network"</span><span class="token punctuation">,</span> ip<span class="token punctuation">:</span> <span class="token string">"fde4:8dba:82e1::c4"</span><span class="token punctuation">,</span> netmask<span class="token punctuation">:</span> <span class="token string">"96"</span>
+<span class="token keyword">end</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[3] 公共网络 - bridged</strong></li>
 </ul>
+<p><strong>公有网络</strong>，会把虚拟机配置成一台可以在同一网络里面访问的设备，即我们局域网中所有的服务器都可以与虚拟机进行通讯和互联。需要注意的是，我们需要登录虚拟机来查看路由器给其分配的 <code>IP</code> 地址。</p>
 <p><img src="../images/use-vagrant-tool-tourist-06.png" alt="Vagrant工具使用教程 - 公共网络"></p>
-<pre class="line-numbers language-ruby"><code class="language-ruby">  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>network <span class="token string">"public_network"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-ruby"><code class="language-ruby"><span class="token constant">Vagrant</span><span class="token punctuation">.</span><span class="token function">configure</span><span class="token punctuation">(</span><span class="token string">"2"</span><span class="token punctuation">)</span> <span class="token keyword">do</span> <span class="token operator">|</span>config<span class="token operator">|</span>
+  <span class="token comment" spellcheck="true"># DHCP</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>network <span class="token string">"public_network"</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>network <span class="token string">"public_network"</span><span class="token punctuation">,</span> auto_config<span class="token punctuation">:</span> <span class="token keyword">false</span>
+
+  <span class="token comment" spellcheck="true"># Static IP</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>network <span class="token string">"public_network"</span><span class="token punctuation">,</span> ip<span class="token punctuation">:</span> <span class="token string">"192.168.0.17"</span>
+
+  <span class="token comment" spellcheck="true"># Default Network Interface</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>network <span class="token string">"public_network"</span><span class="token punctuation">,</span> bridge<span class="token punctuation">:</span> <span class="token string">"en1: Wi-Fi (AirPort)"</span>
+<span class="token keyword">end</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-ruby"><code class="language-ruby"><span class="token comment" spellcheck="true"># Disable Auto-Configuration</span>
+
+<span class="token constant">Vagrant</span><span class="token punctuation">.</span><span class="token function">configure</span><span class="token punctuation">(</span><span class="token string">"2"</span><span class="token punctuation">)</span> <span class="token keyword">do</span> <span class="token operator">|</span>config<span class="token operator">|</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>network <span class="token string">"public_network"</span><span class="token punctuation">,</span> auto_config<span class="token punctuation">:</span> <span class="token keyword">false</span>
+
+  <span class="token comment" spellcheck="true"># manual ip</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>provision <span class="token string">"shell"</span><span class="token punctuation">,</span>
+    run<span class="token punctuation">:</span> <span class="token string">"always"</span><span class="token punctuation">,</span>
+    inline<span class="token punctuation">:</span> <span class="token string">"ifconfig eth1 192.168.0.17 netmask 255.255.255.0 up"</span>
+
+  <span class="token comment" spellcheck="true"># manual ipv6</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>provision <span class="token string">"shell"</span><span class="token punctuation">,</span>
+    run<span class="token punctuation">:</span> <span class="token string">"always"</span><span class="token punctuation">,</span>
+    inline<span class="token punctuation">:</span> <span class="token string">"ifconfig eth1 inet6 add fc00::17/7"</span>
+<span class="token keyword">end</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-ruby"><code class="language-ruby"><span class="token comment" spellcheck="true"># Default Router</span>
+
+<span class="token constant">Vagrant</span><span class="token punctuation">.</span><span class="token function">configure</span><span class="token punctuation">(</span><span class="token string">"2"</span><span class="token punctuation">)</span> <span class="token keyword">do</span> <span class="token operator">|</span>config<span class="token operator">|</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>network <span class="token string">"public_network"</span><span class="token punctuation">,</span> ip<span class="token punctuation">:</span> <span class="token string">"192.168.0.17"</span>
+
+  <span class="token comment" spellcheck="true"># default router</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>provision <span class="token string">"shell"</span><span class="token punctuation">,</span>
+    run<span class="token punctuation">:</span> <span class="token string">"always"</span><span class="token punctuation">,</span>
+    inline<span class="token punctuation">:</span> <span class="token string">"route add default gw 192.168.0.1"</span>
+
+  <span class="token comment" spellcheck="true"># default router ipv6</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>provision <span class="token string">"shell"</span><span class="token punctuation">,</span>
+    run<span class="token punctuation">:</span> <span class="token string">"always"</span><span class="token punctuation">,</span>
+    inline<span class="token punctuation">:</span> <span class="token string">"route -A inet6 add default gw fc00::1 eth1"</span>
+
+  <span class="token comment" spellcheck="true"># delete default gw on eth0</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>provision <span class="token string">"shell"</span><span class="token punctuation">,</span>
+    run<span class="token punctuation">:</span> <span class="token string">"always"</span><span class="token punctuation">,</span>
+    inline<span class="token punctuation">:</span> <span class="token string">"eval `route -n | awk '{ if ($8 ==\"eth0\" &amp;&amp; $2 != \"0.0.0.0\") print \"route del default gw \" $2; }'`"</span>
+<span class="token keyword">end</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <p>有时，我们的实验环境或者项目不仅仅需要一台服务，而是需要多个服务器上分别部署不同的服务，进行协同工作，比如部署一个最小的 <code>K8S</code> 集群(三台服务)。当然，<code>Vagrant</code> 也是支持，我们在配置文件中进行多主机的配置，比如配置网络、共享目录、主机名等等。</p>
 <ul>
@@ -777,6 +844,17 @@ $ vim Vagrantfile<span aria-hidden="true" class="line-numbers-rows"><span></span
 
   <span class="token comment" spellcheck="true"># 定义主机通用配置 - 使用同一个Box启动</span>
   config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>box <span class="token operator">=</span> <span class="token string">"hashicorp/bionic64"</span>
+
+  <span class="token comment" spellcheck="true"># 指定具体版本；不自动更新；可选参数</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>box_version <span class="token operator">=</span> <span class="token string">"1.0.282"</span>
+  <span class="token comment" spellcheck="true"># 可指定具体的URL项目地址；可选参数</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>box_url <span class="token operator">=</span> <span class="token string">"https://vagrantcloud.com/hashicorp/bionic64"</span>
+
+  <span class="token comment" spellcheck="true"># 可指定预先执行的脚本；可选参数</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>provision <span class="token symbol">:shell</span><span class="token punctuation">,</span> path<span class="token punctuation">:</span> <span class="token string">"bootstrap.sh"</span>
+  node<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>provision <span class="token string">"shell"</span><span class="token punctuation">,</span> inline<span class="token punctuation">:</span> <span class="token string">"echo hello from escape."</span>
+  <span class="token comment" spellcheck="true"># 可配置端口转发；可选参数</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>network <span class="token symbol">:forwarded_port</span><span class="token punctuation">,</span> guest<span class="token punctuation">:</span> <span class="token number">80</span><span class="token punctuation">,</span> host<span class="token punctuation">:</span> <span class="token number">4567</span>
 
   <span class="token comment" spellcheck="true"># 定义dev主机</span>
   config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>define <span class="token string">"dev"</span> <span class="token keyword">do</span> <span class="token operator">|</span>development<span class="token operator">|</span>
@@ -795,7 +873,7 @@ $ vim Vagrantfile<span aria-hidden="true" class="line-numbers-rows"><span></span
     config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>synced_folder <span class="token string">"prod"</span><span class="token punctuation">,</span> <span class="token string">"/vagrant_data"</span>
   <span class="token keyword">end</span>
 
-<span class="token keyword">end</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token keyword">end</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 启动全部或一台</span>
 $ vagrant up
 $ vagrant up dev
@@ -915,7 +993,9 @@ $ vagrant vbguest --do <span class="token function">install</span> node1<span ar
 <p>如果需要提升性能的话，可以使用 <code>NFS</code> 类型来完成共享目录，但是在启动的时候会有权限相关的问题，这时就可以使用 <code>bindfs</code> 查看来解决此问题了。解决的方式就是通过，创建一个中间层来完成主机和虚拟机的文件共享。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 安装插件</span>
 $ vagrant plugin <span class="token function">install</span> vagrant-bindfs<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-ruby"><code class="language-ruby"><span class="token constant">Vagrant</span><span class="token punctuation">.</span><span class="token function">configure</span><span class="token punctuation">(</span><span class="token string">"2"</span><span class="token punctuation">)</span> <span class="token keyword">do</span> <span class="token operator">|</span>config<span class="token operator">|</span>
+<pre class="line-numbers language-ruby"><code class="language-ruby"><span class="token comment" spellcheck="true"># NFS</span>
+
+<span class="token constant">Vagrant</span><span class="token punctuation">.</span><span class="token function">configure</span><span class="token punctuation">(</span><span class="token string">"2"</span><span class="token punctuation">)</span> <span class="token keyword">do</span> <span class="token operator">|</span>config<span class="token operator">|</span>
   config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>box <span class="token operator">=</span> <span class="token string">"centos/7"</span>
 
   config<span class="token punctuation">.</span>hostmanager<span class="token punctuation">.</span>enabled <span class="token operator">=</span> <span class="token keyword">true</span>
@@ -931,14 +1011,69 @@ $ vagrant plugin <span class="token function">install</span> vagrant-bindfs<span
     node1<span class="token punctuation">.</span>bindfs<span class="token punctuation">.</span>bind_floder <span class="token string">"/mnt/app_data"</span><span class="token punctuation">,</span> <span class="token string">"/app"</span><span class="token punctuation">,</span>
       force_user<span class="token punctuation">:</span> <span class="token string">"root"</span><span class="token punctuation">,</span> force_group<span class="token punctuation">:</span> <span class="token string">"root"</span><span class="token punctuation">,</span> o<span class="token punctuation">:</span> <span class="token string">"nonempty"</span>
   <span class="token keyword">end</span>
+<span class="token keyword">end</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-ruby"><code class="language-ruby"><span class="token comment" spellcheck="true"># Rsync</span>
 
-<span class="token keyword">end</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token constant">Vagrant</span><span class="token punctuation">.</span><span class="token function">configure</span><span class="token punctuation">(</span><span class="token string">"2"</span><span class="token punctuation">)</span> <span class="token keyword">do</span> <span class="token operator">|</span>config<span class="token operator">|</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>synced_folder <span class="token string">"."</span><span class="token punctuation">,</span> <span class="token string">"/vagrant"</span><span class="token punctuation">,</span> type<span class="token punctuation">:</span> <span class="token string">"rsync"</span><span class="token punctuation">,</span>
+    rsync__exclude<span class="token punctuation">:</span> <span class="token string">".git/"</span>
+<span class="token keyword">end</span>
+
+<span class="token constant">Vagrant</span><span class="token punctuation">.</span><span class="token function">configure</span><span class="token punctuation">(</span><span class="token string">"2"</span><span class="token punctuation">)</span> <span class="token keyword">do</span> <span class="token operator">|</span>config<span class="token operator">|</span>
+  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>synced_folder <span class="token string">"bin"</span><span class="token punctuation">,</span> <span class="token string">"/usr/local/bin"</span><span class="token punctuation">,</span> type<span class="token punctuation">:</span> <span class="token string">"rsync"</span><span class="token punctuation">,</span>
+    rsync__exclude<span class="token punctuation">:</span> <span class="token string">".git/"</span><span class="token punctuation">,</span>
+    rsync__args<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"--verbose"</span><span class="token punctuation">,</span> <span class="token string">"--rsync-path='sudo rsync'"</span><span class="token punctuation">,</span> <span class="token string">"--archive"</span><span class="token punctuation">,</span> <span class="token string">"--delete"</span><span class="token punctuation">,</span> <span class="token string">"-z"</span><span class="token punctuation">]</span>
+<span class="token keyword">end</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-ruby"><code class="language-ruby">
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<hr>
+<ul>
+<li><strong>[4] 共享环境 - share</strong></li>
+</ul>
+<p>现在已经有了一个正在运行的 <code>Web</code> 服务器，并可以在本机进行访问。但是，除了提供一个开发环境之外，<code>Vagrant</code> 还使得在这些环境中共享和协作变得容易，我们可以使用 <code>Share</code> 这个插件来完成。<code>Vagrant Share</code> 是一个插件，可以让您将您的 <code>Vagrant</code> 环境分享给世界上任何有互联网连接的人。它会给你一个 <code>URL</code>，可以从世界上任何连接到互联网的设备直接路由到你的环境。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 安装插件</span>
+$ vagrant plugin <span class="token function">install</span> vagrant-share
+Installing the <span class="token string">'vagrant-share'</span> plugin. This can take a few minutes<span class="token punctuation">..</span>.
+Fetching vagrant-share-1.1.10.gem
+Installed the plugin <span class="token string">'vagrant-share (1.1.10)'</span><span class="token operator">!</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 分享 - HTTP Sharing</span>
+$ vagrant share
+<span class="token operator">==</span><span class="token operator">></span> default: Detecting network information <span class="token keyword">for</span> machine<span class="token punctuation">..</span>.
+default: Local machine address: 192.168.84.130
+default: Local HTTP port: 9999
+default: Local HTTPS port: disabled
+<span class="token operator">==</span><span class="token operator">></span> default: Creating Vagrant Share session<span class="token punctuation">..</span>.
+<span class="token operator">==</span><span class="token operator">></span> default: HTTP URL: http://b1fb1f3f.ngrok.io
+
+<span class="token comment" spellcheck="true"># 连接</span>
+$ vagrant connect http://b1fb1f3f.ngrok.io
+
+<span class="token comment" spellcheck="true"># 终止</span>
+$ ^C
+<span class="token operator">==</span><span class="token operator">></span> default: Halting Vagrant share<span class="token operator">!</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 分享 - SSH Sharing</span>
+$ vagrant share --ssh
+<span class="token operator">==</span><span class="token operator">></span> default: Detecting network information <span class="token keyword">for</span> machine<span class="token punctuation">..</span>.
+default: Local machine address: 192.168.84.130
+<span class="token operator">==</span><span class="token operator">></span> default: Generating new SSH key<span class="token punctuation">..</span>.
+default: Please enter a password to encrypt the key:
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+<span class="token operator">==</span><span class="token operator">></span> share:   vagrant connect --ssh bazaar_wolf:sultan_oasis
+
+<span class="token comment" spellcheck="true"># 连接</span>
+$ vagrant connect --ssh bazaar_wolf:sultan_oasis
+Loading share <span class="token string">'bazaar_wolf:sultan_oasis'</span><span class="token punctuation">..</span>.
+
+<span class="token comment" spellcheck="true"># 终止</span>
+$ ^C
+<span class="token operator">==</span><span class="token operator">></span> default: Halting Vagrant share<span class="token operator">!</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="7-参考链接"><a href="#7-参考链接" class="headerlink" title="7. 参考链接"></a>7. 参考链接</h2><blockquote>
 <p><strong>送人玫瑰，手有余香！</strong></p>
 </blockquote>
 <ul>
 <li><a href="https://www.vagrantup.com/intro" target="_blank" rel="noopener">Vagrant 官方网站</a></li>
+<li><a href="https://www.vagrantup.com/docs" target="_blank" rel="noopener">Vagrant 使用文档</a></li>
 <li><a href="https://www.zhihu.com/question/32324376" target="_blank" rel="noopener">Vagrant 和 Docker 的使用场景和区别?</a></li>
 </ul>
 <script>
@@ -1492,7 +1627,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">983.9k</span>&nbsp;字
+                class="white-color">984.6k</span>&nbsp;字
             
             
             
