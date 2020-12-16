@@ -515,7 +515,7 @@ docker inspect --format <span class="token string">'{{/*读取容器状态*/}}{{
      <span class="token punctuation">}</span>,<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 直接级联调用会提示找不到数据</span>
 docker inspect --format <span class="token string">'{{.Options.com.docker.network.driver.mtu}}'</span> bridge
-<span class="token operator">&lt;</span>no value<span class="token operator">></span>
+<span class="token operator">&lt;</span>no value<span class="token operator">&gt;</span>
 
 <span class="token comment" spellcheck="true"># 用引号括起来会提示语法错误</span>
 docker inspect --format <span class="token string">'{{.Options."com.docker.network.driver.mtu"}}'</span> bridge
@@ -530,13 +530,13 @@ docker inspect --format <span class="token string">'{{/*读取网络在hosts上�
 <p>可以在处理过程中设置自定义变量，然后结合自定义变量做更复杂的处理。 如果自定义变量的返回值是对象，则可以通过点号进一步级联访问其属性。比如 <code></code>。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 结合变量的使用，对输出结果进行组装展现，以输出容器的所有绑定端口列表</span>
 docker inspect --format <span class="token string">'{{/*通过变量组合展示容器绑定端口列表*/}}已绑定端口列表：\
-    {{println}}{{range <span class="token variable">$p</span>,<span class="token variable">$conf</span> := .NetworkSettings.Ports}}{{<span class="token variable">$p</span>}} -> \
+    {{println}}{{range <span class="token variable">$p</span>,<span class="token variable">$conf</span> := .NetworkSettings.Ports}}{{<span class="token variable">$p</span>}} -&gt; \
     {{(index <span class="token variable">$conf</span> 0).HostPort}}{{println}}{{end}}'</span> Web_web_1
 
 <span class="token comment" spellcheck="true"># 示例输出信息</span>
 已绑定端口列表：
-80/tcp -<span class="token operator">></span> 32770
-8081/tcp -<span class="token operator">></span> 8081<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+80/tcp -<span class="token operator">&gt;</span> 32770
+8081/tcp -<span class="token operator">&gt;</span> 8081<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="2-循环遍历-range"><a href="#2-循环遍历-range" class="headerlink" title="2. 循环遍历 - range"></a>2. 循环遍历 - range</h2><pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 格式</span>
 <span class="token punctuation">{</span><span class="token punctuation">{</span>range pipeline<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token punctuation">{</span>.<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token punctuation">{</span>end<span class="token punctuation">}</span><span class="token punctuation">}</span>
@@ -601,8 +601,8 @@ docker inspect --format <span class="token string">'{{or .State.Status .State.Re
 <span class="token comment" spellcheck="true"># 2) ne: 不等，即 arg1 != arg2。</span>
 <span class="token comment" spellcheck="true"># 3) lt: 小于，即 arg1 &lt; arg2。</span>
 <span class="token comment" spellcheck="true"># 4) le: 小于等于，即 arg1 &lt;= arg2。</span>
-<span class="token comment" spellcheck="true"># 5) gt: 大于，即 arg1 > arg2。</span>
-<span class="token comment" spellcheck="true"># 6) ge: 大于等于，即 arg1 >= arg2。</span>
+<span class="token comment" spellcheck="true"># 5) gt: 大于，即 arg1 &gt; arg2。</span>
+<span class="token comment" spellcheck="true"># 6) ge: 大于等于，即 arg1 &gt;= arg2。</span>
 
 <span class="token comment" spellcheck="true"># 输出所有已停止的容器名称：</span>
 docker inspect --format <span class="token string">'{{if ne 0.0 .State.ExitCode}}{{.Name}}{{end}}'</span> <span class="token variable"><span class="token variable">$(</span>docker <span class="token function">ps</span> -aq<span class="token variable">)</span></span>
@@ -776,8 +776,8 @@ quay.io/calico/node:v2.6.10
 
 
 <span class="token comment" spellcheck="true"># 8) 获取容器绑定的端口(port bindings)</span>
-<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}} {{$p}} -> {{(index $conf 0).HostPort}} {{end}}' `docker ps -a -q`</span>
-<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}} {{$p}} -> {{(index $conf 0).HostPort}} {{end}}' docker-test1</span>
+<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}} {{$p}} -&gt; {{(index $conf 0).HostPort}} {{end}}' `docker ps -a -q`</span>
+<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}} {{$p}} -&gt; {{(index $conf 0).HostPort}} {{end}}' docker-test1</span>
 
 
 <span class="token comment" spellcheck="true"># 9) 获取service实例的Ip</span>
@@ -1349,7 +1349,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">987.9k</span>&nbsp;字
+                class="white-color">996.9k</span>&nbsp;字
             
             
             
