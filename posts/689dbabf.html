@@ -815,7 +815,7 @@ $ <span class="token function">sudo</span> nginx -g <span class="token string">"
 
 <span class="token keyword">server</span> <span class="token punctuation">{</span>
     <span class="token keyword">listen</span>       <span class="token number">80</span><span class="token punctuation">;</span>
-    <span class="token keyword">server_name</span>  <span class="token operator">~</span><span class="token operator">^</span><span class="token punctuation">(</span><span class="token operator">?</span><span class="token operator">&lt;</span><span class="token keyword">user</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token operator">+</span><span class="token punctuation">)</span>\<span class="token punctuation">.</span>example\<span class="token punctuation">.</span>net$<span class="token punctuation">;</span>
+    <span class="token keyword">server_name</span>  <span class="token operator">~</span><span class="token operator">^</span><span class="token punctuation">(</span><span class="token operator">?</span><span class="token operator">&lt;</span><span class="token keyword">user</span><span class="token operator">></span><span class="token punctuation">.</span><span class="token operator">+</span><span class="token punctuation">)</span>\<span class="token punctuation">.</span>example\<span class="token punctuation">.</span>net$<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
@@ -828,11 +828,11 @@ $ <span class="token function">sudo</span> nginx -g <span class="token string">"
 </ul>
 <p><code>Nginx</code>使用的正则表达式兼容<code>PCRE</code>，虚拟主机名必须以波浪线<code>~</code>起始。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server_name</span>  <span class="token operator">~</span><span class="token operator">^</span>www\d<span class="token operator">+</span>\<span class="token punctuation">.</span>example\<span class="token punctuation">.</span>net$<span class="token punctuation">;</span>
-<span class="token keyword">server_name</span>  <span class="token string">"~^(?&lt;name&gt;\w\d{1,3}+)\.example\.net$"</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<span class="token keyword">server_name</span>  <span class="token string">"~^(?&lt;name>\w\d{1,3}+)\.example\.net$"</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <p>而且还支持正则表达式捕获，如<code>?&lt;name&gt;</code>/<code>?'name'</code>(兼容 Perl 5.10 语法)、<code>?P&lt;name&gt;</code>(兼容 Python 语法)。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># perl</span>
 <span class="token keyword">server</span> <span class="token punctuation">{</span>
-    <span class="token keyword">server_name</span>   <span class="token operator">~</span><span class="token operator">^</span><span class="token punctuation">(</span>www\<span class="token punctuation">.</span><span class="token punctuation">)</span><span class="token operator">?</span><span class="token punctuation">(</span><span class="token operator">?</span><span class="token operator">&lt;</span>domain<span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token operator">+</span><span class="token punctuation">)</span>$<span class="token punctuation">;</span>
+    <span class="token keyword">server_name</span>   <span class="token operator">~</span><span class="token operator">^</span><span class="token punctuation">(</span>www\<span class="token punctuation">.</span><span class="token punctuation">)</span><span class="token operator">?</span><span class="token punctuation">(</span><span class="token operator">?</span><span class="token operator">&lt;</span>domain<span class="token operator">></span><span class="token punctuation">.</span><span class="token operator">+</span><span class="token punctuation">)</span>$<span class="token punctuation">;</span>
 
     <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
         <span class="token keyword">root</span>   <span class="token operator">/</span>sites<span class="token operator">/</span><span class="token variable">$domain</span><span class="token punctuation">;</span>
@@ -1015,7 +1015,7 @@ or <span class="token keyword">server_names_hash_bucket_size</span><span class="
 <p>有些浏览器不接受那些众所周知的证书认证机构签署的证书，而另外一些浏览器却接受它们。这是由于证书签发使用了一些中间认证机构，这些中间机构被众所周知的证书认证机构授权代为签发证书，但是它们自己却不被广泛认知，所以有些客户端不予识别。</p>
 <p>针对这种情况，证书认证机构提供一个<strong>证书链</strong>的包裹，用来声明众所周知的认证机构和自己的关系，需要将这个证书链包裹与服务器证书合并成一个文件。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 在这个文件里，服务器证书需要出现在认证方证书链的前面</span>
-$ cat www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">.</span>crt bundle<span class="token punctuation">.</span>crt <span class="token operator">&gt;</span> www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">.</span>chained<span class="token punctuation">.</span>crt
+$ cat www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">.</span>crt bundle<span class="token punctuation">.</span>crt <span class="token operator">></span> www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">.</span>chained<span class="token punctuation">.</span>crt
 
 <span class="token comment" spellcheck="true"># 这个文件需要使用ssl_certificate指令来引用</span>
 <span class="token keyword">server</span> <span class="token punctuation">{</span>
@@ -1753,7 +1753,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">996.9k</span>&nbsp;字
+                class="white-color">988.7k</span>&nbsp;字
             
             
             

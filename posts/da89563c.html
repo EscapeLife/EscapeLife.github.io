@@ -614,7 +614,7 @@ Unnamed repository<span class="token punctuation">;</span> edit this <span class
 <p>而当我们执行 <code>git status</code> 命令的时候，<code>git</code> 又可以识别出来现在工作区新增了一个文件，这里怎么做到的呢？—— <strong>详见[3.理解 blob 对象和 SHA1]部分</strong></p>
 <p>而当我们执行 <code>git add</code> 命令让 <code>git</code> 帮助我们管理文件的时候，发现右侧新增了一个目录和两个文件，分别是 <code>8d</code> 目录、<code>index</code> 和 <code>0e41..</code> 文件。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 左边执行</span>
-$ <span class="token keyword">echo</span> <span class="token string">"hello git"</span> <span class="token operator">&gt;</span> helle.txt
+$ <span class="token keyword">echo</span> <span class="token string">"hello git"</span> <span class="token operator">></span> helle.txt
 $ <span class="token function">git</span> status
 $ <span class="token function">git</span> add hello.txt
 
@@ -641,7 +641,7 @@ blob 10\0hello <span class="token function">git</span><span aria-hidden="true" c
 <p>为了验证我们上述的说法，我们可以添加同样的内容到另一个文件，然后进行提交，来观察 <code>.git</code> 目录的变化。我们发现，右侧的 <code>objects</code> 目录并没有新增目录和文件。这就可以证明，<code>blob</code> 类型的 <code>object</code> 只存储的是文件的内容，如果两个文件的内容一致的话，则只需要存储一个 <code>object</code> 即可。</p>
 <p>话说这里 <code>object</code> 为什么没有存储文件名称呢？这里因为 <code>SHA1</code> 的 <code>Hash</code> 算法计算哈希的时候，本身就不包括文件名称，所以取什么名称都是无所谓的。那问题来了，就是文件名的信息都存储到哪里去了呢？—— <strong>详见[3.理解 blob 对象和 SHA1]部分</strong></p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 左边执行</span>
-$ <span class="token keyword">echo</span> <span class="token string">"hello git"</span> <span class="token operator">&gt;</span> tmp.txt
+$ <span class="token keyword">echo</span> <span class="token string">"hello git"</span> <span class="token operator">></span> tmp.txt
 $ <span class="token function">git</span> add tmp.txt
 
 <span class="token comment" spellcheck="true"># 右边执行</span>
@@ -700,7 +700,7 @@ zlib<span class="token punctuation">.</span>decompress<span class="token punctua
 <p>而更加深层次的理解，就要从执行 <code>git add</code> 命令后生成相关的 <code>object</code> 对象，但是其存储的是文件的类容、大小和内容，并不包含文件名称的信息。而文件名称相关的信息就包含在生成的 <code>index</code> 文件(索引文件)里面。</p>
 <p>当我们直接查看 <code>index</code> 文件里面的内容，发现使我们无法理解的乱码，但是通过基本的输出，我们可以看到其文件名称。要想查看 <code>index</code> 文件的内容，可以通过 <code>git</code> 提供的相关命令进行查看。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 左边执行</span>
-$ <span class="token keyword">echo</span> <span class="token string">"file1"</span> <span class="token operator">&gt;</span> file1.txt
+$ <span class="token keyword">echo</span> <span class="token string">"file1"</span> <span class="token operator">></span> file1.txt
 $ <span class="token function">git</span> add file1.txt
 $ <span class="token function">cat</span> .git/index
 
@@ -714,7 +714,7 @@ $ <span class="token function">watch</span> -n 1 -d tree .git<span aria-hidden="
 <p>经过如下操作，会使工作区和暂存区和的内容不一致了，通过命令我们也是可以查看区别的。当我们使用 <code>add</code> 命令将新文件添加到暂存区的时候，会发现这下就一致了。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 左边执行</span>
 $ <span class="token function">git</span> status
-$ <span class="token keyword">echo</span> <span class="token string">"file2"</span> <span class="token operator">&gt;</span> file2.txt
+$ <span class="token keyword">echo</span> <span class="token string">"file2"</span> <span class="token operator">></span> file2.txt
 $ <span class="token function">git</span> ls-files -s
 $ <span class="token function">git</span> status
 $ <span class="token function">git</span> add file2.txt
@@ -727,7 +727,7 @@ $ <span class="token function">watch</span> -n 1 -d tree .git<span aria-hidden="
 <p>如果我们这里去修改一个文件的话，很显然这个时候我们的工作区和暂存区又不一致了。当我们使用命令去查看文件状态的时候，发现一个文件被修改了，而 <code>git</code> 是怎么知道的呢？咳咳，就是通过查找 <code>index</code> 文件的内容，找到对应文件名称以及其内部引用的 <code>object</code> 对象，与工作区的文件内容进行对比而来的。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 左边执行</span>
 $ <span class="token function">git</span> ls-files -s
-$ <span class="token keyword">echo</span> <span class="token string">"file.txt"</span> <span class="token operator">&gt;</span> file1.txt
+$ <span class="token keyword">echo</span> <span class="token string">"file.txt"</span> <span class="token operator">></span> file1.txt
 $ <span class="token function">git</span> status
 
 <span class="token comment" spellcheck="true"># 右边执行</span>
@@ -779,7 +779,7 @@ $ <span class="token function">watch</span> -n 1 -d tree .git<span aria-hidden="
 </blockquote>
 <p>当我们再次对 <code>file2.txt</code> 文件的内容进行变更、添加以及提交之后，发现在提交的时候，查看的 <code>commit</code> 对象的内容时，其包含有父节点的 <code>commit</code> 信息。而对于理解的话，可以看看下面的这个提交流程图。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 左边执行</span>
-$ <span class="token keyword">echo</span> <span class="token string">"file2.txt"</span> <span class="token operator">&gt;</span> file2.txt
+$ <span class="token keyword">echo</span> <span class="token string">"file2.txt"</span> <span class="token operator">></span> file2.txt
 $ <span class="token function">git</span> status
 $ <span class="token function">git</span> add file2.txt
 $ <span class="token function">git</span> ls-files -s
@@ -797,7 +797,7 @@ $ <span class="token function">watch</span> -n 1 -d tree .git<span aria-hidden="
 <p>下图所示的文件状态，可以体会到 <code>git</code> 中版本的概念。即 <code>commit</code> 对象指向一个该版本中的文件目录树的根(<code>tree</code>)，然后 <code>tree</code> 在指向 <code>blob</code> 对象(文件)和 <code>tree</code> 对象(目录)，这样就可以无限的往复下去形成一个完整的版本。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 左边执行</span>
 $ <span class="token function">mkdir</span> floder1
-$ <span class="token keyword">echo</span> <span class="token string">"file3"</span> <span class="token operator">&gt;</span> floder1/file3.txt
+$ <span class="token keyword">echo</span> <span class="token string">"file3"</span> <span class="token operator">></span> floder1/file3.txt
 $ <span class="token function">git</span> add floder1
 $ <span class="token function">git</span> ls-files -s
 $ <span class="token function">git</span> commit -m <span class="token string">"3rd commit"</span>
@@ -854,7 +854,7 @@ $ glo <span class="token operator">=</span> <span class="token function">git</sp
 <p><img src="../images/intro-basic-principles-git-25.png" alt="Git 基本原理介绍 - 分支操作的背后逻辑"></p>
 <p>这里需要注意的是，即使我们删除了分支，但是该分支上一些特有的对象并不会被删除的。这些对象其实就是我们俗称的垃圾对象，还有我们多次使用 <code>add</code> 命令所产生的也有垃圾对象，而这些垃圾对象怎么清除和回收呢？后续，我们会涉及到的。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 左边执行</span>
-$ <span class="token keyword">echo</span> <span class="token string">"dev"</span> <span class="token operator">&gt;</span> dev.txt
+$ <span class="token keyword">echo</span> <span class="token string">"dev"</span> <span class="token operator">></span> dev.txt
 $ <span class="token function">git</span> add dev.txt
 $ <span class="token function">git</span> commit -m <span class="token string">"1st commit from dev branch"</span>
 $ <span class="token function">git</span> checkout master
@@ -915,7 +915,7 @@ $ glo <span class="token operator">=</span> <span class="token function">git</sp
 <p><strong>当我们执行 diff 命令之后，Git 的逻辑它们是怎么对比出来的呢？</strong></p>
 </blockquote>
 <p>就在本节中中，我们使用上节的仓库，修改文件内容之后，看看 <code>diff</code> 命令都输出了哪些内容呢？我们这里一起来看看，研究研究！</p>
-<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token keyword">echo</span> <span class="token string">"hello"</span> <span class="token operator">&gt;</span> file1.txt
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token keyword">echo</span> <span class="token string">"hello"</span> <span class="token operator">></span> file1.txt
 $ <span class="token function">git</span> <span class="token function">diff</span>
 $ <span class="token function">git</span> cat-file -p 42d9955
 $ <span class="token function">git</span> cat-file -p ce01362
@@ -1541,7 +1541,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">996.9k</span>&nbsp;字
+                class="white-color">988.7k</span>&nbsp;字
             
             
             
