@@ -463,14 +463,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-12-22
+                    2020-12-23
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    5.3k
+                    5.4k
                 </div>
                 
 
@@ -576,22 +576,34 @@
 </blockquote>
 <p>申请证书要解决的一个关键问题就是，如何证明域名是你所拥有的？<code>Let's Encrypt</code> 提供了三种模式：<strong>HTTP</strong>、<strong>DNS</strong>、<strong>TLS-SNI</strong>。<code>HTTP</code> 模式和 <code>DNS</code> 模式各有优劣，适用于不同的场景。<code>HTTP</code> 模式不需要操作 <code>DNS</code> 记录，只需要新建一个文件就可以完成验证，带来的限制就是验证过程必须操作服务器；<code>DNS</code> 模式不需要操作服务器，只需添加 <code>DNS</code> 的 <code>TXT</code> 记录就行，缺点是必须登录到域名提供商的页面上修改 <code>DNS</code> 记录。不管是 <code>HTTP</code> 模式还是 <code>DNS</code> 模式，申请证书的操作都是可以在任意电脑上完成，申请完之后再将证书复制到服务器上。<code>HTTP</code> 模式验证过程需要操作服务器，<code>DNS</code> 模式验证过程需要操作 <code>DNS</code>。</p>
 <ul>
-<li><p><strong>HTTP 模式</strong></p>
+<li><p><strong>[1] HTTP 模式 - 主机可以开放 80 或 443 端口的选择</strong></p>
 <ul>
 <li>就是 <code>Let's Encrypt</code> 给你一个随机字符串，你需要在 <code>Web</code> 服务器的 <code>/.well-known/acme-challenge/</code> 服务路径下放置一个以该字符串命名的文件，当 <code>Let's Encrypt</code> 能够访问到这个文件时，证明你是这个域名的所有者。</li>
 </ul>
 </li>
-<li><p><strong>DNS</strong></p>
+<li><p><strong>[2] DNS 模式 - 主机无法访问 80 或 443 端口时的选择</strong></p>
 <ul>
 <li>同样是 <code>Let's Encrypt</code> 给你一个随机字符串，你需要以该字符串建立一个 <code>DNS</code> 的 <code>TXT</code> 记录，当 <code>Let's Encrypt</code> 查询域名的 <code>TXT</code> 记录时，发现得到的字符串一致，则证明你是这个域名的所有者。</li>
 </ul>
 </li>
-<li><p><strong>TLS-SNI(基本废弃)</strong></p>
+<li><p><strong>[3] TLS-SNI 模式 - (基本废弃)</strong></p>
 <ul>
 <li>没有仔细研究过，似乎通过 <code>SSL</code> 加密传输。<code>http</code> 走的是 <code>80</code> 端口，<code>tls-sni</code> 走的是 <code>443</code> 端口。由于当前的 <code>tls-sni</code> 似乎有漏洞，该模式一度遭禁用，所以不推荐采用此模式，本文也不加以讨论。</li>
 </ul>
 </li>
+<li><p><strong>[4] 购买域名证书</strong></p>
+<ul>
+<li>当然，这里我们也可以不使用免费的证书，而是使用自己购买的域名证书。</li>
+<li>其配置就更为简单了，只需要下载对应证书存放到指定目录下，配置对应参数即可。</li>
 </ul>
+</li>
+</ul>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">ssl_certificate</span>            <span class="token string">"/etc/ssl/certs/escapelife_com-ssl-bundle.crt"</span><span class="token punctuation">;</span>
+    ssl_trusted_certificate    <span class="token string">"/etc/ssl/certs/escapelife_com-trusted.crt"</span><span class="token punctuation">;</span>
+    <span class="token keyword">ssl_certificate_key</span>        <span class="token string">"/etc/ssl/private/STAR_escapelife_com.key"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <blockquote>
 <p><strong><code>Let's Encrypt</code>虽然可以免费申请，但是有如下限制</strong></p>
 </blockquote>
@@ -1531,7 +1543,7 @@ docker run -it --rm \
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">999.7k</span>&nbsp;字
+                class="white-color">999.8k</span>&nbsp;字
             
             
             
