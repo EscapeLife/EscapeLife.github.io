@@ -4,7 +4,7 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
-    <meta name="keywords" content="Kubernetes的服务发现, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="keywords" content="Kubernetes之Pod实现原理, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Kubernetes的服务发现 | Escape</title>
+    <title>Kubernetes之Pod实现原理 | Escape</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -302,12 +302,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/images/kubernetes-find-service.png')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/kubernetes-pod-system.png')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Kubernetes的服务发现</h1>
+                    <h1 class="description center-align post-title">Kubernetes之Pod实现原理</h1>
                 </div>
             </div>
         </div>
@@ -448,7 +448,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2020-02-18
+                    2019-10-21
                 </div>
                 
 
@@ -462,14 +462,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    315
+                    2.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    8 分
                 </div>
                 
 
@@ -490,16 +490,159 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <blockquote>
-<p><strong>服务发现</strong></p>
+<p><strong>Pod 就是最小并且最简单的 Kubernetes 对象</strong></p>
 </blockquote>
-<p><code>Kubernetes</code> 中为了实现服务实例间的负载均衡和不同服务间的服务发现，创造了 <code>Serivce</code> 对象，同时又为从集群外部访问集群创建了 <code>Ingress</code> 对象。</p>
-<p><img src="../images/kubernetes-find-service.png" alt="Kubernetes的服务发现"></p>
+<p><img src="../images/kubernetes-pod-system-7.png" alt="本机关于Pod实现原理的主要知识点汇总"></p>
+<p><code>Pod</code>、<code>Service</code>、<code>Volume</code> 和 <code>Namespace</code> 是 <code>Kubernetes</code> 集群中四大基本对象，它们能够表示系统中部署的应用、工作负载、网络和磁盘资源，共同定义了集群的状态。<code>Kubernetes</code> 中很多其他的资源其实只对这些基本的对象进行了组合。</p>
+<ul>
+<li><code>Pod</code> -&gt; 集群中的基本单元</li>
+<li><code>Service</code> -&gt; 解决如何访问 Pod 里面服务的问题</li>
+<li><code>Volume</code> -&gt; 集群中的存储卷</li>
+<li><code>Namespace</code> -&gt; 命名空间为集群提供虚拟的隔离作用</li>
+</ul>
+<p><img src="../images/kubernetes-pod-system-1.png" alt="Kubernetes集群中四大基本对象"></p>
+<p><code>Kubernetes</code> 有许许多多的技术概念，同时对应很多 <code>API</code> 对象，其中最重要的也是最基础的是 <code>Pod</code> 对象。<code>Pod</code> 是在 <code>Kubernetes</code> 集群中运行部署应用或服务的最小单元，它是可以支持多容器的。<strong><code>Pod</code> 的设计理念是支持多个容器在一个 <code>Pod</code> 中共享网络地址和文件系统，可以通过进程间通信和文件共享这种简单高效的方式组合完成服务</strong>。</p>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> Pod
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> busybox
+  <span class="token key atrule">labels</span><span class="token punctuation">:</span>
+    <span class="token key atrule">app</span><span class="token punctuation">:</span> busybox
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">containers</span><span class="token punctuation">:</span>
+  <span class="token key atrule">restartPolicy</span><span class="token punctuation">:</span> Always
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> busybox
+      <span class="token key atrule">image</span><span class="token punctuation">:</span> busybox
+      <span class="token key atrule">command</span><span class="token punctuation">:</span>
+        <span class="token punctuation">-</span> sleep
+        <span class="token punctuation">-</span> <span class="token string">"3600"</span>
+      <span class="token key atrule">imagePullPolicy</span><span class="token punctuation">:</span> IfNotPresent<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="1-基本概念"><a href="#1-基本概念" class="headerlink" title="1. 基本概念"></a>1. 基本概念</h2><blockquote>
-<p><strong>1</strong></p>
+<h2 id="1-Pod-的内部结构"><a href="#1-Pod-的内部结构" class="headerlink" title="1. Pod 的内部结构"></a>1. Pod 的内部结构</h2><blockquote>
+<p><strong>Pod 代表着集群中运行的进程：共享网络、共享存储</strong></p>
 </blockquote>
-<p><code>Pod</code> 是有生命周期的，可以被创建且销毁之后不会再启动。而使用 <code>Deployment</code> 来运行您的应用程序，则它可以动态创建和销毁 <code>Pod</code>。就之前学习的知识，我们都是部署单独的服务，并没有应用实际的示例。比如，我们现在部署一个前后端分离的项目，前端是一组 <code>Pod</code>，后端也是一组 <code>Pod</code>，那么前端如何找出并跟踪要连接的 <code>IP</code> 地址，以便前端可以使用工作量的后端部分？</p>
-<p><code>Kubernetes Service</code> 定义了这样一种抽象：一个 <code>Pod</code> 的逻辑分组，一种可以访问它们的策略 —— 通常称为<strong>微服务</strong>。 这一组 <code>Pod</code> 能够被 <code>Service</code> 访问到，通常是通过 <code>Label Selector</code> 来实现的。</p>
+<p>在同一个 <code>Pod</code> 中，有几个概念特别值得关注，首先就是容器，在 <code>Pod</code> 中其实可以同时运行一个或者多个容器，这些容器能够<strong>共享网络</strong>、<strong>存储</strong>以及 <strong>CPU/内存</strong>等资源。</p>
+<p>首先，我们需要知道的是，每个 <code>Pod</code> 都有一个特殊的被称为 <strong>“根容器”</strong> 的 <code>Pause</code> 容器。<code>Pause</code> 容器对应的镜像属于 <code>Kubernetes</code> 平台的一部分，通过 <code>Pause</code> 容器使工作在对应 <code>Pod</code> 的容器之间可以<strong>共享网络</strong>、<strong>共享存储</strong>。</p>
+<p><img src="../images/kubernetes-pod-system-2.png" alt="Pod的内部结构"></p>
+<p><strong>[1] Pod 共享资源</strong></p>
+<p>为什么 <code>Kubernetes</code> 会设计出一个全新的 <code>Pod</code> 概念，并且有这样特殊的结构？主要是因为，使用 <code>Pause</code> 容器作为 <code>Pod</code> 根容器，以它的状态代表整个容器组的状态；其次，<code>Pod</code> 里的多个业务容器共享 <code>Pause</code> 容器的 <code>IP</code> 地址，共享 <code>Pause</code> 容器挂接的 <code>Volume</code> 资源。</p>
+<ul>
+<li><strong>共享存储资源</strong></li>
+</ul>
+<p>可以为一个 <code>Pod</code> 指定多个共享的 <code>Volume</code> 资源。<code>Pod</code> 中的所有容器都可以访问共享的 <code>volume</code> 资源。<code>Volume</code> 也可以用来持久化 <code>Pod</code> 中的存储资源，以防容器重启后文件丢失。</p>
+<ul>
+<li><strong>共享网络资源</strong></li>
+</ul>
+<p>每个 <code>Pod</code> 都会被分配一个唯一的 <code>IP</code> 地址。<code>Pod</code> 中的所有容器共享网络空间，包括 <code>IP</code> 地址和端口。<code>Pod</code> 内部的容器可以使用 <code>localhost</code> 互相通信。<code>Pod</code> 中的容器与外界通信时，必须分配共享网络资源，例如使用宿主机的端口映射。</p>
+<p><img src="../images/kubernetes-pod-system-3.png" alt="Pod的容器之间可以共享网络、共享存储"></p>
+<p><strong>[2] veth 设备的特点</strong></p>
+<p>一个设备收到协议栈的数据发送请求后，会将数据发送到另一个设备上去</p>
+<ul>
+<li><code>veth</code> 和其它的网络设备都一样，一端连接的是内核协议栈</li>
+<li><code>veth</code> 设备是成对出现的，另一端两个设备彼此相连</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 物理网卡eth0配置的IP为192.168.1.11</span>
+<span class="token comment" spellcheck="true"># 而veth0和veth1的IP分别是192.168.2.11和192.168.2.10</span>
+
++----------------------------------------------------------------+
+<span class="token operator">|</span>                                                                <span class="token operator">|</span>
+<span class="token operator">|</span>       +------------------------------------------------+       <span class="token operator">|</span>
+<span class="token operator">|</span>       <span class="token operator">|</span>             Newwork Protocol Stack             <span class="token operator">|</span>       <span class="token operator">|</span>
+<span class="token operator">|</span>       +------------------------------------------------+       <span class="token operator">|</span>
+<span class="token operator">|</span>              ↑               ↑               ↑                 <span class="token operator">|</span>
+<span class="token operator">|</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token operator">|</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.<span class="token operator">|</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.<span class="token operator">|</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.<span class="token operator">|</span>
+<span class="token operator">|</span>              ↓               ↓               ↓                 <span class="token operator">|</span>
+<span class="token operator">|</span>        +----------+    +-----------+   +-----------+           <span class="token operator">|</span>
+<span class="token operator">|</span>        <span class="token operator">|</span>   eth0   <span class="token operator">|</span>    <span class="token operator">|</span>   veth0   <span class="token operator">|</span>   <span class="token operator">|</span>   veth1   <span class="token operator">|</span>           <span class="token operator">|</span>
+<span class="token operator">|</span>        +----------+    +-----------+   +-----------+           <span class="token operator">|</span>
+<span class="token operator">|</span>192.168.1.11  ↑               ↑               ↑                 <span class="token operator">|</span>
+<span class="token operator">|</span>              <span class="token operator">|</span>               +---------------+                 <span class="token operator">|</span>
+<span class="token operator">|</span>              <span class="token operator">|</span>         192.168.2.11     192.168.2.10           <span class="token operator">|</span>
++--------------<span class="token operator">|</span>-------------------------------------------------+
+               ↓
+         Physical Network<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="2-Pod-的网络通信"><a href="#2-Pod-的网络通信" class="headerlink" title="2. Pod 的网络通信"></a>2. Pod 的网络通信</h2><blockquote>
+<p><strong>集群网络解决方案: Kubernetes + Flannel</strong></p>
+</blockquote>
+<p><code>Kubernetes</code> 的网络模型假定了所有 <code>Pod</code> 都在一个直接连通的扁平的网络空间中，这在 <strong>GCE</strong>(<code>Google Compute Engine</code>)里面是现成的网络模型，<code>Kubernetes</code> 假定这个网络已经存在了。而在私有云搭建 <code>Kubernetes</code> 集群，就不能假定这个网络已经存在了。我们需要自己实现这个网络假设，将不同节点上的 <code>Docker</code> 容器之间的互相访问先打通，然后才能正常运行 <code>Kubernetes</code> 集群。</p>
+<ul>
+<li>同一个 <code>Pod</code> 内多个容器之前通过回环网络(<code>lo</code> - <code>127.0.0.1</code>)进行通信</li>
+<li>各 <code>Pod</code> 之间的通讯，则是通过 <code>Overlay Network</code> 网络进行通信</li>
+<li>而 <code>Pod</code> 与 <code>Service</code> 之间的通讯，则是各节点的 <code>iptables</code> 或 <code>lvs</code> 规则</li>
+</ul>
+<p><code>Flannel</code> 是 <code>CoreOS</code> 团队针对 <code>Kubernetes</code> 设计的一个网络规划服务，简单来说，它的功能就是让集群中的不同节点主机创建的 <code>Docker</code> 容器都具有全集群唯一的虚拟 <code>IP</code> 地址。而且它还能在这些 <code>IP</code> 地址之间建立一个覆盖的网络(<code>Overlay Network</code>)，通过这个覆盖网络，将数据包原封不动地传递给目标容器内。</p>
+<p><img src="../images/kubernetes-pod-system-4.png" alt="Overlay Network 网络进行通信"></p>
+<p><img src="../images/kubernetes-pod-system-5.png" alt="数据包原封格式"></p>
+<p><strong>[1] 不同情况下的网络通信方式</strong></p>
+<ul>
+<li><strong>同一个 Pod 内部通讯：</strong><ul>
+<li>同一个 Pod 共享同一个网络命名空间，共享同一个 Linux 协议栈。</li>
+</ul>
+</li>
+<li><strong>不同 Pod 之间通讯：</strong><ul>
+<li>Pod1 和 Pod2 在同一台 Node 主机，由 docker0 网桥直接转发请求到 Pod2 上面，不经过 Flannel 的转发。</li>
+<li>Pod1 和 Pod2 不在同一台 Node 主机，Pod 的地址是与 docker0 在同一个网段的，但 docker0 网络与宿主机网卡是两个完全不同的 IP 网段，并且不同的 Node 之间的通讯只能通过宿主机的物理网卡进行。将 Pod 的 IP 地址和所在 Node 的 IP 地址关联起来，通过这个关联让 Pod 可以互相访问。</li>
+</ul>
+</li>
+<li><strong>Pod 至 Service 的网络</strong><ul>
+<li>目前基于性能考虑，全部为 iptables 或 lvs 维护和转发。</li>
+</ul>
+</li>
+<li><strong>Pod 到外网</strong><ul>
+<li>Pod 想外网发送请求，查找路由表，转发数据包到宿主机的网卡，宿主机网卡完成路由选择之后，iptables 或 lvs 执行 Masquerade，把源 IP 地址更改为宿主机的网卡的 IP 地址，然后向外网服务器发送请求。</li>
+</ul>
+</li>
+<li><strong>外网访问 Pod</strong><ul>
+<li>通过 Service 服务来向外部提供 Pod 服务。</li>
+</ul>
+</li>
+</ul>
+<p><strong>[2] ETCD 之于 Flannel 提供说明：</strong></p>
+<ul>
+<li>存储管理 Flannel 可分配的 IP 地址段资源</li>
+<li>监控 ETCD 中每一个 Pod 的实际 IP 地址，并在内存中建立维护 Pod 节点的路由表</li>
+</ul>
+<p><img src="../images/kubernetes-pod-system-6.png" alt="ETCD之于Flannel提供说明"></p>
+<hr>
+<h2 id="3-Pod-的多种类型"><a href="#3-Pod-的多种类型" class="headerlink" title="3. Pod 的多种类型"></a>3. Pod 的多种类型</h2><blockquote>
+<p><strong>Pod 存在多种不同的创建类型来满足不一样的用途</strong></p>
+</blockquote>
+<p><img src="../images/kubernetes-pod-system.png" alt="Kubernetes组件工作架构图"></p>
+<ul>
+<li><strong>[1] ReplicationController</strong></li>
+</ul>
+<p><code>ReplicationController</code> 用来确保容器应用的副本数量始终保持在用户定义的副本数，即如果有容器异常退出，会自动创建新的 <code>Pod</code> 来代替，而如果异常多出现的容器会自动回收。</p>
+<ul>
+<li><strong>[2] ReplicaSet</strong></li>
+</ul>
+<p>在新版本(相对而言的较优方式)的 <code>Kubernetes</code> 中建议使用 <code>ReplicaSet</code> 来取代 <code>ReplicationController</code> 来管理 <code>Pod</code>。虽然 <code>ReplicaSet</code> 和 <code>ReplicationController</code> 并没有本质上的不同，只是名字不一样而已，唯一的区别就是 <code>ReplicaSet</code> 支持集合式的 <code>selector</code>，可供标签筛选。</p>
+<p>虽然 <code>ReplicaSet</code> 可以独立使用，但一般还是建议使用 <code>Deployment</code> 来自动管理 <code>ReplicaSet</code> 创建的 <code>Pod</code>，这样就无需担心跟其他机制的不兼容问题。比如 <code>ReplicaSet</code> 自身并不支持滚动更新(<code>rolling-update</code>)，但是使用 <code>Deployment</code> 来部署就原生支持。</p>
+<ul>
+<li><strong>[3] Deployment</strong></li>
+</ul>
+<p><code>Deployment</code> 为 <code>Pod</code> 和 <code>ReplicaSet</code> 提供了一个声明式定义方法，用来替代以前使用 <code>ReplicationController</code> 来方便且便捷的管理应用。主要的应用场景，包括：<strong>滚动升级和回滚应用</strong>、<strong>扩容和缩容</strong>、<strong>暂停和继续</strong>。</p>
+<ul>
+<li><strong>[4] HPA</strong></li>
+</ul>
+<p><strong><code>HPA</code></strong> 仅仅适用于 <code>Deployment</code> 和 <code>ReplicaSet</code>，在 <code>V1</code> 版本中仅支持根据 <code>Pod</code> 的 <code>CPU</code> 利用率扩缩容，在新版本中，支持根据内存和用户自定义的 <code>metric</code> 动态扩缩容。</p>
+<ul>
+<li><strong>[5] StatefulSet</strong></li>
+</ul>
+<p><code>StatefulSet</code> 是为了解决有状态服务的问题，相对于 <code>Deployment</code> 和 <code>ReplicaSet</code> 而已。其主要的使用场景，包括：稳定的持久化存储、稳定的网络标识、有序部署、有序收缩。</p>
+<ul>
+<li><strong>[6] DaemonSet</strong></li>
+</ul>
+<p><code>DaemonSet</code> 确保全部或者一些 <code>Node</code> 上面运行一个 <code>Pod</code> 副本。当有 <code>Node</code> 加入集群的时候，也会为它们新加一个 <code>Pod</code>。当有 <code>Node</code> 从集群中移除的时候，这些 <code>Pod</code> 也会被回收。删除 <code>DaemonSet</code> 将会删除它所创建的所有 <code>Pod</code>。</p>
+<p>使用 <code>DaemonSet</code> 的典型场景就是，在每个节点运行日志收集、运行监控系统、运行集群存储等服务，只要新加进来的节点都需要运行该服务。</p>
+<ul>
+<li><strong>[7] Job</strong></li>
+</ul>
+<p><code>Job</code> 负责批处理任务，仅执行一次的任务，它保证批处理任务的一个或者多个 <code>Pod</code> 成功结束，才会返回成功。</p>
+<ul>
+<li><strong>[8] Cront Job</strong></li>
+</ul>
+<p><code>Cront Job</code> 管理是基于时间的 <code>Job</code>，即在给定时间点只运行一次，且周期行的在给定时间点运行特定任务。</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -544,7 +687,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://escapelife.github.io/posts/bd3b4db1.html">https://escapelife.github.io/posts/bd3b4db1.html</a>
+                    <a href="https://escapelife.github.io/posts/27a041e.html">https://escapelife.github.io/posts/27a041e.html</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -757,12 +900,12 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/posts/7af5d7ed.html">
+                <a href="/posts/dbeb891d.html">
                     <div class="card-image">
                         
-                        <img src="/images/book-0-1.jpg" class="responsive-img" alt="《从0到1》摘录">
+                        <img src="/images/new-install-openshfit.png" class="responsive-img" alt="OpenShift的安装和使用">
                         
-                        <span class="card-title">《从0到1》摘录</span>
+                        <span class="card-title">OpenShift的安装和使用</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -773,14 +916,14 @@
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2020-02-20
+                            <i class="far fa-clock fa-fw icon-date"></i>2019-10-25
                         </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Book读万卷书/" class="post-category">
-                                    Book读万卷书
+                            <a href="/categories/K8S即学即用/" class="post-category">
+                                    K8S即学即用
                                 </a>
                             
                             
@@ -790,8 +933,12 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Book/">
-                        <span class="chip bg-color">Book</span>
+                    <a href="/tags/Kubernetes/">
+                        <span class="chip bg-color">Kubernetes</span>
+                    </a>
+                    
+                    <a href="/tags/OpenShift/">
+                        <span class="chip bg-color">OpenShift</span>
                     </a>
                     
                 </div>
@@ -805,12 +952,12 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/posts/10c0df8d.html">
+                <a href="/posts/2c4214e7.html">
                     <div class="card-image">
                         
-                        <img src="/images/kubernetes-resource-controller.png" class="responsive-img" alt="Kubernetes的资源控制器">
+                        <img src="/images/kubernetes-arch.jpg" class="responsive-img" alt="Kubernetes之前世今生">
                         
-                        <span class="card-title">Kubernetes的资源控制器</span>
+                        <span class="card-title">Kubernetes之前世今生</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -821,7 +968,7 @@
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2020-02-14
+                                <i class="far fa-clock fa-fw icon-date"></i>2019-10-20
                             </span>
                         <span class="publish-author">
                             
@@ -1042,7 +1189,7 @@
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1005.9k</span>&nbsp;字
+                class="white-color">1008.4k</span>&nbsp;字
             
             
             

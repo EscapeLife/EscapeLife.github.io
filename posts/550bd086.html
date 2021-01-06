@@ -4,7 +4,7 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
-    <meta name="keywords" content="Kubernetes的Pod实现原理, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="keywords" content="Kuternetes之私有仓库Harbor, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Kubernetes的Pod实现原理 | Escape</title>
+    <title>Kuternetes之私有仓库Harbor | Escape</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -302,12 +302,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/images/kubernetes-pod-system.png')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/kuternetes-harbor-tool.png')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Kubernetes的Pod实现原理</h1>
+                    <h1 class="description center-align post-title">Kuternetes之私有仓库Harbor</h1>
                 </div>
             </div>
         </div>
@@ -427,6 +427,10 @@
                                 <span class="chip bg-color">Kubernetes</span>
                             </a>
                         
+                            <a href="/tags/Harbor/">
+                                <span class="chip bg-color">Harbor</span>
+                            </a>
+                        
                     </div>
                     
                 </div>
@@ -448,28 +452,28 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2019-10-21
+                    2019-11-10
                 </div>
                 
 
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-01-05
+                    2021-01-06
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.2k
+                    2.1k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    8 分
+                    9 分
                 </div>
                 
 
@@ -490,159 +494,429 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <blockquote>
-<p><strong>Pod 就是最小并且最简单的 Kubernetes 对象</strong></p>
+<p><strong>Kuternetes 企业级 Docker 私有仓库 Harbor 工具</strong></p>
 </blockquote>
-<p><img src="../images/kubernetes-pod-system-7.png" alt="本机关于Pod实现原理的主要知识点汇总"></p>
-<p><code>Pod</code>、<code>Service</code>、<code>Volume</code> 和 <code>Namespace</code> 是 <code>Kubernetes</code> 集群中四大基本对象，它们能够表示系统中部署的应用、工作负载、网络和磁盘资源，共同定义了集群的状态。<code>Kubernetes</code> 中很多其他的资源其实只对这些基本的对象进行了组合。</p>
-<ul>
-<li><code>Pod</code> -&gt; 集群中的基本单元</li>
-<li><code>Service</code> -&gt; 解决如何访问 Pod 里面服务的问题</li>
-<li><code>Volume</code> -&gt; 集群中的存储卷</li>
-<li><code>Namespace</code> -&gt; 命名空间为集群提供虚拟的隔离作用</li>
-</ul>
-<p><img src="../images/kubernetes-pod-system-1.png" alt="Kubernetes集群中四大基本对象"></p>
-<p><code>Kubernetes</code> 有许许多多的技术概念，同时对应很多 <code>API</code> 对象，其中最重要的也是最基础的是 <code>Pod</code> 对象。<code>Pod</code> 是在 <code>Kubernetes</code> 集群中运行部署应用或服务的最小单元，它是可以支持多容器的。<strong><code>Pod</code> 的设计理念是支持多个容器在一个 <code>Pod</code> 中共享网络地址和文件系统，可以通过进程间通信和文件共享这种简单高效的方式组合完成服务</strong>。</p>
-<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
-<span class="token key atrule">kind</span><span class="token punctuation">:</span> Pod
-<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
-  <span class="token key atrule">name</span><span class="token punctuation">:</span> busybox
-  <span class="token key atrule">labels</span><span class="token punctuation">:</span>
-    <span class="token key atrule">app</span><span class="token punctuation">:</span> busybox
-<span class="token key atrule">spec</span><span class="token punctuation">:</span>
-  <span class="token key atrule">containers</span><span class="token punctuation">:</span>
-  <span class="token key atrule">restartPolicy</span><span class="token punctuation">:</span> Always
-    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> busybox
-      <span class="token key atrule">image</span><span class="token punctuation">:</span> busybox
-      <span class="token key atrule">command</span><span class="token punctuation">:</span>
-        <span class="token punctuation">-</span> sleep
-        <span class="token punctuation">-</span> <span class="token string">"3600"</span>
-      <span class="token key atrule">imagePullPolicy</span><span class="token punctuation">:</span> IfNotPresent<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>当然，我们这里也可以使用 <code>Docker</code> 官方提供的 <a href="https://docs.docker.com/registry/deploying/" target="_blank" rel="noopener"><code>registry</code></a> 镜像！</p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ docker run -d -p 5000:5000 --restart<span class="token operator">=</span>always --name registry registry:2<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="../images/kuternetes-harbor-tool.png" alt="Kuternetes私有仓库Harbor"></p>
 <hr>
-<h2 id="1-Pod-的内部结构"><a href="#1-Pod-的内部结构" class="headerlink" title="1. Pod 的内部结构"></a>1. Pod 的内部结构</h2><blockquote>
-<p><strong>Pod 代表着集群中运行的进程：共享网络、共享存储</strong></p>
+<h2 id="1-Harbor-基本组件"><a href="#1-Harbor-基本组件" class="headerlink" title="1. Harbor 基本组件"></a>1. Harbor 基本组件</h2><blockquote>
+<p><strong>企业级环境中基于 Harbor 搭建自己的安全认证仓库</strong></p>
 </blockquote>
-<p>在同一个 <code>Pod</code> 中，有几个概念特别值得关注，首先就是容器，在 <code>Pod</code> 中其实可以同时运行一个或者多个容器，这些容器能够<strong>共享网络</strong>、<strong>存储</strong>以及 <strong>CPU/内存</strong>等资源。</p>
-<p>首先，我们需要知道的是，每个 <code>Pod</code> 都有一个特殊的被称为 <strong>“根容器”</strong> 的 <code>Pause</code> 容器。<code>Pause</code> 容器对应的镜像属于 <code>Kubernetes</code> 平台的一部分，通过 <code>Pause</code> 容器使工作在对应 <code>Pod</code> 的容器之间可以<strong>共享网络</strong>、<strong>共享存储</strong>。</p>
-<p><img src="../images/kubernetes-pod-system-2.png" alt="Pod的内部结构"></p>
-<p><strong>[1] Pod 共享资源</strong></p>
-<p>为什么 <code>Kubernetes</code> 会设计出一个全新的 <code>Pod</code> 概念，并且有这样特殊的结构？主要是因为，使用 <code>Pause</code> 容器作为 <code>Pod</code> 根容器，以它的状态代表整个容器组的状态；其次，<code>Pod</code> 里的多个业务容器共享 <code>Pause</code> 容器的 <code>IP</code> 地址，共享 <code>Pause</code> 容器挂接的 <code>Volume</code> 资源。</p>
+<p><code>Docker</code> 容器应用的开发和运行离不开可靠的镜像管理，虽然 <code>Docker</code> 官方也提供了公共的镜像仓库，但是从安全和效率等方面考虑，部署我们私有环境内的 <code>Registry</code> 也是非常必要的。<code>Harbor</code> 是由 <code>VMware</code> 公司开源的企业级的 <code>Docker Registry</code> 管理项目，它包括权限管理(<code>RBAC</code>)、<code>AD</code>/<code>LDAP</code>集成、日志审核、管理界面、自我注册、镜像复制和中文支持等功能，在新版本中还添加了<code>Helm</code>仓库托管的支持。</p>
+<p><img src="../images/kuternetes-harbor-tool-1.png" alt="Kuternetes私有仓库Harbor"></p>
+<p><code>Harbor</code> 的每个组件都是以 <code>Docker</code> 容器的形式构建的，使用 <code>Docker Compose</code> 来对它进行部署。用于部署 <code>Harbor</code> 的 <code>Docker Compose</code> 模板位于 <code>/Deployer/docker-compose.yml</code> 中，其由 <code>5</code> 个容器组成，这几个容器通过 <code>Docker link</code> 的形式连接在一起，在容器之间通过容器名字互相访问。对终端用户而言，只需要暴露 <code>Proxy</code>(即<code>Nginx</code>) 的服务端口即可。</p>
 <ul>
-<li><strong>共享存储资源</strong></li>
+<li><strong>Proxy</strong><ul>
+<li>由<code>Nginx</code>服务器构成的反向代理</li>
 </ul>
-<p>可以为一个 <code>Pod</code> 指定多个共享的 <code>Volume</code> 资源。<code>Pod</code> 中的所有容器都可以访问共享的 <code>volume</code> 资源。<code>Volume</code> 也可以用来持久化 <code>Pod</code> 中的存储资源，以防容器重启后文件丢失。</p>
+</li>
+<li><strong>Registry</strong><ul>
+<li>由<code>Docker</code>官方的开源官方的开源<code>Registry</code>镜像构成的容器实例</li>
+</ul>
+</li>
+<li><strong>UI</strong><ul>
+<li>即架构中的<code>core services</code>服务，构成此容器的代码是<code>Harbor</code>项目的主体</li>
+</ul>
+</li>
+<li><strong>MySQL</strong><ul>
+<li>由官方<code>MySQL</code>镜像构成的数据库容器</li>
+</ul>
+</li>
+<li><strong>Log</strong><ul>
+<li>运行着<code>rsyslogd</code>的容器，通过<code>log-driver</code>的形式收集其他容器的日志</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-Harbor-特性解释"><a href="#2-Harbor-特性解释" class="headerlink" title="2. Harbor 特性解释"></a>2. Harbor 特性解释</h2><blockquote>
+<p><strong>主要介绍 Harbor 工具的特性和优点</strong></p>
+</blockquote>
+<p><img src="../images/kuternetes-harbor-tool-2.png" alt="Kuternetes私有仓库Harbor"></p>
 <ul>
-<li><strong>共享网络资源</strong></li>
+<li><strong>[1] 基于角色控制</strong><ul>
+<li>用户和仓库都是基于项目进行组织的，而用户基于项目可以拥有不同的权限</li>
 </ul>
-<p>每个 <code>Pod</code> 都会被分配一个唯一的 <code>IP</code> 地址。<code>Pod</code> 中的所有容器共享网络空间，包括 <code>IP</code> 地址和端口。<code>Pod</code> 内部的容器可以使用 <code>localhost</code> 互相通信。<code>Pod</code> 中的容器与外界通信时，必须分配共享网络资源，例如使用宿主机的端口映射。</p>
-<p><img src="../images/kubernetes-pod-system-3.png" alt="Pod的容器之间可以共享网络、共享存储"></p>
-<p><strong>[2] veth 设备的特点</strong></p>
-<p>一个设备收到协议栈的数据发送请求后，会将数据发送到另一个设备上去</p>
+</li>
+<li><strong>[2] 基于镜像的复制策略</strong><ul>
+<li>镜像可以在多个<code>Harbor</code>实例之间进行复制实例之间进行复制</li>
+</ul>
+</li>
+<li><strong>[3] 支持 LDAP</strong><ul>
+<li><code>Harbor</code>的用户授权可以使用已经存在<code>LDAP</code>用户</li>
+</ul>
+</li>
+<li><strong>[4] 镜像删除&amp;垃圾回收</strong><ul>
+<li><code>Image</code>可以被删除并且回收<code>Image</code>占用的空间</li>
+</ul>
+</li>
+<li><strong>[5] 用户 UI</strong><ul>
+<li>用户可以轻松的浏览、搜索镜像仓库以及对项目进行管理</li>
+</ul>
+</li>
+<li><strong>[6] 轻松的部署功能</strong><ul>
+<li><code>Harbor</code>提供了提供了<code>online</code>/<code>offline</code>/<code>virtualappliance</code>安装</li>
+</ul>
+</li>
+<li><strong>[7] Harbor 和 docker registry 关系</strong><ul>
+<li><code>Harbor</code>实质上是对<code>docker registry</code>做了封装，扩展了自己的业务模块</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-Harbor-认证过程"><a href="#3-Harbor-认证过程" class="headerlink" title="3. Harbor 认证过程"></a>3. Harbor 认证过程</h2><blockquote>
+<p><strong>认证过程是理解其精髓的核心知识点</strong></p>
+</blockquote>
+<p><code>Harbor</code> 最核心的功能就是给 <code>docker registry</code> 添加上一层权限保护的功能，要实现这个功能，就需要我们在使用 <code>docker login</code>、<code>pull</code>、<code>push</code> 等命令的时候进行拦截，先进行一些权限相关的校验再进行操作，其实这一系列的操作 <code>docker registry v2</code> 就已经为我们提供了支持，<code>v2</code> 版本集成了一个安全认证的功能，将安全认证暴露给外部服务，让外部服务去实现。</p>
+<p><img src="../images/kuternetes-harbor-tool-3.jpg" alt="Harbor整体架构"></p>
+<p>下述就是完整的授权过程，当用户完成下述过程以后便可以执行相关的<code>pull</code>/<code>push</code>操作，认证信息会每次都带在请求头中。</p>
 <ul>
-<li><code>veth</code> 和其它的网络设备都一样，一端连接的是内核协议栈</li>
-<li><code>veth</code> 设备是成对出现的，另一端两个设备彼此相连</li>
+<li><strong>[a]</strong> <code>docker daemon</code>从<code>docker registry</code>拉取镜像。</li>
+<li><strong>[b]</strong> 如果<code>docker registry</code>需要进行授权时，<code>registry</code>将会返回<code>401</code>响应，同时在响应中包含了<code>docker client</code>如何进行认证的信息。</li>
+<li><strong>[c]</strong> <code>docker client</code>根据<code>registry</code>返回的信息，向<code>auth server</code>发送请求获取认证<code>token</code>信息。</li>
+<li><strong>[d]</strong> <code>auth server</code>则根据自己的业务实现去验证提交的用户信息是否存符合业务要求。</li>
+<li><strong>[e]</strong> 用户数据仓库返回用户的相关信息。</li>
+<li><strong>[f]</strong> <code>auth server</code>将会根据查询的用户信息，生成<code>token</code>令牌，以及当前用户所具有的相关权限信息。</li>
+<li><strong>[g]</strong> <code>docker client</code>端接收到返回的<code>200</code>状态码说明操作成功，在控制台上打印<code>Login Succeeded</code>的信息。</li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 物理网卡eth0配置的IP为192.168.1.11</span>
-<span class="token comment" spellcheck="true"># 而veth0和veth1的IP分别是192.168.2.11和192.168.2.10</span>
+<p><img src="../images/kuternetes-harbor-tool-4.jpg" alt="整个登录过程"></p>
+<p><img src="../images/kuternetes-harbor-tool-5.png" alt="Harbor认证流程"></p>
+<hr>
+<h2 id="4-Harbor-配置要求"><a href="#4-Harbor-配置要求" class="headerlink" title="4. Harbor 配置要求"></a>4. Harbor 配置要求</h2><blockquote>
+<p><strong>配置要求主要受限于硬件要求</strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] Hardware</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Minimum</th>
+<th>Recommended</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>CPU</strong></td>
+<td>2 CPU</td>
+<td>4 CPU</td>
+</tr>
+<tr>
+<td><strong>Mem</strong></td>
+<td>4 GB</td>
+<td>8 GB</td>
+</tr>
+<tr>
+<td><strong>Disk</strong></td>
+<td>40 GB</td>
+<td>160 GB</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>[2] Software</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Software</th>
+<th>Version</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Docker engine</strong></td>
+<td>version 17.06.0-ce+ or higher</td>
+<td>For installation instructions, see <a href="https://docs.docker.com/engine/installation/" target="_blank" rel="noopener">docker engine doc</a></td>
+</tr>
+<tr>
+<td><strong>Docker Compose</strong></td>
+<td>version 1.18.0 or higher</td>
+<td>For installation instructions, see <a href="https://docs.docker.com/compose/install/" target="_blank" rel="noopener">docker compose doc</a></td>
+</tr>
+<tr>
+<td><strong>Openssl</strong></td>
+<td>latest is preferred</td>
+<td>Used to generate certificate and keys for Harbor</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>[3] Network ports</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Port</th>
+<th>Protocol</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>443</strong></td>
+<td><strong>HTTPS</strong></td>
+<td>Harbor portal and core API accept HTTPS requests on this port. You can change this port in the configuration file.</td>
+</tr>
+<tr>
+<td><strong>4443</strong></td>
+<td><strong>HTTPS</strong></td>
+<td>Connections to the Docker Content Trust service for Harbor. Only required if Notary is enabled. You can change this port in the configuration file.</td>
+</tr>
+<tr>
+<td><strong>80</strong></td>
+<td><strong>HTTP</strong></td>
+<td>Harbor portal and core API accept HTTP requests on this port. You can change this port in the configuration file.</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>[4] Harbor Components</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Number</th>
+<th>Component</th>
+<th>Version</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><strong>Postgresql</strong></td>
+<td>9.6.10-1.ph2</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Redis</strong></td>
+<td>4.0.10-1.ph2</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Clair</strong></td>
+<td>2.0.8</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Beego</strong></td>
+<td>1.9.0</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Chartmuseum</strong></td>
+<td>0.9.0</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Docker</strong>/<strong>distribution</strong></td>
+<td>2.7.1</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>Docker</strong>/<strong>notary</strong></td>
+<td>0.6.1</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>Helm</strong></td>
+<td>2.9.1</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>Swagger-ui</strong></td>
+<td>3.22.1</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="5-Harbor-安装步骤"><a href="#5-Harbor-安装步骤" class="headerlink" title="5. Harbor 安装步骤"></a>5. Harbor 安装步骤</h2><blockquote>
+<p><strong><a href="https://github.com/goharbor/harbor/blob/master/docs/user_guide.md" target="_blank" rel="noopener">Harbor 的官方用户指南手册</a></strong></p>
+<ul>
+<li><a href="https://github.com/goharbor/harbor/blob/master/docs/configure_https.md" target="_blank" rel="noopener"><strong>配置 HTTPS 设置步骤</strong></a></li>
+<li><a href="https://github.com/goharbor/harbor/blob/master/docs/migration_guide.md" target="_blank" rel="noopener"><strong>服务的升级和降级操作</strong></a></li>
+</ul>
+</blockquote>
+<ul>
+<li><strong>[1] 官网主页</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">https://github.com/goharbor/harbor/releases<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 选择合适的资源包</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Online installer</span>
+harbor-offline-installer-v1.9.2.tgz       605 MB
+harbor-offline-installer-v1.9.2.tgz.asc   833 Bytes
 
-+----------------------------------------------------------------+
-<span class="token operator">|</span>                                                                <span class="token operator">|</span>
-<span class="token operator">|</span>       +------------------------------------------------+       <span class="token operator">|</span>
-<span class="token operator">|</span>       <span class="token operator">|</span>             Newwork Protocol Stack             <span class="token operator">|</span>       <span class="token operator">|</span>
-<span class="token operator">|</span>       +------------------------------------------------+       <span class="token operator">|</span>
-<span class="token operator">|</span>              ↑               ↑               ↑                 <span class="token operator">|</span>
-<span class="token operator">|</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token operator">|</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.<span class="token operator">|</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.<span class="token operator">|</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.<span class="token operator">|</span>
-<span class="token operator">|</span>              ↓               ↓               ↓                 <span class="token operator">|</span>
-<span class="token operator">|</span>        +----------+    +-----------+   +-----------+           <span class="token operator">|</span>
-<span class="token operator">|</span>        <span class="token operator">|</span>   eth0   <span class="token operator">|</span>    <span class="token operator">|</span>   veth0   <span class="token operator">|</span>   <span class="token operator">|</span>   veth1   <span class="token operator">|</span>           <span class="token operator">|</span>
-<span class="token operator">|</span>        +----------+    +-----------+   +-----------+           <span class="token operator">|</span>
-<span class="token operator">|</span>192.168.1.11  ↑               ↑               ↑                 <span class="token operator">|</span>
-<span class="token operator">|</span>              <span class="token operator">|</span>               +---------------+                 <span class="token operator">|</span>
-<span class="token operator">|</span>              <span class="token operator">|</span>         192.168.2.11     192.168.2.10           <span class="token operator">|</span>
-+--------------<span class="token operator">|</span>-------------------------------------------------+
-               ↓
-         Physical Network<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<hr>
-<h2 id="2-Pod-的网络通信"><a href="#2-Pod-的网络通信" class="headerlink" title="2. Pod 的网络通信"></a>2. Pod 的网络通信</h2><blockquote>
-<p><strong>集群网络解决方案: Kubernetes + Flannel</strong></p>
-</blockquote>
-<p><code>Kubernetes</code> 的网络模型假定了所有 <code>Pod</code> 都在一个直接连通的扁平的网络空间中，这在 <strong>GCE</strong>(<code>Google Compute Engine</code>)里面是现成的网络模型，<code>Kubernetes</code> 假定这个网络已经存在了。而在私有云搭建 <code>Kubernetes</code> 集群，就不能假定这个网络已经存在了。我们需要自己实现这个网络假设，将不同节点上的 <code>Docker</code> 容器之间的互相访问先打通，然后才能正常运行 <code>Kubernetes</code> 集群。</p>
+<span class="token comment" spellcheck="true"># Online installer</span>
+harbor-online-installer-v1.9.2.tgz        8.2 KB
+harbor-online-installer-v1.9.2.tgz.asc    833 Bytes<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li>同一个 <code>Pod</code> 内多个容器之前通过回环网络(<code>lo</code> - <code>127.0.0.1</code>)进行通信</li>
-<li>各 <code>Pod</code> 之间的通讯，则是通过 <code>Overlay Network</code> 网络进行通信</li>
-<li>而 <code>Pod</code> 与 <code>Service</code> 之间的通讯，则是各节点的 <code>iptables</code> 或 <code>lvs</code> 规则</li>
+<li><strong>[3] 解压对应安装包</strong></li>
 </ul>
-<p><code>Flannel</code> 是 <code>CoreOS</code> 团队针对 <code>Kubernetes</code> 设计的一个网络规划服务，简单来说，它的功能就是让集群中的不同节点主机创建的 <code>Docker</code> 容器都具有全集群唯一的虚拟 <code>IP</code> 地址。而且它还能在这些 <code>IP</code> 地址之间建立一个覆盖的网络(<code>Overlay Network</code>)，通过这个覆盖网络，将数据包原封不动地传递给目标容器内。</p>
-<p><img src="../images/kubernetes-pod-system-4.png" alt="Overlay Network 网络进行通信"></p>
-<p><img src="../images/kubernetes-pod-system-5.png" alt="数据包原封格式"></p>
-<p><strong>[1] 不同情况下的网络通信方式</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Online installer</span>
+$ <span class="token function">tar</span> xvf harbor-online-installer-version.tgz
+
+<span class="token comment" spellcheck="true"># Offline installer</span>
+$ <span class="token function">tar</span> xvf harbor-offline-installer-version.tgz
+
+<span class="token comment" spellcheck="true"># Mv to /usr/local dir</span>
+$ <span class="token function">sudo</span> <span class="token function">mv</span> harbor /usr/local<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>同一个 Pod 内部通讯：</strong><ul>
-<li>同一个 Pod 共享同一个网络命名空间，共享同一个 Linux 协议栈。</li>
+<li><strong>[4] 修改 harbor.cfg 配置文件</strong></li>
 </ul>
-</li>
-<li><strong>不同 Pod 之间通讯：</strong><ul>
-<li>Pod1 和 Pod2 在同一台 Node 主机，由 docker0 网桥直接转发请求到 Pod2 上面，不经过 Flannel 的转发。</li>
-<li>Pod1 和 Pod2 不在同一台 Node 主机，Pod 的地址是与 docker0 在同一个网段的，但 docker0 网络与宿主机网卡是两个完全不同的 IP 网段，并且不同的 Node 之间的通讯只能通过宿主机的物理网卡进行。将 Pod 的 IP 地址和所在 Node 的 IP 地址关联起来，通过这个关联让 Pod 可以互相访问。</li>
-</ul>
-</li>
-<li><strong>Pod 至 Service 的网络</strong><ul>
-<li>目前基于性能考虑，全部为 iptables 或 lvs 维护和转发。</li>
-</ul>
-</li>
-<li><strong>Pod 到外网</strong><ul>
-<li>Pod 想外网发送请求，查找路由表，转发数据包到宿主机的网卡，宿主机网卡完成路由选择之后，iptables 或 lvs 执行 Masquerade，把源 IP 地址更改为宿主机的网卡的 IP 地址，然后向外网服务器发送请求。</li>
-</ul>
-</li>
-<li><strong>外网访问 Pod</strong><ul>
-<li>通过 Service 服务来向外部提供 Pod 服务。</li>
-</ul>
-</li>
-</ul>
-<p><strong>[2] ETCD 之于 Flannel 提供说明：</strong></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Harbor版本</span>
+_version <span class="token operator">=</span> 1.5.0
+
+<span class="token comment" spellcheck="true"># 设置访问地址; 可以使用IP/域名(必须)</span>
+<span class="token function">hostname</span> <span class="token operator">=</span> docker.escaplife.site
+
+<span class="token comment" spellcheck="true"># 默认服务是走http协议，当然也可以设置为https协议(必须)</span>
+<span class="token comment" spellcheck="true"># 如果设置https协议的话，则nginx ssl选项也是需要设置on的</span>
+ui_url_protocol <span class="token operator">=</span> https
+
+<span class="token comment" spellcheck="true"># Job最大进程数; 默认值为3</span>
+max_job_workers <span class="token operator">=</span> 50
+
+<span class="token comment" spellcheck="true"># 是否创建证书,创建证书将会在下面的路径下生成(必须)</span>
+customize_crt <span class="token operator">=</span> on
+ssl_cert <span class="token operator">=</span> /data/cert/server.crt
+ssl_cert_key <span class="token operator">=</span> /data/cert/server.key
+
+<span class="token comment" spellcheck="true"># 私钥存储路径</span>
+secretkey_path <span class="token operator">=</span> /data
+
+<span class="token comment" spellcheck="true"># 设置日志大小</span>
+admiral_url <span class="token operator">=</span> NA
+log_rotate_count <span class="token operator">=</span> 50
+log_rotate_size <span class="token operator">=</span> 200M
+
+<span class="token comment" spellcheck="true"># 是否使用代理</span>
+http_proxy <span class="token operator">=</span> xxx
+https_proxy <span class="token operator">=</span> xxx
+no_proxy <span class="token operator">=</span> 127.0.0.1,localhost,ui
+
+<span class="token comment" spellcheck="true"># 邮箱设置，发送重置密码邮件时使用</span>
+email_identity <span class="token operator">=</span> xxx
+email_server <span class="token operator">=</span> smtp.mydomain.com
+email_server_port <span class="token operator">=</span> 25
+email_username <span class="token operator">=</span> sample_admin@mydomain.com
+email_password <span class="token operator">=</span> abc
+email_from <span class="token operator">=</span> admin <span class="token operator">&lt;</span>sample_admin@mydomain.com<span class="token operator">></span>
+email_ssl <span class="token operator">=</span> <span class="token boolean">false</span>
+email_insecure <span class="token operator">=</span> <span class="token boolean">false</span>
+
+<span class="token comment" spellcheck="true"># 安装Harbor后管理员UI登陆的密码，默认是Harbor12345</span>
+harbor_admin_password <span class="token operator">=</span> Harbor12345
+
+<span class="token comment" spellcheck="true"># 认证方式；比如LDAP、数据库认证，默认是db_auth方式</span>
+auth_mode <span class="token operator">=</span> db_auth
+
+<span class="token comment" spellcheck="true"># LDAP认证时配置项</span>
+ldap_url <span class="token operator">=</span> ldaps://ldap.mydomain.com
+ldap_basedn <span class="token operator">=</span> ou<span class="token operator">=</span>people,dc<span class="token operator">=</span>mydomain,dc<span class="token operator">=</span>com
+ldap_uid <span class="token operator">=</span> uid
+ldap_scope <span class="token operator">=</span> 2
+ldap_timeout <span class="token operator">=</span> 5
+ldap_verify_cert <span class="token operator">=</span> <span class="token boolean">true</span>
+ldap_group_basedn <span class="token operator">=</span> ou<span class="token operator">=</span>group,dc<span class="token operator">=</span>mydomain,dc<span class="token operator">=</span>com
+ldap_group_filter <span class="token operator">=</span> objectclass<span class="token operator">=</span>group
+ldap_group_gid <span class="token operator">=</span> cn
+ldap_group_scope <span class="token operator">=</span> 2
+
+<span class="token comment" spellcheck="true">#是否开启自动注册</span>
+self_registration <span class="token operator">=</span> on
+
+<span class="token comment" spellcheck="true"># Token有效时间，默认30分钟</span>
+token_expiration <span class="token operator">=</span> 30
+
+<span class="token comment" spellcheck="true"># 用户创建项目权限控制，默认是everyone(所有人)，也可以设置为adminonly(管理员)</span>
+project_creation_restriction <span class="token operator">=</span> everyone
+
+<span class="token comment" spellcheck="true"># Mysql数据库root用户默认密码root123，根据实际时使用来进行修改</span>
+db_host <span class="token operator">=</span> mysql
+db_password <span class="token operator">=</span> root123
+db_port <span class="token operator">=</span> 3306
+db_user <span class="token operator">=</span> root
+
+<span class="token comment" spellcheck="true"># Redis配置</span>
+redis_url <span class="token operator">=</span> redis:6379
+clair_db_host <span class="token operator">=</span> postgres
+clair_db_password <span class="token operator">=</span> password
+clair_db_port <span class="token operator">=</span> 5432
+clair_db_username <span class="token operator">=</span> postgres
+clair_db <span class="token operator">=</span> postgres
+uaa_endpoint <span class="token operator">=</span> uaa.mydomain.org
+uaa_clientid <span class="token operator">=</span> <span class="token function">id</span>
+uaa_clientsecret <span class="token operator">=</span> secret
+uaa_verify_cert <span class="token operator">=</span> <span class="token boolean">true</span>
+uaa_ca_cert <span class="token operator">=</span> /path/to/ca.pem
+registry_storage_provider_name <span class="token operator">=</span> filesystem
+registry_storage_provider_config <span class="token operator">=</span> xxx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li>存储管理 Flannel 可分配的 IP 地址段资源</li>
-<li>监控 ETCD 中每一个 Pod 的实际 IP 地址，并在内存中建立维护 Pod 节点的路由表</li>
+<li><strong>[5] 创建 https 证书以及配置相关目录权限</strong></li>
 </ul>
-<p><img src="../images/kubernetes-pod-system-6.png" alt="ETCD之于Flannel提供说明"></p>
-<hr>
-<h2 id="3-Pod-的多种类型"><a href="#3-Pod-的多种类型" class="headerlink" title="3. Pod 的多种类型"></a>3. Pod 的多种类型</h2><blockquote>
-<p><strong>Pod 存在多种不同的创建类型来满足不一样的用途</strong></p>
-</blockquote>
-<p><img src="../images/kubernetes-pod-system.png" alt="Kubernetes组件工作架构图"></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 创建证书目录</span>
+$ <span class="token function">sudo</span> <span class="token function">mkdir</span> /data/cert
+
+<span class="token comment" spellcheck="true"># 生成私钥</span>
+$ <span class="token function">sudo</span> openssl genrsa -des3 -out server.key 2048
+
+<span class="token comment" spellcheck="true"># 创建证书请求</span>
+$ <span class="token function">sudo</span> openssl req -new -key server.key -out server.csr
+
+<span class="token comment" spellcheck="true"># 备份私钥</span>
+$ <span class="token function">sudo</span> <span class="token function">cp</span> server.key server.key.org
+
+<span class="token comment" spellcheck="true"># 私钥去除密码</span>
+$ <span class="token function">sudo</span> openssl rsa -in server.key.org -out server.key
+
+<span class="token comment" spellcheck="true"># 签名证书</span>
+$ <span class="token function">sudo</span> openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+
+<span class="token comment" spellcheck="true"># 赋值权限</span>
+$ <span class="token function">sudo</span> <span class="token function">chmod</span> -R 777 /data/cert<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[1] ReplicationController</strong></li>
+<li><strong>[6] 运行脚本进行安装</strong></li>
 </ul>
-<p><code>ReplicationController</code> 用来确保容器应用的副本数量始终保持在用户定义的副本数，即如果有容器异常退出，会自动创建新的 <code>Pod</code> 来代替，而如果异常多出现的容器会自动回收。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> <span class="token function">cd</span> /usr/local/harbor
+$ <span class="token function">sudo</span> ./install.sh<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[2] ReplicaSet</strong></li>
+<li><strong>[7] 访问测试</strong></li>
 </ul>
-<p>在新版本(相对而言的较优方式)的 <code>Kubernetes</code> 中建议使用 <code>ReplicaSet</code> 来取代 <code>ReplicationController</code> 来管理 <code>Pod</code>。虽然 <code>ReplicaSet</code> 和 <code>ReplicationController</code> 并没有本质上的不同，只是名字不一样而已，唯一的区别就是 <code>ReplicaSet</code> 支持集合式的 <code>selector</code>，可供标签筛选。</p>
-<p>虽然 <code>ReplicaSet</code> 可以独立使用，但一般还是建议使用 <code>Deployment</code> 来自动管理 <code>ReplicaSet</code> 创建的 <code>Pod</code>，这样就无需担心跟其他机制的不兼容问题。比如 <code>ReplicaSet</code> 自身并不支持滚动更新(<code>rolling-update</code>)，但是使用 <code>Deployment</code> 来部署就原生支持。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 各节点配置/etc/hosts文件</span>
+192.168.3.23    reg.escaplife.com
+
+<span class="token comment" spellcheck="true"># 访问自己配置的域名地址</span>
+https://reg.escaplife.com
+
+<span class="token comment" spellcheck="true"># 默认管理员用户密码</span>
+admin/Harbor12345<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[3] Deployment</strong></li>
+<li><strong>[8] 上传和下载镜像进行测试</strong></li>
 </ul>
-<p><code>Deployment</code> 为 <code>Pod</code> 和 <code>ReplicaSet</code> 提供了一个声明式定义方法，用来替代以前使用 <code>ReplicationController</code> 来方便且便捷的管理应用。主要的应用场景，包括：<strong>滚动升级和回滚应用</strong>、<strong>扩容和缩容</strong>、<strong>暂停和继续</strong>。</p>
-<ul>
-<li><strong>[4] HPA</strong></li>
-</ul>
-<p><strong><code>HPA</code></strong> 仅仅适用于 <code>Deployment</code> 和 <code>ReplicaSet</code>，在 <code>V1</code> 版本中仅支持根据 <code>Pod</code> 的 <code>CPU</code> 利用率扩缩容，在新版本中，支持根据内存和用户自定义的 <code>metric</code> 动态扩缩容。</p>
-<ul>
-<li><strong>[5] StatefulSet</strong></li>
-</ul>
-<p><code>StatefulSet</code> 是为了解决有状态服务的问题，相对于 <code>Deployment</code> 和 <code>ReplicaSet</code> 而已。其主要的使用场景，包括：稳定的持久化存储、稳定的网络标识、有序部署、有序收缩。</p>
-<ul>
-<li><strong>[6] DaemonSet</strong></li>
-</ul>
-<p><code>DaemonSet</code> 确保全部或者一些 <code>Node</code> 上面运行一个 <code>Pod</code> 副本。当有 <code>Node</code> 加入集群的时候，也会为它们新加一个 <code>Pod</code>。当有 <code>Node</code> 从集群中移除的时候，这些 <code>Pod</code> 也会被回收。删除 <code>DaemonSet</code> 将会删除它所创建的所有 <code>Pod</code>。</p>
-<p>使用 <code>DaemonSet</code> 的典型场景就是，在每个节点运行日志收集、运行监控系统、运行集群存储等服务，只要新加进来的节点都需要运行该服务。</p>
-<ul>
-<li><strong>[7] Job</strong></li>
-</ul>
-<p><code>Job</code> 负责批处理任务，仅执行一次的任务，它保证批处理任务的一个或者多个 <code>Pod</code> 成功结束，才会返回成功。</p>
-<ul>
-<li><strong>[8] Cront Job</strong></li>
-</ul>
-<p><code>Cront Job</code> 管理是基于时间的 <code>Job</code>，即在给定时间点只运行一次，且周期行的在给定时间点运行特定任务。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 指定Docker信任我们搭建的私有镜像仓库地址</span>
+$ <span class="token function">sudo</span> vim /etc/docker/daemon.json
+<span class="token punctuation">{</span>
+    <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+    <span class="token string">"insecure-registries"</span><span class="token keyword">:</span> <span class="token punctuation">[</span><span class="token string">'https://reg.escaplife.com'</span><span class="token punctuation">]</span>,
+    <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true"># 下载镜像测试</span>
+$ docker pull escape/nginx-test:v1
+
+<span class="token comment" spellcheck="true"># 推送镜像测试</span>
+$ docker tag escape/nginx-test:v1 reg.escaplife.com/library/nginx-test:v1
+$ docker pull reg.escaplife.com/library/nginx-test:v1
+
+<span class="token comment" spellcheck="true"># 用户登录测试</span>
+$ docker login https://reg.escaplife.com
+
+<span class="token comment" spellcheck="true"># 启动容器测试</span>
+$ kubectl run nginx-deployment \
+    --image<span class="token operator">=</span>reg.escaplife.com/library/nginx-test:v1 \
+    --port<span class="token operator">=</span>80 --replicas<span class="token operator">=</span>1
+
+<span class="token comment" spellcheck="true"># 通过IPVS查看对应规则</span>
+$ <span class="token function">sudo</span> ipvsadm -Ln<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="../images/kuternetes-harbor-tool-6.png" alt="Harbor认证流程"></p>
+<p><img src="../images/kuternetes-harbor-tool-7.png" alt="Harbor认证流程"></p>
+<p><img src="../images/kuternetes-harbor-tool-8.png" alt="Harbor认证流程"></p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -687,7 +961,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://escapelife.github.io/posts/1b2fd738.html">https://escapelife.github.io/posts/1b2fd738.html</a>
+                    <a href="https://escapelife.github.io/posts/550bd086.html">https://escapelife.github.io/posts/550bd086.html</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -727,6 +1001,10 @@
                             
                                 <a href="/tags/Kubernetes/">
                                     <span class="chip bg-color">Kubernetes</span>
+                                </a>
+                            
+                                <a href="/tags/Harbor/">
+                                    <span class="chip bg-color">Harbor</span>
                                 </a>
                             
                         </div>
@@ -900,12 +1178,12 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/posts/dbeb891d.html">
+                <a href="/posts/8032061c.html">
                     <div class="card-image">
                         
-                        <img src="/images/new-install-openshfit.png" class="responsive-img" alt="OpenShift的安装和使用">
+                        <img src="/images/yaml-lanuage-info.jpg" class="responsive-img" alt="Kubernetes之YAML语法">
                         
-                        <span class="card-title">OpenShift的安装和使用</span>
+                        <span class="card-title">Kubernetes之YAML语法</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -916,7 +1194,7 @@
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2019-10-25
+                            <i class="far fa-clock fa-fw icon-date"></i>2019-11-11
                         </span>
                         <span class="publish-author">
                             
@@ -933,8 +1211,16 @@
                 
                 <div class="card-action article-tags">
                     
+                    <a href="/tags/Docker/">
+                        <span class="chip bg-color">Docker</span>
+                    </a>
+                    
                     <a href="/tags/Kubernetes/">
                         <span class="chip bg-color">Kubernetes</span>
+                    </a>
+                    
+                    <a href="/tags/YAML/">
+                        <span class="chip bg-color">YAML</span>
                     </a>
                     
                 </div>
@@ -948,12 +1234,12 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/posts/ab4af6a8.html">
+                <a href="/posts/f0fc2468.html">
                     <div class="card-image">
                         
-                        <img src="/images/kubernetes-arch.jpg" class="responsive-img" alt="Kubernetes的前世今生">
+                        <img src="/images/kubernetes-install-info.png" class="responsive-img" alt="Kubernetes之集群安装">
                         
-                        <span class="card-title">Kubernetes的前世今生</span>
+                        <span class="card-title">Kubernetes之集群安装</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -964,7 +1250,7 @@
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2019-10-20
+                                <i class="far fa-clock fa-fw icon-date"></i>2019-11-09
                             </span>
                         <span class="publish-author">
                             
@@ -1185,7 +1471,7 @@
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1005.9k</span>&nbsp;字
+                class="white-color">1008.4k</span>&nbsp;字
             
             
             
