@@ -427,6 +427,10 @@
                                 <span class="chip bg-color">Kubernetes</span>
                             </a>
                         
+                            <a href="/tags/Ingress/">
+                                <span class="chip bg-color">Ingress</span>
+                            </a>
+                        
                     </div>
                     
                 </div>
@@ -506,6 +510,23 @@
 </ul>
 <p><img src="../images/kubernetes-ingress-service-01.png" alt="Kubernetes之Ingress服务 - 请求流程"></p>
 <p><img src="../images/kubernetes-ingress-service-02.png" alt="Kubernetes之Ingress服务 - Nginx协程的工作方案"></p>
+<pre class="line-numbers language-bash"><code class="language-bash">Kubernetes                                                  Workstation
++---------------------------------------------------+     +------------------+
+<span class="token operator">|</span>                                                   <span class="token operator">|</span>     <span class="token operator">|</span>                  <span class="token operator">|</span>
+<span class="token operator">|</span>  +-----------+   apiserver        +------------+  <span class="token operator">|</span>     <span class="token operator">|</span>  +------------+  <span class="token operator">|</span>
+<span class="token operator">|</span>  <span class="token operator">|</span>           <span class="token operator">|</span>   proxy            <span class="token operator">|</span>            <span class="token operator">|</span>  <span class="token operator">|</span>     <span class="token operator">|</span>  <span class="token operator">|</span>            <span class="token operator">|</span>  <span class="token operator">|</span>
+<span class="token operator">|</span>  <span class="token operator">|</span> apiserver <span class="token operator">|</span>                    <span class="token operator">|</span>  ingress   <span class="token operator">|</span>  <span class="token operator">|</span>     <span class="token operator">|</span>  <span class="token operator">|</span>  ingress   <span class="token operator">|</span>  <span class="token operator">|</span>
+<span class="token operator">|</span>  <span class="token operator">|</span>           <span class="token operator">|</span>                    <span class="token operator">|</span> controller <span class="token operator">|</span>  <span class="token operator">|</span>     <span class="token operator">|</span>  <span class="token operator">|</span> controller <span class="token operator">|</span>  <span class="token operator">|</span>
+<span class="token operator">|</span>  <span class="token operator">|</span>           <span class="token operator">|</span>                    <span class="token operator">|</span>            <span class="token operator">|</span>  <span class="token operator">|</span>     <span class="token operator">|</span>  <span class="token operator">|</span>            <span class="token operator">|</span>  <span class="token operator">|</span>
+<span class="token operator">|</span>  <span class="token operator">|</span>           <span class="token operator">|</span>                    <span class="token operator">|</span>            <span class="token operator">|</span>  <span class="token operator">|</span>     <span class="token operator">|</span>  <span class="token operator">|</span>            <span class="token operator">|</span>  <span class="token operator">|</span>
+<span class="token operator">|</span>  <span class="token operator">|</span>           <span class="token operator">|</span>  <span class="token function">service</span> account/  <span class="token operator">|</span>            <span class="token operator">|</span>  <span class="token operator">|</span>     <span class="token operator">|</span>  <span class="token operator">|</span>            <span class="token operator">|</span>  <span class="token operator">|</span>
+<span class="token operator">|</span>  <span class="token operator">|</span>           <span class="token operator">|</span>  kubeconfig        <span class="token operator">|</span>            <span class="token operator">|</span>  <span class="token operator">|</span>     <span class="token operator">|</span>  <span class="token operator">|</span>            <span class="token operator">|</span>  <span class="token operator">|</span>
+<span class="token operator">|</span>  <span class="token operator">|</span>           +<span class="token operator">&lt;</span>-------------------+            <span class="token operator">|</span>  <span class="token operator">|</span>     <span class="token operator">|</span>  <span class="token operator">|</span>            <span class="token operator">|</span>  <span class="token operator">|</span>
+<span class="token operator">|</span>  <span class="token operator">|</span>           <span class="token operator">|</span>                    <span class="token operator">|</span>            <span class="token operator">|</span>  <span class="token operator">|</span>     <span class="token operator">|</span>  <span class="token operator">|</span>            <span class="token operator">|</span>  <span class="token operator">|</span>
+<span class="token operator">|</span>  +------+----+      kubeconfig    +------+-----+  <span class="token operator">|</span>     <span class="token operator">|</span>  +------+-----+  <span class="token operator">|</span>
+<span class="token operator">|</span>         <span class="token operator">|</span><span class="token operator">&lt;</span>--------------------------------------------------------<span class="token operator">|</span>        <span class="token operator">|</span>
+<span class="token operator">|</span>                                                   <span class="token operator">|</span>     <span class="token operator">|</span>                  <span class="token operator">|</span>
++---------------------------------------------------+     +------------------+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="2-服务安装"><a href="#2-服务安装" class="headerlink" title="2. 服务安装"></a>2. 服务安装</h2><blockquote>
 <p><strong>介绍关于 Ingress 服务的安装方式！</strong></p>
@@ -737,9 +758,14 @@ nginx-web2    web2.escape.com               80       9m10s<span aria-hidden="tru
 $ openssl req -x509 -sha256 -nodes \
     -days 365 -newkey rsa:2048 \
     -keyout tls.key -out tls.crt -subj <span class="token string">"/CN=nginxsvc/O=nginxsvc"</span>
+Generating a 2048 bit RSA private key
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>+++
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>+++
+writing new private key to <span class="token string">'tls.key'</span>
 
 <span class="token comment" spellcheck="true"># 在K8S中创建一个名称为tls-secret的secret格式的证书信息</span>
-$ kubectl create secret tls tls-secret --key tls.key --cert tls.crt<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ kubectl create secret tls tls-secret --key tls.key --cert tls.crt
+secret <span class="token string">"tls-secret"</span> created<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>Deployment/Service/Ingress</strong><ul>
 <li>我们这里可以使用 <code>kubectl apply -f ingress-https.yml</code> 来直接部署服务。</li>
@@ -965,6 +991,10 @@ $ kubectl create secret generic basic-auth --from-file<span class="token operato
                             
                                 <a href="/tags/Kubernetes/">
                                     <span class="chip bg-color">Kubernetes</span>
+                                </a>
+                            
+                                <a href="/tags/Ingress/">
+                                    <span class="chip bg-color">Ingress</span>
                                 </a>
                             
                         </div>
@@ -1423,7 +1453,7 @@ $ kubectl create secret generic basic-auth --from-file<span class="token operato
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1010.2k</span>&nbsp;字
+                class="white-color">1010.5k</span>&nbsp;字
             
             
             
