@@ -462,14 +462,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    4.2k
+                    4.6k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    18 分
+                    19 分
                 </div>
                 
 
@@ -534,8 +534,14 @@ how.nice.to.look<span class="token operator">=</span>fairlyNice
 $ kubectl create configmap game-config \
     --from-file<span class="token operator">=</span>docs/user-guide/config-map/kubectl
 
+<span class="token comment" spellcheck="true"># 查看存储的ConfigMap列表</span>
+$  kubectl get configmap
+NAME               DATA   AGE
+game-config        2      22s
+
 <span class="token comment" spellcheck="true"># 查看对应内容</span>
-$ kubectl get configmaps game-config-2 -o yaml<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ kubectl describe configmap game-config
+$ kubectl get configmap game-config -o yaml<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[2] 使用文件创建</strong></li>
 </ul>
@@ -544,8 +550,15 @@ $ kubectl get configmaps game-config-2 -o yaml<span aria-hidden="true" class="li
 $ kubectl create configmap game-config-2 \
     --from-file<span class="token operator">=</span>docs/user-guide/config-map/kubectl/game.properties
 
+<span class="token comment" spellcheck="true"># 查看存储的ConfigMap列表</span>
+$  kubectl get configmap
+NAME               DATA   AGE
+game-config        2      34s
+game-config-2      1      2s
+
 <span class="token comment" spellcheck="true"># 查看对应内容</span>
-$ kubectl get configmaps game-config-2 -o yaml<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ kubectl describe configmap game-config-2
+$ kubectl get configmap game-config-2 -o yaml<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[3] 使用字面值创建</strong></li>
 </ul>
@@ -632,10 +645,7 @@ $ kubectl get configmaps special-config -o yaml<span aria-hidden="true" class="l
           <span class="token key atrule">valueFrom</span><span class="token punctuation">:</span>
             <span class="token key atrule">configMapKeyRef</span><span class="token punctuation">:</span>
               <span class="token key atrule">name</span><span class="token punctuation">:</span> special<span class="token punctuation">-</span>config
-              <span class="token key atrule">key</span><span class="token punctuation">:</span> special.type
-      <span class="token key atrule">envFrom</span><span class="token punctuation">:</span>
-        <span class="token punctuation">-</span> <span class="token key atrule">configMapRef</span><span class="token punctuation">:</span>
-          <span class="token key atrule">name</span><span class="token punctuation">:</span> env<span class="token punctuation">-</span>config<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+              <span class="token key atrule">key</span><span class="token punctuation">:</span> special.type<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[3] 通过数据卷插件使用 ConfigMap</strong></li>
 </ul>
@@ -751,17 +761,15 @@ DEBUG<span aria-hidden="true" class="line-numbers-rows"><span></span><span></spa
 </ul>
 <hr>
 <h3 id="3-1-Service-Account"><a href="#3-1-Service-Account" class="headerlink" title="3.1 Service Account"></a>3.1 Service Account</h3><p><code>Service Account</code> 是用来访问 <code>Kubernetes API</code> 接口的，由 <code>Kubernetes</code> 自动创建和管理的，并且会自动挂载到 <code>Pod</code> 的 <code>/run/secrets/kubernetes.io/serviceaccount</code> 目录中。</p>
-<pre class="line-numbers language-bash"><code class="language-bash">$ kubectl run nginx --image nginx
-deployment <span class="token string">"nginx"</span> created
-
-$ kubectl get pods
+<pre class="line-numbers language-bash"><code class="language-bash">$ kubectl get pods -n kube-system
 NAME                    READY  STATUS   RESTARTS  AGE
-nginx-3137573019-md1u2  1/1    Running  0         13s
+kube-proxy-md1u2        1/1    Running  0         13d
 
-$ kubectl <span class="token function">exec</span> nginx-3137573019-md1u2 <span class="token function">ls</span> /run/secrets/kubernetes.io/serviceaccount
+$ kubectl <span class="token function">exec</span> kube-proxy-md1u2 -- \
+    <span class="token function">ls</span> /run/secrets/kubernetes.io/serviceaccount
 ca.crt
 namespace
-token<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+token<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="3-2-Opaque"><a href="#3-2-Opaque" class="headerlink" title="3.2 Opaque"></a>3.2 Opaque</h3><ul>
 <li><strong>[1] 创建说明</strong></li>
@@ -837,11 +845,19 @@ MWYyZDFlMmU2N2Rm<span aria-hidden="true" class="line-numbers-rows"><span></span>
 <h3 id="3-3-dockerconfigjson"><a href="#3-3-dockerconfigjson" class="headerlink" title="3.3 dockerconfigjson"></a>3.3 dockerconfigjson</h3><ul>
 <li>使用 <code>Kuberctl</code> 创建 <code>docker registry</code> 认证的 <code>secret</code>。</li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash">$ kubectl create secret docker-registry myregistrykey \
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 创建格式</span>
+$ kubectl create secret docker-registry myregistrykey \
     --docker-server<span class="token operator">=</span>DOCKER_REGISTRY_SERVER \
     --docker-username<span class="token operator">=</span>DOCKER_USER \
     --docker-password<span class="token operator">=</span>DOCKER_PASSWORD \
-    --docker-email<span class="token operator">=</span>DOCKER_EMAIL<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    --docker-email<span class="token operator">=</span>DOCKER_EMAIL
+
+<span class="token comment" spellcheck="true"># 示例演示</span>
+$ kubectl create secret docker-registry myregistrykey \
+    --docker-server<span class="token operator">=</span>hub.escape.com \
+    --docker-username<span class="token operator">=</span>admin \
+    --docker-password<span class="token operator">=</span>harbor123456 \
+    --docker-email<span class="token operator">=</span>harbor@escape.com<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>在创建 <code>Pod</code> 的时候，通过 <code>imagePullSecrets</code> 来引用刚创建的 <code>myregistrykey</code>。</li>
 </ul>
@@ -1026,43 +1042,65 @@ MWYyZDFlMmU2N2Rm<span aria-hidden="true" class="line-numbers-rows"><span></span>
 <p><strong>演示 NFS 模式下的持久化方案！</strong></p>
 </blockquote>
 <ul>
-<li><strong>[1] 安装 NFS 服务器</strong></li>
+<li><strong>[1] 安装 NFS 服务器端服务</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 安装相关工具</span>
 $ yum <span class="token function">install</span> -y nfs-common nfs-utils rpcbind
 
 <span class="token comment" spellcheck="true"># 创建共享目录</span>
-$ <span class="token function">mkdir</span> /nfsdata
-$ <span class="token function">chmod</span> 666 /nfsdata
-$ <span class="token function">chown</span> -R nfsnobody /nfsdata
+$ <span class="token function">mkdir</span> /nfs-data
+$ <span class="token function">chmod</span> -R 666 /nfs-data
+$ <span class="token function">chown</span> -R nfs-data /nfs-data
 
 <span class="token comment" spellcheck="true"># 配置挂载</span>
 $ <span class="token function">cat</span> /etc/exports
-/nfsdata    *<span class="token punctuation">(</span>rw,no_root_squash,no_all_squash,sync<span class="token punctuation">)</span>
+/nfs-data    *<span class="token punctuation">(</span>rw,no_root_squash,no_all_squash,sync<span class="token punctuation">)</span>
 
 <span class="token comment" spellcheck="true"># 重启服务生效</span>
 $ systemctl start rpcbind
 $ systemctl start nfs<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[2] 部署 PV</strong></li>
+<li><strong>[2] 安装 NFS 客户端服务</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 安装客户端工具</span>
+$ yum <span class="token function">install</span> -y nfs-common nfs-utils rpcbind
+
+<span class="token comment" spellcheck="true"># 查看服务端挂载地址</span>
+$ showmount -e 192.168.66.100
+/nfs-data    *
+
+<span class="token comment" spellcheck="true"># 尝试客户端手动挂载</span>
+$ <span class="token function">mkdir</span> -pv /test
+$ <span class="token function">mount</span> -t -nfs 192.168.66.100:/nfs-data /test/<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 部署 PV</strong></li>
 </ul>
 <pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
 <span class="token key atrule">kind</span><span class="token punctuation">:</span> PersistentVolume
 <span class="token key atrule">metadata</span><span class="token punctuation">:</span>
   <span class="token key atrule">name</span><span class="token punctuation">:</span> nfspv1
 <span class="token key atrule">spec</span><span class="token punctuation">:</span>
-  <span class="token key atrule">persistentVolumeReclaimPolicy</span><span class="token punctuation">:</span> Recycle
-  <span class="token key atrule">storageClassName</span><span class="token punctuation">:</span> nfs
+  <span class="token key atrule">persistentVolumeReclaimPolicy</span><span class="token punctuation">:</span> Retain
+  <span class="token comment" spellcheck="true"># 我们可以给PV起名字；比如高速/低速等</span>
+  <span class="token key atrule">storageClassName</span><span class="token punctuation">:</span> nfs<span class="token punctuation">-</span>fast
   <span class="token key atrule">accessModes</span><span class="token punctuation">:</span>
     <span class="token punctuation">-</span> ReadWriteOnce
   <span class="token key atrule">capacity</span><span class="token punctuation">:</span>
-    <span class="token key atrule">storage</span><span class="token punctuation">:</span> 1Gi
+    <span class="token key atrule">storage</span><span class="token punctuation">:</span> 10Gi
   <span class="token key atrule">nfs</span><span class="token punctuation">:</span>
-    <span class="token key atrule">path</span><span class="token punctuation">:</span> /data/nfs
-    <span class="token key atrule">server</span><span class="token punctuation">:</span> 10.66.66.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    <span class="token key atrule">path</span><span class="token punctuation">:</span> /nfs<span class="token punctuation">-</span>data
+    <span class="token key atrule">server</span><span class="token punctuation">:</span> 192.168.66.100<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看当前可用PV(我们这里多创建几个)</span>
+$ kubectl get <span class="token function">pv</span> -n default
+NAME      CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM    STORAGECLASS   REASON   AGE
+nfspv1    10Gi       RWO            Retain           Available            nfs-fast                3m
+nfspv2    5Gi        RWO            Retain           Available            nfs-fast                4m
+nfspv3    5Gi        RWO            Retain           Available            nfs-slow                5m
+nfspv4    1Gi        ROX            Retain           Available            nfs-fast                6m<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[3] 创建服务并使用 PVC</strong></li>
+<li><strong>[4] 创建服务并使用 PVC</strong></li>
 </ul>
+<p>通过如下配置文件，我们创建了三个 <code>Nginx</code> 的副本。但是，观察发现只有一个 <code>web-0</code> 的 <code>POD</code> 绑定到了属于自己的 <code>PV</code> 数据存储，而 <code>web-2</code> 显示没有符合自己要求的 <code>PV</code>，而后续的 <code>POD</code> 压根都没有开始创建。</p>
 <pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
 <span class="token key atrule">kind</span><span class="token punctuation">:</span> Service
 <span class="token key atrule">metadata</span><span class="token punctuation">:</span>
@@ -1111,6 +1149,13 @@ $ systemctl start nfs<span aria-hidden="true" class="line-numbers-rows"><span></
         <span class="token key atrule">resources</span><span class="token punctuation">:</span>
           <span class="token key atrule">requests</span><span class="token punctuation">:</span>
             <span class="token key atrule">storage</span><span class="token punctuation">:</span> 1Gi<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看当前可用PV(我们这里多创建几个)</span>
+$ kubectl get <span class="token function">pv</span> -n default
+NAME      CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM                STORAGECLASS   REASON   AGE
+nfspv1    10Gi       RWO            Retain           Bound       default/www-web-0    nfs-fast                3m
+nfspv2    5Gi        RWO            Retain           Available                        nfs-fast                4m
+nfspv3    5Gi        RWO            Retain           Available                        nfs-slow                5m
+nfspv4    1Gi        ROX            Retain           Available                        nfs-fast                6m<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="5-4-注意事项"><a href="#5-4-注意事项" class="headerlink" title="5.4 注意事项"></a>5.4 注意事项</h3><blockquote>
 <p><strong>主要讨论关于 StatefulSet 的使用和注意细节！</strong></p>
@@ -1404,62 +1449,6 @@ $ systemctl start nfs<span aria-hidden="true" class="line-numbers-rows"><span></
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/posts/8c0f83d.html">
-                    <div class="card-image">
-                        
-                        <img src="/images/learn-pssh-command.png" class="responsive-img" alt="ParallelSSH系列工具介绍">
-                        
-                        <span class="card-title">ParallelSSH系列工具介绍</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            
-                        
-                    </div>
-                    <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2020-03-09
-                        </span>
-                        <span class="publish-author">
-                            
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/Tools工具分享/" class="post-category">
-                                    Tools工具分享
-                                </a>
-                            
-                            
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/Linux/">
-                        <span class="chip bg-color">Linux</span>
-                    </a>
-                    
-                    <a href="/tags/Pssh/">
-                        <span class="chip bg-color">Pssh</span>
-                    </a>
-                    
-                    <a href="/tags/SSH/">
-                        <span class="chip bg-color">SSH</span>
-                    </a>
-                    
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
-            </div>
-            <div class="card">
                 <a href="/posts/a0392184.html">
                     <div class="card-image">
                         
@@ -1475,9 +1464,9 @@ $ systemctl start nfs<span aria-hidden="true" class="line-numbers-rows"><span></
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2020-03-09
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2020-03-09
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -1495,6 +1484,54 @@ $ systemctl start nfs<span aria-hidden="true" class="line-numbers-rows"><span></
                     
                     <a href="/tags/Kubernetes/">
                         <span class="chip bg-color">Kubernetes</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/posts/ee046162.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/it-outsourcing-models.jpg" class="responsive-img" alt="对将进入外包公司的你说不">
+                        
+                        <span class="card-title">对将进入外包公司的你说不</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-03-07
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Wen文所未闻/" class="post-category">
+                                    Wen文所未闻
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Essays/">
+                        <span class="chip bg-color">Essays</span>
                     </a>
                     
                 </div>
@@ -1697,7 +1734,7 @@ $ systemctl start nfs<span aria-hidden="true" class="line-numbers-rows"><span></
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1014.7k</span>&nbsp;字
+                class="white-color">1015k</span>&nbsp;字
             
             
             
