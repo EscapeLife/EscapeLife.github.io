@@ -455,21 +455,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-01-10
+                    2021-01-12
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.9k
+                    3.4k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    12 分
+                    13 分
                 </div>
                 
 
@@ -532,7 +532,7 @@
 </li>
 <li><p><strong>安全性说明</strong></p>
 <ul>
-<li><code>Controller Manager</code>、Scheduler<code>与</code>API Server<code>在同一台机器，所以直接使用</code>API Server<code>的非安全端口访问，</code>–insecure-bind-address=127.0.0.1`</li>
+<li><code>Controller Manager</code>、<code>Scheduler</code> 与 <code>API Server</code> 在同一台机器，所以直接使用 <code>API Server</code> 的非安全端口访问，<code>--insecure-bind-address=127.0.0.1</code></li>
 <li><code>kubectl</code>、<code>kubelet</code>、<code>kube-proxy</code> 访问 <code>API Server</code> 就都需要证书进行 <code>HTTPS</code> 双向认证</li>
 </ul>
 </li>
@@ -548,6 +548,26 @@
 <li><strong>[3] kubeconfig</strong></li>
 </ul>
 <p><code>kubeconfig</code> 文件包含集群参数（<code>CA</code> 证书、<code>API Server</code> 地址），客户端参数（上面生成的证书和私钥），集群 <code>context</code> 信息（集群名称、用户名）。<code>Kubenetes</code> 组件通过启动时指定不同的 <code>kubeconfig</code> 文件可以切换到不同的集群。</p>
+<p>我们可以简单理解为，<code>kubeconfig</code> 文件就是一个认证函，其中包含了访问服务的信息以及用于认证的信息。默认会在家目录下创建一个隐藏的 <code>.kube/config</code> 目录，对应 <code>kubeconfig</code> 文件就在这里保存着。</p>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> Config <span class="token comment" spellcheck="true"># 类型</span>
+<span class="token key atrule">clusters</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">cluster</span><span class="token punctuation">:</span>
+      <span class="token key atrule">certificate-authority-data</span><span class="token punctuation">:</span> LSxxQo= <span class="token comment" spellcheck="true"># 集群认证信息</span>
+      <span class="token key atrule">server</span><span class="token punctuation">:</span> https<span class="token punctuation">:</span>//192.168.66.10<span class="token punctuation">:</span><span class="token number">6443 </span><span class="token comment" spellcheck="true"># 服务器地址信息</span>
+    <span class="token key atrule">name</span><span class="token punctuation">:</span> kubernetes
+<span class="token key atrule">contexts</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">context</span><span class="token punctuation">:</span>
+      <span class="token key atrule">cluster</span><span class="token punctuation">:</span> kubernetes
+      <span class="token key atrule">user</span><span class="token punctuation">:</span> kubernetes<span class="token punctuation">-</span>admin
+    <span class="token key atrule">name</span><span class="token punctuation">:</span> kubernetes<span class="token punctuation">-</span>admin@kubernetes
+<span class="token key atrule">current-context</span><span class="token punctuation">:</span> kubernetes<span class="token punctuation">-</span>admin@kubernetes <span class="token comment" spellcheck="true"># 当前的集群</span>
+<span class="token key atrule">preferences</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token key atrule">users</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> kubernetes<span class="token punctuation">-</span>admin <span class="token comment" spellcheck="true"># 当前的用户名</span>
+    <span class="token key atrule">user</span><span class="token punctuation">:</span>
+      <span class="token key atrule">client-certificate-data</span><span class="token punctuation">:</span> LSxxQo= <span class="token comment" spellcheck="true"># 客户端证书</span>
+      <span class="token key atrule">client-key-data</span><span class="token punctuation">:</span> LSxxQo= <span class="token comment" spellcheck="true"># 客户端私钥</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[4] ServiceAccount</strong></li>
 </ul>
@@ -561,8 +581,9 @@
 <li><code>ca.crt</code> 根证书。用于 <code>Client</code> 端验证 <code>API Server</code> 发送的证书。</li>
 <li><code>namespace</code> 标识这个 <code>service-account-token</code> 的作用域名空间。</li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash">$ kubectl get secret --all-namespaces
-$ kubectl describe secret default-token-5gm9r --namespace<span class="token operator">=</span>kube-system<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># /run/secrests/kubenetes.io/serviceaccount</span>
+$ kubectl get secret --all-namespaces
+$ kubectl describe secret default-token-5gm9r --namespace<span class="token operator">=</span>kube-system<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
 <ul>
 <li><strong>总结</strong></li>
@@ -572,23 +593,23 @@ $ kubectl describe secret default-token-5gm9r --namespace<span class="token oper
 <h2 id="4-RBAC"><a href="#4-RBAC" class="headerlink" title="4. RBAC"></a>4. RBAC</h2><p>上面认证过程，只是确认通信的双方都确认了对方是可信的，可以相互通信。而鉴权是确定请求方有哪些资源的权限。<code>API Server</code> 目前支持以下几种授权策略。通过 <code>API Server</code> 的启动参数 <code>--authorization-mode</code> 设置。</p>
 <ul>
 <li><strong><code>AlwaysDeny</code></strong><ul>
-<li>表示拒绝所有的请求，一般用于测试</li>
+<li>表示拒绝所有的请求，一般用于测试。</li>
 </ul>
 </li>
 <li><strong><code>AlwaysAllow</code></strong><ul>
-<li>允许接收所有请求，如果集群不需要授权流程，则可以采用该策略</li>
+<li>允许接收所有请求，如果集群不需要授权流程，则可以采用该策略。</li>
 </ul>
 </li>
 <li><strong><code>ABAC（Attribute-Based Access Control）</code></strong><ul>
-<li>基于属性的访问控制，表示使用用户配置的授权规则对用户请求进行匹配和控制</li>
+<li>基于属性的访问控制，表示使用用户配置的授权规则对用户请求进行匹配和控制(已废弃)。</li>
 </ul>
 </li>
 <li><strong><code>Webbook</code></strong><ul>
-<li>通过调用外部 REST 服务对用户进行授权</li>
+<li>通过调用外部 <code>REST</code> 服务对用户进行授权。</li>
 </ul>
 </li>
 <li><strong><code>RBAC（Role-Based Access Control）</code></strong><ul>
-<li>基于角色的访问控制，现行默认规则</li>
+<li>基于角色的访问控制，现行默认规则(通常策略)。</li>
 </ul>
 </li>
 </ul>
@@ -596,12 +617,13 @@ $ kubectl describe secret default-token-5gm9r --namespace<span class="token oper
 <h3 id="4-1-RBAC-授权模式"><a href="#4-1-RBAC-授权模式" class="headerlink" title="4.1 RBAC 授权模式"></a>4.1 RBAC 授权模式</h3><p><code>RBAC</code>（<code>Role-Based Access Control</code>）基于角色的访问控制，在 <code>Kubernetes 1.5</code> 中引入，现行版本成为默认标准。相对其它访问控制方式，拥有以下优势：</p>
 <ul>
 <li>对集群中的资源和非资源均拥有完整的覆盖</li>
+<li>可以在运行时进行调整，无需重启 <code>API Server</code> 服务</li>
 <li>整个 <code>RBAC</code> 完全由几个 <code>API</code> 对象完成，同其它 <code>API</code> 对象一样，可以用 <code>kubectl</code> 或 <code>API</code> 进行操作</li>
-<li>可以在运行时进行调整，无需重启 <code>API Server</code></li>
 </ul>
 <p><code>RBAC</code> 引入了 <code>4</code> 个新的顶级资源对象：<code>Role</code>、<code>ClusterRole</code>、<code>RoleBinding</code>、<code>ClusterRoleBinding</code>，<code>4</code> 种对象类型均可以通过 <code>kubectl</code> 与 <code>API</code> 操作。</p>
 <p><img src="../images/kubernetes-cluster-security-06.png" alt="Kubernetes之集群安全机制 - RBAC"></p>
 <p>需要注意的是 <code>Kubernetes</code> 并不会提供用户管理，那么 <code>User</code>、<code>Group</code>、<code>ServiceAccount</code> 指定的用户又是从哪里来的呢？<code>Kubernetes</code> 组件（<code>kubectl</code>、<code>kube-proxy</code>）或是其他自定义的用户在向 <code>CA</code> 申请证书时，需要提供一个证书请求文件。</p>
+<p>而在这个文件中就定义了对应的用户和组，<code>CN</code> 定义用户，<code>name.O</code> 定义了组。当 <code>K8S</code> 读取证书信息的时候，会自动把这个两个信息提取出来，当做用户名和组。</p>
 <pre class="line-numbers language-json"><code class="language-json"><span class="token punctuation">{</span>
   <span class="token property">"CN"</span><span class="token operator">:</span> <span class="token string">"admin"</span><span class="token punctuation">,</span>
   <span class="token property">"hosts"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
@@ -621,24 +643,25 @@ $ kubectl describe secret default-token-5gm9r --namespace<span class="token oper
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><code>API Server</code> 会把客户端证书的 <code>CN</code> 字段作为 <code>User</code>，把 <code>names.O</code> 字段作为 <code>Group</code>。<code>kubelet</code> 使用 <code>TLS Bootstaping</code> 认证时，<code>API Server</code> 可以使用 <code>Bootstrap Tokens</code> 或者 <code>Token authentication file</code> 验证 <code>=token</code>，无论哪一种，<code>Kubernetes</code> 都会为 <code>token</code> 绑定一个默认的 <code>User</code> 和 <code>Group Pod</code> 使用 <code>ServiceAccount</code> 认证时，<code>service-account-token</code> 中的 <code>JWT</code> 会保存 <code>User</code> 信息有了用户信息，再创建一对角色/角色绑定(集群角色/集群角色绑定)资源对象，就可以完成权限绑定了。</p>
 <hr>
-<h3 id="4-2-Role-and-ClusterRole"><a href="#4-2-Role-and-ClusterRole" class="headerlink" title="4.2 Role and ClusterRole"></a>4.2 Role and ClusterRole</h3><p>在 RBAC API 中，Role 表示一组规则权限，权限只会增加(累加权限)，不存在一个资源一开始就有很多权限而通过 RBAC 对其进行减少的操作；Role 可以定义在一个 namespace 中，如果想要跨 namespace 则可以创建 ClusterRole。</p>
-<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">kind</span><span class="token punctuation">:</span> Role
-<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> rbac.authorization.k8s.io/v1beta1
+<h3 id="4-2-Role-and-ClusterRole"><a href="#4-2-Role-and-ClusterRole" class="headerlink" title="4.2 Role and ClusterRole"></a>4.2 Role and ClusterRole</h3><p>在 <code>RBAC API</code> 中，<code>Role</code> 表示一组规则权限，权限只会增加(累加权限)，不存在一个资源一开始就有很多权限而通过 <code>RBAC</code> 对其进行减少的操作；<code>Role</code> 可以定义在一个 <code>namespace</code> 中，如果想要跨 <code>namespace</code> 则可以创建 <code>ClusterRole</code>，在创建 <code>ClusterRole</code> 的过程中不需要我们指定名称空间。</p>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> rbac.authorization.k8s.io/v1beta1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> Role
 <span class="token key atrule">metadata</span><span class="token punctuation">:</span>
-  <span class="token key atrule">namespace</span><span class="token punctuation">:</span> default
-  <span class="token key atrule">name</span><span class="token punctuation">:</span> pod<span class="token punctuation">-</span>reader
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> pod<span class="token punctuation">-</span>reader <span class="token comment" spellcheck="true"># 指定用户名称</span>
+  <span class="token key atrule">namespace</span><span class="token punctuation">:</span> default <span class="token comment" spellcheck="true"># 指定组名称</span>
 <span class="token key atrule">rules</span><span class="token punctuation">:</span>
-  <span class="token punctuation">-</span> <span class="token key atrule">apiGroups</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">""</span><span class="token punctuation">]</span> <span class="token comment" spellcheck="true"># "" indicates the core API group</span>
-    <span class="token key atrule">resources</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"pods"</span><span class="token punctuation">]</span>
-    <span class="token key atrule">verbs</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"get"</span><span class="token punctuation">,</span> <span class="token string">"watch"</span><span class="token punctuation">,</span> <span class="token string">"list"</span><span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>ClusterRole 具有与 Role 相同的权限角色控制能力，不同的是 ClusterRole 是集群级别的，ClusterRole 可以用于:</p>
+  <span class="token comment" spellcheck="true"># 指定pod-reader使用apiGroups组和版本</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">apiGroups</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">""</span><span class="token punctuation">]</span> <span class="token comment" spellcheck="true"># 省略为空的话则是coreAPI的核心组</span>
+    <span class="token key atrule">resources</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"pods"</span><span class="token punctuation">]</span> <span class="token comment" spellcheck="true"># 制定资源对象</span>
+    <span class="token key atrule">verbs</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"get"</span><span class="token punctuation">,</span> <span class="token string">"watch"</span><span class="token punctuation">,</span> <span class="token string">"list"</span><span class="token punctuation">]</span> <span class="token comment" spellcheck="true"># 设置对应的权限</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>ClusterRole</code> 具有与 <code>Role</code> 相同的权限角色控制能力，不同的是 <code>ClusterRole</code> 是集群级别的，<code>ClusterRole</code> 可以用于:</p>
 <ul>
-<li>集群级别的资源控制( 例如 node 访问权限 )</li>
-<li>非资源型 endpoints( 例如 /healthz 访问 )</li>
-<li>所有命名空间资源控制(例如 pods )</li>
+<li>集群级别的资源控制(例如 <code>node</code> 访问权限)</li>
+<li>非资源型 <code>endpoints</code>(例如 <code>/healthz</code> 访问)</li>
+<li>所有命名空间资源控制(例如 <code>pods</code>)</li>
 </ul>
-<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">kind</span><span class="token punctuation">:</span> ClusterRole
-<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> rbac.authorization.k8s.io/v1beta1
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> rbac.authorization.k8s.io/v1beta1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> ClusterRole
 <span class="token key atrule">metadata</span><span class="token punctuation">:</span>
   <span class="token key atrule">name</span><span class="token punctuation">:</span> secret<span class="token punctuation">-</span>reader
 <span class="token key atrule">rules</span><span class="token punctuation">:</span>
@@ -646,9 +669,9 @@ $ kubectl describe secret default-token-5gm9r --namespace<span class="token oper
     <span class="token key atrule">resources</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"secrets"</span><span class="token punctuation">]</span>
     <span class="token key atrule">verbs</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"get"</span><span class="token punctuation">,</span> <span class="token string">"watch"</span><span class="token punctuation">,</span> <span class="token string">"list"</span><span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h3 id="4-3-RoleBinding-and-ClusterRoleBinding"><a href="#4-3-RoleBinding-and-ClusterRoleBinding" class="headerlink" title="4.3 RoleBinding and ClusterRoleBinding"></a>4.3 RoleBinding and ClusterRoleBinding</h3><p>RoloBinding 可以将角色中定义的权限授予用户或用户组，RoleBinding 包含一组权限列表(subjects)，权限列表中包含有不同形式的待授予权限资源类型(users, groups, or service accounts)；RoloBinding 同样包含对被 Bind 的 Role 引用；RoleBinding 适用于某个命名空间内授权，而 ClusterRoleBinding 适用于集群范围内的授权。将 default 命名空间的 pod-reader Role 授予 jane 用户，此后 jane 用户在 default 命名空间中将具有 pod-reader 的权限。</p>
-<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">kind</span><span class="token punctuation">:</span> RoleBinding
-<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> rbac.authorization.k8s.io/v1beta1
+<h3 id="4-3-RoleBinding-and-ClusterRoleBinding"><a href="#4-3-RoleBinding-and-ClusterRoleBinding" class="headerlink" title="4.3 RoleBinding and ClusterRoleBinding"></a>4.3 RoleBinding and ClusterRoleBinding</h3><p><code>RoloBinding</code> 可以将角色中定义的权限授予用户或用户组，<code>RoleBinding</code> 包含一组权限列表(<code>subjects</code>)，权限列表中包含有不同形式的待授予权限资源类型(<code>users</code>, <code>groups</code>, or <code>service accounts</code>)；<code>RoloBinding</code> 同样包含对被 <code>Bind</code> 的 <code>Role</code> 引用；<code>RoleBinding</code> 适用于某个命名空间内授权，而 <code>ClusterRoleBinding</code> 适用于集群范围内的授权。将 <code>default</code> 命名空间的 <code>pod-reader Role</code> 授予 <code>jane</code> 用户，此后 <code>jane</code> 用户在 <code>default</code> 命名空间中将具有 <code>pod-reader</code> 的权限。</p>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> rbac.authorization.k8s.io/v1beta1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> RoleBinding
 <span class="token key atrule">metadata</span><span class="token punctuation">:</span>
   <span class="token key atrule">name</span><span class="token punctuation">:</span> read<span class="token punctuation">-</span>pods
   <span class="token key atrule">namespace</span><span class="token punctuation">:</span> default
@@ -660,14 +683,13 @@ $ kubectl describe secret default-token-5gm9r --namespace<span class="token oper
   <span class="token key atrule">kind</span><span class="token punctuation">:</span> Role
   <span class="token key atrule">name</span><span class="token punctuation">:</span> pod<span class="token punctuation">-</span>reader
   <span class="token key atrule">apiGroup</span><span class="token punctuation">:</span> rbac.authorization.k8s.io<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>RoleBinding 同样可以引用 ClusterRole 来对当前 namespace 内用户、用户组或 ServiceAccount 进行授权，这种操作允许集群管理员在整个集群内定义一些通用的 ClusterRole，然后在不同的 namespace 中使用 RoleBinding 来引用。</p>
-<p>例如，以下 RoleBinding 引用了一个 ClusterRole，这个 ClusterRole 具有整个集群内对 secrets 的访问权限；但是其授权用户 dave 只 2 能访问 development 空间中的 secrets(因为 RoleBinding 定义在 development 命名空间)。</p>
-<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token comment" spellcheck="true"># This role binding allows "dave" to read secrets in the "development" namespace.</span>
+<p><code>RoleBinding</code> 同样可以引用 <code>ClusterRole</code> 来对当前 <code>namespace</code> 内用户、用户组或 <code>ServiceAccount</code> 进行授权，这种操作允许集群管理员在整个集群内定义一些通用的 <code>ClusterRole</code>，然后在不同的 <code>namespace</code> 中使用 <code>RoleBinding</code> 来引用。</p>
+<p>例如，以下 <code>RoleBinding</code> 引用了一个 <code>ClusterRole</code>，这个 <code>ClusterRole</code> 具有整个集群内对 <code>secrets</code> 的访问权限；但是其授权用户 <code>dave</code> 只 <code>2</code> 能访问 <code>development</code> 空间中的 <code>secrets</code>(因为 <code>RoleBinding</code> 定义在 <code>development</code> 命名空间)。</p>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> rbac.authorization.k8s.io/v1beta1
 <span class="token key atrule">kind</span><span class="token punctuation">:</span> RoleBinding
-<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> rbac.authorization.k8s.io/v1beta1
 <span class="token key atrule">metadata</span><span class="token punctuation">:</span>
   <span class="token key atrule">name</span><span class="token punctuation">:</span> read<span class="token punctuation">-</span>secrets
-  <span class="token key atrule">namespace</span><span class="token punctuation">:</span> development <span class="token comment" spellcheck="true"># This only grants permissions within the "development" namespace.</span>
+  <span class="token key atrule">namespace</span><span class="token punctuation">:</span> development
 <span class="token key atrule">subjects</span><span class="token punctuation">:</span>
   <span class="token punctuation">-</span> <span class="token key atrule">kind</span><span class="token punctuation">:</span> User
     <span class="token key atrule">name</span><span class="token punctuation">:</span> dave
@@ -675,11 +697,10 @@ $ kubectl describe secret default-token-5gm9r --namespace<span class="token oper
 <span class="token key atrule">roleRef</span><span class="token punctuation">:</span>
   <span class="token key atrule">kind</span><span class="token punctuation">:</span> ClusterRole
   <span class="token key atrule">name</span><span class="token punctuation">:</span> secret<span class="token punctuation">-</span>reader
-  <span class="token key atrule">apiGroup</span><span class="token punctuation">:</span> rbac.authorization.k8s.io<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>使用 ClusterRoleBinding 可以对整个集群中的所有命名空间资源权限进行授权；以下 ClusterRoleBinding 样例展示了授权 manager 组内所有用户在全部命名空间中对 secrets 进行访问。</p>
-<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token comment" spellcheck="true"># This cluster role binding allows anyone in the "manager" group to read secrets in any namespace.</span>
+  <span class="token key atrule">apiGroup</span><span class="token punctuation">:</span> rbac.authorization.k8s.io<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>使用 <code>ClusterRoleBinding</code> 可以对整个集群中的所有命名空间资源权限进行授权；以下 <code>ClusterRoleBinding</code> 样例展示了授权 <code>manager</code> 组内所有用户在全部命名空间中对 <code>secrets</code> 进行访问。</p>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> rbac.authorization.k8s.io/v1beta1
 <span class="token key atrule">kind</span><span class="token punctuation">:</span> ClusterRoleBinding
-<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> rbac.authorization.k8s.io/v1beta1
 <span class="token key atrule">metadata</span><span class="token punctuation">:</span>
   <span class="token key atrule">name</span><span class="token punctuation">:</span> read<span class="token punctuation">-</span>secrets<span class="token punctuation">-</span>global
 <span class="token key atrule">subjects</span><span class="token punctuation">:</span>
@@ -689,45 +710,64 @@ $ kubectl describe secret default-token-5gm9r --namespace<span class="token oper
 <span class="token key atrule">roleRef</span><span class="token punctuation">:</span>
   <span class="token key atrule">kind</span><span class="token punctuation">:</span> ClusterRole
   <span class="token key atrule">name</span><span class="token punctuation">:</span> secret<span class="token punctuation">-</span>reader
-  <span class="token key atrule">apiGroup</span><span class="token punctuation">:</span> rbac.authorization.k8s.io<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+  <span class="token key atrule">apiGroup</span><span class="token punctuation">:</span> rbac.authorization.k8s.io<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h3 id="4-4-Resources"><a href="#4-4-Resources" class="headerlink" title="4.4 Resources"></a>4.4 Resources</h3><p>Kubernetes 集群内一些资源一般以其名称字符串来表示，这些字符串一般会在 API 的 URL 地址中出现；同时某些资源也会包含子资源，例如 logs 资源就属于 pods 的子资源，API 中 URL 样例如下。</p>
+<h3 id="4-4-Resources"><a href="#4-4-Resources" class="headerlink" title="4.4 Resources"></a>4.4 Resources</h3><p><code>Kubernetes</code> 集群内一些资源一般以其名称字符串来表示，这些字符串一般会在 <code>API</code> 的 <code>URL</code> 地址中出现；同时某些资源也会包含子资源，例如 <code>logs</code> 资源就属于 <code>pods</code> 的子资源，<code>API</code> 中 <code>URL</code> 样例如下。</p>
 <pre class="line-numbers language-bash"><code class="language-bash">GET /api/v1/namespaces/<span class="token punctuation">{</span>namespace<span class="token punctuation">}</span>/pods/<span class="token punctuation">{</span>name<span class="token punctuation">}</span>/log<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>如果要在 RBAC 授权模型中控制这些子资源的访问权限，可以通过 / 分隔符来实现，以下是一个定义 pods 资资源 logs 访问权限的 Role 定义样例。</p>
-<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">kind</span><span class="token punctuation">:</span> Role
-<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> rbac.authorization.k8s.io/v1beta
+<p>如果要在 <code>RBAC</code> 授权模型中控制这些子资源的访问权限，可以通过 <code>/</code> 分隔符来实现，以下是一个定义 <code>pods</code> 资资源 <code>logs</code> 访问权限的 <code>Role</code> 定义样例。</p>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> rbac.authorization.k8s.io/v1beta
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> Role
 <span class="token key atrule">metadata</span><span class="token punctuation">:</span>
   <span class="token key atrule">name</span><span class="token punctuation">:</span> pod<span class="token punctuation">-</span>and<span class="token punctuation">-</span>pod<span class="token punctuation">-</span>logs<span class="token punctuation">-</span>reader
   <span class="token key atrule">namespace</span><span class="token punctuation">:</span> default
 <span class="token key atrule">rules</span><span class="token punctuation">:</span>
   <span class="token punctuation">-</span> <span class="token key atrule">apiGroups</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">""</span><span class="token punctuation">]</span>
-    <span class="token key atrule">resources</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"pods/log"</span><span class="token punctuation">]</span>
+    <span class="token key atrule">resources</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"pods"</span><span class="token punctuation">,</span> pods/log"<span class="token punctuation">]</span>
     <span class="token key atrule">verbs</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"get"</span><span class="token punctuation">,</span> <span class="token string">"list"</span><span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h3 id="4-5-to-Subjects"><a href="#4-5-to-Subjects" class="headerlink" title="4.5 to Subjects"></a>4.5 to Subjects</h3><p>RoleBinding 和 ClusterRoleBinding 可以将 Role 绑定到 Subjects；Subjects 可以是 groups、users 或者 service accounts。</p>
-<p>Subjects 中 Users 使用字符串表示，它可以是一个普通的名字字符串，如 “alice”；也可以是 email 格式的邮箱地址，如 “<a href="mailto:wangyanglinux@163.com" target="_blank" rel="noopener">wangyanglinux@163.com</a>”；甚至是一组字符串形式的数字 ID 。但是 Users 的前缀 system: 是系统保留的，集群管理员应该确保普通用户不会使用这个前缀格式。</p>
-<p>Groups 书写格式与 Users 相同，都为一个字符串，并且没有特定的格式要求；同样 system: 前缀为系统保留。</p>
+<h3 id="4-5-to-Subjects"><a href="#4-5-to-Subjects" class="headerlink" title="4.5 to Subjects"></a>4.5 to Subjects</h3><p><code>RoleBinding</code> 和 <code>ClusterRoleBinding</code> 可以将 <code>Role</code> 绑定到 <code>Subjects</code>；<code>Subjects</code> 可以是 <code>groups</code>、<code>users</code> 或者 <code>service accounts</code>。</p>
+<p><code>Subjects</code> 中 <code>Users</code> 使用字符串表示，它可以是一个普通的名字字符串，如 <code>“alice”</code>；也可以是 <code>email</code> 格式的邮箱地址，如 <code>“escape@163.com”</code>；甚至是一组字符串形式的数字 <code>ID</code>。但是 <code>Users</code> 的前缀 <code>system:</code> 是系统保留的，集群管理员应该确保普通用户不会使用这个前缀格式。<code>Groups</code> 书写格式与 <code>Users</code> 相同，都为一个字符串，并且没有特定的格式要求；同样 <code>system:</code> 前缀为系统保留。</p>
 <hr>
 <h3 id="4-6-实践演示"><a href="#4-6-实践演示" class="headerlink" title="4.6 实践演示"></a>4.6 实践演示</h3><blockquote>
 <p><strong>实践：创建一个用户只能管理 dev 空间</strong></p>
 </blockquote>
-<pre class="line-numbers language-json"><code class="language-json"><span class="token punctuation">{</span>
-  <span class="token property">"CN"</span><span class="token operator">:</span> <span class="token string">"devuser"</span><span class="token punctuation">,</span>
-  <span class="token property">"hosts"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+<ul>
+<li><strong>[1] 创建 <code>devuser</code> 用户</strong><ul>
+<li><code>k8s</code> 默认不会帮助我们创建用户(手动执行)</li>
+<li>下述所有操作均在 <code>devuser</code> 用户下面</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> <span class="token function">useradd</span> devuser
+$ <span class="token function">sudo</span> <span class="token function">passwd</span> devuser<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 创建 <code>devuser</code> 的证书请求文件</strong><ul>
+<li>用户名称: <code>devuser</code>；组: <code>k8s</code></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-json"><code class="language-json"># devuser-csr.json
+
+<span class="token punctuation">{</span>
+  <span class="token property">"CN"</span><span class="token operator">:</span> <span class="token string">"devuser"</span><span class="token punctuation">,</span> # 用户名称
+  <span class="token property">"hosts"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> # 表明可以使用的主机；默认为空表示所有主机
   <span class="token property">"key"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"algo"</span><span class="token operator">:</span> <span class="token string">"rsa"</span><span class="token punctuation">,</span>
-    <span class="token property">"size"</span><span class="token operator">:</span> <span class="token number">2048</span>
+    <span class="token property">"algo"</span><span class="token operator">:</span> <span class="token string">"rsa"</span><span class="token punctuation">,</span> # 加密类型
+    <span class="token property">"size"</span><span class="token operator">:</span> <span class="token number">2048</span> # 加密长度
   <span class="token punctuation">}</span><span class="token punctuation">,</span>
   <span class="token property">"names"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
     <span class="token punctuation">{</span>
       <span class="token property">"C"</span><span class="token operator">:</span> <span class="token string">"CN"</span><span class="token punctuation">,</span>
       <span class="token property">"ST"</span><span class="token operator">:</span> <span class="token string">"BeiJing"</span><span class="token punctuation">,</span>
       <span class="token property">"L"</span><span class="token operator">:</span> <span class="token string">"BeiJing"</span><span class="token punctuation">,</span>
-      <span class="token property">"O"</span><span class="token operator">:</span> <span class="token string">"k8s"</span><span class="token punctuation">,</span>
+      <span class="token property">"O"</span><span class="token operator">:</span> <span class="token string">"k8s"</span><span class="token punctuation">,</span> # 组
       <span class="token property">"OU"</span><span class="token operator">:</span> <span class="token string">"System"</span>
     <span class="token punctuation">}</span>
   <span class="token punctuation">]</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 生成 <code>devuser</code> 的证书请求相关文件</strong></li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 下载证书生成工具</span>
 $ <span class="token function">wget</span> https://pkg.cfssl.org/R1.2/cfssl_linux-amd
 $ <span class="token function">mv</span> cfssl_linux-amd64 /usr/local/bin/cfssl
@@ -736,36 +776,46 @@ $ <span class="token function">mv</span> cfssljson_linux-amd64 /usr/local/bin/cf
 $ <span class="token function">wget</span> https://pkg.cfssl.org/R1.2/cfssl-certinfo_linux-amd
 $ <span class="token function">mv</span> cfssl-certinfo_linux-amd64 /usr/local/bin/cfssl-certinfo
 
-$ cfssl gencert -ca<span class="token operator">=</span>ca.crt -ca-key<span class="token operator">=</span>ca.key -profile<span class="token operator">=</span>kubernetes /root/devuser-csr.json <span class="token operator">|</span> cfssljson
--bare devuser
-
-<span class="token comment" spellcheck="true"># 设置集群参数</span>
-$ <span class="token function">export</span> KUBE_APISERVER<span class="token operator">=</span><span class="token string">"https://172.20.0.113:6443"</span>
+<span class="token comment" spellcheck="true"># 创建请求证书</span>
+<span class="token comment" spellcheck="true"># 会自动生成devuser.csr(证书请求)和devuser-key.pem(证书私钥)文件</span>
+$ <span class="token function">cd</span> /etc/kubernetes/pki
+$ cfssl gencert -ca<span class="token operator">=</span>ca.crt -ca-key<span class="token operator">=</span>ca.key -profile<span class="token operator">=</span>kubernetes \
+    /root/devuser-csr.json <span class="token operator">|</span> cfssljson -bare devuser<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] 设置集群参数生成 <code>kubeconfig</code> 文件</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 设置集群参数生成kubeconfig文件(devuser.kubeconfig)</span>
+<span class="token comment" spellcheck="true"># set-cluster: 设置集群名称</span>
+<span class="token comment" spellcheck="true"># certificate-authority: 指定请求</span>
+$ <span class="token function">cd</span> /home/devuser
+$ <span class="token function">export</span> KUBE_APISERVER<span class="token operator">=</span><span class="token string">"https://192.168.66.10:6443"</span>
 $ kubectl config set-cluster kubernetes \
-    --certificate-authority<span class="token operator">=</span>/etc/kubernetes/ssl/ca.pem \
+    --certificate-authority<span class="token operator">=</span>/etc/kubernetes/pki/ca.crt \
     --embed-certs<span class="token operator">=</span>true \
     --server<span class="token operator">=</span><span class="token variable">${KUBE_APISERVER}</span> \
-    --kubeconfig<span class="token operator">=</span>devuser.kubeconfig
-
-<span class="token comment" spellcheck="true"># 设置客户端认证参数</span>
+    --kubeconfig<span class="token operator">=</span>devuser.kubeconfig<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] 设置客户端认证/上下文参数</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 设置客户端认证</span>
 $ kubectl config set-credentials devuser \
-    --client-certificate<span class="token operator">=</span>/etc/kubernetes/ssl/devuser.pem \
-    --client-key<span class="token operator">=</span>/etc/kubernetes/ssl/devuser-key.pem \
+    --client-certificate<span class="token operator">=</span>/etc/kubernetes/pki/devuser.pem \
+    --client-key<span class="token operator">=</span>/etc/kubernetes/pki/devuser-key.pem \
     --embed-certs<span class="token operator">=</span>true \
     --kubeconfig<span class="token operator">=</span>devuser.kubeconfig
 
 <span class="token comment" spellcheck="true"># 设置上下文参数</span>
 $ kubectl config set-context kubernetes \
-    --cluster<span class="token operator">=</span>kubernetes \
-    --user<span class="token operator">=</span>devuser \
-    --namespace<span class="token operator">=</span>dev \
+    --cluster<span class="token operator">=</span>kubernetes \ <span class="token comment" spellcheck="true"># 集群名称</span>
+    --user<span class="token operator">=</span>devuser \ <span class="token comment" spellcheck="true"># 用户名</span>
+    --namespace<span class="token operator">=</span>dev \ <span class="token comment" spellcheck="true"># 名称空间</span>
     --kubeconfig<span class="token operator">=</span>devuser.kubeconfig
 
 <span class="token comment" spellcheck="true"># 设置默认上下文</span>
-$ kubectl config use-context kubernetes --kubeconfig<span class="token operator">=</span>devuser.kubeconfig
-$ <span class="token function">cp</span> -f ./devuser.kubeconfig /root/.kube/config
 $ kubectl create rolebinding devuser-admin-binding \
-    --clusterrole<span class="token operator">=</span>admin --user<span class="token operator">=</span>devuser --namespace<span class="token operator">=</span>dev<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    --clusterrole<span class="token operator">=</span>admin --user<span class="token operator">=</span>devuser --namespace<span class="token operator">=</span>dev
+$ kubectl config use-context kubernetes --kubeconfig<span class="token operator">=</span>devuser.kubeconfig
+$ <span class="token function">cp</span> -f ./devuser.kubeconfig /root/.kube/config<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="5-准入控制"><a href="#5-准入控制" class="headerlink" title="5. 准入控制"></a>5. 准入控制</h2><p>准入控制是 <code>API Server</code> 的插件集合，通过添加不同的插件，实现额外的准入控制规则。甚至于 <code>API Server</code> 的一些主要的功能都需要通过 <code>Admission Controllers</code> 实现，比如 <code>ServiceAccount</code>。官方文档上有一份针对不同版本的准入控制器推荐列表，其中最新的 <code>1.14</code> 的推荐列表是：</p>
 <ul>
@@ -1342,7 +1392,7 @@ $ kubectl create rolebinding devuser-admin-binding \
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1024.1k</span>&nbsp;字
+                class="white-color">1024.6k</span>&nbsp;字
             
             
             
