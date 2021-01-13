@@ -459,21 +459,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-01-09
+                    2021-01-13
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    64
+                    2.9k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    13 分
                 </div>
                 
 
@@ -498,7 +498,492 @@
 </blockquote>
 <p><img src="../images/kubernetes-helm-tool.png" alt="Kubernetes之HELM工具"></p>
 <hr>
-<script>
+<h2 id="1-了解-Helm-工具"><a href="#1-了解-Helm-工具" class="headerlink" title="1. 了解 Helm 工具"></a>1. 了解 Helm 工具</h2><p>在没使用 <code>helm</code> 之前，向 <code>kubernetes</code> 部署应用，我们要依次部署 <code>deployment</code>、<code>svc</code> 等，步骤较繁琐。况且随着很多项目微服务化，复杂的应用在容器中部署以及管理显得较为复杂，<code>helm</code> 通过打包的方式，支持发布的版本管理和控制，很大程度上简化了 <code>Kubernetes</code> 应用的部署和管理。</p>
+<p><code>Helm</code> 本质就是让 <code>K8s</code> 的应用管理（<code>Deployment</code>, <code>Service</code> 等) 可配置，能动态生成。通过动态生成 <code>K8s</code> 资源清单文件（<code>deployment.yaml</code>，<code>service.yaml</code>）。然后调用 <code>Kubectl</code> 自动执行 <code>K8s</code> 资源部署。<code>Helm</code> 是官方提供的类似于 <code>YUM</code> 的包管理器，是部署环境的流程封装。<code>Helm</code> 有两个重要的概念：<code>chart</code> 和 <code>release</code>。</p>
+<ul>
+<li><code>chart</code> 是创建一个应用的信息集合，包括各种 <code>Kubernetes</code> 对象的配置模板、参数定义、依赖关系、文档说明等。<code>chart</code> 是应用部署的自包含逻辑单元。可以将 <code>chart</code> 想象成 <code>apt</code>、<code>yum</code> 中的软件安装包。</li>
+<li><code>release</code> 是 <code>chart</code> 的运行实例，代表了一个正在运行的应用。当 <code>chart</code> 被安装到 <code>Kubernetes</code> 集群，就生成一个 <code>release</code>。<code>chart</code> 能够多次安装到同一个集群，每次安装都是一个 <code>release</code>。</li>
+</ul>
+<p><code>Helm</code> 包含两个组件：<code>Helm</code> 客户端和 <code>Tiller</code> 服务器，如下图所示:</p>
+<p><img src="../images/kubernetes-helm-tool-01.png" alt="Kubernetes之HELM工具"></p>
+<p><code>Helm</code> 客户端负责 <code>chart</code> 和 <code>release</code> 的创建和管理以及和 <code>Tiller</code> 的交互。<code>Tiller</code> 服务器运行在 <code>Kubernetes</code> 集群中，它会处理 <code>Helm</code> 客户端的请求，与 <code>Kubernetes API Server</code> 交互。</p>
+<hr>
+<h2 id="2-Helm-部署方式"><a href="#2-Helm-部署方式" class="headerlink" title="2. Helm 部署方式"></a>2. Helm 部署方式</h2><p>越来越多的公司和团队开始使用 <code>Helm</code> 这个 <code>Kubernetes</code> 的包管理器，我们也将使用 <code>Helm</code> 安装 <code>Kubernetes</code> 的常用组件。<code>Helm</code> 由客户端命 <code>helm</code> 令行工具和服务端 <code>tiller</code> 组成，<code>Helm</code> 的安装十分简单。下载 <code>helm</code> 命令行工具到 <code>master</code> 节点 <code>node1</code> 的 <code>/usr/local/bin</code> 下，这里下载的 <code>2.13.1</code> 版本：</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 时间同步</span>
+$ ntpdate ntp1.aliyun.com
+
+<span class="token comment" spellcheck="true"># 下载安装</span>
+$ <span class="token function">wget</span> https://storage.googleapis.com/kubernetes-helm/helm-v2.13.1-linux-amd64.tar.gz
+$ <span class="token function">tar</span> -zxvf helm-v2.13.1-linux-amd64.tar.gz
+$ <span class="token function">cd</span> linux-amd64/
+$ <span class="token function">cp</span> helm /usr/local/bin/<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>为了安装服务端 <code>tiller</code>，还需要在这台机器上配置好 <code>kubectl</code> 工具和 <code>kubeconfig</code> 文件，确保 <code>kubectl</code> 工具可以在这台机器上访问 <code>apiserver</code> 且正常使用。这里的 <code>node1</code> 节点以及配置好了 <code>kubectl</code>。</p>
+<p>因为 <code>Kubernetes APIServer</code> 开启了 <code>RBAC</code> 访问控制，所以需要创建 <code>tiller</code> 使用的 <code>service account: tiller</code> 并分配合适的角色给它。详细内容可以查看 <code>helm</code> 文档中的 <code>Role-based Access Control</code>。这里简单起见直接分配 <code>cluster-admin</code> 这个集群内置的 <code>ClusterRole</code> 给它。创建 <code>rbac-config.yaml</code> 文件：</p>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> ServiceAccount
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> tiller
+  <span class="token key atrule">namespace</span><span class="token punctuation">:</span> kube<span class="token punctuation">-</span>system
+
+<span class="token punctuation">---</span>
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> rbac.authorization.k8s.io/v1beta
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> ClusterRoleBinding
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> tiller
+<span class="token key atrule">roleRef</span><span class="token punctuation">:</span>
+  <span class="token key atrule">apiGroup</span><span class="token punctuation">:</span> rbac.authorization.k8s.io
+  <span class="token key atrule">kind</span><span class="token punctuation">:</span> ClusterRole
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> cluster<span class="token punctuation">-</span>admin
+<span class="token key atrule">subjects</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">kind</span><span class="token punctuation">:</span> ServiceAccount
+    <span class="token key atrule">name</span><span class="token punctuation">:</span> tiller
+    <span class="token key atrule">namespace</span><span class="token punctuation">:</span> kube<span class="token punctuation">-</span>system<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash">$ kubectl create -f rbac-config.yaml \
+    serviceaccount/tiller created \
+    clusterrolebinding.rbac.authorization.k8s.io/tiller created
+
+$ helm init --service-account tiller --skip-refresh<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>tiller</code> 默认被部署在 <code>k8s</code> 集群中的 <code>kube-system</code> 这个 <code>namespace</code> 下。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ kubectl get pod -n kube-system -l app<span class="token operator">=</span>helm
+NAME                             READY   STATUS     RESTARTS    AGE
+tiller-deploy-c4fd4cd68-dwkhv    1/1     Running    0           83s
+
+$ helm version
+Client: <span class="token operator">&amp;</span>version.Version<span class="token punctuation">{</span>
+  SemVer:<span class="token string">"v2.13.1"</span>,
+  GitCommit:<span class="token string">"618447cbf203d147601b4b9bd7f8c37a5d39fbb4"</span>,
+  GitTreeState:<span class="token string">"clean"</span>
+<span class="token punctuation">}</span>
+Server: <span class="token operator">&amp;</span>version.Version<span class="token punctuation">{</span>
+  SemVer:<span class="token string">"v2.13.1"</span>,
+  GitCommit:<span class="token string">"618447cbf203d147601b4b9bd7f8c37a5d39fbb4"</span>,
+  GitTreeState:<span class="token string">"clean"</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="3-Helm-自定义模板"><a href="#3-Helm-自定义模板" class="headerlink" title="3. Helm 自定义模板"></a>3. Helm 自定义模板</h2><ul>
+<li><strong>[1] 创建文件夹</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">mkdir</span> ./hello-world
+$ <span class="token function">cd</span> ./hello-world<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 创建自描述文件 - Chart.yaml</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 这个文件必须有name和version定义</span>
+$ <span class="token function">cat</span> <span class="token operator">&lt;&lt;</span><span class="token string">'EOF'</span> <span class="token operator">></span> ./Chart.yaml
+name: hello-world
+version: 1.0.
+EOF<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 创建模板文件</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 用于生成Kubernetes资源清单(manifests)</span>
+$ <span class="token function">mkdir</span> ./templates<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-yaml"><code class="language-yaml">$ cat &lt;&lt;'EOF' <span class="token punctuation">></span> ./templates/deployment.yaml
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> extensions/v1beta1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> Deployment
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> hello<span class="token punctuation">-</span>world
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">replicas</span><span class="token punctuation">:</span> <span class="token number">1</span>
+  <span class="token key atrule">template</span><span class="token punctuation">:</span>
+    <span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+      <span class="token key atrule">labels</span><span class="token punctuation">:</span>
+        <span class="token key atrule">app</span><span class="token punctuation">:</span> hello<span class="token punctuation">-</span>world
+    <span class="token key atrule">spec</span><span class="token punctuation">:</span>
+      <span class="token key atrule">containers</span><span class="token punctuation">:</span>
+        <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> hello<span class="token punctuation">-</span>world
+          <span class="token key atrule">image</span><span class="token punctuation">:</span> hub.escape.com/library/myapp<span class="token punctuation">:</span>v
+          <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+            <span class="token punctuation">-</span> <span class="token key atrule">containerPort</span><span class="token punctuation">:</span> <span class="token number">80</span>
+              <span class="token key atrule">protocol</span><span class="token punctuation">:</span> TCP
+EOF<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-yaml"><code class="language-yaml">$ cat &lt;&lt;'EOF' <span class="token punctuation">></span> ./templates/service.yaml
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> Service
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> hello<span class="token punctuation">-</span>world
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">type</span><span class="token punctuation">:</span> NodePort
+  <span class="token key atrule">selector</span><span class="token punctuation">:</span>
+    <span class="token key atrule">app</span><span class="token punctuation">:</span> hello<span class="token punctuation">-</span>world
+  <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">port</span><span class="token punctuation">:</span> <span class="token number">80</span>
+      <span class="token key atrule">targetPort</span><span class="token punctuation">:</span> <span class="token number">80</span>
+      <span class="token key atrule">protocol</span><span class="token punctuation">:</span> TCP
+EOF<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] 创建 Release</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用命令创建一次Release</span>
+$ helm install.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] 相关操作记录</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 列出已经部署的Release</span>
+$ helm <span class="token function">ls</span>
+
+<span class="token comment" spellcheck="true"># 查询一个特定的Release的状态</span>
+$ helm status RELEASE_NAME
+
+<span class="token comment" spellcheck="true"># 移除所有与这个Release相关的Kubernetes资源</span>
+$ helm delete cautious-shrimp
+
+<span class="token comment" spellcheck="true"># helm rollback RELEASE_NAME REVISION_NUMBER</span>
+$ helm rollback cautious-shrimp 1
+
+<span class="token comment" spellcheck="true"># 使用命令移除所有与指定Release相关的Kubernetes资源和所有这个Release的记录</span>
+$ helm delete --purge cautious-shrimp
+$ helm <span class="token function">ls</span> --deleted<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[6] 配置体现在配置文件 - values.yaml</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">cat</span> <span class="token operator">&lt;&lt;</span><span class="token string">'EOF'</span> <span class="token operator">></span> ./values.yaml
+image:
+  repository: gcr.io/google-samples/node-hello
+  tag: <span class="token string">'1.0'</span>
+EOF<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[7] 定义模板文件</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 这个文件中定义的值，在模板文件中可以通过.VAlues对象访问到</span>
+$ <span class="token function">cat</span> <span class="token operator">&lt;&lt;</span><span class="token string">'EOF'</span> <span class="token operator">></span> ./templates/deployment.yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: hello-world
+spec:
+  replicas: 1
+  template:
+    metadata:
+    labels:
+      app: hello-world
+    spec:
+      containers:
+        - name: hello-world
+          image: <span class="token punctuation">{</span><span class="token punctuation">{</span> .Values.image.repository <span class="token punctuation">}</span><span class="token punctuation">}</span>:<span class="token punctuation">{</span><span class="token punctuation">{</span> .Values.image.tag <span class="token punctuation">}</span><span class="token punctuation">}</span>
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+EOF<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[8] 改变配置文件对应变量</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 在values.yaml中的值可以被部署release时</span>
+<span class="token comment" spellcheck="true"># 用到的参数 --values YAML_FILE_PATH 或 --set key1=value1, key2=value2 覆盖掉</span>
+$ helm <span class="token function">install</span> --set image.tag<span class="token operator">=</span><span class="token string">'latest'</span><span class="token keyword">.</span>
+
+<span class="token comment" spellcheck="true"># 升级版本</span>
+helm upgrade -f values.yaml <span class="token function">test</span> <span class="token keyword">.</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[9] Debug 模式</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用模板动态生成K8s资源清单，非常需要能提前预览生成的结果。</span>
+<span class="token comment" spellcheck="true"># 使用 --dry-run --debug 选项来打印出生成的清单文件内容，而不执行部署</span>
+helm install. --dry-run --debug --set image.tag<span class="token operator">=</span>latest<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="3-实战部署服务-dashboard"><a href="#3-实战部署服务-dashboard" class="headerlink" title="3. 实战部署服务 - dashboard"></a>3. 实战部署服务 - dashboard</h2><blockquote>
+<p><strong>使用 Helm 部署 dashboard 服务！</strong></p>
+</blockquote>
+<ul>
+<li><strong>kubernetes-dashboard.yaml</strong></li>
+</ul>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">image</span><span class="token punctuation">:</span>
+  <span class="token key atrule">repository</span><span class="token punctuation">:</span> k8s.gcr.io/kubernetes<span class="token punctuation">-</span>dashboard<span class="token punctuation">-</span>amd64
+  <span class="token key atrule">tag</span><span class="token punctuation">:</span> v1.10.1
+<span class="token key atrule">ingress</span><span class="token punctuation">:</span>
+  <span class="token key atrule">enabled</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+  <span class="token key atrule">hosts</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> k8s.frognew.com
+  <span class="token key atrule">annotations</span><span class="token punctuation">:</span>
+    <span class="token key atrule">nginx.ingress.kubernetes.io/ssl-redirect</span><span class="token punctuation">:</span> <span class="token string">"true"</span>
+    <span class="token key atrule">nginx.ingress.kubernetes.io/backend-protocol</span><span class="token punctuation">:</span> <span class="token string">"HTTPS"</span>
+  <span class="token key atrule">tls</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">secretName</span><span class="token punctuation">:</span> frognew<span class="token punctuation">-</span>com<span class="token punctuation">-</span>tls<span class="token punctuation">-</span>secret
+      <span class="token key atrule">hosts</span><span class="token punctuation">:</span>
+        <span class="token punctuation">-</span> k8s.frognew.com
+<span class="token key atrule">rbac</span><span class="token punctuation">:</span>
+  <span class="token key atrule">clusterAdminRole</span><span class="token punctuation">:</span> <span class="token boolean important">true</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>部署服务操作</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true">#</span>
+$ helm <span class="token function">install</span> stable/kubernetes-dashboard \
+    -n kubernetes-dashboard \
+    --namespace kube-system \
+    -f kubernetes-dashboard.yaml<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true">#</span>
+$ kubectl -n kube-system get secret <span class="token operator">|</span> <span class="token function">grep</span> kubernetes-dashboard-token
+
+<span class="token comment" spellcheck="true"># 修改ClusterIP为NodePort</span>
+$ kubectl edit svc kubernetes-dashboard -n kube-system<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="4-实战部署服务-metrics-server"><a href="#4-实战部署服务-metrics-server" class="headerlink" title="4. 实战部署服务 - metrics-server"></a>4. 实战部署服务 - metrics-server</h2><blockquote>
+<p><strong>使用 Helm 部署 metrics-server 服务！</strong></p>
+</blockquote>
+<p>从 <code>Heapster</code> 的 <a href="https://github.com/kubernetes/heapster" target="_blank" rel="noopener">github</a> 中可以看到已经，<code>heapster</code> 已经 <code>DEPRECATED</code>。这里是 <code>heapster</code> 的 <code>deprecation timeline</code>。可以看出 <code>heapster</code> 从 <code>Kubernetes 1.12</code> 开始将从 <code>Kubernetes</code> 各种安装脚本中移除。<code>Kubernetes</code> 推荐使用 <code>metrics-server</code>。我们这里也使用 <code>helm</code> 来部署 <code>metrics-server</code>。</p>
+<ul>
+<li><strong>metrics-server.yaml</strong></li>
+</ul>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">args</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token punctuation">-</span><span class="token punctuation">-</span>logtostderr
+  <span class="token punctuation">-</span> <span class="token punctuation">-</span><span class="token punctuation">-</span>kubelet<span class="token punctuation">-</span>insecure<span class="token punctuation">-</span>tls
+  <span class="token punctuation">-</span> <span class="token punctuation">-</span><span class="token punctuation">-</span>kubelet<span class="token punctuation">-</span>preferred<span class="token punctuation">-</span>address<span class="token punctuation">-</span>types=InternalIP<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash">$ helm <span class="token function">install</span> stable/metrics-server -n metrics-server \
+    --namespace kube-system -f metrics-server.yaml<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>使用下面的命令可以获取到关于集群节点基本的指标信息</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ kubectl <span class="token function">top</span> node
+NAME   CPU<span class="token punctuation">(</span>cores<span class="token punctuation">)</span>  CPU%  MEMORY<span class="token punctuation">(</span>bytes<span class="token punctuation">)</span>  MEMORY%
+node1  650m        32%   1276Mi         73%
+node2  73m         3%    527Mi          30%<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash">$ kubectl <span class="token function">top</span> pod --all-namespaces
+NAMESPACE        NAME                                             CPU<span class="token punctuation">(</span>cores<span class="token punctuation">)</span>   MEMORY<span class="token punctuation">(</span>bytes<span class="token punctuation">)</span>
+ingress-nginx    nginx-ingress-controller-6f5687c58d-jdxzk        3m           142Mi
+ingress-nginx    nginx-ingress-controller-6f5687c58d-lxj5q        5m           146Mi
+ingress-nginx    nginx-ingress-default-backend-6dc6c46dcc-lf882   1m           4Mi
+kube-system      coredns-86c58d9df4-k5jkh                         2m           15Mi
+kube-system      coredns-86c58d9df4-rw6tt                         3m           23Mi
+kube-system      etcd-node1                                       20m          86Mi
+kube-system      kube-apiserver-node1                             33m          468Mi
+kube-system      kube-controller-manager-node1                    29m          89Mi
+kube-system      kube-flannel-ds-amd64-8nr5j                      2m           13Mi
+kube-system      kube-flannel-ds-amd64-bmncz                      2m           21Mi
+kube-system      kube-proxy-d5gxv                                 2m           18Mi
+kube-system      kube-proxy-zm29n                                 2m           16Mi
+kube-system      kube-scheduler-node1                             8m           28Mi
+kube-system      kubernetes-dashboard-788c98d699-qd2cx            2m           16Mi
+kube-system      metrics-server-68785fbcb4-k4g9v                  3m           12Mi
+kube-system      tiller-deploy-c4fd4cd68-dwkhv                    1m           24Mi<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="5-实战部署服务-Prometheus"><a href="#5-实战部署服务-Prometheus" class="headerlink" title="5. 实战部署服务 - Prometheus"></a>5. 实战部署服务 - Prometheus</h2><blockquote>
+<p><strong>使用 Helm 部署 Prometheus 服务！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] 组件说明</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">1. MetricServer：是kubernetes集群资源使用情况的聚合器，收集数据给kubernetes集群内使用，如kubectl,hpa,scheduler等
+2. PrometheusOperator：是一个系统监测和警报工具箱，用来存储监控数据
+3. NodeExporter：用于各node的关键度量指标状态数据
+4. KubeStateMetrics：收集kubernetes集群内资源对象数据，制定告警规则
+5. Prometheus：采用pull方式收集apiserver，scheduler，controller-manager，kubelet组件数据，通过http协议传输
+6. Grafana：是可视化数据统计和监控平台。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 构建记录</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 克隆仓库</span>
+$ <span class="token function">git</span> clone https://github.com/coreos/kube-prometheus.git
+$ <span class="token function">cd</span> /root/kube-prometheus/manifests<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token comment" spellcheck="true"># 修改grafana-service.yaml文件，使用nodepode方式访问grafana</span>
+$ vim grafana<span class="token punctuation">-</span>service.yaml
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> Service
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> grafana
+  <span class="token key atrule">namespace</span><span class="token punctuation">:</span> monitoring
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">type</span><span class="token punctuation">:</span> NodePort <span class="token comment" spellcheck="true"># 添加内容</span>
+  <span class="token key atrule">selector</span><span class="token punctuation">:</span>
+    <span class="token key atrule">app</span><span class="token punctuation">:</span> grafana
+  <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> http
+      <span class="token key atrule">port</span><span class="token punctuation">:</span> <span class="token number">3000</span>
+      <span class="token key atrule">targetPort</span><span class="token punctuation">:</span> http
+      <span class="token key atrule">nodePort</span><span class="token punctuation">:</span> <span class="token number">30100 </span><span class="token comment" spellcheck="true"># 添加内容</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token comment" spellcheck="true"># 修改prometheus-service.yaml改为nodepode</span>
+$ vim prometheus<span class="token punctuation">-</span>service.yaml
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> Service
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> prometheus<span class="token punctuation">-</span>k8s
+  <span class="token key atrule">namespace</span><span class="token punctuation">:</span> monitoring
+  <span class="token key atrule">labels</span><span class="token punctuation">:</span>
+    <span class="token key atrule">prometheus</span><span class="token punctuation">:</span> k8s
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">type</span><span class="token punctuation">:</span> NodePort
+  <span class="token key atrule">selector</span><span class="token punctuation">:</span>
+    <span class="token key atrule">app</span><span class="token punctuation">:</span> prometheus
+    <span class="token key atrule">prometheus</span><span class="token punctuation">:</span> k8s
+  <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> web
+      <span class="token key atrule">port</span><span class="token punctuation">:</span> <span class="token number">9090</span>
+      <span class="token key atrule">targetPort</span><span class="token punctuation">:</span> web
+      <span class="token key atrule">nodePort</span><span class="token punctuation">:</span> <span class="token number">30200</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token comment" spellcheck="true"># 修改alertmanager-service.yaml改为nodepode</span>
+$ vim alertmanager<span class="token punctuation">-</span>service.yaml
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> Service
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> alertmanager<span class="token punctuation">-</span>main
+  <span class="token key atrule">labels</span><span class="token punctuation">:</span>
+    <span class="token key atrule">alertmanager</span><span class="token punctuation">:</span> main
+  <span class="token key atrule">namespace</span><span class="token punctuation">:</span> monitoring
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">type</span><span class="token punctuation">:</span> NodePort
+<span class="token key atrule">selector</span><span class="token punctuation">:</span>
+  <span class="token key atrule">alertmanager</span><span class="token punctuation">:</span> main
+  <span class="token key atrule">app</span><span class="token punctuation">:</span> alertmanager
+  <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> web
+      <span class="token key atrule">port</span><span class="token punctuation">:</span> <span class="token number">9093</span>
+      <span class="token key atrule">targetPort</span><span class="token punctuation">:</span> web
+      <span class="token key atrule">nodePort</span><span class="token punctuation">:</span> <span class="token number">30300</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] Horizontal Pod Autoscaling</strong></li>
+</ul>
+<p><code>Horizontal Pod Autoscaling</code> 可以根据 <code>CPU</code> 利用率或者内存使用情况自动伸缩一个 <code>Replication Controller</code>、<code>Deployment</code> 或者 <code>Replica Set</code> 中的 <code>Pod</code> 数量。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 限制资源使用</span>
+$ kubectl run php-apache --image<span class="token operator">=</span>gcr.io/google_containers/hpa-example \
+    --requests<span class="token operator">=</span>cpu<span class="token operator">=</span>200m --expose --port<span class="token operator">=</span>80
+
+<span class="token comment" spellcheck="true"># 创建HPA控制器</span>
+$ kubectl autoscale deployment php-apache \
+    --cpu-percent<span class="token operator">=</span>50 --min<span class="token operator">=</span>1 --max<span class="token operator">=</span>10
+
+<span class="token comment" spellcheck="true"># 增加负载并查看负载节点数目</span>
+$ kubectl run -i --tty load-generator --image<span class="token operator">=</span>busybox /bin/sh
+$ <span class="token keyword">while</span> <span class="token boolean">true</span><span class="token punctuation">;</span> <span class="token keyword">do</span> <span class="token function">wget</span> -q -O- http://php-apache.default.svc.cluster.local<span class="token punctuation">;</span> <span class="token keyword">done</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] 资源限制 - Pod</strong></li>
+</ul>
+<p><code>Kubernetes</code> 对资源的限制实际上是通过 <code>cgroup</code> 来控制的，<code>cgroup</code> 是容器的一组用来控制内核如何运行进程的相关属性集合。针对内存、<code>CPU</code> 和各种设备都有对应的 <code>cgroup</code>。</p>
+<p>默认情况下，<code>Pod</code> 运行没有 <code>CPU</code> 和内存的限额。这意味着系统中的任何 <code>Pod</code> 将能够像执行该 <code>Pod</code> 所在的节点一样，消耗足够多的 <code>CPU</code> 和内存。一般会针对某些应用的 <code>pod</code> 资源进行资源限制，这个资源限制是通过 <code>resources</code> 的 <code>requests</code> 和 <code>limits</code> 来实现。<code>requests</code> 要分分配的资源，<code>limits</code> 为最高请求的资源值，可以简单理解为初始值和最大值。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">spec:
+  containers:
+    - name: auth
+      image: xxxx
+      imagePullPolicy: Always
+      ports:
+        - containerPort: 8080
+          protocol: TCP
+      resources:
+        limits:
+          cpu: <span class="token string">"4"</span>
+          memory: 2Gi
+        requests:
+          cpu: 250m
+          memory: 250Mi<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] 资源限制 - Namespace</strong></li>
+</ul>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token comment" spellcheck="true"># 计算资源配额</span>
+
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> ResourceQuota
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> compute<span class="token punctuation">-</span>resources
+  <span class="token key atrule">namespace</span><span class="token punctuation">:</span> spark<span class="token punctuation">-</span>cluster
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">hard</span><span class="token punctuation">:</span>
+    <span class="token key atrule">pods</span><span class="token punctuation">:</span> <span class="token string">"20"</span>
+    <span class="token key atrule">requests.cpu</span><span class="token punctuation">:</span> <span class="token string">"20"</span>
+    <span class="token key atrule">requests.memory</span><span class="token punctuation">:</span> 100Gi
+    <span class="token key atrule">limits.cpu</span><span class="token punctuation">:</span> <span class="token string">"40"</span>
+    <span class="token key atrule">limits.memory</span><span class="token punctuation">:</span> 200Gi<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token comment" spellcheck="true"># 配置对象数量配额限制</span>
+
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> ResourceQuota
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> object<span class="token punctuation">-</span>counts
+  <span class="token key atrule">namespace</span><span class="token punctuation">:</span> spark<span class="token punctuation">-</span>cluster
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">hard</span><span class="token punctuation">:</span>
+    <span class="token key atrule">configmaps</span><span class="token punctuation">:</span> <span class="token string">"10"</span>
+    <span class="token key atrule">persistentvolumeclaims</span><span class="token punctuation">:</span> <span class="token string">"4"</span>
+    <span class="token key atrule">replicationcontrollers</span><span class="token punctuation">:</span> <span class="token string">"20"</span>
+    <span class="token key atrule">secrets</span><span class="token punctuation">:</span> <span class="token string">"10"</span>
+    <span class="token key atrule">services</span><span class="token punctuation">:</span> <span class="token string">"10"</span>
+    <span class="token key atrule">services.loadbalancers</span><span class="token punctuation">:</span> <span class="token string">"2"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token comment" spellcheck="true"># 配置CPU和内存LimitRange</span>
+<span class="token comment" spellcheck="true"># default即limit的值</span>
+<span class="token comment" spellcheck="true"># defaultRequest即request的值</span>
+
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> LimitRange
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> mem<span class="token punctuation">-</span>limit<span class="token punctuation">-</span>range
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">limits</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">default</span><span class="token punctuation">:</span>
+        <span class="token key atrule">memory</span><span class="token punctuation">:</span> 50Gi
+        <span class="token key atrule">cpu</span><span class="token punctuation">:</span> <span class="token number">5</span>
+      <span class="token key atrule">defaultRequest</span><span class="token punctuation">:</span>
+        <span class="token key atrule">memory</span><span class="token punctuation">:</span> 1Gi
+        <span class="token key atrule">cpu</span><span class="token punctuation">:</span> <span class="token number">1</span>
+      <span class="token key atrule">type</span><span class="token punctuation">:</span> Container<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[6] 访问 prometheus 服务</strong></li>
+</ul>
+<p><code>prometheus</code> 对应的 <code>nodeport</code> 端口为 <code>30200</code>，访问 <code>http://MasterIP:30200</code>。</p>
+<p><img src="../images/kubernetes-helm-tool-02.png" alt="Kubernetes之HELM工具"></p>
+<p>通过访问 <code>http://MasterIP:30200/target</code> 可以看到 <code>prometheus</code> 已经成功连接上了 <code>k8s</code> 的 <code>apiserver</code>。</p>
+<p><img src="../images/kubernetes-helm-tool-03.png" alt="Kubernetes之HELM工具"></p>
+<p>查看 <code>service-discovery</code>。</p>
+<p><img src="../images/kubernetes-helm-tool-04.png" alt="Kubernetes之HELM工具"></p>
+<p><code>Prometheus</code> 自己的指标</p>
+<p><img src="../images/kubernetes-helm-tool-05.png" alt="Kubernetes之HELM工具"></p>
+<p><code>prometheus</code> 的 <code>WEB</code> 界面上提供了基本的查询 <code>K8S</code> 集群中每个 <code>POD</code> 的 <code>CPU</code> 使用情况，查询条件如下。</p>
+<p><img src="../images/kubernetes-helm-tool-06.png" alt="Kubernetes之HELM工具"></p>
+<p>上述的查询有出现数据，说明 <code>node-exporter</code> 往 <code>prometheus</code> 中写入数据正常，接下来我们就可以部署<code>grafana</code> 组件，实现更友好的 <code>webui</code> 展示数据了。</p>
+<p><img src="../images/kubernetes-helm-tool-07.png" alt="Kubernetes之HELM工具"></p>
+<ul>
+<li><strong>[7] 访问 grafana 服务</strong></li>
+</ul>
+<p>查看 <code>grafana</code> 服务暴露的端口号，如上可以看到 <code>grafana</code> 的端口号是 <code>30100</code>，浏览器访问 <code>http://MasterIP:30100</code> 用户名密码默认 <code>admin/admin</code>。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ kubectl get <span class="token function">service</span> -n monitoring <span class="token operator">|</span> <span class="token function">grep</span> grafana
+grafana    NodePort   10.107.56.143   <span class="token operator">&lt;</span>none<span class="token operator">></span>    3000:30100/TCP    20h<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><img src="../images/kubernetes-helm-tool-08.png" alt="Kubernetes之HELM工具"></p>
+<p>修改密码并登陆。</p>
+<p><img src="../images/kubernetes-helm-tool-09.png" alt="Kubernetes之HELM工具"></p>
+<p>添加数据源 <code>grafana</code> 默认已经添加了 <code>Prometheus</code> 数据源，<code>grafana</code> 支持多种时序数据源，每种数据源都有各自的查询编辑器。</p>
+<p><img src="../images/kubernetes-helm-tool-10.png" alt="Kubernetes之HELM工具"></p>
+<p><code>Prometheus</code> 数据源的相关参数。</p>
+<p><img src="../images/kubernetes-helm-tool-11.png" alt="Kubernetes之HELM工具"></p>
+<p>目前官方支持了如下几种数据源。</p>
+<p><img src="../images/kubernetes-helm-tool-12.png" alt="Kubernetes之HELM工具"></p>
+<hr>
+<h2 id="6-实战部署服务-ELK"><a href="#6-实战部署服务-ELK" class="headerlink" title="6. 实战部署服务 - ELK"></a>6. 实战部署服务 - ELK</h2><blockquote>
+<p><strong>使用 Helm 部署 ELK 服务！</strong></p>
+</blockquote>
+<ul>
+<li><strong>添加 Google incubator 仓库</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 添加存储</span>
+$ helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>部署 Elasticsearch 服务</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 创建名称空间</span>
+$ kubectl create namespace efk
+
+<span class="token comment" spellcheck="true"># 获取elasticsearch服务</span>
+$ helm fetch incubator/elasticsearch
+
+<span class="token comment" spellcheck="true"># 安装服务</span>
+$ helm <span class="token function">install</span> --name els1 --namespace<span class="token operator">=</span>efk -f values.yaml incubator/elasticsearch
+$ kubectl run cirror-<span class="token variable">$RANDOM</span> --rm -it --image<span class="token operator">=</span>cirros -- /bin/sh
+$ curl Elasticsearch:Port/_cat/nodes<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>部署 Fluentd 服务</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 获取Fluentd服务</span>
+$ helm fetch stable/fluentd-elasticsearch
+
+<span class="token comment" spellcheck="true"># 更改其中Fluentd访问地址</span>
+$ vim values.yaml
+
+<span class="token comment" spellcheck="true"># 安装服务</span>
+$ helm <span class="token function">install</span> --name flu1 --namespace<span class="token operator">=</span>efk -f values.yaml stable/fluentd-elasticsearch<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>部署 kibana 服务</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 获取kibana服务</span>
+$ helm fetch stable/kibana --version 0.14.8
+
+<span class="token comment" spellcheck="true"># 安装服务</span>
+$ helm <span class="token function">install</span> --name kib1 --namespace<span class="token operator">=</span>efk -f values.yaml stable/kibana --version 0.14.8<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre><code></code></pre><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -1048,7 +1533,7 @@
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1024.6k</span>&nbsp;字
+                class="white-color">1027.5k</span>&nbsp;字
             
             
             
