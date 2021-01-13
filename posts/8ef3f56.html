@@ -466,14 +466,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    3.3k
+                    3.6k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    14 分
+                    16 分
                 </div>
                 
 
@@ -725,7 +725,24 @@ $ helm install. --dry-run --debug --set image.tag<span class="token operator">=<
 <p><strong>使用 Helm 部署 dashboard 服务！</strong></p>
 </blockquote>
 <ul>
-<li><strong>kubernetes-dashboard.yaml</strong></li>
+<li><strong>[1] 对应配置文件下载</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 下载仓库中的charm到本地</span>
+<span class="token comment" spellcheck="true"># 包含上述的kubernetes-dashboard.yaml文件</span>
+$ helm repo update
+$ helm repo list
+$ helm fetch stable/kubernetes-dashboard
+
+<span class="token comment" spellcheck="true"># 解压对应文件</span>
+$ <span class="token function">tar</span> -xf kubernetes-dashboard-1.8.0.tgz
+$ <span class="token function">cd</span> kubernetes-dashboard<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] kubernetes-dashboard.yaml</strong><ul>
+<li>在项目目录下面创建如下变量配置文件</li>
+<li>该文件就类似于自定义模板中的 <code>values.yaml</code> 文件</li>
+<li>用于告诉模板我们自己定义的对应变量是什么</li>
+</ul>
+</li>
 </ul>
 <pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">image</span><span class="token punctuation">:</span>
   <span class="token key atrule">repository</span><span class="token punctuation">:</span> k8s.gcr.io/kubernetes<span class="token punctuation">-</span>dashboard<span class="token punctuation">-</span>amd64
@@ -744,18 +761,41 @@ $ helm install. --dry-run --debug --set image.tag<span class="token operator">=<
 <span class="token key atrule">rbac</span><span class="token punctuation">:</span>
   <span class="token key atrule">clusterAdminRole</span><span class="token punctuation">:</span> <span class="token boolean important">true</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>部署服务操作</strong></li>
+<li><strong>[3] 部署服务操作</strong><ul>
+<li>部署服务完成之后，通过浏览器进行访问会提示不是一个私密连接警告</li>
+<li>因为谷歌浏览器会对 <code>https</code> 进行验证，鉴别真伪与否</li>
+<li>我们可以给谷歌浏览器中导入我们集群的证书来防止告警提示</li>
+<li>整数位置: <code>/etc/kubernetes/pki/ca.crt</code></li>
+<li>或者通过在谷歌浏览器中输入 <code>thisisunsafe</code> 命令来消除警告</li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true">#</span>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 服务部署</span>
 $ helm <span class="token function">install</span> stable/kubernetes-dashboard \
-    -n kubernetes-dashboard \
-    --namespace kube-system \
-    -f kubernetes-dashboard.yaml<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true">#</span>
-$ kubectl -n kube-system get secret <span class="token operator">|</span> <span class="token function">grep</span> kubernetes-dashboard-token
+    -n kubernetes-dashboard \     <span class="token comment" spellcheck="true"># 指定创建名称</span>
+    --namespace kube-system \     <span class="token comment" spellcheck="true"># 指定名称空间</span>
+    -f kubernetes-dashboard.yaml  <span class="token comment" spellcheck="true"># 指定变量文件</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看创建的pod服务</span>
+$ kubectl get pod -n kube-system <span class="token operator">|</span> <span class="token string">'grep dashboard'</span>
 
-<span class="token comment" spellcheck="true"># 修改ClusterIP为NodePort</span>
-$ kubectl edit svc kubernetes-dashboard -n kube-system<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token comment" spellcheck="true"># 查看创建的svc服务</span>
+$ kubectl get svc -n kube-system <span class="token operator">|</span> <span class="token string">'grep dashboard'</span>
+
+<span class="token comment" spellcheck="true"># 修改配置(配置文件也好)</span>
+<span class="token comment" spellcheck="true"># 访问对应的(https://192.168.66.10:30324)</span>
+$ kubectl edit svc kubernetes-dashboard -n kube-system<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] 获取登录 dashboard 的 token 令牌</strong><ul>
+<li>需要通过命令的方式在集群中获取对应令牌信息</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看dashboard的token名称</span>
+$ kubectl get secret -n kube-system <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">'kubernetes-dashboard-token'</span>
+
+<span class="token comment" spellcheck="true"># 查看登录dashboard的token令牌信息</span>
+$ kubectl describe secret kubernetes-dashboard-token-ph5lt \
+    -n kube-system <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">'token:'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="5-实战部署服务-metrics-server"><a href="#5-实战部署服务-metrics-server" class="headerlink" title="5. 实战部署服务 - metrics-server"></a>5. 实战部署服务 - metrics-server</h2><blockquote>
 <p><strong>使用 Helm 部署 metrics-server 服务！</strong></p>
@@ -1573,7 +1613,7 @@ $ helm <span class="token function">install</span> --name kib1 --namespace<span 
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1027.9k</span>&nbsp;字
+                class="white-color">1028.2k</span>&nbsp;字
             
             
             
