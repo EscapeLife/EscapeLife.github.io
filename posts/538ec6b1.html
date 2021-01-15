@@ -317,104 +317,10 @@
 
 
 
-<main class="post-container content">
+<main class="container content">
 
     
-    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
-<style>
-    #articleContent h1::before,
-    #articleContent h2::before,
-    #articleContent h3::before,
-    #articleContent h4::before,
-    #articleContent h5::before,
-    #articleContent h6::before {
-        display: block;
-        content: " ";
-        height: 100px;
-        margin-top: -100px;
-        visibility: hidden;
-    }
-
-    #articleContent :focus {
-        outline: none;
-    }
-
-    .toc-fixed {
-        position: fixed;
-        top: 64px;
-    }
-
-    .toc-widget {
-        width: 345px;
-        padding-left: 20px;
-    }
-
-    .toc-widget .toc-title {
-        padding: 35px 0 15px 17px;
-        font-size: 1.5rem;
-        font-weight: bold;
-        line-height: 1.5rem;
-    }
-
-    .toc-widget ol {
-        padding: 0;
-        list-style: none;
-    }
-
-    #toc-content {
-        padding-bottom: 30px;
-        overflow: auto;
-    }
-
-    #toc-content ol {
-        padding-left: 10px;
-    }
-
-    #toc-content ol li {
-        padding-left: 10px;
-    }
-
-    #toc-content .toc-link:hover {
-        color: #42b983;
-        font-weight: 700;
-        text-decoration: underline;
-    }
-
-    #toc-content .toc-link::before {
-        background-color: transparent;
-        max-height: 25px;
-
-        position: absolute;
-        right: 23.5vw;
-        display: block;
-    }
-
-    #toc-content .is-active-link {
-        color: #42b983;
-    }
-
-    #floating-toc-btn {
-        position: fixed;
-        right: 15px;
-        bottom: 76px;
-        padding-top: 15px;
-        margin-bottom: 0;
-        z-index: 998;
-    }
-
-    #floating-toc-btn .btn-floating {
-        width: 48px;
-        height: 48px;
-    }
-
-    #floating-toc-btn .btn-floating i {
-        line-height: 48px;
-        font-size: 1.4rem;
-    }
-</style>
-<div class="row">
-    <div id="main-content" class="col s12 m12 l9">
-        <!-- 文章内容详情 -->
+    <!-- 文章内容详情 -->
 <div id="artDetail">
     <div class="card">
         <div class="card-content article-info">
@@ -466,14 +372,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    461
+                    994
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    2 分
+                    5 分
                 </div>
                 
 
@@ -496,8 +402,66 @@
                 <blockquote>
 <p><strong>我们一起学习如何修改 Kubernetes 的证书可用时限吧！</strong></p>
 </blockquote>
+<p>使用过的朋友肯定知道，<code>Kubernetes</code> 默认的证书有效期只有 <code>1</code> 年，因此需要每年手动更新一次节点上面的证书，显然这对我们实际生产环境来说是很不友好的；因此我们要对 <code>Kubernetes</code> 的 <code>SSL</code> 证书有效期进行修改。如下给出了具体的方法，但是有可能到你开始使用的时候，已经不再试用。</p>
 <p><img src="../images/kubernetes-change-certificate.png" alt="Kubernetes之修改证书时限"></p>
 <hr>
+<ul>
+<li><strong>[0] 查看当前证书有效期</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 证书存放在: /etc/kubernetes/pki 目录下</span>
+$ <span class="token function">ls</span> -lh /etc/kubernetes/pki
+-rw-r--r-- 1 root root 1212 May 19 14:01 apiserver.crt
+-rw-r--r-- 1 root root 1090 May 19 14:01 apiserver-etcd-client.crt
+-rw------- 1 root root 1679 May 19 14:01 apiserver-etcd-client.key
+-rw------- 1 root root 1675 May 19 14:01 apiserver.key
+-rw-r--r-- 1 root root 1099 May 19 14:01 apiserver-kubelet-client.crt
+-rw------- 1 root root 1679 May 19 14:01 apiserver-kubelet-client.key
+-rw-r--r-- 1 root root 1025 May  17  2020 ca.crt
+-rw------- 1 root root 1679 May  17  2020 ca.key
+drwxr-xr-x 2 root root 4096 May  17  2020 etcd/
+-rw-r--r-- 1 root root 1038 May  17  2020 front-proxy-ca.crt
+-rw------- 1 root root 1679 May  17  2020 front-proxy-ca.key
+-rw-r--r-- 1 root root 1058 May 19 14:01 front-proxy-client.crt
+-rw------- 1 root root 1675 May 19 14:01 front-proxy-client.key
+-rw------- 1 root root 1675 May  17  2020 sa.key
+-rw------- 1 root root  451 May  17  2020 sa.pub
+
+<span class="token comment" spellcheck="true"># 查看有效期</span>
+$ <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token variable"><span class="token variable">$(</span><span class="token function">ls</span> *.crt<span class="token variable">)</span></span><span class="token punctuation">;</span> <span class="token keyword">do</span> \
+    <span class="token keyword">echo</span> <span class="token string">"===== <span class="token variable">$i</span> ====="</span><span class="token punctuation">;</span> \
+    openssl x509 -in <span class="token variable">$i</span> -text -noout <span class="token operator">|</span> <span class="token function">grep</span> -A 3 <span class="token string">'Validity'</span><span class="token punctuation">;</span> <span class="token keyword">done</span>
+
+<span class="token comment" spellcheck="true"># 除了ca根证书外其他证书有效期都是1年</span>
+<span class="token operator">==</span><span class="token operator">==</span><span class="token operator">=</span> apiserver.crt <span class="token operator">==</span><span class="token operator">==</span><span class="token operator">=</span>
+        Validity
+            Not Before: May 12 07:51:36 2020 GMT
+            Not After <span class="token keyword">:</span> May 12 07:51:36 2021 GMT
+        Subject: CN <span class="token operator">=</span> kube-apiserver
+<span class="token operator">==</span><span class="token operator">==</span><span class="token operator">=</span> apiserver-etcd-client.crt <span class="token operator">==</span><span class="token operator">==</span><span class="token operator">=</span>
+        Validity
+            Not Before: May 12 07:51:36 2020 GMT
+            Not After <span class="token keyword">:</span> May 12 07:51:36 2021 GMT
+        Subject: O <span class="token operator">=</span> system:masters, CN <span class="token operator">=</span> kube-apiserver-etcd-client
+<span class="token operator">==</span><span class="token operator">==</span><span class="token operator">=</span> apiserver-kubelet-client.crt <span class="token operator">==</span><span class="token operator">==</span><span class="token operator">=</span>
+        Validity
+            Not Before: May 12 07:51:36 2020 GMT
+            Not After <span class="token keyword">:</span> May 12 07:51:36 2021 GMT
+        Subject: O <span class="token operator">=</span> system:masters, CN <span class="token operator">=</span> kube-apiserver-kubelet-client
+<span class="token operator">==</span><span class="token operator">==</span><span class="token operator">=</span> ca.crt <span class="token operator">==</span><span class="token operator">==</span><span class="token operator">=</span>
+        Validity
+            Not Before: May 12 07:51:36 2020 GMT
+            Not After <span class="token keyword">:</span> May 10 07:51:36 2029 GMT
+        Subject: CN <span class="token operator">=</span> kubernetes
+<span class="token operator">==</span><span class="token operator">==</span><span class="token operator">=</span> front-proxy-ca.crt <span class="token operator">==</span><span class="token operator">==</span><span class="token operator">=</span>
+        Validity
+            Not Before: May 12 07:51:36 2019 GMT
+            Not After <span class="token keyword">:</span> May 10 07:51:36 2029 GMT
+        Subject: CN <span class="token operator">=</span> front-proxy-ca
+<span class="token operator">==</span><span class="token operator">==</span><span class="token operator">=</span> front-proxy-client.crt <span class="token operator">==</span><span class="token operator">==</span><span class="token operator">=</span>
+        Validity
+            Not Before: May 12 07:51:36 2020 GMT
+            Not After <span class="token keyword">:</span> May 12 07:51:36 2021 GMT
+        Subject: CN <span class="token operator">=</span> front-proxy-client<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[1] Go 环境部署</strong></li>
 </ul>
@@ -951,100 +915,6 @@ masterNode<span class="token operator">=</span><span class="token string">"192.1
 <script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
 
 
-    </div>
-    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
-        <div class="toc-widget card" style="background-color: white;">
-            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
-            <div id="toc-content"></div>
-        </div>
-    </div>
-</div>
-
-<!-- TOC 悬浮按钮. -->
-
-<div id="floating-toc-btn" class="hide-on-med-and-down">
-    <a class="btn-floating btn-large bg-color">
-        <i class="fas fa-list-ul"></i>
-    </a>
-</div>
-
-
-<script src="/libs/tocbot/tocbot.min.js"></script>
-<script>
-    $(function () {
-        tocbot.init({
-            tocSelector: '#toc-content',
-            contentSelector: '#articleContent',
-            headingsOffset: -($(window).height() * 0.4 - 45),
-            collapseDepth: Number('4'),
-            headingSelector: 'h2, h3, h4, h5'
-        });
-
-        // modify the toc link href to support Chinese.
-        let i = 0;
-        let tocHeading = 'toc-heading-';
-        $('#toc-content a').each(function () {
-            $(this).attr('href', '#' + tocHeading + (++i));
-        });
-
-        // modify the heading title id to support Chinese.
-        i = 0;
-        $('#articleContent').children('h2, h3, h4, h5').each(function () {
-            $(this).attr('id', tocHeading + (++i));
-        });
-
-        // Set scroll toc fixed.
-        let tocHeight = parseInt($(window).height() * 0.4 - 64);
-        let $tocWidget = $('.toc-widget');
-        $(window).scroll(function () {
-            let scroll = $(window).scrollTop();
-            /* add post toc fixed. */
-            if (scroll > tocHeight) {
-                $tocWidget.addClass('toc-fixed');
-            } else {
-                $tocWidget.removeClass('toc-fixed');
-            }
-        });
-
-        
-        /* 修复文章卡片 div 的宽度. */
-        let fixPostCardWidth = function (srcId, targetId) {
-            let srcDiv = $('#' + srcId);
-            if (srcDiv.length === 0) {
-                return;
-            }
-
-            let w = srcDiv.width();
-            if (w >= 450) {
-                w = w + 21;
-            } else if (w >= 350 && w < 450) {
-                w = w + 18;
-            } else if (w >= 300 && w < 350) {
-                w = w + 16;
-            } else {
-                w = w + 14;
-            }
-            $('#' + targetId).width(w);
-        };
-
-        // 切换TOC目录展开收缩的相关操作.
-        const expandedClass = 'expanded';
-        let $tocAside = $('#toc-aside');
-        let $mainContent = $('#main-content');
-        $('#floating-toc-btn .btn-floating').click(function () {
-            if ($tocAside.hasClass(expandedClass)) {
-                $tocAside.removeClass(expandedClass).hide();
-                $mainContent.removeClass('l9');
-            } else {
-                $tocAside.addClass(expandedClass).show();
-                $mainContent.addClass('l9');
-            }
-            fixPostCardWidth('artDetail', 'prenext-posts');
-        });
-        
-    });
-</script>
-
     
 
 </main>
@@ -1121,7 +991,7 @@ masterNode<span class="token operator">=</span><span class="token string">"192.1
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1028.8k</span>&nbsp;字
+                class="white-color">1030.6k</span>&nbsp;字
             
             
             
