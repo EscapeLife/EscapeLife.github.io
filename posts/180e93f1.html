@@ -427,8 +427,8 @@
                                 <span class="chip bg-color">Kubernetes</span>
                             </a>
                         
-                            <a href="/tags/HELM/">
-                                <span class="chip bg-color">HELM</span>
+                            <a href="/tags/Kubeadm/">
+                                <span class="chip bg-color">Kubeadm</span>
                             </a>
                         
                     </div>
@@ -466,14 +466,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    4.1k
+                    4.5k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    21 分
+                    22 分
                 </div>
                 
 
@@ -667,27 +667,40 @@ $ <span class="token function">chmod</span> 755 /etc/sysconfig/modules/ipvs.modu
 Welcome to Ubuntu 18.04.2 LTS <span class="token punctuation">(</span>GNU/Linux 4.15.0-50-generic x86_64<span class="token punctuation">)</span>
 
 <span class="token comment" spellcheck="true"># 部署节点(命令行)</span>
+<span class="token comment" spellcheck="true"># 注意pod和service的地址需要不同(否则会报错)</span>
 $ <span class="token function">sudo</span> kubeadm init \
     --kubernetes-version<span class="token operator">=</span>1.20.2 \
     --image-repository registry.aliyuncs.com/google_containers \
     --apiserver-advertise-address<span class="token operator">=</span>192.168.30.30 \
     --pod-network-cidr<span class="token operator">=</span>10.244.0.0/16 \
-    --service-cidr<span class="token operator">=</span>10.244.0.0/16
+    --service-cidr<span class="token operator">=</span>10.245.0.0/16
 
 <span class="token comment" spellcheck="true"># 部署镜像配置(配置文件)</span>
-$ <span class="token function">sudo</span> kubeadm init --config ./kubeadm.yaml
-Your Kubernetes control-plane has initialized successfully<span class="token operator">!</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> kubeadm init --config ./kubeadm-config.yaml
+Your Kubernetes control-plane has initialized successfully<span class="token operator">!</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看IP段是否生效(iptable)</span>
+$ ip route show
+10.244.0.0/24 dev cni0 proto kernel scope <span class="token function">link</span> src 10.244.0.1
+10.244.1.0/24 via 10.244.1.0 dev flannel.1 onlink
+10.244.2.0/24 via 10.244.2.0 dev flannel.1 onlink
+
+<span class="token comment" spellcheck="true"># # 查看IP段是否生效(ipvs)</span>
+$ ipvsadm -L -n
+IP Virtual Server version 1.2.1 <span class="token punctuation">(</span>size<span class="token operator">=</span>4096<span class="token punctuation">)</span>
+Prot LocalAddress:Port Scheduler Flags
+  -<span class="token operator">></span> RemoteAddress:Port           Forward Weight ActiveConn InActConn<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>配置文件定义</strong><ul>
 <li>接口使用了 <code>v1beta2</code> 版本</li>
 <li>配置主节点 <code>IP</code> 地址为 ``</li>
 <li>为 <code>flannel</code> 分配的是 <code>10.244.0.0/16</code> 网段</li>
-<li>选择的 <code>kubernetes</code> 是当前最新的 <code>1.20.1</code> 版本</li>
+<li>选择的 <code>kubernetes</code> 是当前最新的 <code>1.20.2</code> 版本</li>
 <li>加入了 <code>controllerManager</code> 的水平扩容功能</li>
 </ul>
 </li>
 </ul>
-<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token comment" spellcheck="true"># kubeadm.yaml</span>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token comment" spellcheck="true"># kubeadm-config.yaml</span>
+<span class="token comment" spellcheck="true"># sudo kubeadm config print init-defaults > kubeadm-config.yaml</span>
 <span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> kubeadm.k8s.io/v1beta2
 <span class="token key atrule">imageRepository</span><span class="token punctuation">:</span> registry.aliyuncs.com/google_containers
 <span class="token key atrule">kind</span><span class="token punctuation">:</span> ClusterConfiguration
@@ -701,7 +714,7 @@ Your Kubernetes control-plane has initialized successfully<span class="token ope
   <span class="token key atrule">ExtraArgs</span><span class="token punctuation">:</span>
     <span class="token key atrule">horizontal-pod-autoscaler-use-rest-clients</span><span class="token punctuation">:</span> <span class="token string">"true"</span>
     <span class="token key atrule">horizontal-pod-autoscaler-sync-period</span><span class="token punctuation">:</span> <span class="token string">"10s"</span>
-    <span class="token key atrule">node-monitor-grace-period</span><span class="token punctuation">:</span> <span class="token string">"10s"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    <span class="token key atrule">node-monitor-grace-period</span><span class="token punctuation">:</span> <span class="token string">"10s"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>执行成功之后会输出如下信息，需要安装如下步骤操作下</strong><ul>
 <li><strong>第一步</strong> 在 <code>kubectl</code> 默认控制和操作集群节点的时候，需要使用到 <code>CA</code> 的密钥，传输过程是通过 <code>TLS</code> 协议保障通讯的安全性。通过下面 <code>3</code> 行命令拷贝密钥信息到当前用户家目录下，这样 <code>kubectl</code> 执行时会首先访问 <code>.kube</code> 目录，使用这些授权信息访问集群。</li>
@@ -800,6 +813,14 @@ $ kubectl apply -f ./kube-flannel.yml
 $ kubectl logs kube-flannel-ds-6xxs5 --namespace<span class="token operator">=</span>kube-system
 $ kubectl describe pod kube-flannel-ds-6xxs5 --namespace<span class="token operator">=</span>kube-system<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><img src="../images/install-mini-k8s-01.png" alt="部署flannel网络"></p>
+<ul>
+<li>如果使用当中存在问题的，可以参考 <a href="https://github.com/coreos/flannel/blob/master/Documentation/troubleshooting.md" target="_blank" rel="noopener">官方的问题手册</a>。<ul>
+<li>因为我们这里使用的是 <code>Vagrant</code> 虚拟出来的机器进行 <code>K8S</code> 的部署，但是在运行对应 <code>yaml</code> 配置的时候，会报错。通过查看日志发现是因为默认绑定的是虚拟机上面的 <code>eth0</code> 这块网卡，而这块网卡是 <code>Vagrant</code> 使用的，我们应该绑定的是 <code>eth1</code> 才对。</li>
+<li><code>Vagrant</code> 通常为所有 <code>VM</code> 分配两个接口，第一个为所有主机分配的 <code>IP</code> 地址为 <code>10.0.2.15</code>，用于获得 <code>NAT</code> 的外部流量。这样会导致 <code>flannel</code> 部署存在问题。通过官方问题说明，我们可以使用 <code>--iface=eth1</code> 这个参数选择第二个网卡。</li>
+<li>对应的参数使用方式，可以参考 <a href="https://stackoverflow.com/questions/47845739/configuring-flannel-to-use-a-non-default-interface-in-kubernetes" target="_blank" rel="noopener">flannel use –iface=eth1</a> 中的回答自行添加，而这里我直接修改了启动的配置文件，在启动服务的时候通过 <code>args</code> 修改了，如下所示。</li>
+</ul>
+</li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash">$ kubectl get pods -n kube-system
 NAME                                 READY   STATUS    RESTARTS   AGE
 coredns-7f89b7bc75-bh42f             1/1     Running   0          61m
@@ -1003,6 +1024,7 @@ kube-scheduler-k8s-master            1/1     Running   0          62m<span aria-
           <span class="token key atrule">args</span><span class="token punctuation">:</span>
             <span class="token punctuation">-</span> <span class="token punctuation">-</span><span class="token punctuation">-</span>ip<span class="token punctuation">-</span>masq
             <span class="token punctuation">-</span> <span class="token punctuation">-</span><span class="token punctuation">-</span>kube<span class="token punctuation">-</span>subnet<span class="token punctuation">-</span>mgr
+            <span class="token punctuation">-</span> <span class="token punctuation">-</span><span class="token punctuation">-</span>iface=eth1
           <span class="token key atrule">resources</span><span class="token punctuation">:</span>
             <span class="token key atrule">requests</span><span class="token punctuation">:</span>
               <span class="token key atrule">cpu</span><span class="token punctuation">:</span> <span class="token string">"100m"</span>
@@ -1037,7 +1059,7 @@ kube-scheduler-k8s-master            1/1     Running   0          62m<span aria-
             <span class="token key atrule">path</span><span class="token punctuation">:</span> /etc/cni/net.d
         <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> flannel<span class="token punctuation">-</span>cfg
           <span class="token key atrule">configMap</span><span class="token punctuation">:</span>
-            <span class="token key atrule">name</span><span class="token punctuation">:</span> kube<span class="token punctuation">-</span>flannel<span class="token punctuation">-</span>cfg<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+            <span class="token key atrule">name</span><span class="token punctuation">:</span> kube<span class="token punctuation">-</span>flannel<span class="token punctuation">-</span>cfg<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>至此集群部署成功！如果有参数错误需要修改，你也可以在 <code>reset</code> 后重新 <code>init</code> 集群。</li>
 </ul>
@@ -1070,8 +1092,8 @@ $ kubectl describe pod \
     --namespace<span class="token operator">=</span>kubernetes-dashboard<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash">$ kubectl get svc -n kubernetes-dashboard
 NAME                        TYPE        CLUSTER-IP      EXTERNAL-IP   PORT<span class="token punctuation">(</span>S<span class="token punctuation">)</span>    AGE
-dashboard-metrics-scraper   ClusterIP   10.100.6.83     <span class="token operator">&lt;</span>none<span class="token operator">></span>        8000/TCP   13h
-kubernetes-dashboard        ClusterIP   10.99.243.226   <span class="token operator">&lt;</span>none<span class="token operator">></span>        443/TCP    13h<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+dashboard-metrics-scraper   ClusterIP   10.245.214.11    <span class="token operator">&lt;</span>none<span class="token operator">></span>        8000/TCP   26s
+kubernetes-dashboard        ClusterIP   10.245.161.146   <span class="token operator">&lt;</span>none<span class="token operator">></span>        443/TCP    26s<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <p>需要注意的是 <code>dashboard</code> 默认不允许外网访问，即使通过 <code>kubectl proxy</code> 允许外网访问。但 <code>dashboard</code> 又只允许 <code>HTTPS</code> 访问，这样 <code>kubeadm init</code> 时自签名的 <code>CA</code> 证书是不被浏览器承认的。</p>
 <p>我采用的方案是 <code>Nginx</code> 作为反向代理，使用 <code>Lets Encrypt</code> 提供的有效证书对外提供服务，再经由 <code>proxy_pass</code> 指令反向代理到 <code>kubectl proxy</code> 上，如下所示。此时，本地可经由 <code>8888</code> 访问到 <code>dashboard</code> 服务，再通过 <code>Nginx</code> 访问它。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 代理</span>
@@ -1524,8 +1546,8 @@ $ kubectl -n kubernetes-dashboard describe secret \
                                     <span class="chip bg-color">Kubernetes</span>
                                 </a>
                             
-                                <a href="/tags/HELM/">
-                                    <span class="chip bg-color">HELM</span>
+                                <a href="/tags/Kubeadm/">
+                                    <span class="chip bg-color">Kubeadm</span>
                                 </a>
                             
                         </div>
@@ -1988,7 +2010,7 @@ $ kubectl -n kubernetes-dashboard describe secret \
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1035.1k</span>&nbsp;字
+                class="white-color">1035.5k</span>&nbsp;字
             
             
             
