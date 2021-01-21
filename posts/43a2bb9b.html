@@ -593,7 +593,7 @@ Storage Driver: devicemapper
 $ <span class="token function">du</span> -d1 -h /var/lib/docker/containers <span class="token operator">|</span> <span class="token function">sort</span> -h
 
 <span class="token comment" spellcheck="true"># 清除您选择的容器日志文件的内容</span>
-$ <span class="token function">cat</span> /dev/null <span class="token operator">&gt;</span> /var/lib/docker/containers/container_id/container_log_name<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">cat</span> /dev/null <span class="token operator">></span> /var/lib/docker/containers/container_id/container_log_name<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <ul>
 <li><p><strong>[问题起因二]</strong> 显然我遇到的不是上一种情况，而是在启动容器的时候，容器启动之后不久就显示是 <code>unhealthy</code> 的状态，通过如下日志发现，原来是复制配置文件启动的时候，提示磁盘空间不足。</p>
@@ -822,9 +822,9 @@ $ docker run -d -p 80:80 <span class="token variable">$PWD</span>:/etc/nginx ngi
 <li><p>可以将 <code>nginx.conf</code> 中的 <code>localhost</code> 改为宿主机的 <code>IP</code> 地址，就可以解决 <code>502</code> 的错误。</p>
 </li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查询宿主机IP地址 =&gt; 172.17.0.1</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查询宿主机IP地址 => 172.17.0.1</span>
 $ ip addr show docker0
-docker0: <span class="token operator">&lt;</span>BROADCAST,MULTICAST,UP,LOWER_UP<span class="token operator">&gt;</span> mtu 1500 qdisc noqueue state UP group default
+docker0: <span class="token operator">&lt;</span>BROADCAST,MULTICAST,UP,LOWER_UP<span class="token operator">></span> mtu 1500 qdisc noqueue state UP group default
     link/ether 02:42:d5:4c:f2:1e brd ff:ff:ff:ff:ff:ff
     inet 172.17.0.1/16 scope global docker0
        valid_lft forever preferred_lft forever
@@ -955,7 +955,7 @@ $ docker-compose -f ./docker-compose.yml -p app1 up -d<span aria-hidden="true" c
 <li>随即，查看了脚本发现报错地方是执行了一个 <code>exec</code> 的 <code>docker</code> 命令，大致如下所示。很奇怪的是，手动执行或直接调脚本的时候，怎么都是没有问题的，但是等到 <code>CI</code> 调用的时候怎么都是有问题。后来好好看下下面这个命令，注意到 <code>-it</code> 这个参数了。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 脚本调用docker命令</span>
-docker <span class="token function">exec</span> -it <span class="token operator">&lt;</span>container_name<span class="token operator">&gt;</span> psql -Upostgres <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+docker <span class="token function">exec</span> -it <span class="token operator">&lt;</span>container_name<span class="token operator">></span> psql -Upostgres <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
 <li>我们可以一起看下 <code>exec</code> 命令的这两个参数，自然就差不多理解了。</li>
 </ul>
@@ -991,7 +991,7 @@ docker <span class="token function">exec</span> -it <span class="token operator"
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Crontab定时任务</span>
 0 */6 * * * \
-    docker <span class="token function">exec</span> -it <span class="token operator">&lt;</span>container_name<span class="token operator">&gt;</span> sh -c \
+    docker <span class="token function">exec</span> -it <span class="token operator">&lt;</span>container_name<span class="token operator">></span> sh -c \
         <span class="token string">'exec mysqldump --all-databases -uroot -ppassword ......'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法]</strong> 后来发现是因为执行的 <code>docker</code> 命令多个 <code>-i</code> 导致的。因为 <code>Crontab</code> 命令执行的时候，并不是交互式的，所以需要把这个去掉才可以。总结就是，如果你需要回显的话则需要 <code>-t</code> 选项，如果需要交互式会话则需要 <code>-i</code> 选项。</li>
@@ -1054,7 +1054,7 @@ Error response from daemon: conflict: unable to delete 3ccxxxx2e862 <span class=
 <li><strong>[解决方法]</strong> 后来才发现，出现这个原因主要是因为 <code>TAG</code>，即存在其他镜像引用了这个镜像。这里我们可以使用如下命令查看对应镜像文件的依赖关系，然后根据对应 <code>TAG</code> 来删除镜像。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查询依赖 - image_id表示镜像名称</span>
-$ docker image inspect --format<span class="token operator">=</span><span class="token string">'{{.RepoTags}} {{.Id}} {{.Parent}}'</span> <span class="token variable"><span class="token variable">$(</span>docker image <span class="token function">ls</span> -q --filter since<span class="token operator">=</span><span class="token operator">&lt;</span>image_id<span class="token operator">&gt;</span><span class="token variable">)</span></span>
+$ docker image inspect --format<span class="token operator">=</span><span class="token string">'{{.RepoTags}} {{.Id}} {{.Parent}}'</span> <span class="token variable"><span class="token variable">$(</span>docker image <span class="token function">ls</span> -q --filter since<span class="token operator">=</span><span class="token operator">&lt;</span>image_id<span class="token operator">></span><span class="token variable">)</span></span>
 
 <span class="token comment" spellcheck="true"># 根据TAG删除镜像</span>
 $ docker rmi -f c565xxxxc87f<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
@@ -1650,7 +1650,7 @@ nginx: <span class="token punctuation">[</span>alert<span class="token punctuati
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1044.3k</span>&nbsp;字
+                class="white-color">1035.8k</span>&nbsp;字
             
             
             
