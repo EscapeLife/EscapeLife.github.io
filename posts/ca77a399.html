@@ -517,12 +517,12 @@
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 我们可以看到命令都是需要动态链接的</span>
 $ ldd /usr/bin/lsof
     linux-vdso.so.1 <span class="token punctuation">(</span>0x00007ffead5d4000<span class="token punctuation">)</span>
-    libselinux.so.1 <span class="token operator">=</span><span class="token operator">></span> /lib/x86_64-linux-gnu/libselinux.so.1 <span class="token punctuation">(</span>0x00007f64feb94000<span class="token punctuation">)</span>
-    libc.so.6 <span class="token operator">=</span><span class="token operator">></span> /lib/x86_64-linux-gnu/libc.so.6 <span class="token punctuation">(</span>0x00007f64fe7f5000<span class="token punctuation">)</span>
-    libpcre.so.3 <span class="token operator">=</span><span class="token operator">></span> /lib/x86_64-linux-gnu/libpcre.so.3 <span class="token punctuation">(</span>0x00007f64fe582000<span class="token punctuation">)</span>
-    libdl.so.2 <span class="token operator">=</span><span class="token operator">></span> /lib/x86_64-linux-gnu/libdl.so.2 <span class="token punctuation">(</span>0x00007f64fe37e000<span class="token punctuation">)</span>
+    libselinux.so.1 <span class="token operator">=</span><span class="token operator">&gt;</span> /lib/x86_64-linux-gnu/libselinux.so.1 <span class="token punctuation">(</span>0x00007f64feb94000<span class="token punctuation">)</span>
+    libc.so.6 <span class="token operator">=</span><span class="token operator">&gt;</span> /lib/x86_64-linux-gnu/libc.so.6 <span class="token punctuation">(</span>0x00007f64fe7f5000<span class="token punctuation">)</span>
+    libpcre.so.3 <span class="token operator">=</span><span class="token operator">&gt;</span> /lib/x86_64-linux-gnu/libpcre.so.3 <span class="token punctuation">(</span>0x00007f64fe582000<span class="token punctuation">)</span>
+    libdl.so.2 <span class="token operator">=</span><span class="token operator">&gt;</span> /lib/x86_64-linux-gnu/libdl.so.2 <span class="token punctuation">(</span>0x00007f64fe37e000<span class="token punctuation">)</span>
     /lib64/ld-linux-x86-64.so.2 <span class="token punctuation">(</span>0x00007f64fefe4000<span class="token punctuation">)</span>
-    libpthread.so.0 <span class="token operator">=</span><span class="token operator">></span> /lib/x86_64-linux-gnu/libpthread.so.0 <span class="token punctuation">(</span>0x00007f64fe161000<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    libpthread.so.0 <span class="token operator">=</span><span class="token operator">&gt;</span> /lib/x86_64-linux-gnu/libpthread.so.0 <span class="token punctuation">(</span>0x00007f64fe161000<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>该服务器上面还是很多开发和测试环境使用的环境和配置的程序，如果正式的导致系统无法使用，那就玩大的。所有开始在网上找相关的内容，可是一直都没有知道处理上述问题的方法，让人感觉到绝望。</li>
 <li>幸好，有个厉害的同事说可以使用 <code>LD_PRELOAD</code> 环境变量来优先加载指定 <code>so</code> 文件，这样命令就可以使用，对原本有问题的 <code>link</code> 文件进行修复了。随即，试了下，果然奏效了。</li>
@@ -563,9 +563,9 @@ $ ldd /usr/bin/lsof
 <span class="token comment" spellcheck="true"># random_num.c</span>
 <span class="token comment" spellcheck="true">##############</span>
 
-<span class="token comment" spellcheck="true">#include &lt;stdio.h></span>
-<span class="token comment" spellcheck="true">#include &lt;stdlib.h></span>
-<span class="token comment" spellcheck="true">#include &lt;time.h></span>
+<span class="token comment" spellcheck="true">#include &lt;stdio.h&gt;</span>
+<span class="token comment" spellcheck="true">#include &lt;stdlib.h&gt;</span>
+<span class="token comment" spellcheck="true">#include &lt;time.h&gt;</span>
 
 int main<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
   srand<span class="token punctuation">(</span>time<span class="token punctuation">(</span>NULL<span class="token punctuation">))</span><span class="token punctuation">;</span>
@@ -598,17 +598,17 @@ $ <span class="token function">export</span> LD_PRELOAD<span class="token operat
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 程序random_nums所需要的库的列表</span>
 <span class="token comment" spellcheck="true"># 这个列表是构建进可执行程序中的并且它是在编译时决定的</span>
 $ ldd random_nums
-linux-vdso.so.1 <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">(</span>0x00007fff4bdfe000<span class="token punctuation">)</span>
-libc.so.6 <span class="token operator">=</span><span class="token operator">></span> /lib/x86_64-linux-gnu/libc.so.6 <span class="token punctuation">(</span>0x00007f48c03ec000<span class="token punctuation">)</span>
+linux-vdso.so.1 <span class="token operator">=</span><span class="token operator">&gt;</span> <span class="token punctuation">(</span>0x00007fff4bdfe000<span class="token punctuation">)</span>
+libc.so.6 <span class="token operator">=</span><span class="token operator">&gt;</span> /lib/x86_64-linux-gnu/libc.so.6 <span class="token punctuation">(</span>0x00007f48c03ec000<span class="token punctuation">)</span>
 /lib64/ld-linux-x86-64.so.2 <span class="token punctuation">(</span>0x00007f48c07e3000<span class="token punctuation">)</span>
 
 <span class="token comment" spellcheck="true"># 可以使用如下命令查看so文件的全部函数列表</span>
 $ nm -D /lib/libc.so.6 <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">"rand()"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 列出我们强加指定库之后的链接库列表</span>
 $ LD_PRELOAD<span class="token operator">=</span><span class="token variable">$PWD</span>/unrandom.so ldd random_nums
-linux-vdso.so.1 <span class="token operator">=</span><span class="token operator">></span>  <span class="token punctuation">(</span>0x00007fff369dc000<span class="token punctuation">)</span>
+linux-vdso.so.1 <span class="token operator">=</span><span class="token operator">&gt;</span>  <span class="token punctuation">(</span>0x00007fff369dc000<span class="token punctuation">)</span>
 /some/path/to/unrandom.so <span class="token punctuation">(</span>0x00007f262b439000<span class="token punctuation">)</span>
-libc.so.6 <span class="token operator">=</span><span class="token operator">></span> /lib/x86_64-linux-gnu/libc.so.6 <span class="token punctuation">(</span>0x00007f262b044000<span class="token punctuation">)</span>
+libc.so.6 <span class="token operator">=</span><span class="token operator">&gt;</span> /lib/x86_64-linux-gnu/libc.so.6 <span class="token punctuation">(</span>0x00007f262b044000<span class="token punctuation">)</span>
 /lib64/ld-linux-x86-64.so.2 <span class="token punctuation">(</span>0x00007f262b63d000<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>需要注意的是，别以为通过 <code>LD_PRELOAD</code> 环境变量就可以获得 <code>root</code> 权限了。你想多了，因为通过这种方法是不会绕过安全机制的限制的。专业的解释是，如果 <code>RUID != EUID</code> 的话，库是不会通过这种方法预加载进来的。</li>
@@ -1203,7 +1203,7 @@ libc.so.6 <span class="token operator">=</span><span class="token operator">></s
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1035.8k</span>&nbsp;字
+                class="white-color">1044.3k</span>&nbsp;字
             
             
             

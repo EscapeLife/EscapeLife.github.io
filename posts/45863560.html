@@ -413,14 +413,14 @@
 <li><strong>[2] 问题原因</strong></li>
 </ul>
 <p>后来，在故障的那个 <code>pipeline</code> 对应的服务器上面，手动 <code>build</code> 镜像，发现还是会出现无法找到可用的 <code>pip3</code> 命令的报错。如果找不到 <code>pip3</code> 命令的话，肯定是安装 <code>pip3</code> 的时候发生的错了。随即，看了下对应的 <code>Dockerfile</code> 文件，发现了如下安装步骤。</p>
-<pre class="line-numbers language-dockerfile"><code class="language-dockerfile">RUN sed -i s/archive.ubuntu.com/mirrors.aliyun.com/g /etc/apt/sources.list && \
-    apt update -y && \
-    apt update -y && \
+<pre class="line-numbers language-dockerfile"><code class="language-dockerfile">RUN sed -i s/archive.ubuntu.com/mirrors.aliyun.com/g /etc/apt/sources.list &amp;&amp; \
+    apt update -y &amp;&amp; \
+    apt update -y &amp;&amp; \
         python3.6-dev \
         python3-distutils \
         ......
-    wget -qO - http://site.escapelife.me/python/12345...67 | python3 - && \
-    pip3 install cython invoke supervisor --upgrade --no-cache-dir && \
+    wget -qO - http://site.escapelife.me/python/12345...67 | python3 - &amp;&amp; \
+    pip3 install cython invoke supervisor --upgrade --no-cache-dir &amp;&amp; \
     ......<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>测试了下 <code>wget</code> 是否可以成功下载到对应的文件，发现无法解析到对应域名，所以导致并没有下载到想打的东西。又因为后面的管道命令，导致对应的报错并没有显示出来，返回码还是正确的。后面，发现是国内的 <code>DNS</code> 搞事情导致反解析域名到 <code>IP</code> 地址出了问题。将服务器的 <code>DNS</code> 修改之后，再次重跑 <code>CI</code>，即可正常运行了。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 发现wget命令返回4的错误码</span>
@@ -464,15 +464,15 @@ $ docker run -it --rm --dns<span class="token operator">=</span>8.8.4.4 --entryp
 <p>最终，我们为了防止同样的问题再次出现，对构建的 <code>Dockerfile</code> 文件做了特殊处理，即在任何使用管道的命令之前，加了 <code>pipefail</code> 变量。又因为默认 <code>ubuntu:18.04</code> 镜像使用的是 <code>sh</code> 且不支持 <code>set -o pipefail</code> 的设置，所以需要在之前将其改为 <code>bash</code> 方可正常使用。</p>
 <pre class="line-numbers language-dockerfile"><code class="language-dockerfile">SHELL ["/bin/bash", "-c"]
 
-RUN sed -i s/archive.ubuntu.com/mirrors.aliyun.com/g /etc/apt/sources.list && \
-    apt update -y && \
-    apt update -y && \
+RUN sed -i s/archive.ubuntu.com/mirrors.aliyun.com/g /etc/apt/sources.list &amp;&amp; \
+    apt update -y &amp;&amp; \
+    apt update -y &amp;&amp; \
         python3.6-dev \
         python3-distutils \
         ......
-    set -o pipefail && \
-    wget -qO - http://site.escapelife.me/python/12345...67 | python3 - && \
-    pip3 install cython invoke supervisor --upgrade --no-cache-dir && \
+    set -o pipefail &amp;&amp; \
+    wget -qO - http://site.escapelife.me/python/12345...67 | python3 - &amp;&amp; \
+    pip3 install cython invoke supervisor --upgrade --no-cache-dir &amp;&amp; \
     ......<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
@@ -930,7 +930,7 @@ RUN sed -i s/archive.ubuntu.com/mirrors.aliyun.com/g /etc/apt/sources.list && \
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1035.8k</span>&nbsp;字
+                class="white-color">1044.3k</span>&nbsp;字
             
             
             
