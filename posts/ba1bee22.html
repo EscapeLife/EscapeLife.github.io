@@ -459,21 +459,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-12-08
+                    2021-02-02
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    12.3k
+                    12.5k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    50 分
+                    51 分
                 </div>
                 
 
@@ -1655,6 +1655,46 @@ httpd主机 <span class="token operator">==</span><span class="token operator">>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将客户端client.crt转换为pkcs12格式</span>
 <span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># openssl pkcs12 -export -clcerts -in client.crt -inkey client.key -out client.pfx</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <hr>
+<ul>
+<li><strong>把 windows 中用 pfx 证书转为 appache/nginx 用到 key 和 crt 组成的证书</strong><ul>
+<li><a href="https://xy2z.io/posts/2020-pfx-certificates-nginx-apache2/" target="_blank" rel="noopener">Setup SSL using .PFX file on nginx/apache2</a></li>
+<li><code>-nocerts</code> =&gt; No certificates at all will be output.</li>
+<li><code>-clcerts</code> =&gt; Only output client certificates (not CA certificates).</li>
+<li><code>-nokeys</code> =&gt; No private keys will be output.</li>
+<li><code>-nodes</code> =&gt; Don’t encrypt the private keys at all.</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># pfx文件是受密码保护的证书档案，其中包含您的证书和私钥。</span>
+
+<span class="token comment" spellcheck="true"># 生成RSA信息</span>
+$ openssl pkcs12 -in ./YOUR-PFX-FILE.pfx -nocerts -nodes -out domain.private.rsa
+
+<span class="token comment" spellcheck="true"># 生成CRT信息</span>
+$ openssl pkcs12 -in ./YOUR-PFX-FILE.pfx -clcerts -nokeys -out domain.public.crt
+$ openssl pkcs12 -in ./YOUR-PFX-FILE.pfx -cacerts -out bundle.crt
+$ <span class="token function">cat</span> domain.public.crt bundle.crt <span class="token operator">></span> domain.chained.crt
+
+<span class="token comment" spellcheck="true"># 生成KEY信息</span>
+$ openssl pkcs12 -in ./YOUR-PFX-FILE.pfx -nocerts -out domain.encrypted.key
+$ openssl rsa -in domain.encrypted.key -out domain.decrypt.key
+
+<span class="token comment" spellcheck="true"># 授权(需要时操作)</span>
+$ <span class="token function">sudo</span> <span class="token function">chmod</span> 600 domain.*
+$ <span class="token function">sudo</span> <span class="token function">chown</span> root:root domain.tld.*<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 对应如下Nginx配置</span>
+<span class="token keyword">server</span> <span class="token punctuation">{</span>
+   <span class="token keyword">listen</span>       <span class="token number">443</span> <span class="token keyword">ssl</span><span class="token punctuation">;</span>
+   <span class="token keyword">server_name</span>  domain<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
+
+   <span class="token keyword">ssl_certificate</span>        <span class="token operator">/</span>path<span class="token operator">/</span>to<span class="token operator">/</span>your<span class="token operator">/</span>domain<span class="token punctuation">.</span>chained<span class="token punctuation">.</span>crt<span class="token punctuation">;</span>
+   <span class="token keyword">ssl_certificate_key</span>    <span class="token operator">/</span>path<span class="token operator">/</span>to<span class="token operator">/</span>your<span class="token operator">/</span>domain<span class="token punctuation">.</span>decrypt<span class="token punctuation">.</span>key<span class="token punctuation">;</span>
+   <span class="token comment" spellcheck="true"># ssl_certificate_key  /path/to/your/domain.private.rsa;</span>
+
+   <span class="token keyword">root</span> <span class="token operator">/</span>mnt<span class="token operator">/</span>www<span class="token operator">/</span>nginx<span class="token punctuation">;</span>
+   <span class="token keyword">index</span> <span class="token keyword">index</span><span class="token punctuation">.</span>html<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
 <h4 id="3-5-4-配置启用SSL功能"><a href="#3-5-4-配置启用SSL功能" class="headerlink" title="3.5.4 配置启用SSL功能"></a>3.5.4 配置启用<code>SSL</code>功能</h4><pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 配置httpd支持使用ssl功能</span>
 $ yum -y <span class="token function">install</span> mod_ssl
 $ httpd -M <span class="token operator">|</span> <span class="token function">grep</span> ssl
@@ -2832,7 +2872,7 @@ Allow from 172.16.2.3<span aria-hidden="true" class="line-numbers-rows"><span></
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1039.1k</span>&nbsp;字
+                class="white-color">1039.3k</span>&nbsp;字
             
             
             
