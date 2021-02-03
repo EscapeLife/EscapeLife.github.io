@@ -459,7 +459,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-02-02
+                    2021-02-03
                 </div>
                 
 
@@ -1670,18 +1670,19 @@ httpd主机 <span class="token operator">==</span><span class="token operator">>
 <span class="token comment" spellcheck="true"># 生成RSA信息</span>
 $ openssl pkcs12 -in ./YOUR-PFX-FILE.pfx -nocerts -nodes -out domain.private.rsa
 
-<span class="token comment" spellcheck="true"># 生成CRT信息</span>
+<span class="token comment" spellcheck="true"># 生成CRT信息(删除domain.public.crt和domain.bundle.crt临时文件)</span>
 $ openssl pkcs12 -in ./YOUR-PFX-FILE.pfx -clcerts -nokeys -out domain.public.crt
-$ openssl pkcs12 -in ./YOUR-PFX-FILE.pfx -cacerts -out bundle.crt
-$ <span class="token function">cat</span> domain.public.crt bundle.crt <span class="token operator">></span> domain.chained.crt
+$ openssl pkcs12 -in ./YOUR-PFX-FILE.pfx -cacerts -out domain.bundle.crt
+$ <span class="token function">cat</span> domain.public.crt domain.bundle.crt <span class="token operator">></span> domain.crt
 
-<span class="token comment" spellcheck="true"># 生成KEY信息</span>
+<span class="token comment" spellcheck="true"># 生成解密后的KEY信息(删除domain.encrypted.key临时文件)</span>
+<span class="token comment" spellcheck="true"># 这个domain.encrypted.key也可以称之为domain.encrypted.pem</span>
 $ openssl pkcs12 -in ./YOUR-PFX-FILE.pfx -nocerts -out domain.encrypted.key
-$ openssl rsa -in domain.encrypted.key -out domain.decrypt.key
+$ openssl rsa -in domain.encrypted.key -out domain.key
 
 <span class="token comment" spellcheck="true"># 授权(需要时操作)</span>
 $ <span class="token function">sudo</span> <span class="token function">chmod</span> 600 domain.*
-$ <span class="token function">sudo</span> <span class="token function">chown</span> root:root domain.tld.*<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> <span class="token function">chown</span> root:root domain.tld.*<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 对应如下Nginx配置</span>
 <span class="token keyword">server</span> <span class="token punctuation">{</span>
    <span class="token keyword">listen</span>       <span class="token number">443</span> <span class="token keyword">ssl</span><span class="token punctuation">;</span>
@@ -2872,7 +2873,7 @@ Allow from 172.16.2.3<span aria-hidden="true" class="line-numbers-rows"><span></
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1039.3k</span>&nbsp;字
+                class="white-color">1039.4k</span>&nbsp;字
             
             
             
