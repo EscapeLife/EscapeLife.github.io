@@ -504,9 +504,9 @@
 <hr>
 <p>当物理内存和交换空间不够用时，<code>OOM Killer</code> 就会选择杀死进程，那么它是怎样知道要先杀死哪个进程呢？其实 <code>Linux</code> 的每个进程都有一个 <code>oom_score</code> (位于<code>/proc/&lt;pid&gt;/oom_score</code>文件中)，这个值越大，就越有可能被 <code>OOM Killer</code> 选中。</p>
 <ul>
-<li>如果进程消耗的内存越大，它的 oom_score 通常也会越大。</li>
-<li>如果进程运行了很长时间，并且消耗很多 CPU 时间，那么通常它的 oom_score 会偏小。</li>
-<li>如果进程以 superuser 的身份运行，那么它的 oom_score 也会偏小。</li>
+<li>如果进程消耗的内存越大，它的 <code>oom_score</code> 通常也会越大。</li>
+<li>如果进程运行了很长时间，并且消耗很多 <code>CPU</code> 时间，那么通常它的 <code>oom_score</code> 会偏小。</li>
+<li>如果进程以 <code>Superuser</code> 的身份运行，那么它的 <code>oom_score</code> 也会偏小。</li>
 </ul>
 <p>如何才能尽量防止某个重要的进程被杀死呢？<code>Linux</code> 每个进程都有一个 <code>oom_adj</code>(位于<code>/proc/&lt;pid&gt;/oom_adj</code>文件中)，这个值的范围是 <code>[-17, +15]</code>，进程的 <code>oom_adj</code> 会影响 <code>oom_score</code> 的计算，也就是说，我们可以通过调小进程的 <code>oom_adj</code> 从而降低进程的 <code>oom_score</code>。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># MySQL OOM Killer</span>
@@ -516,7 +516,7 @@ $ <span class="token function">sudo</span> <span class="token keyword">echo</spa
 <p><strong>小问题引发的，小小思考！</strong></p>
 </blockquote>
 <p>事情是这样的，我们一个服务因为跑任务导致服务器的内存使用过多，导致系统出现 <code>OOM</code> 的情况。然后启动了系统保护，把 <code>supervisor</code> 服务给杀了，但是他启动的子进程没有杀完。导致任务跑完之后，内存释放了，而 <code>ci</code> 对应的之前子进程没有杀完且启动了新的进程，导致服务奇怪的异常出现。</p>
-<p>在 <code>supervisor</code> 官方 <code>issus</code> 中发现了下面这个问题，很早之前就有人提出了这个问题，并且给了自己的补丁方法，但是项目的维护者不知道出于什么考虑，导致这个问题已经没有合入也没有任何解释。我在下面 <code>@</code> 了两个核心开发者，但是也是没有回复。但是，你却发现他们还是在不断地提交代码和合入代码，我有点方了。</p>
+<p>在 <code>supervisor</code> 官方 <a href="https://github.com/Supervisor/supervisor/pull/754" target="_blank" rel="noopener"><strong><code>issus</code></strong></a> 中发现了下面这个问题，很早之前就有人提出了这个问题，并且给了自己的补丁方法，但是项目的维护者不知道出于什么考虑，导致这个问题已经没有合入也没有任何解释。我在下面 <code>@</code> 了两个核心开发者，但是也是没有回复。但是，你却发现他们还是在不断地提交代码和合入代码，我有点方了。</p>
 <p>现在就是继续关注这个问题，看看之后什么会合入或者修复，目前看还是只有考虑使用其他的方式来规避这个问题的出现。</p>
 <p><img src="../images/withdrawal-during-oom-1.png" alt="防止程序OOM时退出"></p>
 <hr>
@@ -524,7 +524,7 @@ $ <span class="token function">sudo</span> <span class="token keyword">echo</spa
 <p><strong>知其然，知其所以然！</strong></p>
 </blockquote>
 <p><code>Linux</code> 系统中的 <code>OOM killer</code> 是为了在内存不足的情况下，杀掉消耗内存最多、优先级最低的任务，从而保障系统可以最基本的正常运行。内核通过计算内存消耗，得出 <code>oom_score</code> 的数值。同时 <code>oom_score_adj</code> 允许用于自定义，我们理解为程序运行的优先级，优先级越高对应的值越小，即<strong>越小越不容易被杀</strong>，范围在 <code>-1000~1000</code> 之内。</p>
-<p>在系统内存紧张的时候，内核通过 <code>oom = oom_score + oom_score_adj</code> 公式，计算出分数最高的进程，向其发送关闭信号。</p>
+<p>在系统内存紧张的时候，内核通过 <strong><code>oom = oom_score + oom_score_adj</code></strong> 公式，计算出分数最高的进程，向其发送关闭信号。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># OOM的计算方式</span>
 oom <span class="token operator">=</span> oom_score + oom_score_adj
 
