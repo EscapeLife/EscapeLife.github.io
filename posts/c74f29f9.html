@@ -477,7 +477,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    7 分
+                    8 分
                 </div>
                 
 
@@ -508,7 +508,7 @@
 <li>如果进程运行了很长时间，并且消耗很多 <code>CPU</code> 时间，那么通常它的 <code>oom_score</code> 会偏小。</li>
 <li>如果进程以 <code>Superuser</code> 的身份运行，那么它的 <code>oom_score</code> 也会偏小。</li>
 </ul>
-<p>如何才能尽量防止某个重要的进程被杀死呢？<code>Linux</code> 每个进程都有一个 <code>oom_adj</code>(位于<code>/proc/&lt;pid&gt;/oom_adj</code>文件中)，这个值的范围是 <code>[-17, +15]</code>，进程的 <code>oom_adj</code> 会影响 <code>oom_score</code> 的计算，也就是说，我们可以通过调小进程的 <code>oom_adj</code> 从而降低进程的 <code>oom_score</code>。</p>
+<p>如何才能尽量防止某个重要的进程被杀死呢？<code>Linux</code> 每个进程都有一个 <code>oom_adj</code>(位于<code>/proc/&lt;pid&gt;/oom_adj</code>文件中)，这个值的范围是 <code>[-17, +15]</code>，默认值为 <code>0</code>，值越大越容易被 <code>kill</code> 掉。如果设置为 <code>-17</code> 的话，表示永远不会被清除。进程的 <code>oom_adj</code> 会影响 <code>oom_score</code> 的计算，也就是说，我们可以通过调小进程的 <code>oom_adj</code> 从而降低进程的 <code>oom_score</code>。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># MySQL OOM Killer</span>
 $ <span class="token function">sudo</span> <span class="token keyword">echo</span> -10 <span class="token operator">></span> /proc/<span class="token variable"><span class="token variable">$(</span>pidof mysqld<span class="token variable">)</span></span>/oom_adj<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <hr>
