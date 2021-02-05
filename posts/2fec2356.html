@@ -463,21 +463,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-02-04
+                    2021-02-05
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2k
+                    2.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    8 分
+                    9 分
                 </div>
                 
 
@@ -514,7 +514,7 @@
 <h2 id="1-了解-OOM-机制"><a href="#1-了解-OOM-机制" class="headerlink" title="1. 了解 OOM 机制"></a>1. 了解 OOM 机制</h2><blockquote>
 <p><strong>Linux 系统下应避免因内存耗尽导致系统 Hang 住或频繁读写 Swap 的情况！</strong></p>
 </blockquote>
-<p>如果管理过服务器的话，肯定或多或少会遇到系统 <code>OOM</code> 的情况，这种情况多出现在系统内存严重不足的情况下。在系统 <code>OOM</code> 之前，我们会发现系统巨卡，如果上面部署服务的话，肯定会严重影响使用的。</p>
+<p>如果运维过服务器的话，肯定或多或少会遇到系统 <code>OOM</code> 的情况，这种情况多出现在系统内存严重不足的时候。在系统 <code>OOM</code> 之前，我们会发现系统巨卡，如果上面部署服务的话，肯定会严重影响使用的。</p>
 <ul>
 <li><strong>理解 <code>OOM</code> 的作用</strong></li>
 </ul>
@@ -533,11 +533,11 @@
 <li><a href="https://superuser.com/questions/406101/is-it-possible-to-make-the-oom-killer-intervent-earlier" target="_blank" rel="noopener">Is it possible to make the OOM killer intervent earlier?</a></li>
 </ul>
 <p><img src="../images/oom-to-linux-hang-01.png" alt="OOM导致服务器卡死 - Boom"></p>
-<p>这个时候系统就非常卡了，很容易到系统 <code>Hang</code> 住的情况，到最后不得不重启机器。而我们日常的清理内存操作，因为系统内存足够，所以在我们手动执行如下命令之后，开始时会比较卡一会儿，而并不会出现死机的情况。</p>
+<p>这个时候系统就非常卡了，很容易遇到系统 <code>Hang</code> 住的情况，到最后不得不重启机器。而我们日常的清理内存操作，因为系统内存足够，所以在我们手动执行如下命令之后，开始时会比较卡一会儿，而并不会出现死机的情况。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 清理内存</span>
 $ <span class="token function">sync</span> <span class="token operator">&amp;&amp;</span> <span class="token keyword">echo</span> 3 <span class="token operator">|</span> <span class="token function">sudo</span> <span class="token function">tee</span> /proc/sys/vm/drop_caches<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <p>因为这个问题，我们苦苦挣扎，辗转难以入睡。希望操作系统一直保持正常运行，即便提前干掉耗内存大的进程。但是，使用内核提供的 <code>OOM Killer</code> 无法实现这一目标。</p>
-<p>如果临时使用的话，可以在我们启动服务之前，通过 <code>choom</code> 命令来进行优先级的设置。这样当系统内存不足时，会优先/延后杀掉我们的服务。</p>
+<p>如果“临时”使用的话，可以在我们启动服务之前，通过 <code>choom</code> 命令来进行优先级的设置。这样当系统内存不足时，会优先/延后杀掉我们的服务。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>program:app<span class="token punctuation">]</span>
 directory<span class="token operator">=</span>/data/app
 command<span class="token operator">=</span>sudo choom -n -500 -- <span class="token function">sudo</span> -u app python3 run.py<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
@@ -546,7 +546,7 @@ command<span class="token operator">=</span>sudo choom -n -500 -- <span class="t
 <p><strong>Linux 系统下应避免因内存耗尽导致系统 Hang 住或频繁读写 Swap 的情况！</strong></p>
 </blockquote>
 <p>而在用户空间中，我们可以做任何我们想做的事情，包括“自杀”。所以，我们监控在系统内存不足的情况下，决定杀掉它它它，来释放内存。当然这里我们不用自己去实现上述逻辑来删除系统进程，只要使用 <a href="https://github.com/rfjakob/earlyoom" target="_blank" rel="noopener">EarlyOOM</a> 这个工具就可以完成我们的心愿。</p>
-<p>当系统内存不足时，<code>earlyOOM</code> 会在系统可用内存以及 <code>swap</code> 都低于 <code>10％</code> (默认值)的话，给占用内存最多的进程发 <code>terminate</code> 信号，如果可用内存继续下降到 <code>5%</code> 的话，将发送 <code>kill</code> 信号终止内存最大的进程(即 <code>oom_score</code> 最大的)从而释放内存。</p>
+<p>当系统内存不足时，<code>earlyOOM</code> 会在系统可用内存以及 <code>swap</code> 都必须低于 <code>10％</code> (默认值-<code>PERCENT</code>)的话，这时 <code>earlyoom</code> 才会给占用内存最多的进程发 <code>SIGTERM</code> 信号，如果可用内存继续下降到 <code>5%</code> (默认值-<code>PERCENT/2</code>)的话，将发送 <code>SIGKILL</code> 信号终止内存最大的进程(即 <code>oom_score</code> 最大的)从而释放内存。</p>
 <ul>
 <li><strong><a href="https://github.com/rfjakob/earlyoom" target="_blank" rel="noopener">earlyoom</a></strong><ul>
 <li><code>Early OOM Daemon for Linux</code></li>
@@ -571,6 +571,7 @@ $ <span class="token function">sudo</span> <span class="token function">make</sp
 $ <span class="token function">sudo</span> systemctl start earlyoom
 $ <span class="token function">sudo</span> systemctl <span class="token function">enable</span> earlyoom
 $ <span class="token function">sudo</span> systemctl start earlyoom<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>其实最好的解决方法，还是从代码层面进行修改和调整。根据以往的经验来说，大部分情况下都是因为代码的逻辑或者使用方式不对，导致某个/多个操作需要占用大量内存且短时间不会释放。与此同时，程序可以限制下内存的使用，尽量避免导致系统 <code>OOM</code> 出现。最后是，通过装像 <code>earlyoom</code> 这类 <code>pre-oom</code> 的工具来保障系统和服务的正常使用。</p>
 <hr>
 <h2 id="4-工具使用方式"><a href="#4-工具使用方式" class="headerlink" title="4. 工具使用方式"></a>4. 工具使用方式</h2><blockquote>
 <p><strong>Linux 系统下应避免因内存耗尽导致系统 Hang 住或频繁读写 Swap 的情况！</strong></p>
@@ -583,28 +584,46 @@ $ <span class="token function">sudo</span> systemctl start earlyoom<span aria-hi
 <li>这样避免在内存充足(还有<code>xG</code>内存)的情况下，进程被强制退出</li>
 </ul>
 </li>
-<li><strong>增加 <code>--avoid xx</code> 参数</strong><ul>
+<li><strong>增加 <code>-S xxx</code> 参数</strong><ul>
+<li>设置 <code>swap</code> 的最小交换分区大小(单位为<code>KiB</code>)</li>
+</ul>
+</li>
+<li><strong>增加 <code>-r xxx</code> 参数</strong><ul>
+<li>设置内存报告间隔(默认为<code>1</code>秒)，设置为 <code>0</code> 表示完全禁用</li>
+</ul>
+</li>
+<li><strong>增加 <code>--avoid xxx</code> 参数</strong><ul>
 <li>指定避免杀掉的进程 - 正则表达式</li>
 <li>实例说明：<code>earlyoom --avoid '^(foo|bar)$'</code></li>
 </ul>
 </li>
-<li><strong>增加 <code>--prefer xx</code> 参数</strong><ul>
+<li><strong>增加 <code>--prefer xxx</code> 参数</strong><ul>
 <li>设置优先杀掉的进程 - 正则表达式</li>
 <li>实例说明：<code>earlyoom --prefer '^(foo|bar)$'</code></li>
+</ul>
+</li>
+<li><strong>增加 <code>-p</code> 参数</strong><ul>
+<li>将 Earlyoom 的优先级设置为-20，将 oom_score_adj 设置为-100</li>
+</ul>
+</li>
+<li><strong>增加 <code>--dryrun</code> 参数</strong><ul>
+<li>设置为干跑模式(不会删除任何进程)</li>
 </ul>
 </li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># systemctl</span>
 <span class="token comment" spellcheck="true"># /etc/default/earlyoom</span>
 EARLYOOM_ARGS<span class="token operator">=</span><span class="token string">"-r 3600 -n --avoid '(^|/)(init|systemd|Xorg|sshd)$'"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash">EARLYOOM_ARGS<span class="token operator">=</span><span class="token string">"-m 10 -M 1048576 -r 60 \
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># systemctl</span>
+<span class="token comment" spellcheck="true"># /etc/default/earlyoom</span>
+EARLYOOM_ARGS<span class="token operator">=</span><span class="token string">"-m 10 -M 1048576 -r 60 \
     -r 3600 -n --avoid '(^|/)(init|systemd|Xorg|sshd)$' \
-     --prefer '(^|/)(java|chromium)$"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+     --prefer '(^|/)(java|chromium)$"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>如果是通过源代码编译安装，则直接启动就可以使用了。</li>
 <li>输出的信息，包括使用的内存和 <code>swap</code> 状态。</li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 直接启动</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 直接启动(二进制编译)</span>
 $ ./earlyoom
 earlyoom v1.4-6-ga4021ae
 mem total: 9823 MiB, swap total: 9823 MiB
@@ -620,7 +639,7 @@ mem avail:  5086 of  9823 MiB <span class="token punctuation">(</span>51 %<span 
 <li>如果是通过 <code>systemd</code> 服务安装的话，则会自动后台运行。</li>
 <li>输出的信息，包括使用的内存和 <code>swap</code> 状态。</li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 后台运行</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 后台运行(通过apt安装)</span>
 $ systemctl status earlyoom
 systemd<span class="token punctuation">[</span>1<span class="token punctuation">]</span>: Started Early OOM Daemon.
 earlyoom<span class="token punctuation">[</span>73837<span class="token punctuation">]</span>: earlyoom 1.6.2
@@ -1215,7 +1234,7 @@ Usage: ./earlyoom <span class="token punctuation">[</span>OPTION<span class="tok
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1042.9k</span>&nbsp;字
+                class="white-color">1043.1k</span>&nbsp;字
             
             
             
