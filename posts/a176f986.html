@@ -462,14 +462,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.6k
+                    2.8k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    11 分
+                    12 分
                 </div>
                 
 
@@ -498,12 +498,62 @@
 <p>Linux 的文件权限，远不止 rwx 那么简单，还有一些特殊权限是用来打破限制和默认的安全上下文规则的，除了之前介绍过的隐藏属性，还有几个显式的特殊权限。下面就来说说 Linux 文件系统上的 SUID，SGID 和 Sticky 权限。</p>
 </blockquote>
 <h2 id="1-权限"><a href="#1-权限" class="headerlink" title="1. 权限"></a>1. 权限</h2><ul>
+<li><code>user</code><ul>
 <li><code>r</code></li>
 <li><code>w</code></li>
 <li><code>x</code></li>
-<li><code>user</code></li>
-<li><code>group</code></li>
-<li><code>other</code></li>
+</ul>
+</li>
+<li><code>group</code><ul>
+<li><code>r</code></li>
+<li><code>w</code></li>
+<li><code>x</code></li>
+</ul>
+</li>
+<li><code>other</code><ul>
+<li><code>r</code></li>
+<li><code>w</code></li>
+<li><code>x</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<ul>
+<li><strong>目录 - rwx - 说明</strong><ul>
+<li><code>r</code><ul>
+<li>有读取目录内容列表的权限</li>
+<li>即可以使用 <code>ls</code> 命令查看该目录的内容列表</li>
+</ul>
+</li>
+<li><code>w</code><ul>
+<li>有更改目录的权限</li>
+<li>即可以在此目录下新建文件或子目录等</li>
+</ul>
+</li>
+<li><code>x</code><ul>
+<li>可以进入该目录</li>
+<li>即可以使用 <code>cd</code> 命令进入该目录</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>目录 - rwx - 说明</strong><ul>
+<li><code>r</code><ul>
+<li>可读取此文件的内容</li>
+<li>即可以打开文件</li>
+</ul>
+</li>
+<li><code>w</code><ul>
+<li>可编辑此文件的内容</li>
+<li>即可以增加、删除、更改文件内容</li>
+</ul>
+</li>
+<li><code>x</code><ul>
+<li>可以执行此文件</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 <hr>
 <h2 id="2-安全上下文"><a href="#2-安全上下文" class="headerlink" title="2. 安全上下文"></a>2. 安全上下文</h2><p><strong>前提：进程有属主和属组；文件有属主和属组</strong></p>
@@ -531,39 +581,98 @@
 <h3 id="3-3-Sticky"><a href="#3-3-Sticky" class="headerlink" title="3.3 Sticky"></a>3.3 Sticky</h3><ul>
 <li>对于一个多人可写的目录，如果设置了 sticky，则每个用户仅能删除自己的文件</li>
 </ul>
-<p><strong>权限设定：</strong><br><code>chmod o+t DIR...</code><br><code>chmod o-t DIR...</code></p>
-<p>SUID SGID STICKY<br>000 0<br>001 1<br>010 2<br>011 3<br>100 4<br>101 5<br>110 6<br>111 7</p>
+<p><strong>权限设定：</strong></p>
+<p><code>chmod o+t DIR...</code><br><code>chmod o-t DIR...</code></p>
 <p><code>chmod 4777 /tmp/a.txt</code></p>
+<table>
+<thead>
+<tr>
+<th>NUM</th>
+<th>SUID</th>
+<th>SGID</th>
+<th>STICKY</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>4</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>5</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>6</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>7</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody></table>
 <hr>
 <h3 id="3-4-三个权限位映射"><a href="#3-4-三个权限位映射" class="headerlink" title="3.4 三个权限位映射"></a>3.4 三个权限位映射</h3><blockquote>
 <p>请注意，在权限位上可能会出现<code>s</code>和<code>S</code>，其意义实际上不一样。</p>
 </blockquote>
 <ul>
 <li><p><code>SUID</code>: user, 占据属主的执行权限位</p>
-</li>
-<li><p><code>s</code>: 属主拥有 x 权限</p>
-</li>
-<li><p><code>S</code>：属主没有 x 权限</p>
+<ul>
+<li><code>s</code>: 属主拥有 x 权限</li>
+<li><code>S</code>：属主没有 x 权限</li>
+</ul>
 </li>
 <li><p><code>SGID</code>: group, 占据 group 的执行权限位</p>
-</li>
-<li><p><code>s</code>: group 拥有 x 权限</p>
-</li>
-<li><p><code>S</code>：group 没有 x 权限</p>
+<ul>
+<li><code>s</code>: group 拥有 x 权限</li>
+<li><code>S</code>：group 没有 x 权限</li>
+</ul>
 </li>
 <li><p><code>Sticky</code>: other, 占据 ohter 的执行权限位</p>
-</li>
-<li><p><code>t</code>: other 拥有 x 权限</p>
-</li>
-<li><p><code>T</code>：other 没有 x 权限</p>
+<ul>
+<li><code>t</code>: other 拥有 x 权限</li>
+<li><code>T</code>：other 没有 x 权限</li>
+</ul>
 </li>
 </ul>
+<hr>
 <h3 id="3-5-chattr-命"><a href="#3-5-chattr-命" class="headerlink" title="3.5 chattr 命"></a>3.5 chattr 命</h3><ul>
+<li><strong>注释:</strong>ls 是看不到<code>attr</code>属性的，可以用<code>lsattr</code>显示特定属性。</li>
 <li><code>chattr +i xxx</code> 锁定该文件 ，不允许修改，删除，重命名，重定向方式清空也不可以。</li>
 <li><code>chattr -i xxx</code> 去掉锁定。</li>
 <li><code>chattr +a xxx</code>只能&gt;&gt;追加内容，不能删除和减少。</li>
 <li><code>chattr -a xxx</code>去掉只能追加这种锁定</li>
-<li><strong>注释:</strong>ls 是看不到<code>attr</code>属性的，可以用<code>lsattr</code>显示特定属性。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ <span class="token function">touch</span> file1
 <span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ chattr +i file1
@@ -605,7 +714,6 @@ rm: cannot remove ‘file2’: Operation not permitted<span aria-hidden="true" c
 <li><code>CentOS 7</code> 之前版本，系统安装时候创建的文件系统有<code>ACL</code>功能，默认手工创建的<code>ext4</code>文件系统无<code>ACL</code>功 能，需手动增加。</li>
 </ul>
 </blockquote>
-<p><img src="http://www.yulongjun.com/images/14975901556633.jpg" alt="acl"></p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 比如在CentOS6上新加一块磁盘，创建了sdb1分区，可以用下面命令使其支持ACL</span>
 tune2fs –o acl /dev/sdb1
 <span class="token function">mount</span> –o acl /dev/sdb1 /mnt/test<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
@@ -613,14 +721,14 @@ tune2fs –o acl /dev/sdb1
 <h3 id="4-1-getfacl-XXX"><a href="#4-1-getfacl-XXX" class="headerlink" title="4.1 getfacl XXX"></a>4.1 getfacl XXX</h3><ul>
 <li>获取文件或文件夹的权限</li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash">默认的从上到下的权限依次是：
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 默认的从上到下的权限依次是：</span>
 <span class="token operator">></span> <span class="token comment" spellcheck="true">#owner:文件的拥有者</span>
 <span class="token operator">></span> <span class="token comment" spellcheck="true">#group：文件的拥有组</span>
 <span class="token operator">></span> user：自定义的用户（可多个）
 <span class="token operator">></span> group：自定义的组（可多个）
 <span class="token operator">></span> other：自定义的其它用户（可多个）
 
-如果一个用户属于多个自定义的组，权限是这几个组的权限的累加。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token comment" spellcheck="true"># 如果一个用户属于多个自定义的组，权限是这几个组的权限的累加。</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ <span class="token function">touch</span> a
 <span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ getfacl a
 <span class="token comment" spellcheck="true"># file: a</span>
@@ -1372,7 +1480,7 @@ setfacl --set-file<span class="token operator">=</span>/root/acl.txt /testdir/di
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1044.9k</span>&nbsp;字
+                class="white-color">1045k</span>&nbsp;字
             
             
             
