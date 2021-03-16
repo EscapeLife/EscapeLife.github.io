@@ -459,21 +459,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-03-12
+                    2021-03-16
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.9k
+                    2.3k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    8 分
+                    10 分
                 </div>
                 
 
@@ -545,17 +545,98 @@ $ pip <span class="token function">install</span> -U git+https://github.com/pypp
 </ul>
 <p><img src="../images/python-pyppetter-lib-use-02.png" alt="Pyppeteer使用教程 - Pyppeteer"></p>
 <ul>
-<li><strong>[2] Launcher Class</strong></li>
+<li><strong>[2] Launcher Class</strong><ul>
+<li>启动浏览器只需要调用 <code>launch</code> 方法</li>
+<li>返回类型是 <code>browser</code> 模块中的 <code>Browser</code> 浏览器对象</li>
+<li>这是一个 <code>async</code> 修饰的方法，所以调用它的时候需要使用 <code>await</code> 关键字</li>
 </ul>
+</li>
+</ul>
+<pre class="line-numbers language-python"><code class="language-python">pyppeteer<span class="token punctuation">.</span>launcher<span class="token punctuation">.</span>launch<span class="token punctuation">(</span>options<span class="token punctuation">:</span> dict <span class="token operator">=</span> None<span class="token punctuation">,</span> <span class="token operator">**</span>kwargs<span class="token punctuation">)</span> → pyppeteer<span class="token punctuation">.</span>browser<span class="token punctuation">.</span>Browser<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p><img src="../images/python-pyppetter-lib-use-03.png" alt="Pyppeteer使用教程 - Launcher Class"></p>
 <ul>
-<li><strong>[3] Browser Class</strong></li>
+<li><strong>[3] Browser Class</strong><ul>
+<li><code>browser = await launch()</code></li>
+<li>通常将其赋值给 <code>browser</code> 变量，其实它就是 <code>Browser</code> 类的一个实例</li>
+<li>浏览器 <code>browser</code> 示例作为一个对象，其自然有很多用于操作浏览器本身的方法</li>
 </ul>
+</li>
+</ul>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">pyppeteer</span><span class="token punctuation">.</span>browser<span class="token punctuation">.</span>Browser<span class="token punctuation">(</span>
+    connection<span class="token punctuation">:</span> pyppeteer<span class="token punctuation">.</span>connection<span class="token punctuation">.</span>Connection<span class="token punctuation">,</span>
+    contextIds<span class="token punctuation">:</span> List<span class="token punctuation">[</span>str<span class="token punctuation">]</span><span class="token punctuation">,</span>
+    ignoreHTTPSErrors<span class="token punctuation">:</span> bool<span class="token punctuation">,</span>
+    setDefaultViewport<span class="token punctuation">:</span> bool<span class="token punctuation">,</span>
+    process<span class="token punctuation">:</span> Optional<span class="token punctuation">[</span>subprocess<span class="token punctuation">.</span>Popen<span class="token punctuation">]</span> <span class="token operator">=</span> None<span class="token punctuation">,</span>
+    closeCallback<span class="token punctuation">:</span> Callable<span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    Awaitable<span class="token punctuation">[</span>None<span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">=</span> None<span class="token punctuation">,</span> <span class="token operator">**</span>kwargs<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><img src="../images/python-pyppetter-lib-use-04.png" alt="Pyppeteer使用教程 - Browser Class"></p>
 <ul>
-<li><strong>[4] Page Class</strong></li>
+<li><strong>[4] Page Class</strong><ul>
+<li><code>page = await browser.newPage()</code></li>
+<li><code>Page</code> 即页面，就对应一个网页，一个选项卡</li>
+</ul>
+</li>
 </ul>
 <p><img src="../images/python-pyppetter-lib-use-05.png" alt="Pyppeteer使用教程 - Page Class"></p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 模拟鼠标右键点击一下</span>
+<span class="token keyword">import</span> asyncio
+<span class="token keyword">from</span> pyppeteer <span class="token keyword">import</span> launch
+<span class="token keyword">from</span> pyquery <span class="token keyword">import</span> PyQuery <span class="token keyword">as</span> pq
+
+<span class="token keyword">async</span> <span class="token keyword">def</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+   browser <span class="token operator">=</span> <span class="token keyword">await</span> launch<span class="token punctuation">(</span>headless<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span>
+   page <span class="token operator">=</span> <span class="token keyword">await</span> browser<span class="token punctuation">.</span>newPage<span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token keyword">await</span> page<span class="token punctuation">.</span>goto<span class="token punctuation">(</span><span class="token string">'https://dynamic2.scrape.cuiqingcai.com/'</span><span class="token punctuation">)</span>
+   <span class="token keyword">await</span> page<span class="token punctuation">.</span>waitForSelector<span class="token punctuation">(</span><span class="token string">'.item .name'</span><span class="token punctuation">)</span>
+   <span class="token keyword">await</span> page<span class="token punctuation">.</span>click<span class="token punctuation">(</span><span class="token string">'.item .name'</span><span class="token punctuation">,</span> options<span class="token operator">=</span><span class="token punctuation">{</span>
+       <span class="token string">'button'</span><span class="token punctuation">:</span> <span class="token string">'right'</span><span class="token punctuation">,</span>
+       <span class="token string">'clickCount'</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>  <span class="token comment" spellcheck="true"># 1 or 2</span>
+       <span class="token string">'delay'</span><span class="token punctuation">:</span> <span class="token number">3000</span><span class="token punctuation">,</span>    <span class="token comment" spellcheck="true"># 毫秒</span>
+   <span class="token punctuation">}</span><span class="token punctuation">)</span>
+   <span class="token keyword">await</span> browser<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+asyncio<span class="token punctuation">.</span>get_event_loop<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>run_until_complete<span class="token punctuation">(</span>main<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 页面输入文本</span>
+<span class="token keyword">import</span> asyncio
+<span class="token keyword">from</span> pyppeteer <span class="token keyword">import</span> launch
+<span class="token keyword">from</span> pyquery <span class="token keyword">import</span> PyQuery <span class="token keyword">as</span> pq
+
+<span class="token keyword">async</span> <span class="token keyword">def</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+   browser <span class="token operator">=</span> <span class="token keyword">await</span> launch<span class="token punctuation">(</span>headless<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span>
+   page <span class="token operator">=</span> <span class="token keyword">await</span> browser<span class="token punctuation">.</span>newPage<span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token keyword">await</span> page<span class="token punctuation">.</span>goto<span class="token punctuation">(</span><span class="token string">'https://www.taobao.com'</span><span class="token punctuation">)</span>
+   <span class="token keyword">await</span> page<span class="token punctuation">.</span>type<span class="token punctuation">(</span><span class="token string">'#q'</span><span class="token punctuation">,</span> <span class="token string">'iPad'</span><span class="token punctuation">)</span>
+   <span class="token keyword">await</span> asyncio<span class="token punctuation">.</span>sleep<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span>
+   <span class="token keyword">await</span> browser<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+asyncio<span class="token punctuation">.</span>get_event_loop<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>run_until_complete<span class="token punctuation">(</span>main<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 执行JS代码</span>
+<span class="token keyword">import</span> asyncio
+<span class="token keyword">from</span> pyppeteer <span class="token keyword">import</span> launch
+
+width<span class="token punctuation">,</span> height <span class="token operator">=</span> <span class="token number">1366</span><span class="token punctuation">,</span> <span class="token number">768</span>
+
+<span class="token keyword">async</span> <span class="token keyword">def</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+   browser <span class="token operator">=</span> <span class="token keyword">await</span> launch<span class="token punctuation">(</span><span class="token punctuation">)</span>
+   page <span class="token operator">=</span> <span class="token keyword">await</span> browser<span class="token punctuation">.</span>newPage<span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token keyword">await</span> page<span class="token punctuation">.</span>setViewport<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">'width'</span><span class="token punctuation">:</span> width<span class="token punctuation">,</span> <span class="token string">'height'</span><span class="token punctuation">:</span> height<span class="token punctuation">}</span><span class="token punctuation">)</span>
+   <span class="token keyword">await</span> page<span class="token punctuation">.</span>goto<span class="token punctuation">(</span><span class="token string">'https://dynamic2.scrape.cuiqingcai.com/'</span><span class="token punctuation">)</span>
+   <span class="token keyword">await</span> page<span class="token punctuation">.</span>waitForSelector<span class="token punctuation">(</span><span class="token string">'.item .name'</span><span class="token punctuation">)</span>
+   <span class="token keyword">await</span> asyncio<span class="token punctuation">.</span>sleep<span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span>
+   <span class="token keyword">await</span> page<span class="token punctuation">.</span>screenshot<span class="token punctuation">(</span>path<span class="token operator">=</span><span class="token string">'example.png'</span><span class="token punctuation">)</span>
+   dimensions <span class="token operator">=</span> <span class="token keyword">await</span> page<span class="token punctuation">.</span>evaluate<span class="token punctuation">(</span><span class="token triple-quoted-string string">'''() => {
+       return {
+           width: document.documentElement.clientWidth,
+           height: document.documentElement.clientHeight,
+           deviceScaleFactor: window.devicePixelRatio,
+       }
+   }'''</span><span class="token punctuation">)</span>
+
+   <span class="token keyword">print</span><span class="token punctuation">(</span>dimensions<span class="token punctuation">)</span>
+   <span class="token keyword">await</span> browser<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+asyncio<span class="token punctuation">.</span>get_event_loop<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>run_until_complete<span class="token punctuation">(</span>main<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="4-选择器"><a href="#4-选择器" class="headerlink" title="4. 选择器"></a>4. 选择器</h2><blockquote>
 <p><strong>可以参考 <a href="https://www.w3schools.com/cssref/css_selectors.asp" target="_blank" rel="noopener">CSS Selector Reference</a> 来查看示例样例来学习和理解！</strong></p>
@@ -653,16 +734,19 @@ $ pip <span class="token function">install</span> -U git+https://github.com/pypp
 <span class="token keyword">from</span> pyppeteer <span class="token keyword">import</span> launch
 
 <span class="token keyword">async</span> <span class="token keyword">def</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token comment" spellcheck="true"># 创建一个浏览器对象</span>
+    <span class="token comment" spellcheck="true"># 启动浏览器; 创建一个浏览器对象</span>
     browser <span class="token operator">=</span> <span class="token keyword">await</span> launch<span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token comment" spellcheck="true"># 新建一个页面对象</span>
+    <span class="token comment" spellcheck="true"># 新建一个选项卡; 新建一个页面对象</span>
     page <span class="token operator">=</span> <span class="token keyword">await</span> browser<span class="token punctuation">.</span>newPage<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true"># 浏览器页面跳转</span>
     <span class="token keyword">await</span> page<span class="token punctuation">.</span>goto<span class="token punctuation">(</span><span class="token string">'https://example.com'</span><span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true"># 页面成功加载; 等待节点元素加载</span>
+    <span class="token keyword">await</span> page<span class="token punctuation">.</span>waitForSelector<span class="token punctuation">(</span><span class="token string">'.item .name'</span><span class="token punctuation">)</span>
     <span class="token keyword">await</span> page<span class="token punctuation">.</span>screenshot<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">'path'</span><span class="token punctuation">:</span> <span class="token string">'example.png'</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
     <span class="token keyword">await</span> browser<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
 
 <span class="token comment" spellcheck="true"># 创建异步池并执行异步模块main函数</span>
-asyncio<span class="token punctuation">.</span>get_event_loop<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>run_until_complete<span class="token punctuation">(</span>main<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+asyncio<span class="token punctuation">.</span>get_event_loop<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>run_until_complete<span class="token punctuation">(</span>main<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[2] 页面上的执行 JS 代码</strong></li>
 </ul>
@@ -1432,7 +1516,7 @@ title_elements <span class="token operator">=</span> <span class="token keyword"
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1054.5k</span>&nbsp;字
+                class="white-color">1054.9k</span>&nbsp;字
             
             
             
