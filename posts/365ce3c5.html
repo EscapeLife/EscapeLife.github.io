@@ -622,17 +622,17 @@ listening on eth0, link-type EN10MB <span class="token punctuation">(</span>Ethe
 </li>
 <li><p>抓取所有经过 eth1，目的地址是 192.168.1.254 或 192.168.1.200 端口是 80 的 TCP 数据</p>
 <ul>
-<li><code>tcpdump -i eth1 &#39;((tcp) and (port 80) and ((dst host 192.168.1.254) or (dst host 192.168.1.200)))&#39;</code></li>
+<li><code>tcpdump -i eth1 '((tcp) and (port 80) and ((dst host 192.168.1.254) or (dst host 192.168.1.200)))'</code></li>
 </ul>
 </li>
 <li><p>抓取所有经过 eth1，目标 MAC 地址是 00:01:02:03:04:05 的 ICMP 数据</p>
 <ul>
-<li><code>tcpdump -i eth1 &#39;((icmp) and ((ether dst host 00:01:02:03:04:05)))&#39;</code></li>
+<li><code>tcpdump -i eth1 '((icmp) and ((ether dst host 00:01:02:03:04:05)))'</code></li>
 </ul>
 </li>
 <li><p>抓取所有经过 eth1，目的网络是 192.168，但目的主机不是 192.168.1.200 的 TCP 数据</p>
 <ul>
-<li><code>tcpdump -i eth1 &#39;((tcp) and ((dst net 192.168) and (not dst host 192.168.1.200)))&#39;</code></li>
+<li><code>tcpdump -i eth1 '((tcp) and ((dst net 192.168) and (not dst host 192.168.1.200)))'</code></li>
 </ul>
 </li>
 </ul>
@@ -752,7 +752,7 @@ proto<span class="token punctuation">[</span>x:y<span class="token punctuation">
 <li>当发送端的<code>MTU</code>大于到目的路径链路上的<code>MTU</code>时就会被<code>分片</code>，权威的请参考《TCP/IP 详解》</li>
 <li><code>Fragment Offset</code>字段只有在分片的时候才使用</li>
 <li>要抓<code>Flags</code>中带<code>DF</code>位标记的不分片的包，第七字节的值应该是：<code>01000000 = 64</code></li>
-<li><code>tcpdump -i eth1 &#39;ip[6] = 64&#39;</code>，从<code>0</code>开始编号</li>
+<li><code>tcpdump -i eth1 'ip[6] = 64'</code>，从<code>0</code>开始编号</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash">分片信息在IP头的第七和第八字节
  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -764,12 +764,12 @@ Bit 2: <span class="token punctuation">(</span>MF<span class="token punctuation"
 <p><strong>抓分片包</strong></p>
 <ul>
 <li>匹配<code>MF</code>分片包，第七字节的值应该是：<code>00100000 = 32</code><ul>
-<li><code>tcpdump -i eth1 &#39;ip[6] = 32&#39;</code></li>
+<li><code>tcpdump -i eth1 'ip[6] = 32'</code></li>
 </ul>
 </li>
 <li>最后分片包的开始 3 位是 0，但是有<code>Fragment Offset</code>字段</li>
 <li><strong>匹配分片</strong>和<strong>最后分片</strong><ul>
-<li><code>tcpdump -i eth1 &#39;((ip[6:2] &gt; 0) and (not ip[6] = 64))&#39;</code></li>
+<li><code>tcpdump -i eth1 '((ip[6:2] &gt; 0) and (not ip[6] = 64))'</code></li>
 </ul>
 </li>
 <li>测试分片可以用如下命令<ul>
@@ -786,7 +786,7 @@ Bit 2: <span class="token punctuation">(</span>MF<span class="token punctuation"
 </ul>
 </li>
 <li>在网关可以用下面的命令看看网络中谁在使用<code>traceroute</code><ul>
-<li><code>tcpdump -i eth1 &#39;ip[8] &lt; 5&#39;</code></li>
+<li><code>tcpdump -i eth1 'ip[8] &lt; 5'</code></li>
 </ul>
 </li>
 </ul>
@@ -798,7 +798,7 @@ Bit 2: <span class="token punctuation">(</span>MF<span class="token punctuation"
 <p><strong>抓大于 X 字节的包</strong></p>
 <ul>
 <li>大于 600 字节<ul>
-<li><code>tcpdump -i eth1 &#39;ip[2:2] &gt; 600&#39;</code></li>
+<li><code>tcpdump -i eth1 'ip[2:2] &gt; 600'</code></li>
 </ul>
 </li>
 </ul>
@@ -829,7 +829,7 @@ Bit 2: <span class="token punctuation">(</span>MF<span class="token punctuation"
 <ul>
 <li><p>抓取源端口大于 1024 的 TCP 数据包</p>
 <ul>
-<li><code>tcpdump -i eth1 &#39;tcp[0:2] &gt; 1024&#39;</code></li>
+<li><code>tcpdump -i eth1 'tcp[0:2] &gt; 1024'</code></li>
 </ul>
 </li>
 <li><p>匹配<code>TCP</code>数据包的特殊标记</p>
@@ -859,33 +859,33 @@ Bit 2: <span class="token punctuation">(</span>MF<span class="token punctuation"
 <ul>
 <li><p><strong>只抓 SYN 包，第十四字节是二进制的 00000010，也就是十进制的 2</strong></p>
 <ul>
-<li><code>tcpdump -i eth1 &#39;tcp[13] = 2&#39;</code></li>
+<li><code>tcpdump -i eth1 'tcp[13] = 2'</code></li>
 </ul>
 </li>
 <li><p><strong>抓 SYN, ACK （00010010 or 18）</strong></p>
 <ul>
-<li><code>tcpdump -i eth1 &#39;tcp[13] = 18&#39;</code></li>
+<li><code>tcpdump -i eth1 'tcp[13] = 18'</code></li>
 </ul>
 </li>
 <li><p><strong>抓 SYN 或者 SYN-ACK</strong></p>
 <ul>
-<li><code>tcpdump -i eth1 &#39;tcp[13] &amp; 2 = 2&#39;</code></li>
+<li><code>tcpdump -i eth1 'tcp[13] &amp; 2 = 2'</code></li>
 <li>用到了位操作，就是不管 ACK 位是啥。</li>
 </ul>
 </li>
 <li><p><strong>抓 PSH-ACK</strong></p>
 <ul>
-<li><code>tcpdump -i eth1 &#39;tcp[13] = 24&#39;</code></li>
+<li><code>tcpdump -i eth1 'tcp[13] = 24'</code></li>
 </ul>
 </li>
 <li><p><strong>抓所有包含 FIN 标记的包（FIN 通常和 ACK 一起，表示幽会完了，回见）</strong></p>
 <ul>
-<li><code>tcpdump -i eth1 &#39;tcp[13] &amp; 1 = 1&#39;</code></li>
+<li><code>tcpdump -i eth1 'tcp[13] &amp; 1 = 1'</code></li>
 </ul>
 </li>
 <li><p><strong>抓 RST（勾搭没成功，伟大的 greatwall 对她认为有敏感信息的连接发 RST 包，典型的棒打鸳鸯）</strong></p>
 <ul>
-<li><code>tcpdump -i eth1 &#39;tcp[13] &amp; 4 = 4&#39;</code></li>
+<li><code>tcpdump -i eth1 'tcp[13] &amp; 4 = 4'</code></li>
 </ul>
 </li>
 </ul>
@@ -933,36 +933,36 @@ Bit 2: <span class="token punctuation">(</span>MF<span class="token punctuation"
 <li><p><strong>按照 TCP 标记位抓包</strong></p>
 <ul>
 <li>只抓 SYN 包<ul>
-<li><code>tcpdump -i eth1 &#39;tcp[tcpflags] = tcp-syn&#39;</code></li>
+<li><code>tcpdump -i eth1 'tcp[tcpflags] = tcp-syn'</code></li>
 </ul>
 </li>
 <li>抓 SYN, ACK<ul>
-<li><code>tcpdump -i eth1 &#39;tcp[tcpflags] &amp; tcp-syn != 0 and tcp[tcpflags] &amp; tcp-ack != 0&#39;</code></li>
+<li><code>tcpdump -i eth1 'tcp[tcpflags] &amp; tcp-syn != 0 and tcp[tcpflags] &amp; tcp-ack != 0'</code></li>
 </ul>
 </li>
 </ul>
 </li>
 <li><p><strong>抓 SMTP 数据</strong></p>
 <ul>
-<li><code>tcpdump -i eth1 &#39;((port 25) and (tcp[(tcp[12]&gt;&gt;2):4] = 0x4d41494c))&#39;</code></li>
+<li><code>tcpdump -i eth1 '((port 25) and (tcp[(tcp[12]&gt;&gt;2):4] = 0x4d41494c))'</code></li>
 <li>抓取数据区开始为”MAIL”的包，”MAIL”的十六进制为 0x4d41494c。</li>
 </ul>
 </li>
 <li><p><strong>抓 HTTP GET 数据</strong></p>
 <ul>
-<li><code>tcpdump -i eth1 &#39;tcp[(tcp[12]&gt;&gt;2):4] = 0x47455420&#39;</code></li>
+<li><code>tcpdump -i eth1 'tcp[(tcp[12]&gt;&gt;2):4] = 0x47455420'</code></li>
 <li>“GET “的十六进制是 47455420</li>
 </ul>
 </li>
 <li><p><strong>抓 SSH 返回</strong></p>
 <ul>
-<li><code>tcpdump -i eth1 &#39;tcp[(tcp[12]&gt;&gt;2):4] = 0x5353482D&#39;</code></li>
+<li><code>tcpdump -i eth1 'tcp[(tcp[12]&gt;&gt;2):4] = 0x5353482D'</code></li>
 <li>“SSH-“的十六进制是 0x5353482D</li>
 </ul>
 </li>
 <li><p><strong>抓老版本的 SSH 返回信息，如”SSH-1.99..”</strong></p>
 <ul>
-<li><code>tcpdump -i eth1 &#39;(tcp[(tcp[12]&gt;&gt;2):4] = 0x5353482D) and (tcp[((tcp[12]&gt;&gt;2)+4):2] = 0x312E)&#39;</code></li>
+<li><code>tcpdump -i eth1 '(tcp[(tcp[12]&gt;&gt;2):4] = 0x5353482D) and (tcp[((tcp[12]&gt;&gt;2)+4):2] = 0x312E)'</code></li>
 </ul>
 </li>
 </ul>
@@ -994,7 +994,7 @@ Bit 2: <span class="token punctuation">(</span>MF<span class="token punctuation"
 <p><code>-c</code>参数对于运维人员来说也比较常用，因为流量比较大的服务器，靠人工<code>CTRL+C</code>还是抓的太多，甚至导致服务器宕机，于是可以用<code>-c</code>参数指定抓多少个包。</p>
 <ul>
 <li>上面的命令计算抓 10000 个 SYN 包花费多少时间，可以判断访问量大概是多少<ul>
-<li><code>time tcpdump -nn -i eth0 &#39;tcp[tcpflags] = tcp-syn&#39; -c 10000 &gt; /dev/null</code></li>
+<li><code>time tcpdump -nn -i eth0 'tcp[tcpflags] = tcp-syn' -c 10000 &gt; /dev/null</code></li>
 </ul>
 </li>
 </ul>
@@ -1068,10 +1068,10 @@ tcpdump: listening on eth0, link-type EN10MB <span class="token punctuation">(</
 <ul>
 <li><strong>【<code>-F</code>选项】- 指定过滤表达式所在的文件</strong><ul>
 <li>还记得我们在第一招中所提到的命令么，我帮助大家回忆一下：<ul>
-<li><code>tcpdump -i eth0 -nn -X &#39;port 53&#39; -c 1</code></li>
+<li><code>tcpdump -i eth0 -nn -X 'port 53' -c 1</code></li>
 </ul>
 </li>
-<li>这里面的<code>&#39;port 53&#39;</code>便叫做<strong>过滤表达式</strong>，用于设置我们抓包的条件的，只有满足过滤条件的网络包，才会被抓过来。当这个过滤条件非常<strong>复杂</strong>，或者我们需要将一个过滤条件固化下来复用的时候，就会想到把它存到一个<strong>文本文件</strong>中。此时，<code>-F</code>选项就会派上用场。</li>
+<li>这里面的<code>'port 53'</code>便叫做<strong>过滤表达式</strong>，用于设置我们抓包的条件的，只有满足过滤条件的网络包，才会被抓过来。当这个过滤条件非常<strong>复杂</strong>，或者我们需要将一个过滤条件固化下来复用的时候，就会想到把它存到一个<strong>文本文件</strong>中。此时，<code>-F</code>选项就会派上用场。</li>
 <li>我们建立了一个<code>filter.txt</code>文本文件来存储过滤表达式，然后通过<code>-F</code>来指定<code>filter.txt</code>，这样<code>tcpdump</code>就会心知肚明地读取<code>filter.txt</code>中的内容作为过滤条件。</li>
 </ul>
 </li>
@@ -1246,7 +1246,7 @@ tcp<span class="token punctuation">[</span>tcpflags<span class="token punctuatio
 tcp<span class="token punctuation">[</span>tcpflags<span class="token punctuation">]</span> <span class="token operator">&amp;</span> tcp-fin<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>要提取 TCP 协议里的 SYN-ACK 数据包，不但可以使用上面的方法，也可以直接使用最本质的方法 tcp[13]==18</li>
-<li>如果要抓取一个区间内的端口，可以使用 portrange 语法：<code>tcpdump -i eth0 -nn &#39;portrange 52-55&#39; -c 1 -XX</code></li>
+<li>如果要抓取一个区间内的端口，可以使用 portrange 语法：<code>tcpdump -i eth0 -nn 'portrange 52-55' -c 1 -XX</code></li>
 </ul>
 <hr>
 <h2 id="8-输出分析"><a href="#8-输出分析" class="headerlink" title="8. 输出分析"></a>8. 输出分析</h2><blockquote>
@@ -1362,7 +1362,25 @@ b457 <span class="token operator">==</span><span class="token operator">></span>
 <p><strong>送人玫瑰，手有余香！</strong></p>
 </blockquote>
 <p><a href="http://roclinux.cn/?p=2474" target="_blank" rel="noopener"><strong>Linux 大棚</strong></a> &gt; <a href="https://www.wains.be/pub/networking/tcpdump_advanced_filters.txt" target="_blank" rel="noopener"><strong>tcpdump advanced filters</strong></a></p>
-
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
                 
             </div>
             <hr/>
@@ -1890,7 +1908,7 @@ b457 <span class="token operator">==</span><span class="token operator">></span>
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1038k</span>&nbsp;字
+                class="white-color">1056.8k</span>&nbsp;字
             
             
             

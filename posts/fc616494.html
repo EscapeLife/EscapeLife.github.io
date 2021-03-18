@@ -591,13 +591,13 @@ python setup.py sdist<span aria-hidden="true" class="line-numbers-rows"><span></
 </ul>
 <p><strong>find_packages =&gt; 找包</strong></p>
 <p>对于简单工程来说，手动增加 <code>packages</code> 参数是容易。而对于复杂的工程来说，可能添加很多的包，这是手动添加就变得麻烦。<code>Setuptools</code> 模块提供了一个 <code>find_packages</code> 函数，它默认在与 <code>setup.py</code> 文件同一目录下搜索各个含有 <code>__init__.py</code> 的目录做为要添加的包。</p>
-<p>默认默认情况下 <code>setup.py</code> 文件只在其所在的目录下搜索包。如果不用 <code>find_packages</code> 函数，想要找到其他目录下的包，也可以设置 <code>package_dir</code> 参数，其指定哪些目录下的文件被映射到哪个源码包，如 <code>package_dir={&#39;&#39;: &#39;src&#39;}</code> 表示 <code>“root package”</code> 中的模块都在 <code>src</code> 目录中。</p>
+<p>默认默认情况下 <code>setup.py</code> 文件只在其所在的目录下搜索包。如果不用 <code>find_packages</code> 函数，想要找到其他目录下的包，也可以设置 <code>package_dir</code> 参数，其指定哪些目录下的文件被映射到哪个源码包，如 <code>package_dir={'': 'src'}</code> 表示 <code>“root package”</code> 中的模块都在 <code>src</code> 目录中。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 第一个参数where指定在哪个目录下搜索包</span>
 <span class="token comment" spellcheck="true"># 第二个参数exclude用于指定排除哪些包</span>
 <span class="token comment" spellcheck="true"># 第三个参数include指出要包含的包</span>
 find_packages<span class="token punctuation">(</span>where<span class="token operator">=</span><span class="token string">'.'</span>, exclude<span class="token operator">=</span><span class="token punctuation">(</span><span class="token punctuation">)</span>, include<span class="token operator">=</span><span class="token punctuation">(</span><span class="token string">'*'</span>,<span class="token punctuation">))</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <p><strong>package_data =&gt; 包含数据文件</strong></p>
-<p>该参数是一个从包名称到 <code>glob</code> 模式列表的字典。如果数据文件包含在包的子目录中，则 <code>glob</code> 可以包括子目录名称。其格式一般为 <code>{&#39;package_name&#39;: [&#39;files&#39;]}</code>，比如 <code>package_data={&#39;mypkg&#39;: [&#39;data/*.dat&#39;],}</code>。</p>
+<p>该参数是一个从包名称到 <code>glob</code> 模式列表的字典。如果数据文件包含在包的子目录中，则 <code>glob</code> 可以包括子目录名称。其格式一般为 <code>{'package_name': ['files']}</code>，比如 <code>package_data={'mypkg': ['data/*.dat'],}</code>。</p>
 <p><strong>include_package_data =&gt; 包含数据文件</strong></p>
 <p>该参数被设置为 <code>True</code> 时自动添加包中受版本控制的数据文件，可替代 <code>package_data</code>，同时，<code>exclude_package_data</code> 可以排除某些文件。注意当需要加入没有被版本控制的文件时，还是仍然需要使用 <code>package_data</code> 参数才行。</p>
 <p><strong>data_files =&gt; 包含数据文件</strong></p>
@@ -867,27 +867,27 @@ README、README.txt、setup.py和setup.cfg文件<span aria-hidden="true" class="
 </ul>
 <p><strong>从左向右做一个简单的解释</strong></p>
 <ul>
-<li><code>&quot;N.N&quot;</code><ul>
+<li><code>"N.N"</code><ul>
 <li>必须的部分，两个 “N” 分别代表了主版本和副版本号</li>
 </ul>
 </li>
-<li><code>&quot;[.N]&quot;</code><ul>
+<li><code>"[.N]"</code><ul>
 <li>次要版本号，可以有零或多个</li>
 </ul>
 </li>
-<li><code>&quot;{a|b|c|rc}&quot;</code><ul>
+<li><code>"{a|b|c|rc}"</code><ul>
 <li>阶段代号，可选, a, b, c, rc 分别代表 alpha, beta, candidate 和 release candidate</li>
 </ul>
 </li>
-<li><code>&quot;N[.N]&quot;</code><ul>
+<li><code>"N[.N]"</code><ul>
 <li>阶段版本号，如果提供，则至少有一位主版本号，后面可以加无限多位的副版本号</li>
 </ul>
 </li>
-<li><code>&quot;.postN&quot;</code><ul>
+<li><code>".postN"</code><ul>
 <li>发行后更新版本号，可选</li>
 </ul>
 </li>
-<li><code>&quot;.devN&quot;</code><ul>
+<li><code>".devN"</code><ul>
 <li>开发期间的发行版本号，可选</li>
 </ul>
 </li>
@@ -1251,7 +1251,25 @@ $ poetry publish -r my-repository<span aria-hidden="true" class="line-numbers-ro
 <li><a href="http://wsfdl.com/python/2015/09/06/Python%E5%BA%94%E7%94%A8%E7%9A%84%E6%89%93%E5%8C%85%E5%92%8C%E5%8F%91%E5%B8%83%E4%B8%8A.html" target="_blank" rel="noopener">Python Application 的打包和发布</a></li>
 <li><a href="https://zhuanlan.zhihu.com/p/81025311" target="_blank" rel="noopener">相比 Pipenv 工具，Poetry 是一个更好的选择</a></li>
 </ul>
-
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
                 
             </div>
             <hr/>
@@ -1791,7 +1809,7 @@ $ poetry publish -r my-repository<span aria-hidden="true" class="line-numbers-ro
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1038k</span>&nbsp;字
+                class="white-color">1056.8k</span>&nbsp;字
             
             
             
