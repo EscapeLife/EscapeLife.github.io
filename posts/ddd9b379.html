@@ -302,7 +302,7 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/images/use-APScheduler-tools-1.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/use-APScheduler-tools.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
@@ -459,21 +459,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-12-09
+                    2021-03-30
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.3k
+                    2.7k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    10 分
+                    12 分
                 </div>
                 
 
@@ -494,18 +494,50 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <blockquote>
-<p>高级 <code>Python</code> 调度程序(<code>APScheduler</code>)一个 <code>Python</code> 库，可让您安排稍后执行的 <code>Python</code> 代码，可以是一次，也可以是定期执行。您可以根据需要随时添加新作业或删除旧作业。如果将作业存储在数据库中，它们也将在调度程序重新启动后继续运行并保持其状态。重新启动调度程序后，它将运行它应该在脱机时运行的所有作业。</p>
+<p><strong><code>APScheduler</code> 即可以单独使用，也可以用于常见的 <code>Web</code> 框架。</strong></p>
 </blockquote>
-<p><img src="../images/use-APScheduler-tools-1.jpg" alt="定时任务APScheduler工具"></p>
+<p>高级 <code>Python</code> 调度程序(<code>APScheduler</code>)一个 <code>Python</code> 库，可让您安排稍后执行的 <code>Python</code> 代码，可以是一次，也可以是定期执行。您可以根据需要随时添加新作业或删除旧作业。如果将作业存储在数据库中，它们也将在调度程序重新启动后继续运行并保持其状态。重新启动调度程序后，它将运行它应该在脱机时运行的所有作业。</p>
+<ul>
+<li><a href="https://github.com/viniciuschiele/flask-apscheduler" target="_blank" rel="noopener"><code>APScheduler</code></a></li>
+<li><a href="https://github.com/jcass77/django-apscheduler" target="_blank" rel="noopener"><code>django-apscheduler</code></a></li>
+</ul>
+<p><img src="../images/use-APScheduler-tools.jpg" alt="定时任务APScheduler工具"></p>
 <hr>
 <h2 id="1-安装工具"><a href="#1-安装工具" class="headerlink" title="1. 安装工具"></a>1. 安装工具</h2><blockquote>
 <p><strong>APScheduler 工具的安装方式原来如此简单</strong></p>
 </blockquote>
+<ul>
+<li><strong>安装操作</strong></li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 直接安装即可</span>
 $ pip <span class="token function">install</span> apscheduler<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 下载安装即可</span>
 $ https://pypi.python.org/pypi/APScheduler/
 $ python setup.py <span class="token function">install</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>简单使用</strong></li>
+</ul>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> datetime <span class="token keyword">import</span> datetime
+<span class="token keyword">from</span> apscheduler<span class="token punctuation">.</span>schedulers<span class="token punctuation">.</span>background <span class="token keyword">import</span> BackgroundScheduler
+
+<span class="token keyword">def</span> <span class="token function">tick</span><span class="token punctuation">(</span>text<span class="token operator">=</span>None<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"Tick! The time is: {datetime.now()} - {text}"</span><span class="token punctuation">)</span>
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
+    scheduler <span class="token operator">=</span> BackgroundScheduler<span class="token punctuation">(</span>timezone<span class="token operator">=</span><span class="token string">"Asia/Shanghai"</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># 使用date触发器</span>
+    scheduler<span class="token punctuation">.</span>add_job<span class="token punctuation">(</span>tick<span class="token punctuation">,</span> <span class="token string">'date'</span><span class="token punctuation">,</span> run_date<span class="token operator">=</span>date<span class="token punctuation">(</span><span class="token number">2009</span><span class="token punctuation">,</span> <span class="token number">11</span><span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">,</span> args<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'hello'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true"># 使用interval触发器</span>
+    scheduler<span class="token punctuation">.</span>add_job<span class="token punctuation">(</span>tick<span class="token punctuation">,</span> <span class="token string">'interval'</span><span class="token punctuation">,</span> hours<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span> seconds<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true"># 使用crontab触发器</span>
+    scheduler<span class="token punctuation">.</span>add_job<span class="token punctuation">(</span>tick<span class="token punctuation">,</span> <span class="token string">'cron'</span><span class="token punctuation">,</span> hours<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span> seconds<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'Press Ctrl+C to exit ...'</span><span class="token punctuation">)</span>
+        scheduler<span class="token punctuation">.</span>start<span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># 启动任务</span>
+    <span class="token keyword">except</span> <span class="token punctuation">(</span>KeyboardInterrupt<span class="token punctuation">,</span> SystemExit<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">pass</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="2-基本组件"><a href="#2-基本组件" class="headerlink" title="2. 基本组件"></a>2. 基本组件</h2><blockquote>
 <p><strong>基本组件分为: <code>triggers</code> | <code>job stores</code> | <code>executors</code> | <code>schedulers</code></strong></p>
@@ -528,48 +560,101 @@ $ python setup.py <span class="token function">install</span><span aria-hidden="
 <p>任务调度器(<code>schedulers</code>)的作用就是将各个组件给调度起来。通常，你的应用程序中只会运行一个 <code>schedulers</code>。应用程序开发人员通常不直接处理任务存储(<code>job stores</code>)，执行器(<code>executors</code>)和触发器(<code>triggers</code>)。相反，任务调度器(<code>schedulers</code>)提供了适当的接口来处理所有这些。配置 <code>job stores</code> 和 <code>executors</code> 是通过 <code>schedulers</code> 完成的，添加、修改和删除作业也是如此。</p>
 <hr>
 <h2 id="3-正确选择"><a href="#3-正确选择" class="headerlink" title="3. 正确选择"></a>3. 正确选择</h2><blockquote>
-<p><strong>Choosing the right scheduler, job store(s), executor(s) and trigger(s)</strong></p>
+<p><strong>Choosing the right <a href="https://apscheduler.readthedocs.io/en/latest/py-modindex.html" target="_blank" rel="noopener">scheduler, job store(s), executor(s) and trigger(s)</a></strong></p>
 </blockquote>
-<p><img src="../images/use-APScheduler-tools-1.jpg" alt="APScheduler"></p>
+<p><img src="../images/use-APScheduler-tools-1.jpg" alt="APScheduler定时任务工具"></p>
 <ul>
-<li><p><a href="https://apscheduler.readthedocs.io/en/latest/modules/events.html#module-apscheduler.events" target="_blank" rel="noopener"><strong><code>apscheduler.events</code></strong></a></p>
-<ul>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/events.html#module-apscheduler.events" target="_blank" rel="noopener"><strong><code>apscheduler.events</code></strong></a><ul>
 <li><a href="https://apscheduler.readthedocs.io/en/latest/modules/executors/base.html#module-apscheduler.executors.base" target="_blank" rel="noopener"><code>apscheduler.executors.base</code></a></li>
 <li><a href="https://apscheduler.readthedocs.io/en/latest/modules/executors/debug.html#module-apscheduler.executors.debug" target="_blank" rel="noopener"><code>apscheduler.executors.debug</code></a></li>
-<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/executors/pool.html#module-apscheduler.executors.pool" target="_blank" rel="noopener"><code>apscheduler.executors.pool</code></a></li>
-<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/executors/asyncio.html#module-apscheduler.executors.asyncio" target="_blank" rel="noopener"><code>apscheduler.executors.asyncio</code></a></li>
-<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/executors/gevent.html#module-apscheduler.executors.gevent" target="_blank" rel="noopener"><code>apscheduler.executors.gevent</code></a></li>
-<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/executors/twisted.html#module-apscheduler.executors.twisted" target="_blank" rel="noopener"><code>apscheduler.executors.twisted</code></a></li>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/executors/pool.html#module-apscheduler.executors.pool" target="_blank" rel="noopener"><code>apscheduler.executors.pool</code></a><ul>
+<li>线程池执行器、进程池执行器</li>
 </ul>
 </li>
-<li><p><a href="https://apscheduler.readthedocs.io/en/latest/modules/job.html#module-apscheduler.job" target="_blank" rel="noopener"><strong><code>apscheduler.job</code></strong></a></p>
-<ul>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/executors/asyncio.html#module-apscheduler.executors.asyncio" target="_blank" rel="noopener"><code>apscheduler.executors.asyncio</code></a><ul>
+<li>asyncio 程序执行器</li>
+</ul>
+</li>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/executors/gevent.html#module-apscheduler.executors.gevent" target="_blank" rel="noopener"><code>apscheduler.executors.gevent</code></a><ul>
+<li>Gevent 程序执行器</li>
+</ul>
+</li>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/executors/twisted.html#module-apscheduler.executors.twisted" target="_blank" rel="noopener"><code>apscheduler.executors.twisted</code></a><ul>
+<li>Twisted 程序执行器</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/job.html#module-apscheduler.job" target="_blank" rel="noopener"><strong><code>apscheduler.job</code></strong></a><ul>
 <li><a href="https://apscheduler.readthedocs.io/en/latest/modules/jobstores/base.html#module-apscheduler.jobstores.base" target="_blank" rel="noopener"><code>apscheduler.jobstores.base</code></a></li>
-<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/jobstores/memory.html#module-apscheduler.jobstores.memory" target="_blank" rel="noopener"><code>apscheduler.jobstores.memory</code></a></li>
-<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/jobstores/sqlalchemy.html#module-apscheduler.jobstores.sqlalchemy" target="_blank" rel="noopener"><code>apscheduler.jobstores.sqlalchemy</code></a></li>
-<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/jobstores/redis.html#module-apscheduler.jobstores.redis" target="_blank" rel="noopener"><code>apscheduler.jobstores.redis</code></a></li>
-<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/jobstores/mongodb.html#module-apscheduler.jobstores.mongodb" target="_blank" rel="noopener"><code>apscheduler.jobstores.mongodb</code></a></li>
-<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/jobstores/rethinkdb.html#module-apscheduler.jobstores.rethinkdb" target="_blank" rel="noopener"><code>apscheduler.jobstores.rethinkdb</code></a></li>
-<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/jobstores/zookeeper.html#module-apscheduler.jobstores.zookeeper" target="_blank" rel="noopener"><code>apscheduler.jobstores.zookeeper</code></a></li>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/jobstores/memory.html#module-apscheduler.jobstores.memory" target="_blank" rel="noopener"><code>apscheduler.jobstores.memory</code></a><ul>
+<li>没有序列化，任务存储在内存中，增删改查都是在内存中完成</li>
 </ul>
 </li>
-<li><p><a href="https://apscheduler.readthedocs.io/en/latest/modules/schedulers.html#module-apscheduler.schedulers" target="_blank" rel="noopener"><strong><code>apscheduler.schedulers</code></strong></a></p>
-<ul>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/jobstores/sqlalchemy.html#module-apscheduler.jobstores.sqlalchemy" target="_blank" rel="noopener"><code>apscheduler.jobstores.sqlalchemy</code></a><ul>
+<li>使用 SQLAlchemy 这个 ORM 框架作为存储方式</li>
+</ul>
+</li>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/jobstores/redis.html#module-apscheduler.jobstores.redis" target="_blank" rel="noopener"><code>apscheduler.jobstores.redis</code></a><ul>
+<li>使用 redis 作为存储器</li>
+</ul>
+</li>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/jobstores/mongodb.html#module-apscheduler.jobstores.mongodb" target="_blank" rel="noopener"><code>apscheduler.jobstores.mongodb</code></a><ul>
+<li>使用 mongodb 作为存储器</li>
+</ul>
+</li>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/jobstores/rethinkdb.html#module-apscheduler.jobstores.rethinkdb" target="_blank" rel="noopener"><code>apscheduler.jobstores.rethinkdb</code></a><ul>
+<li>使用 rethinkdb 作为存储器</li>
+</ul>
+</li>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/jobstores/zookeeper.html#module-apscheduler.jobstores.zookeeper" target="_blank" rel="noopener"><code>apscheduler.jobstores.zookeeper</code></a><ul>
+<li>使用 zookeeper 作为存储器</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/schedulers.html#module-apscheduler.schedulers" target="_blank" rel="noopener"><strong><code>apscheduler.schedulers</code></strong></a><ul>
 <li><a href="https://apscheduler.readthedocs.io/en/latest/modules/schedulers/base.html#module-apscheduler.schedulers.base" target="_blank" rel="noopener"><code>apscheduler.schedulers.base</code></a></li>
-<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/schedulers/blocking.html#module-apscheduler.schedulers.blocking" target="_blank" rel="noopener"><code>apscheduler.schedulers.blocking</code></a></li>
-<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/schedulers/background.html#module-apscheduler.schedulers.background" target="_blank" rel="noopener"><code>apscheduler.schedulers.background</code></a></li>
-<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/schedulers/asyncio.html#module-apscheduler.schedulers.asyncio" target="_blank" rel="noopener"><code>apscheduler.schedulers.asyncio</code></a></li>
-<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/schedulers/gevent.html#module-apscheduler.schedulers.gevent" target="_blank" rel="noopener"><code>apscheduler.schedulers.gevent</code></a></li>
-<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/schedulers/tornado.html#module-apscheduler.schedulers.tornado" target="_blank" rel="noopener"><code>apscheduler.schedulers.tornado</code></a></li>
-<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/schedulers/twisted.html#module-apscheduler.schedulers.twisted" target="_blank" rel="noopener"><code>apscheduler.schedulers.twisted</code></a></li>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/schedulers/blocking.html#module-apscheduler.schedulers.blocking" target="_blank" rel="noopener"><code>apscheduler.schedulers.blocking</code></a><ul>
+<li>适用于调度程序是进程中唯一运行的进程，调用 start 函数会阻塞当前线程，不能立即返回</li>
 </ul>
 </li>
-<li><p><a href="https://apscheduler.readthedocs.io/en/latest/modules/triggers/base.html#module-apscheduler.triggers.base" target="_blank" rel="noopener"><strong><code>apscheduler.triggers.base</code></strong></a></p>
-<ul>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/schedulers/background.html#module-apscheduler.schedulers.background" target="_blank" rel="noopener"><code>apscheduler.schedulers.background</code></a><ul>
+<li>适用于调度程序在应用程序的后台运行，调用 start 后主线程不会阻塞</li>
+</ul>
+</li>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/schedulers/asyncio.html#module-apscheduler.schedulers.asyncio" target="_blank" rel="noopener"><code>apscheduler.schedulers.asyncio</code></a><ul>
+<li>适用于使用了 Asyncio 模块的应用程序</li>
+</ul>
+</li>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/schedulers/gevent.html#module-apscheduler.schedulers.gevent" target="_blank" rel="noopener"><code>apscheduler.schedulers.gevent</code></a><ul>
+<li>适用于使用 Gevent 模块的应用程序</li>
+</ul>
+</li>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/schedulers/tornado.html#module-apscheduler.schedulers.tornado" target="_blank" rel="noopener"><code>apscheduler.schedulers.tornado</code></a><ul>
+<li>适用于构建 Tornado 的应用程序</li>
+</ul>
+</li>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/schedulers/twisted.html#module-apscheduler.schedulers.twisted" target="_blank" rel="noopener"><code>apscheduler.schedulers.twisted</code></a><ul>
+<li>适用于构建 Twisted 的应用程序</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/triggers/base.html#module-apscheduler.triggers.base" target="_blank" rel="noopener"><strong><code>apscheduler.triggers.base</code></strong></a><ul>
 <li><a href="https://apscheduler.readthedocs.io/en/latest/modules/triggers/cron.html#module-apscheduler.triggers.cron" target="_blank" rel="noopener"><code>apscheduler.triggers.cron</code></a></li>
-<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/triggers/date.html#module-apscheduler.triggers.date" target="_blank" rel="noopener"><code>apscheduler.triggers.date</code></a></li>
-<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/triggers/interval.html#module-apscheduler.triggers.interval" target="_blank" rel="noopener"><code>apscheduler.triggers.interval</code></a></li>
-<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/triggers/combining.html#module-apscheduler.triggers.combining" target="_blank" rel="noopener"><code>apscheduler.triggers.combining</code></a></li>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/triggers/date.html#module-apscheduler.triggers.date" target="_blank" rel="noopener"><code>apscheduler.triggers.date</code></a><ul>
+<li>date 触发器</li>
+</ul>
+</li>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/triggers/interval.html#module-apscheduler.triggers.interval" target="_blank" rel="noopener"><code>apscheduler.triggers.interval</code></a><ul>
+<li>interval 触发器</li>
+</ul>
+</li>
+<li><a href="https://apscheduler.readthedocs.io/en/latest/modules/triggers/combining.html#module-apscheduler.triggers.combining" target="_blank" rel="noopener"><code>apscheduler.triggers.combining</code></a><ul>
+<li>crontab 触发器</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -645,6 +730,7 @@ job_defaults <span class="token operator">=</span> <span class="token punctuatio
 <h2 id="5-使用方法"><a href="#5-使用方法" class="headerlink" title="5. 使用方法"></a>5. 使用方法</h2><blockquote>
 <p><strong>主要介绍任务的添加、删除、启动、停止等方式</strong></p>
 </blockquote>
+<p><img src="../images/use-APScheduler-tools-2.png" alt="APScheduler定时任务工具"></p>
 <ul>
 <li><strong>[1] 启动任务</strong></li>
 </ul>
@@ -654,7 +740,13 @@ scheduler<span class="token punctuation">.</span>add_executor<span class="token 
 scheduler<span class="token punctuation">.</span>add_job<span class="token punctuation">(</span>tick<span class="token punctuation">,</span> <span class="token string">'interval'</span><span class="token punctuation">,</span> seconds<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span>
 scheduler<span class="token punctuation">.</span>start<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[2] 添加任务</strong></li>
+<li><strong>[2] 关闭任务</strong></li>
+</ul>
+<p>默认情况下，调度程序关闭其作业存储和执行程序，并等待直到所有当前正在执行的作业完成。如果您不想等待，可以执行以下操作：</p>
+<pre class="line-numbers language-python"><code class="language-python">scheduler<span class="token punctuation">.</span>shutdown<span class="token punctuation">(</span><span class="token punctuation">)</span>
+scheduler<span class="token punctuation">.</span>shutdown<span class="token punctuation">(</span>wait<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 添加任务</strong></li>
 </ul>
 <p>添加任务有两种方式，第一种方式就是最常用 <code>add_job()</code> 方法，第二种方式是使用装饰器模式的 <code>scheduled_job()</code> 方法，用于基本不会变更的任务程序上。</p>
 <p>需要额外注意的是，如果在 <code>executor</code> 或 <code>job store</code> 中使用序列化存储的话，那么在你添加任务的时候有些额外要求需要注意。第一是，任务 <code>target</code> 对象必须是全局内可以方法的；第二是，任务 <code>target</code> 的参数必须是可以进行序列化的。</p>
@@ -663,7 +755,7 @@ scheduler<span class="token punctuation">.</span>start<span class="token punctua
 scheduler<span class="token punctuation">.</span>add_executor<span class="token punctuation">(</span><span class="token string">'processpool'</span><span class="token punctuation">)</span>
 scheduler<span class="token punctuation">.</span>add_job<span class="token punctuation">(</span>tick<span class="token punctuation">,</span> <span class="token string">'interval'</span><span class="token punctuation">,</span> seconds<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">,</span> id<span class="token operator">=</span><span class="token string">'tick'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[3] 删除任务</strong></li>
+<li><strong>[4] 删除任务</strong></li>
 </ul>
 <p>从调度程序中删除作业时，它将从其关联的作业存储中删除，并且不再执行。有两种方式可以实现这一目标：第一种方式，就是通过使用 <code>remove_job()</code> 方法删除任务 <code>ID</code> 或者删除任务别名；第二种方式，就是通过使用 <code>add_job()</code> 方法的 <code>remove()</code> 达到删除的目的。</p>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># using an explicit job ID:</span>
@@ -674,11 +766,11 @@ scheduler<span class="token punctuation">.</span>remove_job<span class="token pu
 job <span class="token operator">=</span> scheduler<span class="token punctuation">.</span>add_job<span class="token punctuation">(</span>myfunc<span class="token punctuation">,</span> <span class="token string">'interval'</span><span class="token punctuation">,</span> minutes<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span>
 job<span class="token punctuation">.</span>remove<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[4] 停止和恢复任务</strong></li>
+<li><strong>[5] 停止和恢复任务</strong></li>
 </ul>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># to pause a job</span>
 scheduler<span class="token punctuation">.</span>add_job<span class="token punctuation">(</span>myfunc<span class="token punctuation">,</span> <span class="token string">'interval'</span><span class="token punctuation">,</span> minutes<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span> id<span class="token operator">=</span><span class="token string">'my_job_id'</span><span class="token punctuation">)</span>
-scheduler<span class="token punctuation">.</span>pause_job<span class="token string">'my_job_id'</span><span class="token punctuation">)</span>
+scheduler<span class="token punctuation">.</span>pause_job<span class="token punctuation">(</span><span class="token string">'my_job_id'</span><span class="token punctuation">)</span>
 scheduler<span class="token punctuation">.</span>pause<span class="token punctuation">(</span><span class="token punctuation">)</span>
 
 job <span class="token operator">=</span> scheduler<span class="token punctuation">.</span>add_job<span class="token punctuation">(</span>myfunc<span class="token punctuation">,</span> <span class="token string">'interval'</span><span class="token punctuation">,</span> minutes<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span>
@@ -691,7 +783,7 @@ scheduler<span class="token punctuation">.</span>resume<span class="token punctu
 job <span class="token operator">=</span> scheduler<span class="token punctuation">.</span>add_job<span class="token punctuation">(</span>myfunc<span class="token punctuation">,</span> <span class="token string">'interval'</span><span class="token punctuation">,</span> minutes<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span>
 job<span class="token punctuation">.</span>resume<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[5] 修改任务</strong></li>
+<li><strong>[6] 修改任务</strong></li>
 </ul>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># scheduler</span>
 scheduler<span class="token punctuation">.</span>add_job<span class="token punctuation">(</span>myfunc<span class="token punctuation">,</span> <span class="token string">'interval'</span><span class="token punctuation">,</span> minutes<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span> id<span class="token operator">=</span><span class="token string">'my_job_id'</span><span class="token punctuation">)</span>
@@ -701,14 +793,14 @@ scheduler<span class="token punctuation">.</span>reschedule_job<span class="toke
 job <span class="token operator">=</span> scheduler<span class="token punctuation">.</span>add_job<span class="token punctuation">(</span>myfunc<span class="token punctuation">,</span> <span class="token string">'interval'</span><span class="token punctuation">,</span> minutes<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span>
 job<span class="token punctuation">.</span>modify<span class="token punctuation">(</span>max_instances<span class="token operator">=</span><span class="token number">6</span><span class="token punctuation">,</span> name<span class="token operator">=</span><span class="token string">'Alternate name'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[6] 获取任务</strong></li>
+<li><strong>[7] 获取任务</strong></li>
 </ul>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 获取任务列表</span>
 scheduler<span class="token punctuation">.</span>print_jobs<span class="token punctuation">(</span><span class="token punctuation">)</span>
 scheduler<span class="token punctuation">.</span>get_jobs<span class="token punctuation">(</span><span class="token punctuation">)</span>
 scheduler<span class="token punctuation">.</span>get_job<span class="token punctuation">(</span><span class="token string">'tick'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[7] 打印日志</strong></li>
+<li><strong>[8] 打印日志</strong></li>
 </ul>
 <p>如果调度程序未按预期工作，则将 <code>apscheduler</code> 记录器的日志记录级别提高到 <code>DEBUG</code> 级别会很有帮助。如果您尚未首先启用日志记录，则可以执行以下操作：</p>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> logging
@@ -751,7 +843,7 @@ executors <span class="token operator">=</span> <span class="token punctuation">
     <span class="token keyword">except</span> <span class="token punctuation">(</span>KeyboardInterrupt<span class="token punctuation">,</span> SystemExit<span class="token punctuation">)</span><span class="token punctuation">:</span>
         scheduler<span class="token punctuation">.</span>shutdown<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[2] jobstores/sqlalchemy_.py</strong></li>
+<li><strong>[2] jobstores/sqlalchemy.py</strong></li>
 </ul>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> sys
 <span class="token keyword">import</span> os
@@ -1436,7 +1528,7 @@ conn<span class="token punctuation">.</span>root<span class="token punctuation">
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1058.5k</span>&nbsp;字
+                class="white-color">1058.9k</span>&nbsp;字
             
             
             
