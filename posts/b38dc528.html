@@ -466,14 +466,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    181
+                    772
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    2 分
                 </div>
                 
 
@@ -498,6 +498,36 @@
 </blockquote>
 <p>诡异的问题时常发生，如果正确的处理它们呢？将是一个值得思考和学习的问题！通过对错误和异常问题的排除和处理，能够增长我们的知识储备已经掌握处理问题最为有效和使用的方式。这里将会记录常见的集群使用的问题，以备不时之需。</p>
 <p><img src="../images/nginx-diseases-all-list.png" alt="Nginx疑难杂症汇总"></p>
+<hr>
+<h2 id="1-提示-Cookie-长度超限"><a href="#1-提示-Cookie-长度超限" class="headerlink" title="1. 提示 Cookie 长度超限"></a>1. 提示 Cookie 长度超限</h2><blockquote>
+<p><strong>报错信息：Request Request Header Or Cookie Too Large</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 服务新建之后，在其他用户登录网页的时候，页面提示 <code>400: Bad Request</code> 报错错误，大致如下所示：</li>
+</ul>
+<p><img src="../images/nginx-diseases-all-list-01.png" alt="Nginx疑难杂症汇总 - 提示Cookie长度超限"></p>
+<ul>
+<li><strong>[解决方法]</strong> 后来发现，是因为多个服务公用同一个域名导致在该域名下面存储的 <code>Cookie</code> 太多导致的，可以设置如下两个参数来缓解该问题的出现。<ul>
+<li><a href="http://nginx.org/en/docs/http/ngx_http_core_module.html#client_header_buffer_size" target="_blank" rel="noopener">client_header_buffer_size</a></li>
+<li><a href="http://nginx.org/en/docs/http/ngx_http_core_module.html#large_client_header_buffers" target="_blank" rel="noopener">large_client_header_buffers</a></li>
+</ul>
+</li>
+</ul>
+<p>设置读取客户端请求头的缓冲区大小。对于大多数请求，1K 字节的缓冲区就足够了。但是，如果一个请求包含很长的 <code>cookie</code>，或者来自 <code>WAP</code> 客户端，那么它可能不适合 <code>1K</code>。如果请求行或请求头字段不适合这个缓冲区，那么将分配更大的缓冲区，由 <code>large_client_header_buffers</code> 指令配置。</p>
+<p><img src="../images/nginx-diseases-all-list-02.png" alt="Nginx疑难杂症汇总 - client_header_buffer_size"></p>
+<p>设置用于读取大型的客户端请求头的缓冲区的最大数量和大小。请求行不能超过一个缓冲区的大小，否则会向客户端返回 <code>414</code>（<code>Request-URI Too Large</code>）错误。请求头字段也不能超过一个缓冲区的大小，否则会将 <code>400</code>（<code>Bad Request</code>）错误返回给客户端，缓冲区仅按需分配。默认情况下，缓冲区大小等于 <code>8K</code> 字节。 如果在请求处理结束后将连接转换为保持活动状态，则会释放这些缓冲区。</p>
+<p><img src="../images/nginx-diseases-all-list-03.png" alt="Nginx疑难杂症汇总 - large_client_header_buffers"></p>
+<p>后来网上找到了，对 <code>nginx</code> 处理 <code>header</code> 时的方法，大致如下所示：</p>
+<ol>
+<li>先处理请求的 request_line，之后才是 <code>request_header</code>。</li>
+<li>这两者的 <code>buffer</code> 分配策略相同。</li>
+<li>先根据 <code>client_header_buffer_size</code> 配置的值分配一个 <code>buffer</code>，如果分配的 <code>buffer</code> 无法容纳 <code>request_line</code>/<code>request_header</code>，那么就会再次根据 <code>large_client_header_buffers</code> 配置的参数分配 <code>large_buffer</code>，如果 <code>large_buffer</code> 还是无法容纳，那么就会返回 <code>414</code>/<code>400</code> 错误。</li>
+</ol>
+<p>根据对手册的理解，这两个指令在配置 <code>header_buffer</code> 时的使用场景是不同的，个人理解如下：</p>
+<ol>
+<li>如果你的请求中的 <code>header</code> 都很大，那么应该使用 <code>client_header_buffer_size</code>，这样能减少一次内存分配。</li>
+<li>如果你的请求中只有少量请求 <code>header</code> 很大，那么应该使用 <code>large_client_header_buffers</code>，因为这样就仅需在处理大 <code>header</code> 时才会分配更多的空间，从而减少无谓的内存空间浪费。</li>
+</ol>
 <hr>
 <script>
         document.querySelectorAll('.github-emoji')
@@ -1057,7 +1087,7 @@
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1059.8k</span>&nbsp;字
+                class="white-color">1060.4k</span>&nbsp;字
             
             
             
