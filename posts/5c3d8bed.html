@@ -459,7 +459,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-12-09
+                    2021-04-07
                 </div>
                 
 
@@ -473,7 +473,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    15 分
+                    16 分
                 </div>
                 
 
@@ -496,7 +496,12 @@
                 <blockquote>
 <p><strong>该工具的主要作用就是用于配置/管理/共享和安装应用程序的 Docker 客户端插件</strong></p>
 </blockquote>
+<ul>
+<li><a href="https://www.docker.com/products/docker-app" target="_blank" rel="noopener">Docker App 官网</a></li>
+<li><a href="https://github.com/docker/app" target="_blank" rel="noopener">Docker App GitHub 仓库</a></li>
+</ul>
 <p><img src="../images/how-to-use-docker-compose.jpg" alt="使用docker-app来提高compose效率"></p>
+<hr>
 <h2 id="1-背景介绍"><a href="#1-背景介绍" class="headerlink" title="1. 背景介绍"></a>1. 背景介绍</h2><blockquote>
 <p><strong>本部分主要介绍了关于 docker-app 工具的背景和开发原因</strong></p>
 </blockquote>
@@ -518,18 +523,28 @@
 </blockquote>
 <p>在最新的版本中 <code>Docker App</code> 已经变成了一个 <code>docker</code> 内置的命令行插件，它将 <code>docker</code> 命令扩展为 <code>app</code> 子命令。 因为现在还是在实验阶段，所以启动该功能的话，需要 <code>docker</code> 版本在 <code>19.03.0</code> 以更高版本中设置环境变量 <code>EXPERIMENTAL=true</code> 才可以使用。</p>
 <ul>
-<li><strong>[1] 安装方式</strong></li>
+<li><strong>[1] 安装方式 - MacOS</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Download your OS tarball</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Download Mac OS Tarball</span>
 $ <span class="token function">export</span> OSTYPE<span class="token operator">=</span><span class="token string">"<span class="token variable"><span class="token variable">$(</span><span class="token function">uname</span> <span class="token operator">|</span> <span class="token function">tr</span> A-Z a-z<span class="token variable">)</span></span>"</span>
-$ curl -fsSL --output <span class="token string">"/tmp/docker-app-<span class="token variable">${OSTYPE}</span>.tar.gz"</span> <span class="token string">"https://.../docker-app-<span class="token variable">${OSTYPE}</span>.tar.gz"</span>
+$ curl -fsSL --output <span class="token string">"/tmp/docker-app-<span class="token variable">${OSTYPE}</span>.tar.gz"</span> <span class="token string">"https://github.com/docker/app/releases/download/v0.8.0/docker-app-<span class="token variable">${OSTYPE}</span>.tar.gz"</span>
 $ <span class="token function">tar</span> xf <span class="token string">"/tmp/docker-app-<span class="token variable">${OSTYPE}</span>.tar.gz"</span> -C /tmp/
 
 <span class="token comment" spellcheck="true"># Install as a Docker CLI plugin</span>
 $ <span class="token function">mkdir</span> -p ~/.docker/cli-plugins
 $ <span class="token function">cp</span> <span class="token string">"/tmp/docker-app-plugin-<span class="token variable">${OSTYPE}</span>"</span> ~/.docker/cli-plugins/docker-app<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[2] 命令使用</strong></li>
+<li><strong>[2] 安装方式 - Windows</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Download Windows Tarball</span>
+$ Invoke-WebRequest -Uri https://github.com/docker/app/releases/download/v0.8.0/docker-app-windows.tar.gz -OutFile docker-app.tar.gz -UseBasicParsing
+$ <span class="token function">tar</span> xf <span class="token string">"docker-app.tar.gz"</span>
+
+<span class="token comment" spellcheck="true"># Install as a Docker CLI plugin</span>
+$ New-Item -ItemType Directory -Path ~/.docker/cli-plugins -ErrorAction SilentlyContinue
+$ <span class="token function">cp</span> docker-app-plugin-windows.exe ~/.docker/cli-plugins/docker-app.exe<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 命令使用</strong></li>
 </ul>
 <p><img src="../images/how-to-use-docker-compose-2.png" alt="使用docker-app来提高compose效率"></p>
 <hr>
@@ -572,7 +587,7 @@ Created <span class="token string">"hello.dockerapp"</span>
 $ tree
 <span class="token keyword">.</span>
 ├── docker-compose.yml
-├── hello.dockerapp
+└── hello.dockerapp
     ├── docker-compose.yml  <span class="token comment" spellcheck="true"># 基础compose文件</span>
     ├── metadata.yml        <span class="token comment" spellcheck="true"># 该compose镜像的相关信息</span>
     └── parameters.yml      <span class="token comment" spellcheck="true"># compose文件中的参数对应值</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
@@ -599,8 +614,7 @@ sha256:4a492748ae55170daadd1ddfff4db30e0ef3d38bf0f57a913512caa323e140de
 $ docker app push escape/nginx_test:0.1.0
 
 <span class="token comment" spellcheck="true"># 镜像加速(换命)</span>
-<span class="token comment" spellcheck="true"># https://github.com/Azure/container-service-for-azure-china</span>
-<span class="token comment" spellcheck="true"># /blob/master/aks/README.md#22-container-registry-proxy</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+https://github.com/Azure/container-service-for-azure-china/blob/master/aks/README.md<span class="token comment" spellcheck="true">#22-container-registry-proxy</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><code>Compose</code> 文件中的所有信息都存储在 <code>DockerHub</code> 上的 <code>CNAB</code> 包中。您可能注意到了，它也是参数化的，因此可以在运行时替换它的值来满足部署要求。我们也可以直接从 <code>DockerHub</code> 安装应用程序。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看远程镜像信息</span>
 $ docker app image inspect escape/nginx_test:0.1.0 --pretty
@@ -630,7 +644,7 @@ hello-docker
 │ ├── Dockerfile
 │ └── main.go
 ├── docker-compose.yml
-└── frontend
+├── frontend
 ├── Dockerfile
 └── nginx.conf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-yml"><code class="language-yml"># docker-compose.yml
@@ -877,8 +891,9 @@ $ tree
 <h2 id="6-写在最后"><a href="#6-写在最后" class="headerlink" title="6. 写在最后"></a>6. 写在最后</h2><blockquote>
 <p><strong>期望越大，失望越大！</strong></p>
 </blockquote>
-<p>其实这篇博客，我修修改改了好几天了。一方面因为版本的更新，需要整理新版的功能特性以及对于的安装操作步骤；另一方面就是重新编写之前不再适配的内容，达到后续还可以按照该博客正常操作。博客更新完之后，我的内心其实是难过的。在新版本的 <code>0.9.0</code> 中，去除了我认为很重要的功能，就是更加配置文件，重新生成各种环境的 <code>docker-compose.yml</code> 命令，哎，我感觉我要弃坑了。</p>
-<p>下面是之前版本中，可以使用的命令功能，现在已经没有了，砍了 <code>2/3</code> 的子命令。我只能说，拜拜了，您嘞！<br><img src="../images/how-to-use-docker-compose-4.png" alt="使用docker-app来提高compose效率"></p>
+<p>其实这篇博客，我修修改改了好几天了。一方面因为版本的更新，需要整理新版的功能特性以及对于的安装操作步骤；另一方面就是重新编写之前不再适配的内容，达到后续还可以按照该博客正常操作。博客更新完之后，我的内心其实是难过的。在新版本的 <code>0.9.0</code> 中，去除了我认为很重要的功能，就是更新配置文件，来重新生成各种环境的 <code>docker-compose.yml</code> 命令，哎，我感觉我要弃坑了。</p>
+<p>下面是之前版本中，可以使用的命令功能，现在已经没有了，砍了 <code>2/3</code> 的子命令。我只能说，拜拜了，您嘞！</p>
+<p><img src="../images/how-to-use-docker-compose-4.png" alt="使用docker-app来提高compose效率"></p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -1429,7 +1444,7 @@ $ tree
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1060.4k</span>&nbsp;字
+                class="white-color">1060.5k</span>&nbsp;字
             
             
             
