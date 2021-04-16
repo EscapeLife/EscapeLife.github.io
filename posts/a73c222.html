@@ -365,7 +365,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-12-09
+                    2021-04-16
                 </div>
                 
 
@@ -404,13 +404,13 @@
 </blockquote>
 <p><img src="/images/zabbix-agent.png" alt="排查zabbix-agent脱管"></p>
 <hr>
-<p>早上系统运维发信息说有一台我们的服务器<code>zabbix-agent</code>脱管了，说是昨天还是正常的，需要我排查下问题。之前一直没有使用过这台服务器，登录上去之后，先通过<code>lastlog</code>和<code>last</code>看了下是否有异常的用户操作，但是因为这台服务器权限没有进行细分导致都是<code>root</code>的信息。</p>
+<p>早上系统运维发信息说有一台我们的服务器 <code>zabbix-agent</code> 脱管了，说是昨天还是正常的，需要我排查下问题。之前一直没有使用过这台服务器，登录上去之后，先通过 <code>lastlog</code> 和 <code>last</code> 看了下是否有异常的用户操作，但是因为这台服务器权限没有进行细分导致都是 <code>root</code> 的信息。</p>
 <p><img src="/images/zabbix-agent1.png" alt="排查zabbix-agent脱管"></p>
-<p>发现服务器的<code>zabbix-agent</code>服务并没有启动，随后看了下对应服务的日志位置和信息，发现前一天有异常日志，如下所示。</p>
+<p>发现服务器的 <code>zabbix-agent</code> 服务并没有启动，随后看了下对应服务的日志位置和信息，发现前一天有异常日志，如下所示。</p>
 <p><img src="/images/zabbix-agent2.png" alt="排查zabbix-agent脱管"></p>
 <p>通过查看日志信息并没有看到有任何异常的日志信息，对于上述信息大都是因为配置文件异常导致服务加载异常的，想想还是看看最近有没有什么不正常的操作。</p>
 <p><img src="/images/zabbix-agent3.png" alt="排查zabbix-agent脱管"></p>
-<p>排除我进去进入的操作，稍微往上翻了下，发现有人<code>reboot</code>重启了系统。想了想发现，可能是因为该服务并没有设置开机自启动，重启服务导致该服务未启动，所以才会脱管的。为了验证自己的判断逻辑，查了下系统的自启动服务列表(<code>CentOS7</code>系统)。</p>
+<p>排除我进去进入的操作，稍微往上翻了下，发现有人 <code>reboot</code> 启了系统。想了想发现，可能是因为该服务并没有设置开机自启动，重启服务导致该服务未启动，所以才会脱管的。为了验证自己的判断逻辑，查了下系统的自启动服务列表(<code>CentOS7</code>系统)。</p>
 <p><img src="/images/zabbix-agent4.png" alt="排查zabbix-agent脱管"></p>
 <p><img src="/images/zabbix-agent5.png" alt="排查zabbix-agent脱管"></p>
 <p>验证之前的判断是正确的，启动<code>zabbix-agent</code>服务并将其加入开机自启动列表中，服务正常了。</p>
