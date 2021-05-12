@@ -1,0 +1,2303 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="愉快的使用restic备份数据, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>愉快的使用restic备份数据 | Escape</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Escape</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Escape</div>
+        <div class="logo-desc">
+            
+            听摇滚,但不偏颇;也挺古典,但不安逸
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/EscapeLife" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/EscapeLife" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/happy-use-restic-backup.png')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">愉快的使用restic备份数据</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Linux/">
+                                <span class="chip bg-color">Linux</span>
+                            </a>
+                        
+                            <a href="/tags/Restic/">
+                                <span class="chip bg-color">Restic</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Linux命令使用/" class="post-category">
+                                Linux命令使用
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2021-05-01
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2021-05-12
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    7k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    34 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <blockquote>
+<p><strong><code>Restic</code> 是一个快速且安全的数据文件备份程序。在下面的章节中，将介绍该工具的典型工作流程，从安装开始，准备一个新的资源备份数据，并进行第一次备份。</strong></p>
+</blockquote>
+<ul>
+<li><a href="https://github.com/restic/restic" target="_blank" rel="noopener">Restic - 官方仓库地址</a></li>
+<li><a href="https://restic.readthedocs.io/en/stable/index.html" target="_blank" rel="noopener">Restic - 官方文档地址</a></li>
+<li><a href="https://github.com/Lobaro/restic-backup-docker" target="_blank" rel="noopener">restic-backup-docker - 官方推荐的第三方容器</a></li>
+</ul>
+<p><img src="../images/happy-use-restic-backup.png" alt="愉快的使用restic备份数据"></p>
+<hr>
+<h2 id="1-工具的安装方式"><a href="#1-工具的安装方式" class="headerlink" title="1. 工具的安装方式"></a>1. 工具的安装方式</h2><blockquote>
+<p><strong>该工具提供多种平台的对应安装包！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] macOS</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># brew</span>
+$ brew <span class="token function">install</span> restic
+
+<span class="token comment" spellcheck="true"># macprots</span>
+$ <span class="token function">sudo</span> port <span class="token function">install</span> restic<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] Debian</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># apt</span>
+$ <span class="token function">apt-get</span> <span class="token function">install</span> restic<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] CentOS</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># yum</span>
+$ yum <span class="token function">install</span> yum-plugin-copr
+$ yum copr <span class="token function">enable</span> copart/restic
+$ yum <span class="token function">install</span> restic<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] Docker</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># docker</span>
+$ docker pull restic/restic<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] 二进制安装</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># clone</span>
+$ <span class="token function">git</span> clone https://github.com/restic/restic
+
+<span class="token comment" spellcheck="true"># run</span>
+$ <span class="token function">cd</span> restic <span class="token operator">&amp;&amp;</span> go run build.go
+
+<span class="token comment" spellcheck="true"># build</span>
+$ go run build.go --goos linux --goarch arm --goarm 6<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[6] Official Binaries</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ restic version
+restic 0.9.3 compiled with go1.11.2 on linux/amd64
+
+$ restic self-update
+<span class="token function">find</span> latest release of restic at GitHub
+latest version is 0.9.4
+download <span class="token function">file</span> SHA256SUMS
+download SHA256SUMS
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+successfully updated restic to version 0.9.4
+
+$ restic version
+restic 0.9.4 compiled with go1.12.1 on linux/amd64<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="2-命令行自动补全"><a href="#2-命令行自动补全" class="headerlink" title="2. 命令行自动补全"></a>2. 命令行自动补全</h2><blockquote>
+<p><strong>执行如下命令可以使我们在使用 restic 时参数自动补全，提升使用效率！</strong></p>
+</blockquote>
+<ul>
+<li><strong>补全命令帮助提示</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ ./restic generate --help
+
+The <span class="token string">"generate"</span> <span class="token function">command</span> writes automatically generated files <span class="token punctuation">(</span>like the <span class="token function">man</span> pages
+and the auto-completion files <span class="token keyword">for</span> <span class="token function">bash</span> and zsh<span class="token punctuation">)</span>.
+
+Usage:
+  restic generate <span class="token punctuation">[</span>flags<span class="token punctuation">]</span> <span class="token punctuation">[</span>command<span class="token punctuation">]</span>
+
+Flags:
+      --bash-completion <span class="token function">file</span>   <span class="token function">write</span> <span class="token function">bash</span> completion <span class="token function">file</span>
+  -h, --help                   <span class="token function">help</span> <span class="token keyword">for</span> generate
+      --man directory          <span class="token function">write</span> <span class="token function">man</span> pages to directory
+      --zsh-completion <span class="token function">file</span>    <span class="token function">write</span> zsh completion <span class="token function">file</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>执行如下命令即可完成命令补全</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># autocompletion</span>
+$ <span class="token function">sudo</span> ./restic generate --bash-completion /etc/bash_completion.d/restic
+writing <span class="token function">bash</span> completion <span class="token function">file</span> to /etc/bash_completion.d/restic<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="3-可配置的存储库"><a href="#3-可配置的存储库" class="headerlink" title="3. 可配置的存储库"></a>3. 可配置的存储库</h2><blockquote>
+<p><strong>介绍 Restic 支持的数据存储类型！</strong></p>
+</blockquote>
+<p>安装好了 <code>Restic</code> 后，还需要配置下存储方式，也就是你想备份到本地还是远程服务器上。以下配置过程中都会要你输入密码，千万不能忘了，不然数据就找不回来了。</p>
+<p>这里需要说的是，<code>Rclone</code> 这种方式，其可以挂载 <code>OneDrive</code> 或者 <code>Google</code> 网盘，具体的使用和配置情况可以参考官方文档进行操作。当然不仅限于我下面列举出来的这些，更多的存储库支持请查看官方文档。</p>
+<ul>
+<li><strong>[1] Local</strong><ul>
+<li>设置本地存储</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 备份到本地/data/restic-repo文件夹</span>
+$ restic init --repo /data/restic-repo
+enter password <span class="token keyword">for</span> new repository:
+enter password again:
+created restic repository a879a2dad9 at /data/restic-repo
+Please note that knowledge of your password is required to access the repository.
+Losing your password means that your data is irrecoverably lost.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] SFTP</strong><ul>
+<li>设置远程备份</li>
+<li>使用前需要设置无密码登录(免密登录)</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 生成~/.ssh/id_rsa.pub公钥和对应私钥</span>
+$ <span class="token function">cd</span> ~ <span class="token operator">&amp;&amp;</span> ssh-keygen -t rsa
+
+<span class="token comment" spellcheck="true"># [方法一] 复制服务器A中的id_rsa.pub值到服务器B</span>
+$ <span class="token keyword">echo</span> <span class="token string">'xxxxxxx'</span> <span class="token operator">>></span> ~/.ssh/authorized_keys
+
+<span class="token comment" spellcheck="true"># [方法二] 当然可以使用如下命令自动完成免密登录</span>
+$ ssh-copy-id -i ~/.ssh/id_rsa.pub root@192.168.100.2
+
+<span class="token comment" spellcheck="true"># 测试免密登录</span>
+$ <span class="token function">ssh</span> -vv root@192.168.100.2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash">$ restic -r sftp:user@host:/data/restic-repo init
+enter password <span class="token keyword">for</span> new repository:
+enter password again:
+created restic repository f1c6108821 at sftp:user@host:/data/restic-repo
+Please note that knowledge of your password is required to access the repository.
+Losing your password means that your data is irrecoverably lost.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] REST Server</strong><ul>
+<li>设置远程备份</li>
+<li><code>HTTP</code> 或 <code>HTTPS</code> 协议将数据备份到远程服务器</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># http</span>
+$ restic -r rest:http://host:8000/
+
+<span class="token comment" spellcheck="true"># https</span>
+$ restic -r rest:https://host:8000/
+$ restic -r rest:https://user:pass@host:8000/
+$ restic -r rest:https://user:pass@host:8000/my_backup_repo/<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] Amazon S3</strong><ul>
+<li>设置远程备份</li>
+<li>可以将数据备份到 <code>AWS</code> 的 <code>bucket</code> 中</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 设置AWS秘钥</span>
+$ <span class="token function">export</span> AWS_ACCESS_KEY_ID<span class="token operator">=</span><span class="token operator">&lt;</span>MY_ACCESS_KEY<span class="token operator">></span>
+$ <span class="token function">export</span> AWS_SECRET_ACCESS_KEY<span class="token operator">=</span><span class="token operator">&lt;</span>MY_SECRET_ACCESS_KEY<span class="token operator">></span>
+
+<span class="token comment" spellcheck="true"># 初始化AWS作为后端的存储库</span>
+$ restic -r s3:s3.amazonaws.com/bucket_name init
+enter password <span class="token keyword">for</span> new repository:
+enter password again:
+created restic repository eefee03bbd at s3:s3.amazonaws.com/bucket_name
+Please note that knowledge of your password is required to access the repository.
+Losing your password means that your data is irrecoverably lost.
+
+<span class="token comment" spellcheck="true"># 设置同步时间时区</span>
+$ restic -r s3:s3.amazonaws.com/bucket_name init -o s3.region<span class="token operator">=</span><span class="token string">"us-east-1"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] Minio Server</strong><ul>
+<li>设置远程备份</li>
+<li><code>Minio</code> 是一个用 <code>Go</code> 编写的开源对象存储，兼容 <code>AWS S3</code> 的 <code>API</code> 写法。</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 设置Minio秘钥</span>
+$ <span class="token function">export</span> AWS_ACCESS_KEY_ID<span class="token operator">=</span><span class="token operator">&lt;</span>MY_ACCESS_KEY<span class="token operator">></span>
+$ <span class="token function">export</span> AWS_SECRET_ACCESS_KEY<span class="token operator">=</span><span class="token operator">&lt;</span>MY_SECRET_ACCESS_KEY<span class="token operator">></span>
+
+<span class="token comment" spellcheck="true"># 初始化Minio作为后端的存储库</span>
+$ ./restic -r s3:http://localhost:9000/restic init
+enter password <span class="token keyword">for</span> new repository:
+enter password again:
+created restic repository 6ad29560f5 at s3:http://localhost:9000/restic1
+Please note that knowledge of your password is required to access
+the repository. Losing your password means that your data is irrecoverably lost.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[6] Alibaba OSS</strong><ul>
+<li>设置远程备份</li>
+<li>阿里巴巴 <code>OSS</code> 是一种加密、安全、易用的对象存储服务，可以实现海量数据的存储和备份</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 设置OSS秘钥</span>
+$ <span class="token function">export</span> AWS_ACCESS_KEY_ID<span class="token operator">=</span><span class="token operator">&lt;</span>YOUR-OSS-ACCESS-KEY-ID<span class="token operator">></span>
+$ <span class="token function">export</span> AWS_SECRET_ACCESS_KEY<span class="token operator">=</span><span class="token operator">&lt;</span>YOUR-OSS-SECRET-ACCESS-KEY<span class="token operator">></span>
+
+<span class="token comment" spellcheck="true"># 初始化OSS作为后端的存储库</span>
+$ ./restic -o s3.bucket-lookup<span class="token operator">=</span>dns -o s3.region<span class="token operator">=</span><span class="token operator">&lt;</span>OSS-REGION<span class="token operator">></span> -r s3:https://<span class="token operator">&lt;</span>OSS-ENDPOINT<span class="token operator">></span>/<span class="token operator">&lt;</span>OSS-BUCKET-NAME<span class="token operator">></span> init
+enter password <span class="token keyword">for</span> new backend:
+enter password again:
+created restic backend xxxxxxxxxx at s3:https://<span class="token operator">&lt;</span>OSS-ENDPOINT<span class="token operator">></span>/<span class="token operator">&lt;</span>OSS-BUCKET-NAME<span class="token operator">></span>
+Please note that knowledge of your password is required to access
+the repository. Losing your password means that your data is irrecoverably lost.
+
+<span class="token comment" spellcheck="true"># 例如使用实际端点</span>
+$ restic -o s3.bucket-lookup<span class="token operator">=</span>dns -o s3.region<span class="token operator">=</span>oss-eu-west-1 -r s3:https://oss-eu-west-1.aliyuncs.com/bucketname init<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="4-开始第一次备份"><a href="#4-开始第一次备份" class="headerlink" title="4. 开始第一次备份"></a>4. 开始第一次备份</h2><blockquote>
+<p><strong>以下均将/data/im-data 文件夹的文件备份到/data/restic-repo 存储文件夹</strong></p>
+</blockquote>
+<p>现在我们准备备份一些数据，目录中特定时间点的内容在 <code>Restic</code> 中称为 <strong>“快照”</strong>。运行以下命令，然后再次输入上方选择的存储库密码，即可开始你的第一次文件备份。</p>
+<ul>
+<li><strong>我们这里以本地备份为例进行演示说明</strong><ul>
+<li>执行之后 <code>Restic</code> 创建了目录的备份(速度非常快)</li>
+<li>完成之后创建了一个名为 <code>40dc1520</code> 的快照(十六进制字符)</li>
+<li>这里 <code>--verbose</code> 可以让备份输出更多信息</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 第一次备份数据</span>
+$ restic -r /data/restic-repo --verbose backup /data/im-data
+<span class="token function">open</span> repository
+enter password <span class="token keyword">for</span> repository:  <span class="token comment" spellcheck="true"># 需要输入密码</span>
+password is correct
+lock repository
+load index files
+start scan
+start backup
+scan finished <span class="token keyword">in</span> 1.837s
+processed 1.720 GiB <span class="token keyword">in</span> 0:12  <span class="token comment" spellcheck="true"># 处理了1.7G数据(即/data/im-data目录大小)</span>
+Files:  5307 new,  0 changed,  0 unmodified
+Dirs:   1867 new,  0 changed,  0 unmodified
+Added:  1.200 GiB            <span class="token comment" spellcheck="true"># 仅将1.2G添加到了存储库中(意味着数据有重复)</span>
+snapshot 40dc1520 saved      <span class="token comment" spellcheck="true"># 在远程仓库中生成的快照版本</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 再次运行backup命令，Retic将创建数据的另一个快照</span>
+<span class="token comment" spellcheck="true"># 这一次并没有向存储库添加新数据，因为所有数据已经存在了</span>
+$ restic -r /data/restic-repo --verbose backup /data/im-data
+<span class="token function">open</span> repository
+enter password <span class="token keyword">for</span> repository:
+password is correct
+lock repository
+load index files
+using parent snapshot d875ae93
+start scan
+start backup
+scan finished <span class="token keyword">in</span> 1.881s
+processed 1.720 GiB <span class="token keyword">in</span> 0:03
+Files:  0 new,  0 changed,  5307 unmodified
+Dirs:   0 new,  0 changed,  1867 unmodified
+Added:  0 B
+snapshot 79766175 saved<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 可以备份同一个存储库中的单个文件</span>
+$ <span class="token keyword">echo</span> <span class="token string">'more data foo bar'</span> <span class="token operator">>></span> ~/work.txt
+
+<span class="token comment" spellcheck="true"># 再一次执行同步单文件操作</span>
+$ restic -r /data/restic-repo --verbose backup /data/im-data/work.txt
+<span class="token function">open</span> repository
+enter password <span class="token keyword">for</span> repository:
+password is correct
+lock repository
+load index files
+using parent snapshot f3f8d56b
+start scan
+start backup
+scan finished <span class="token keyword">in</span> 2.115s
+modified  /home/user/work.txt, saved <span class="token keyword">in</span> 0.007s <span class="token punctuation">(</span>22 B added<span class="token punctuation">)</span>
+modified  /home/user/, saved <span class="token keyword">in</span> 0.008s <span class="token punctuation">(</span>0 B added, 378 B metadata<span class="token punctuation">)</span>
+modified  /home/, saved <span class="token keyword">in</span> 0.009s <span class="token punctuation">(</span>0 B added, 375 B metadata<span class="token punctuation">)</span>
+processed 22 B <span class="token keyword">in</span> 0:02
+Files:  0 new,  1 changed,  0 unmodified
+Dirs:   0 new,  2 changed,  0 unmodified
+Data Blobs:  1 new
+Tree Blobs:  3 new
+Added:  1.116 KiB
+snapshot 8dc503fc saved<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 运行检查命令来验证所有数据都正确地存储在存储库中了</span>
+<span class="token comment" spellcheck="true"># 应该定期运行此命令，以确保存储库的内部结构没有错误</span>
+$ restic check<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[1] 文件变化检测</strong></li>
+</ul>
+<p>当使用 <code>Restic</code> 备份数据的时候，如果遇到已经备份过的文件，无论是在当前备份数据中还是在先前备份数据中，它都可以确保文件的内容在存储库中仅存储一次。为此，通常会扫描每个文件的全部内容才可以。因为这种方式非常耗时，所以 <code>Restic</code> 还可以使用基于 <strong>文件元数据</strong> 的检测方式来确定文件自上次备份以来是否存在变动。如果是，则不会再次扫描文件。</p>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>参数</th>
+<th>对应含义解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><strong><code>--force</code></strong></td>
+<td>关闭更改检测并重新扫描所有文件</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong><code>--ignore-ctime</code></strong></td>
+<td>要求 mtime 匹配，但允许 ctime 不同</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong><code>--ignore-inode</code></strong></td>
+<td>要求 mtime 匹配，但允许 inode number 和 ctime 不同</td>
+</tr>
+</tbody></table>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 可以这样使用</span>
+$ restic -r /data/restic-repo backup --force /data/im-data
+$ restic -r /data/restic-repo backup --ignore-ctime /data/im-data
+$ restic -r /data/restic-repo backup --ignore-inode /data/im-data<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 排除文件或目录</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>参数</th>
+<th>对应含义解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><strong><code>--exclude</code></strong></td>
+<td>指定一次或多次排除一个或多个项</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong><code>--iexclude</code></strong></td>
+<td>与 exclude 相同，但忽略路径的情况</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong><code>--exclude-caches</code></strong></td>
+<td>指定一次排除包含特殊文件的文件夹</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong><code>--exclude-file</code></strong></td>
+<td>指定一次排除包含特殊文件的文件夹</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong><code>--iexclude-file</code></strong></td>
+<td>与 exclude-file 相同，但忽略路径的情况</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong><code>--exclude-if-present foo</code></strong></td>
+<td>排除文件夹包含名为 foo 的文件，不支持文件名的通配符</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong><code>--exclude-larger-than size</code></strong></td>
+<td>指定一次以排除大于给定大小的文件</td>
+</tr>
+</tbody></table>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># excludes.txt</span>
+
+<span class="token comment" spellcheck="true"># exclude go-files</span>
+*.go
+
+<span class="token comment" spellcheck="true"># exclude foo/x/y/z/bar foo/x/bar foo/bar</span>
+foo/**/bar<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 可以这样使用</span>
+$ restic -r /srv/restic-repo backup ~/work --exclude<span class="token operator">=</span><span class="token string">"*.c"</span> --exclude-file<span class="token operator">=</span>excludes.txt
+
+<span class="token comment" spellcheck="true"># 在执行备份时，它将防止restic跨越文件系统边界</span>
+$ restic -r /srv/restic-repo backup --one-file-system /
+$ restic -r /srv/restic-repo backup --one-file-system / /media/usb
+$ restic -r /srv/restic-repo backup ~/work --exclude-larger-than 1M<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 包含文件或目录</strong><ul>
+<li>当需要备份多个不在同一文件夹中的文件时，这很有用</li>
+<li>包含的文件必须编码为 <code>UTF-8</code> 或 <code>UTF-16</code>，带有字节顺序标记</li>
+<li>脚本生产文件列表的时候，使用 <code>find print0</code> 选项生成是最安全的选择</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># print0</span>
+$ <span class="token function">find</span> /tmp/somefiles -regex PATTERN -print0 <span class="token operator">></span> /tmp/files_to_backup
+
+<span class="token comment" spellcheck="true"># backup</span>
+$ restic -r /srv/restic-repo backup --files-from-raw /tmp/files_to_backup
+
+<span class="token comment" spellcheck="true"># more file</span>
+$ restic backup --files-from /tmp/files_to_backup /tmp/some_additional_file
+$ restic backup --files-from /tmp/glob-pattern --files-from-raw /tmp/generated-list /tmp/some_additional_file<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] 比较版本快照</strong><ul>
+<li><code>Restic</code> 有一个 <code>diff</code> 命令，它显示两个快照之间的差异，并显示一个统计信息，只需向命令传递两个快照 <code>id</code>。</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ restic -r /data/restic-repo <span class="token function">diff</span> 5845b002 2ab627a6
+password is correct
+comparing snapshot ea657ce5 to 2ab627a6:
+
+ C   /restic/cmd_diff.go
++    /restic/foo
+ C   /restic/restic
+
+Files:           0 new,     0 removed,     2 changed
+Dirs:            1 new,     0 removed
+Others:          0 new,     0 removed
+Data Blobs:     14 new,    15 removed
+Tree Blobs:      2 new,     1 removed
+  Added:   16.403 MiB
+  Removed: 16.402 MiB<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] 从标准输出来保存数据</strong><ul>
+<li>有时直接保存程序的输出会很好，例如 <code>mysqldump</code> 以便稍后恢复 <code>SQL</code></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 程序在非零退出时返回非零退出代码</span>
+$ <span class="token keyword">set</span> -o pipefail
+
+<span class="token comment" spellcheck="true"># 介绍mysqldump的使用示例</span>
+$ mysqldump <span class="token punctuation">[</span><span class="token punctuation">..</span>.<span class="token punctuation">]</span> <span class="token operator">|</span> restic -r /data/restic-repo backup --stdin
+$ mysqldump <span class="token punctuation">[</span><span class="token punctuation">..</span>.<span class="token punctuation">]</span> <span class="token operator">|</span> restic -r /data/restic-repo backup --stdin --stdin-filename production.sql<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[6] 退出状态码</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>状态码</th>
+<th>状态码含义解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><strong><code>0</code></strong></td>
+<td>备份成功</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong><code>1</code></strong></td>
+<td>致命错误；没有创建快照</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong><code>2</code></strong></td>
+<td>无法读取源文件；不完整的快照与剩余文件</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="5-操作使用存储库"><a href="#5-操作使用存储库" class="headerlink" title="5. 操作使用存储库"></a>5. 操作使用存储库</h2><blockquote>
+<p><strong>介绍操作本地或存储库的方法和常用命令！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] 列出所有快照</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 列出存储在存储库中的所有快照</span>
+$ restic -r /data/restic-repo snapshots
+enter password <span class="token keyword">for</span> repository:
+ID        Date                 Host    Tags   Directory
+----------------------------------------------------------------------
+40dc1520  2021-05-08 21:38:30  kasimir        /home/user/work
+79766175  2021-05-08 21:40:19  kasimir        /home/user/work
+bdbd3439  2021-05-08 21:45:17  luigi          /home/art
+590c8fc8  2021-05-08 21:47:38  kazik          /srv
+9f0bc19e  2021-05-08 21:46:11  luigi          /srv<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 可以通过目录路径筛选列表</span>
+$ restic -r /data/restic-repo snapshots --path<span class="token operator">=</span><span class="token string">"/srv"</span>
+enter password <span class="token keyword">for</span> repository:
+ID        Date                 Host    Tags   Directory
+----------------------------------------------------------------------
+590c8fc8  2021-05-08 21:47:38  kazik          /srv
+9f0bc19e  2021-05-08 21:46:11  luigi          /srv
+
+<span class="token comment" spellcheck="true"># 或者按主机过滤</span>
+$ restic -r /srv/restic-repo snapshots --host luigi
+enter password <span class="token keyword">for</span> repository:
+ID        Date                 Host    Tags   Directory
+----------------------------------------------------------------------
+bdbd3439  2021-05-08 21:45:17  luigi          /home/art
+9f0bc19e  2021-05-08 21:46:11  luigi          /srv
+
+<span class="token comment" spellcheck="true"># 组合过滤器也是可能的</span>
+$ restic -r /srv/restic-repo snapshots --group-by host
+enter password <span class="token keyword">for</span> repository:
+snapshots <span class="token keyword">for</span> <span class="token punctuation">(</span>host <span class="token punctuation">[</span>kasimir<span class="token punctuation">]</span><span class="token punctuation">)</span>
+ID        Date                 Host    Tags   Directory
+----------------------------------------------------------------------
+40dc1520  2021-05-08 21:38:30  kasimir        /home/user/work
+79766175  2021-05-08 21:40:19  kasimir        /home/user/work
+2 snapshots
+
+snapshots <span class="token keyword">for</span> <span class="token punctuation">(</span>host <span class="token punctuation">[</span>luigi<span class="token punctuation">]</span><span class="token punctuation">)</span>
+ID        Date                 Host    Tags   Directory
+----------------------------------------------------------------------
+bdbd3439  2021-05-08 21:45:17  luigi          /home/art
+9f0bc19e  2021-05-08 21:46:11  luigi          /srv
+2 snapshots
+
+snapshots <span class="token keyword">for</span> <span class="token punctuation">(</span>host <span class="token punctuation">[</span>kazik<span class="token punctuation">]</span><span class="token punctuation">)</span>
+ID        Date                 Host    Tags   Directory
+----------------------------------------------------------------------
+590c8fc8  2021-05-08 21:47:38  kazik          /srv
+1 snapshots<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 在存储库之间复制快照</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 需要在两个存储库之间传输快照</span>
+<span class="token comment" spellcheck="true"># 使用copy命令从本地存储库到远程存储库</span>
+$ restic -r /data/restic-repo copy --repo2 /data/restic-repo-copy
+repository d6504c63 opened successfully, password is correct
+repository 3dd0878c opened successfully, password is correct
+
+snapshot 410b18a2 of <span class="token punctuation">[</span>/home/user/work<span class="token punctuation">]</span> at 2020-06-09 23:15:57.305305 +0200 CEST<span class="token punctuation">)</span>
+  copy started, this may take a while<span class="token punctuation">..</span>.
+snapshot 7a746a07 saved
+
+snapshot 4e5d5487 of <span class="token punctuation">[</span>/home/user/work<span class="token punctuation">]</span> at 2020-05-01 22:44:07.012113 +0200 CEST<span class="token punctuation">)</span>
+skipping snapshot 4e5d5487, was already copied to snapshot 50eb62b7<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 可以通过host/path/tag来进行筛选</span>
+$ restic -r /data/restic-repo copy \
+    --repo2 /data/restic-repo-copy \
+    --host luigi --path /srv --tag foo,bar
+
+<span class="token comment" spellcheck="true"># 还可以显式指定要复制的快照列表</span>
+$ restic -r /data/restic-repo copy \
+    --repo2 /data/restic-repo-copy \
+    410b18a2 4e5d5487 latest<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 快照拷贝后删除重复数据</strong><ul>
+<li>即使存储库之间可以传输快照，但存储库之间重复的快照数据可能无法正常删除掉</li>
+<li>为了确保重复的数据可以正确的删除，需将存储库使用相同的参数将大文件分割成较小的块</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用chunk参数创建新的存储库</span>
+<span class="token comment" spellcheck="true"># 注意chunker参数不可能更改现有存储库</span>
+$ restic -r /data/restic-repo-copy init \
+    --repo2 /data/restic-repo --copy-chunker-params<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] 检查完整性和一致性</strong><ul>
+<li>假设存储库所在的服务器发生故障，或者受到黑客攻击并修改存储库中的文件，目的是让我们恢复恶意数据，达到攻击的目的。为了避免此问题的发生，最好定期使用 <code>check</code> 命令来测试存储库是否一致和数据是否完整。</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 黑客修改数据</span>
+$ <span class="token keyword">echo</span> <span class="token string">"boom"</span> <span class="token operator">></span> /data/restic-repo/index/de30<span class="token punctuation">..</span>.b139628<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 尝试恢复如下所示修改过的快照将会产生错误</span>
+$ restic -r /data/restic-repo --no-cache \
+    restore c23e491f --target /tmp/restore-work
+Fatal: unable to load index de30f323: load <span class="token operator">&lt;</span>index/de30f3231c<span class="token operator">></span>: invalid data returned<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 检查存储库一致性 - 存在异常</span>
+$ restic -r /data/restic-repo check
+<span class="token punctuation">..</span>.
+load indexes
+error: error loading index de30f323: load <span class="token operator">&lt;</span>index/de30f3231c<span class="token operator">></span>: invalid data returned
+Fatal: LoadIndex returned errors
+
+<span class="token comment" spellcheck="true"># 检查存储库一致性 - 数据正常</span>
+$ restic -r /src/restic-repo check
+<span class="token punctuation">..</span>.
+load indexes
+check all packs
+check snapshots, trees and blobs
+no errors were found<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 默认情况下不检测数据库磁盘上文件是否被修改</span>
+<span class="token comment" spellcheck="true"># 可以使用restic命令也验证存储库中包文件的完整性</span>
+$ restic -r /data/restic-repo check --read-data
+<span class="token punctuation">..</span>.
+load indexes
+check all packs
+check snapshots, trees and blobs
+<span class="token function">read</span> all data
+<span class="token punctuation">[</span>0:00<span class="token punctuation">]</span> 100.00%  3 / 3 items
+duration: 0:00
+no errors were found
+
+<span class="token comment" spellcheck="true"># 因为比较花费时间，所以可以使用子集验证方式</span>
+$ restic -r /data/restic-repo check --read-data-subset<span class="token operator">=</span>1/5
+$ restic -r /data/restic-repo check --read-data-subset<span class="token operator">=</span>2/5
+$ restic -r /data/restic-repo check --read-data-subset<span class="token operator">=</span>3/5
+$ restic -r /data/restic-repo check --read-data-subset<span class="token operator">=</span>4/5
+$ restic -r /data/restic-repo check --read-data-subset<span class="token operator">=</span>5/5
+$ restic -r /srv/restic-repo check --read-data-subset<span class="token operator">=</span>2.5%
+$ restic -r /srv/restic-repo check --read-data-subset<span class="token operator">=</span>100%<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="6-从备份恢复数据"><a href="#6-从备份恢复数据" class="headerlink" title="6. 从备份恢复数据"></a>6. 从备份恢复数据</h2><blockquote>
+<p><strong>介绍如何从备份数据库中恢复数据！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] 从快照中恢复数据</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 只需使用以下命令就可以将最新快照的内容恢复</span>
+$ restic -r /data/restic-repo \
+    restore 79766175 --target /tmp/restore-work
+enter password <span class="token keyword">for</span> repository:
+restoring <span class="token operator">&lt;</span>Snapshot of <span class="token punctuation">[</span>/home/user/work<span class="token punctuation">]</span> at 2021-05-08 21:40:19.884408621 +0200 CEST<span class="token operator">></span> to /tmp/restore-work
+
+<span class="token comment" spellcheck="true"># 恢复也可以使用组合参数进行选择</span>
+$ restic -r /data/restic-repo \
+    restore latest --target /tmp/restore-art \
+    --path <span class="token string">"/home/art"</span> --host luigi
+enter password <span class="token keyword">for</span> repository:
+restoring <span class="token operator">&lt;</span>Snapshot of <span class="token punctuation">[</span>/home/art<span class="token punctuation">]</span> at 2021-05-08 21:45:17.884408621 +0200 CEST<span class="token operator">></span> to /tmp/restore-art
+
+<span class="token comment" spellcheck="true"># 也可以使用参数来恢复单个文件</span>
+$ restic -r /data/restic-repo \
+    restore 79766175 --target /tmp/restore-work \
+    --include /work/foo --exclude /home/art
+enter password <span class="token keyword">for</span> repository:
+restoring <span class="token operator">&lt;</span>Snapshot of <span class="token punctuation">[</span>/home/user/work<span class="token punctuation">]</span> at 2021-05-08 21:40:19.884408621 +0200 CEST<span class="token operator">></span> to /tmp/restore-work
+
+<span class="token comment" spellcheck="true"># 使用如下命令查看存储库库列表，从而指定exclude参数</span>
+$ restic <span class="token function">ls</span> latest
+$ restic <span class="token function">find</span> foo<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 使用挂载来恢复数据</strong><ul>
+<li>将备份文件作为常规文件系统浏览和挂载</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 创建一个挂载点(/mnt/restic)</span>
+$ <span class="token function">mkdir</span> /mnt/restic
+
+<span class="token comment" spellcheck="true"># 使用FUSE为存储库提供服务</span>
+$ restic -r /data/restic-repo <span class="token function">mount</span> /mnt/restic
+enter password <span class="token keyword">for</span> repository:
+Now serving /data/restic-repo at /mnt/restic
+When finished, quit with Ctrl-c or <span class="token function">umount</span> the mountpoint.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 输出文件内容到标准输出</strong><ul>
+<li>将文件打印到标准输出，可以让其他工具直接读取数据</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># dump</span>
+$ restic -r /srv/restic-repo dump latest production.sql <span class="token operator">|</span> mysql<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看对应文件的快照版本</span>
+$ restic -r /srv/restic-repo snapshots
+ID        Date                 Host        Tags        Directory
+----------------------------------------------------------------------
+562bfc5e  2020-07-14 20:18:01  mopped                  /home/user/file1
+bbacb625  2020-07-14 20:18:07  mopped                  /home/other/work
+e922c858  2020-07-14 20:18:10  mopped                  /home/other/work
+098db9d5  2020-07-14 20:18:13  mopped                  /production.sql
+b62f46ec  2020-07-14 20:18:16  mopped                  /home/user/file1
+1541acae  2020-07-14 20:18:18  mopped                  /home/other/work
+----------------------------------------------------------------------
+
+<span class="token comment" spellcheck="true"># 使用retic命令到1541acae这个快照版本</span>
+$ restic -r /srv/restic-repo \
+    dump 098db9d5 production.sql <span class="token operator">|</span> mysql
+
+<span class="token comment" spellcheck="true"># 也可以给restic传递一个路径，该路径用于选择最新的快照</span>
+$ restic -r /srv/restic-repo \
+    dump --path /production.sql latest production.sql <span class="token operator">|</span> mysql
+
+<span class="token comment" spellcheck="true"># 也可以将整个文件夹结构的内容转储到标准输出</span>
+$ restic -r /srv/restic-repo \
+    dump latest /home/other/work <span class="token operator">></span> restore.tar
+$ restic -r /srv/restic-repo \
+    dump -a <span class="token function">zip</span> latest /home/other/work <span class="token operator">></span> restore.zip<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="7-删除备份的快照"><a href="#7-删除备份的快照" class="headerlink" title="7. 删除备份的快照"></a>7. 删除备份的快照</h2><blockquote>
+<p><strong>快照多的话，有时也是需要删除的！</strong></p>
+</blockquote>
+<p>备份空间总是有限的，所以 <code>Restic</code> 也允许删除旧的快照数据。这可以手动完成(通过指定要删除的快照 ID)，也可以使用参数描述要忘记哪些快照的策略。对于快照的删除操作，可以使调用这两个命令，一是 <code>forget</code> 命令，二是 <code>prune</code> 命令，从存储库中实际删除快照引用的数据。</p>
+<p>删除快照的数据，有可能是一个耗时的操作过程，这取决于需要处理的快照和数据的数量。在删除操作期间，存储库处于锁定状态，无法完成备份。同时，建议在执行之前先运行 <code>restic check</code> 命令，以确保在存储库的完整和一致。</p>
+<ul>
+<li><strong>[1] 删除单个快照</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 列出存储库中的所有快照</span>
+$ restic -r /srv/restic-repo snapshots
+enter password <span class="token keyword">for</span> repository:
+ID        Date                 Host      Tags  Directory
+----------------------------------------------------------------------
+40dc1520  2021-05-08 21:38:30  kasimir         /home/user/work
+79766175  2021-05-08 21:40:19  kasimir         /home/user/work
+bdbd3439  2021-05-08 21:45:17  luigi           /home/art
+590c8fc8  2021-05-08 21:47:38  kazik           /srv
+9f0bc19e  2021-05-08 21:46:11  luigi           /srv
+
+<span class="token comment" spellcheck="true"># 指定快照ID来删除快照</span>
+$ restic -r /srv/restic-repo forget bdbd3439
+enter password <span class="token keyword">for</span> repository:
+removed snapshot d3f01f63
+
+<span class="token comment" spellcheck="true"># 虽然上述命令将快照删除了，但文件引用的数据仍然存储在存储库中</span>
+<span class="token comment" spellcheck="true"># 要清除未引用的数据，必须运行prune命令(之后存储库就变小了)</span>
+$ restic -r /data/restic-repo prune
+enter password <span class="token keyword">for</span> repository:
+repository 33002c5e opened successfully, password is correct
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用--prune命令将两步化为一步</span>
+$ restic forget --keep-last 1 --prune
+snapshots <span class="token keyword">for</span> host mopped, directories /home/user/work:
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 根据策略删除快照</strong><ul>
+<li>手动删除费时费力，则 <code>restic</code> 允许根据策略指定应该自动删除哪些快照</li>
+<li>可以指定保留多少小时/每日/每周/每月和每年快照，以及删除多少其他快照</li>
+<li>可以使用 <code>--dry-run</code> 参数来测试需要删除的文件和目录列表</li>
+</ul>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>参数</th>
+<th>参数含义解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><strong><code>--keep-last n</code></strong></td>
+<td>不删除最近的 n 个快照</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong><code>--keep-hourly n</code></strong></td>
+<td>不删除快照的最后 n 个小时；每小时只保留最后一个快照</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong><code>--keep-daily n</code></strong></td>
+<td>不删除快照的最后 n 个天；每小时只保留最后一个快照</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong><code>--keep-weekly n</code></strong></td>
+<td>不删除快照的最后 n 个周；每小时只保留最后一个快照</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong><code>--keep-monthly n</code></strong></td>
+<td>不删除快照的最后 n 个月；每小时只保留最后一个快照</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong><code>--keep-yearly n</code></strong></td>
+<td>不删除快照的最后 n 个年；每小时只保留最后一个快照</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong><code>--keep-tag</code></strong></td>
+<td>保留所有由此选项指定的标签的快照；可多次指定</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong><code>--keep-within duration</code></strong></td>
+<td>保留在最新快照持续时间内创建的所有快照</td>
+</tr>
+</tbody></table>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将删除快照限制为具有特定主机名/标记的快照</span>
+<span class="token comment" spellcheck="true"># 删除所有带有标记foo的快照的所有快照，除了最新的快照</span>
+$ restic forget --tag foo --keep-last 1
+
+<span class="token comment" spellcheck="true"># 删除所有快照中除了最后一个快照之外的所有设置了foo或bar标记的快照</span>
+$ restic forget --tag foo --tag bar --keep-last 1
+
+<span class="token comment" spellcheck="true"># 只保留带有foo和bar标记的所有快照的最后一个快照</span>
+$ restic forget --tag foo,bar --keep-last 1
+
+<span class="token comment" spellcheck="true"># 不删除存储库中的所有快照</span>
+$ restic forget --keep-last 0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 假设我们每个星期天都做一次备份</span>
+<span class="token comment" spellcheck="true"># 下面命令可以保留最后四个星期日的最后四个快照，但删除其余的</span>
+$ restic forget --keep-daily 4 --dry-run
+repository f00c6e2a opened successfully, password is correct
+Applying Policy: keep the last 4 daily snapshots
+keep 4 snapshots:
+ID        Time                 Host        Tags        Reasons         Paths
+-------------------------------------------------------------------------------
+8f8018c0  2019-10-27 11:00:00  mopped                  daily snapshot  /home/user/work
+59403279  2019-11-03 11:00:00  mopped                  daily snapshot  /home/user/work
+dfee9fb4  2019-11-10 11:00:00  mopped                  daily snapshot  /home/user/work
+e1ae2f40  2019-11-17 11:00:00  mopped                  daily snapshot  /home/user/work
+-------------------------------------------------------------------------------
+4 snapshots
+
+remove 8 snapshots:
+ID        Time                 Host        Tags        Paths
+---------------------------------------------------------------
+0a1f9759  2019-09-01 11:00:00  mopped                  /home/user/work
+46cfe4d5  2019-09-08 11:00:00  mopped                  /home/user/work
+f6b1f037  2019-09-15 11:00:00  mopped                  /home/user/work
+eb430a5d  2019-09-22 11:00:00  mopped                  /home/user/work
+8cf1cb9a  2019-09-29 11:00:00  mopped                  /home/user/work
+5d33b116  2019-10-06 11:00:00  mopped                  /home/user/work
+b9553125  2019-10-13 11:00:00  mopped                  /home/user/work
+e1a7b58b  2019-10-20 11:00:00  mopped                  /home/user/work
+---------------------------------------------------------------
+8 snapshots
+
+<span class="token comment" spellcheck="true"># 可以加多个参数</span>
+$ restic forget --keep-daily 7 \
+    --keep-weekly 5 --keep-monthly 12 --keep-yearly 75<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 定制快照删除策略</strong></li>
+</ul>
+<p>为了理解自定义选项，需要先解释删除策略的过程是如何工作的：</p>
+<ol>
+<li>扫描所有快照和快照中的目录，以确定哪些数据仍在使用。</li>
+<li>对于存储库中的所有文件，<code>restic</code> 会查明该文件是完全使用、部分使用还是完全未使用。</li>
+<li>完全未使用的文件被标记为删除，保存充分使用的文件。根据用户的选择，保留或标记部分使用的文件以便重新打包。</li>
+<li>在决定要做什么之后，<code>prune</code> 将实际执行重新打包，根据更改修改索引，并删除过时的文件。</li>
+</ol>
+<p><code>prune</code> 命令接受以下选项：</p>
+<ul>
+<li><code>--max-unused limit</code><ul>
+<li>允许存储库中未使用的数据达到指定的上限</li>
+<li>指定存储大小，比如 <code>200M</code>，设置为 <code>0</code> 表示不限制</li>
+<li>指定存储百分比，比如 <code>10%</code>，设置为 <code>0</code> 表示不限制</li>
+<li>指定 <code>unlimited</code> 表示对部分未使用的文件没有限制</li>
+</ul>
+</li>
+<li><code>--max-repack-size size</code><ul>
+<li>设置了限制要重新打包的文件的总大小</li>
+</ul>
+</li>
+<li><code>--repack-cacheable-only</code><ul>
+<li>只有包含元数据并将被存储在缓存中的文件才会被重新打包</li>
+</ul>
+</li>
+<li><code>--dry-run</code><ul>
+<li>只显示 <code>prune</code> 操作要处理的文件列表</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># --dry-run</span>
+$ restic forget --prune --dry-run
+
+<span class="token comment" spellcheck="true"># --max-unused</span>
+$ restic forget --max-unused 200M --keep-last 1 --prune<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="8-管理仓库的钥匙"><a href="#8-管理仓库的钥匙" class="headerlink" title="8. 管理仓库的钥匙"></a>8. 管理仓库的钥匙</h2><blockquote>
+<p><strong>介绍管理仓库的钥匙和密码等信息！</strong></p>
+</blockquote>
+<p><code>key</code> 命令允许我们为每个存储库设置多个访问密钥或密码。实际上，我们还可以使用 <code>list</code>、<code>add</code>、<code>remove</code> 和 <code>passwd</code>(更改密码)子命令来精确地管理这些密钥。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ restic -r /srv/restic-repo key list
+enter password <span class="token keyword">for</span> repository:
+ ID          User        Host        Created
+----------------------------------------------------------------------
+*eb78040b    username    kasimir   2015-08-12 13:29:57
+
+$ restic -r /srv/restic-repo key add
+enter password <span class="token keyword">for</span> repository:
+enter password <span class="token keyword">for</span> new key:
+enter password again:
+saved new key as <span class="token operator">&lt;</span>Key of username@kasimir, created on 2015-08-12 13:35:05.316831933 +0200 CEST<span class="token operator">></span>
+
+$ restic -r /srv/restic-repo key list
+enter password <span class="token keyword">for</span> repository:
+ ID          User        Host        Created
+----------------------------------------------------------------------
+ 5c657874    username    kasimir   2015-08-12 13:35:05
+*eb78040b    username    kasimir   2015-08-12 13:29:57<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="9-命令参数的列表"><a href="#9-命令参数的列表" class="headerlink" title="9. 命令参数的列表"></a>9. 命令参数的列表</h2><blockquote>
+<p><strong>展示 restic 命令帮助列表！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] Restic Help</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ ./restic --help
+
+restic is a backup program <span class="token function">which</span> allows saving multiple revisions of files and
+directories <span class="token keyword">in</span> an encrypted repository stored on different backends.
+
+Usage:
+  restic <span class="token punctuation">[</span>command<span class="token punctuation">]</span>
+
+Available Commands:
+  backup        Create a new backup of files and/or directories
+  cache         Operate on local cache directories
+  <span class="token function">cat</span>           Print internal objects to stdout
+  check         Check the repository <span class="token keyword">for</span> errors
+  copy          Copy snapshots from one repository to another
+  <span class="token function">diff</span>          Show differences between two snapshots
+  dump          Print a backed-up <span class="token function">file</span> to stdout
+  <span class="token function">find</span>          Find a file, a directory or restic IDs
+  forget        Remove snapshots from the repository
+  generate      Generate manual pages and auto-completion files <span class="token punctuation">(</span>bash, zsh<span class="token punctuation">)</span>
+  <span class="token function">help</span>          Help about any <span class="token function">command</span>
+  init          Initialize a new repository
+  key           Manage keys <span class="token punctuation">(</span>passwords<span class="token punctuation">)</span>
+  list          List objects <span class="token keyword">in</span> the repository
+  <span class="token function">ls</span>            List files <span class="token keyword">in</span> a snapshot
+  migrate       Apply migrations
+  <span class="token function">mount</span>         Mount the repository
+  prune         Remove unneeded data from the repository
+  rebuild-index Build a new index
+  recover       Recover data from the repository
+  restore       Extract the data from a snapshot
+  self-update   Update the restic binary
+  snapshots     List all snapshots
+  stats         Scan the repository and show basic statistics
+  tag           Modify tags on snapshots
+  unlock        Remove locks other processes created
+  version       Print version information
+
+Flags:
+      --cacert <span class="token function">file</span>                <span class="token function">file</span> to load root certificates from <span class="token punctuation">(</span>default: use system certificates<span class="token punctuation">)</span>
+      --cache-dir directory        <span class="token keyword">set</span> the cache directory. <span class="token punctuation">(</span>default: use system default cache directory<span class="token punctuation">)</span>
+      --cleanup-cache              auto remove old cache directories
+  -h, --help                       <span class="token function">help</span> <span class="token keyword">for</span> restic
+      --json                       <span class="token keyword">set</span> output mode to JSON <span class="token keyword">for</span> commands that support it
+      --key-hint key               key ID of key to try decrypting first <span class="token punctuation">(</span>default: <span class="token variable">$RESTIC_KEY_HINT</span><span class="token punctuation">)</span>
+      --limit-download int         limits downloads to a maximum rate <span class="token keyword">in</span> KiB/s. <span class="token punctuation">(</span>default: unlimited<span class="token punctuation">)</span>
+      --limit-upload int           limits uploads to a maximum rate <span class="token keyword">in</span> KiB/s. <span class="token punctuation">(</span>default: unlimited<span class="token punctuation">)</span>
+      --no-cache                   <span class="token keyword">do</span> not use a local cache
+      --no-lock                    <span class="token keyword">do</span> not lock the repository, this allows some operations on read-only repositories
+  -o, --option key<span class="token operator">=</span>value           <span class="token keyword">set</span> extended option <span class="token punctuation">(</span>key<span class="token operator">=</span>value, can be specified multiple times<span class="token punctuation">)</span>
+      --password-command <span class="token function">command</span>   shell <span class="token function">command</span> to obtain the repository password from <span class="token punctuation">(</span>default: <span class="token variable">$RESTIC_PASSWORD_COMMAND</span><span class="token punctuation">)</span>
+  -p, --password-file <span class="token function">file</span>         <span class="token function">file</span> to <span class="token function">read</span> the repository password from <span class="token punctuation">(</span>default: <span class="token variable">$RESTIC_PASSWORD_FILE</span><span class="token punctuation">)</span>
+  -q, --quiet                      <span class="token keyword">do</span> not output comprehensive progress report
+  -r, --repo repository            repository to backup to or restore from <span class="token punctuation">(</span>default: <span class="token variable">$RESTIC_REPOSITORY</span><span class="token punctuation">)</span>
+      --repository-file <span class="token function">file</span>       <span class="token function">file</span> to <span class="token function">read</span> the repository location from <span class="token punctuation">(</span>default: <span class="token variable">$RESTIC_REPOSITORY_FILE</span><span class="token punctuation">)</span>
+      --tls-client-cert <span class="token function">file</span>       path to a <span class="token function">file</span> containing PEM encoded TLS client certificate and private key
+  -v, --verbose n                  be verbose <span class="token punctuation">(</span>specify multiple <span class="token function">times</span> or a level using --verbose<span class="token operator">=</span>n, max level/times is 3<span class="token punctuation">)</span>
+
+Use <span class="token string">"restic [command] --help"</span> <span class="token keyword">for</span> <span class="token function">more</span> information about a command.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] Restic Backup</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ ./restic backup --help
+
+The <span class="token string">"backup"</span> <span class="token function">command</span> creates a new snapshot and saves the files and directories
+given as the arguments.
+
+EXIT STATUS
+<span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">=</span>
+
+Exit status is 0 <span class="token keyword">if</span> the <span class="token function">command</span> was successful.
+Exit status is 1 <span class="token keyword">if</span> there was a fatal error <span class="token punctuation">(</span>no snapshot created<span class="token punctuation">)</span>.
+Exit status is 3 <span class="token keyword">if</span> some <span class="token function">source</span> data could not be <span class="token function">read</span> <span class="token punctuation">(</span>incomplete snapshot created<span class="token punctuation">)</span>.
+
+Usage:
+  restic backup <span class="token punctuation">[</span>flags<span class="token punctuation">]</span> FILE/DIR <span class="token punctuation">[</span>FILE/DIR<span class="token punctuation">]</span> <span class="token punctuation">..</span>.
+
+Flags:
+  -e, --exclude pattern                        exclude a pattern <span class="token punctuation">(</span>can be specified multiple times<span class="token punctuation">)</span>
+      --exclude-caches                         excludes cache directories that are marked with a CACHEDIR.TAG file. See https://bford.info/cachedir/ <span class="token keyword">for</span> the Cache Directory Tagging Standard
+      --exclude-file <span class="token function">file</span>                      <span class="token function">read</span> exclude patterns from a <span class="token function">file</span> <span class="token punctuation">(</span>can be specified multiple times<span class="token punctuation">)</span>
+      --exclude-if-present filename<span class="token punctuation">[</span>:header<span class="token punctuation">]</span>   takes filename<span class="token punctuation">[</span>:header<span class="token punctuation">]</span>, exclude contents of directories containing filename <span class="token punctuation">(</span>except filename itself<span class="token punctuation">)</span> <span class="token keyword">if</span> header of that <span class="token function">file</span> is as provided <span class="token punctuation">(</span>can be specified multiple times<span class="token punctuation">)</span>
+      --exclude-larger-than size               max size of the files to be backed up <span class="token punctuation">(</span>allowed suffixes: k/K, m/M, g/G, t/T<span class="token punctuation">)</span>
+      --files-from <span class="token function">file</span>                        <span class="token function">read</span> the files to backup from <span class="token function">file</span> <span class="token punctuation">(</span>can be combined with <span class="token function">file</span> args<span class="token punctuation">;</span> can be specified multiple times<span class="token punctuation">)</span>
+      --files-from-raw <span class="token function">file</span>                    <span class="token function">read</span> the files to backup from <span class="token function">file</span> <span class="token punctuation">(</span>can be combined with <span class="token function">file</span> args<span class="token punctuation">;</span> can be specified multiple times<span class="token punctuation">)</span>
+      --files-from-verbatim <span class="token function">file</span>               <span class="token function">read</span> the files to backup from <span class="token function">file</span> <span class="token punctuation">(</span>can be combined with <span class="token function">file</span> args<span class="token punctuation">;</span> can be specified multiple times<span class="token punctuation">)</span>
+  -f, --force                                  force re-reading the target files/directories <span class="token punctuation">(</span>overrides the <span class="token string">"parent"</span> flag<span class="token punctuation">)</span>
+  -h, --help                                   <span class="token function">help</span> <span class="token keyword">for</span> backup
+  -H, --host <span class="token function">hostname</span>                          <span class="token keyword">set</span> the <span class="token function">hostname</span> <span class="token keyword">for</span> the snapshot manually. To prevent an expensive rescan use the <span class="token string">"parent"</span> flag
+      --iexclude pattern                       same as --exclude pattern but ignores the casing of filenames
+      --iexclude-file <span class="token function">file</span>                     same as --exclude-file but ignores casing of filenames <span class="token keyword">in</span> patterns
+      --ignore-inode                           ignore inode number changes when checking <span class="token keyword">for</span> modified files
+  -x, --one-file-system                        exclude other <span class="token function">file</span> systems
+      --parent snapshot                        use this parent snapshot <span class="token punctuation">(</span>default: last snapshot <span class="token keyword">in</span> the repo that has the same target files/directories<span class="token punctuation">)</span>
+      --stdin                                  <span class="token function">read</span> backup from stdin
+      --stdin-filename filename                filename to use when reading from stdin <span class="token punctuation">(</span>default <span class="token string">"stdin"</span><span class="token punctuation">)</span>
+      --tag tags                               add tags <span class="token keyword">for</span> the new snapshot <span class="token keyword">in</span> the <span class="token function">format</span> <span class="token variable"><span class="token variable">`</span>tag<span class="token punctuation">[</span>,tag,<span class="token punctuation">..</span>.<span class="token punctuation">]</span><span class="token variable">`</span></span> <span class="token punctuation">(</span>can be specified multiple times<span class="token punctuation">)</span> <span class="token punctuation">(</span>default <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+      --time <span class="token function">time</span>                              <span class="token function">time</span> of the backup <span class="token punctuation">(</span>ex. <span class="token string">'2012-11-01 22:08:41'</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>default: now<span class="token punctuation">)</span>
+      --use-fs-snapshot                        use filesystem snapshot where possible <span class="token punctuation">(</span>currently only Windows VSS<span class="token punctuation">)</span>
+      --with-atime                             store the atime <span class="token keyword">for</span> all files and directories
+
+Global Flags:
+      --cacert <span class="token function">file</span>                <span class="token function">file</span> to load root certificates from <span class="token punctuation">(</span>default: use system certificates<span class="token punctuation">)</span>
+      --cache-dir directory        <span class="token keyword">set</span> the cache directory. <span class="token punctuation">(</span>default: use system default cache directory<span class="token punctuation">)</span>
+      --cleanup-cache              auto remove old cache directories
+      --json                       <span class="token keyword">set</span> output mode to JSON <span class="token keyword">for</span> commands that support it
+      --key-hint key               key ID of key to try decrypting first <span class="token punctuation">(</span>default: <span class="token variable">$RESTIC_KEY_HINT</span><span class="token punctuation">)</span>
+      --limit-download int         limits downloads to a maximum rate <span class="token keyword">in</span> KiB/s. <span class="token punctuation">(</span>default: unlimited<span class="token punctuation">)</span>
+      --limit-upload int           limits uploads to a maximum rate <span class="token keyword">in</span> KiB/s. <span class="token punctuation">(</span>default: unlimited<span class="token punctuation">)</span>
+      --no-cache                   <span class="token keyword">do</span> not use a local cache
+      --no-lock                    <span class="token keyword">do</span> not lock the repository, this allows some operations on read-only repositories
+  -o, --option key<span class="token operator">=</span>value           <span class="token keyword">set</span> extended option <span class="token punctuation">(</span>key<span class="token operator">=</span>value, can be specified multiple times<span class="token punctuation">)</span>
+      --password-command <span class="token function">command</span>   shell <span class="token function">command</span> to obtain the repository password from <span class="token punctuation">(</span>default: <span class="token variable">$RESTIC_PASSWORD_COMMAND</span><span class="token punctuation">)</span>
+  -p, --password-file <span class="token function">file</span>         <span class="token function">file</span> to <span class="token function">read</span> the repository password from <span class="token punctuation">(</span>default: <span class="token variable">$RESTIC_PASSWORD_FILE</span><span class="token punctuation">)</span>
+  -q, --quiet                      <span class="token keyword">do</span> not output comprehensive progress report
+  -r, --repo repository            repository to backup to or restore from <span class="token punctuation">(</span>default: <span class="token variable">$RESTIC_REPOSITORY</span><span class="token punctuation">)</span>
+      --repository-file <span class="token function">file</span>       <span class="token function">file</span> to <span class="token function">read</span> the repository location from <span class="token punctuation">(</span>default: <span class="token variable">$RESTIC_REPOSITORY_FILE</span><span class="token punctuation">)</span>
+      --tls-client-cert <span class="token function">file</span>       path to a <span class="token function">file</span> containing PEM encoded TLS client certificate and private key
+  -v, --verbose n                  be verbose <span class="token punctuation">(</span>specify multiple <span class="token function">times</span> or a level using --verbose<span class="token operator">=</span>n, max level/times is 3<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Escape</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://escapelife.github.io/posts/912084a4.html">https://escapelife.github.io/posts/912084a4.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Escape</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Linux/">
+                                    <span class="chip bg-color">Linux</span>
+                                </a>
+                            
+                                <a href="/tags/Restic/">
+                                    <span class="chip bg-color">Restic</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/posts/f9dc469b.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/python-fileinput-module.png" class="responsive-img" alt="内置标准库之fileinput">
+                        
+                        <span class="card-title">内置标准库之fileinput</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2021-05-09
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Python第三方库/" class="post-category">
+                                    Python第三方库
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Python/">
+                        <span class="chip bg-color">Python</span>
+                    </a>
+                    
+                    <a href="/tags/Fileinput/">
+                        <span class="chip bg-color">Fileinput</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/posts/15ae9acc.html">
+                    <div class="card-image">
+                        
+                        <img src="/images/docker-image-signature.jpg" class="responsive-img" alt="在Docker中进行镜像签名">
+                        
+                        <span class="card-title">在Docker中进行镜像签名</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-04-24
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Docker学习攻略/" class="post-category">
+                                    Docker学习攻略
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Docker/">
+                        <span class="chip bg-color">Docker</span>
+                    </a>
+                    
+                    <a href="/tags/Notary/">
+                        <span class="chip bg-color">Notary</span>
+                    </a>
+                    
+                    <a href="/tags/DCT/">
+                        <span class="chip bg-color">DCT</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('4'),
+            headingSelector: 'h2, h3, h4, h5'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4, h5').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="764454432"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='none'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2017-2021</span>
+            
+            <span id="year">2017</span>
+            <a href="/about" target="_blank">Escape</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">1080.6k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <span id="sitetime">载入运行时间...</span>
+            <script>
+                function siteTime() {
+                    var seconds = 1000;
+                    var minutes = seconds * 60;
+                    var hours = minutes * 60;
+                    var days = hours * 24;
+                    var years = days * 365;
+                    var today = new Date();
+                    var startYear = "2017";
+                    var startMonth = "2";
+                    var startDate = "14";
+                    var startHour = "0";
+                    var startMinute = "0";
+                    var startSecond = "0";
+                    var todayYear = today.getFullYear();
+                    var todayMonth = today.getMonth() + 1;
+                    var todayDate = today.getDate();
+                    var todayHour = today.getHours();
+                    var todayMinute = today.getMinutes();
+                    var todaySecond = today.getSeconds();
+                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                    var diff = t2 - t1;
+                    var diffYears = Math.floor(diff / years);
+                    var diffDays = Math.floor((diff / days) - diffYears * 365);
+                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
+                        minutes);
+                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
+                        diffMinutes * minutes) / seconds);
+                    if (startYear == todayYear) {
+                        document.getElementById("year").innerHTML = todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
+                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    } else {
+                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
+                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                    }
+                }
+                setInterval(siteTime, 1000);
+            </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/EscapeLife" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:wenpanhappy@126.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
