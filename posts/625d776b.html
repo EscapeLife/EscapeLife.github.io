@@ -459,21 +459,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-04-06
+                    2021-05-24
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.1k
+                    1.5k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    4 分
+                    6 分
                 </div>
                 
 
@@ -602,6 +602,33 @@ https://github.com/git-lfs/git-lfs/blob/master/docs/man/git-lfs-standalone-file.
 $ curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh <span class="token operator">|</span> <span class="token function">sudo</span> <span class="token function">bash</span>
 $ <span class="token function">sudo</span> <span class="token function">apt-get</span> <span class="token function">install</span> git-lfs
 $ <span class="token function">git</span> lfs <span class="token function">install</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="6-Git-切换分支不存在"><a href="#6-Git-切换分支不存在" class="headerlink" title="6. Git 切换分支不存在"></a>6. Git 切换分支不存在</h2><ul>
+<li><strong>问题描述：</strong> 在一个测试仓库上面需要临时切换分支，但是切换分支的时候提示如下错误，提示没有找到匹配的分支。但是登陆远程仓库，发现对应的分支是存在的。想到有可能是因为没有更新代码导致无法获取远程仓库的分支信息，随即执行这个 <code>git fetch</code> 命令，但是报错依旧，且通过 <code>git branch -a</code> 也看不到对应的分支信息。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错提示</span>
+$ <span class="token function">git</span> checkout bugfix_login_error
+error: pathspec <span class="token string">'bugfix_login_error'</span> did not match any file<span class="token punctuation">(</span>s<span class="token punctuation">)</span> known to git.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>解决方法：</strong> 后来，排查了一下 <code>.git</code> 目录文件夹里面的信息，随即发现了问题原因。即远程仓库的获取只是对标于 <code>master</code> 分支，所以我们通过执行 <code>git fetch</code> 命令之后也是无法获取远程仓库的分支信息的，按照如下修改即可解决。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 发现远程仓库的获取只是对标于master分支</span>
+$ <span class="token function">cat</span> .git/config
+<span class="token punctuation">[</span>remote <span class="token string">"origin"</span><span class="token punctuation">]</span>
+    url <span class="token operator">=</span> git@github.com/EscapeLife/app-demo.git
+    fetch <span class="token operator">=</span> +refs/heads/master:refs/remotes/origin/master
+<span class="token punctuation">[</span>branch <span class="token string">"master"</span><span class="token punctuation">]</span>
+    remote <span class="token operator">=</span> origin
+    merge <span class="token operator">=</span> refs/heads/master
+
+<span class="token comment" spellcheck="true"># 应该为带 * 的匹配方式</span>
+<span class="token punctuation">[</span>remote <span class="token string">"origin"</span><span class="token punctuation">]</span>
+    fetch <span class="token operator">=</span> +refs/heads/*:refs/remotes/origin/*<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>问题原因：</strong> 我们正常克隆仓库的时候，对应的 <code>config</code> 配置就是带 <code>*</code> 的样式，但是为什么这个环境的配置会修改了呢？后来发现是因为这个环境是通过 <code>CI</code> 进行自动更新的，而 <code>CI</code> 配置了只获取指定分支的代码，即拉去代码的时候就指定了，这也就导致配置文件也就跟着 <a href="https://iissnan.com/progit/html/zh/ch9_5.html" target="_blank" rel="noopener">变更</a> 了。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 让Git每次只拉取远程的master分支，而不是远程的所有分支</span>
+$ <span class="token function">git</span> fetch origin master:refs/remotes/origin/master<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -1156,7 +1183,7 @@ $ <span class="token function">git</span> lfs <span class="token function">insta
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1086.4k</span>&nbsp;字
+                class="white-color">1086.8k</span>&nbsp;字
             
             
             
