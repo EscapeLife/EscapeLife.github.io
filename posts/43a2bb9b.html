@@ -459,21 +459,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-03-23
+                    2021-05-31
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    6.7k
+                    7.3k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    27 分
+                    29 分
                 </div>
                 
 
@@ -1100,6 +1100,67 @@ nginx: <span class="token punctuation">[</span>alert<span class="token punctuati
 
     <span class="token keyword">include</span> <span class="token operator">/</span>etc<span class="token operator">/</span>nginx<span class="token operator">/</span>conf<span class="token punctuation">.</span>d<span class="token operator">/</span><span class="token operator">*</span><span class="token punctuation">.</span>conf<span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="18-Docker-绑定到-IPv6-地址"><a href="#18-Docker-绑定到-IPv6-地址" class="headerlink" title="18. Docker 绑定到 IPv6 地址"></a>18. Docker 绑定到 IPv6 地址</h2><blockquote>
+<p><strong>Docker 服务在启动的时候，将地址绑定到 IPv6 地址上面了，提示报错信息！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 物理机器更新了对应补丁之后，重启了服务，导致原本可以正常启动的 <code>docker-compose</code> 服务提示如下报错信息。不清楚是否修改了操作系统的相关配置，还是对应 <code>docker</code> 进行的其他方面的配置，比如修改 <code>/etc/docker/daemon.json</code> 或者 <code>docker</code> 的 <code>service</code> 启动文件。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Docker的报错信息</span>
+docker run -p 80:80 nginx:alpine succeeds. Previously, this was failing with Error \
+starting userland proxy: listen tcp6 <span class="token punctuation">[</span>::<span class="token punctuation">]</span>:80: socket: address family not supported by protocol.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 通过如上所示的报错信息，可以看到服务的启动端口绑定到了 <code>tcp6</code> 上面了，但是对应的 <code>socket</code> 发现系统本身并不支持。这时，我们一看下对应的操作系统 <code>ipv6</code> 的设置，发现系统禁用了，所有的 <code>ipv6</code> 地址。需要了解的朋友，可以参考 <a href="https://github.com/moby/moby/pull/42322" target="_blank" rel="noopener">fix port forwarding with ipv6.disable=1</a> 和 <a href="https://github.com/moby/moby/issues/42288" target="_blank" rel="noopener">cannot start if ipv6 is disabled on host</a> 这两个 <code>issus</code> 来获取更多信息。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 操作系统配置</span>
+$ <span class="token function">cat</span> /etc/sysctl.conf <span class="token operator">|</span> <span class="token function">grep</span> ipv6
+net.ipv6.conf.all.disable_ipv6<span class="token operator">=</span>1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[方法一]</strong> 最为简单的解决方法，就是在 <code>docker-compose.yml</code> 文件中，手动指定将对应服务的端口绑定到 <code>ipv4</code> 上面，如下所示。</li>
+</ul>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">version</span><span class="token punctuation">:</span> <span class="token string">"3"</span>
+
+<span class="token key atrule">services</span><span class="token punctuation">:</span>
+  <span class="token key atrule">app</span><span class="token punctuation">:</span>
+    <span class="token key atrule">restart</span><span class="token punctuation">:</span> on<span class="token punctuation">-</span>failure
+    <span class="token key atrule">container_name</span><span class="token punctuation">:</span> app_web
+    <span class="token key atrule">image</span><span class="token punctuation">:</span> app<span class="token punctuation">:</span>latest
+    <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> <span class="token string">"0.0.0.0:80:80/tcp"</span>
+    <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> <span class="token string">"./app_web:/data"</span>
+    <span class="token key atrule">networks</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> app_network
+
+<span class="token key atrule">networks</span><span class="token punctuation">:</span>
+  app_network<span class="token punctuation">:</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[方法二]</strong> 或者修改 <code>/etc/docker/daemon.json</code> 文件，在配置中，阻止 <code>Docker</code> 错误的将端口映射到 <code>IPv6</code> 上，即可达到同样的效果，且不用再次修改多个服务的启动配置文件了。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 修改配置</span>
+$ vim /etc/docker/daemon.json
+<span class="token punctuation">{</span>
+  <span class="token string">"ipv6"</span><span class="token keyword">:</span> false,
+  <span class="token string">"fixed-cidr-v6"</span><span class="token keyword">:</span> <span class="token string">"2001:db8:1::/64"</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true"># 重启服务</span>
+$ systemctl reload docker<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[方法三]</strong> <code>Docker</code> 默认情况下会同时将端口映射于 <code>IPv4</code> 与 <code>IPv6</code> 两者上，而且有的时候会出现只绑定到了 <code>IPv6</code>，导致服务无法正常访问的情况。现在通用的始终还是 <code>IPv4</code> 地址，因此最简单的做法就是关闭 <code>IPv6</code> 地址。详细的配置，可以参考 <a href="https://github.com/moby/moby/issues/2174" target="_blank" rel="noopener">Port redirecting binding to IPv6 but not IPv4 interfaces</a> 这个 <code>issus</code> 地址。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 修改系统配置</span>
+<span class="token keyword">echo</span> <span class="token string">'1'</span> <span class="token operator">></span> /proc/sys/net/ipv6/conf/lo/disable_ipv6
+<span class="token keyword">echo</span> <span class="token string">'1'</span> <span class="token operator">></span> /proc/sys/net/ipv6/conf/lo/disable_ipv6
+<span class="token keyword">echo</span> <span class="token string">'1'</span> <span class="token operator">></span> /proc/sys/net/ipv6/conf/all/disable_ipv6
+<span class="token keyword">echo</span> <span class="token string">'1'</span> <span class="token operator">></span> /proc/sys/net/ipv6/conf/default/disable_ipv6
+
+<span class="token comment" spellcheck="true"># 重启网络</span>
+$ /etc/init.d/networking restart
+
+<span class="token comment" spellcheck="true"># 最后检测是否已关闭IPv6</span>
+ip addr show <span class="token operator">|</span> <span class="token function">grep</span> net6<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -1650,7 +1711,7 @@ nginx: <span class="token punctuation">[</span>alert<span class="token punctuati
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1092.1k</span>&nbsp;字
+                class="white-color">1092.8k</span>&nbsp;字
             
             
             
