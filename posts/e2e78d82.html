@@ -459,21 +459,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-06-04
+                    2021-06-05
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    3.5k
+                    3.9k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    13 分
+                    15 分
                 </div>
                 
 
@@ -574,15 +574,21 @@ $ <span class="token function">ssh</span> user@host <span class="token string">'
 <h2 id="2-本地端口绑定和转发-L"><a href="#2-本地端口绑定和转发-L" class="headerlink" title="2. 本地端口绑定和转发 (-L)"></a>2. 本地端口绑定和转发 (-L)</h2><blockquote>
 <p><strong>你需要熟悉的骚操作终于来了，好好使用哈！</strong> =&gt; <strong><a href="http://www.ruanyifeng.com/blog/2011/12/ssh_port_forwarding.html" target="_blank" rel="noopener">参考链接地址</a></strong></p>
 </blockquote>
-<p><img src="/images/ssh-authenticity-and-use-1.png" alt="SSH服务原理和使用技巧"></p>
+<p><img src="/images/ssh-authenticity-and-use-1.png" alt="SSH服务原理和使用技巧 - 本地端口绑定和转发"></p>
+<p><img src="/images/ssh-authenticity-and-use-4.png" alt="SSH服务原理和使用技巧 - 本地端口绑定和转发"></p>
+<p><img src="/images/ssh-authenticity-and-use-6.png" alt="SSH服务原理和使用技巧 - 本地端口绑定和转发"></p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 格式说明</span>
-$ <span class="token function">ssh</span> -vv -N -L host1_port:host2_ip:host2_port host3_user@host3_ip -p host3_port
+<span class="token comment" spellcheck="true"># ssh -vv -NT -L [本地IP]:本地端口:目标IP:目标端口 中转主机用户@中转主机IP -p 中转主机端口</span>
 
-<span class="token comment" spellcheck="true"># 示例演示 - host1</span>
+<span class="token comment" spellcheck="true"># 实验目的: host1想要访问host2的ftp服务(在host1主机上操作)</span>
 <span class="token comment" spellcheck="true"># host1: 192.168.100.100</span>
 <span class="token comment" spellcheck="true"># host2: 192.168.200.200</span>
 <span class="token comment" spellcheck="true"># host3: 192.168.300.300</span>
-$ <span class="token function">ssh</span> -vv -N -L 2121:192.168.200.200:21 root@192.168.300.300 -p 22<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">ssh</span> -vv -N -L 2121:192.168.200.200:21 root@192.168.300.300 -p 22
+
+<span class="token comment" spellcheck="true"># 实验目的：host1想要访问host3的ftp服务(在host1主机上操作)</span>
+$ <span class="token function">ssh</span> -vv -N -L 2121:localhost:21 root@192.168.300.300 -p 22<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
 <ul>
 <li><strong>[1] 绑定本地端口 (-D)</strong></li>
 </ul>
@@ -596,11 +602,11 @@ $ <span class="token function">ssh</span> -vv -D 8080 user@host<span aria-hidden
 <p>有时，绑定本地端口还不够，还必须指定数据传送的目标主机，从而形成点对点的<strong>“端口转发”</strong>。为了区别后文的<strong>“远程端口转发”</strong>，我们把这种情况称为<strong>“本地端口转发”</strong>。</p>
 <p>假定 <code>host1</code> 是本地主机，<code>host2</code> 是远程主机。由于种种原因，这两台主机之间无法连通。但是，另外还有一台 <code>host3</code> 主机，可以同时连通前面两台主机。因此，很自然的想法就是，通过 <code>host3</code> 将 <code>host1</code> 连上 <code>host2</code> 主机。</p>
 <p>下面命令中的 <code>-L</code> 参数一共接受三个值，分别是<strong>“本地端口:目标主机:目标主机端口”</strong>，它们之间用冒号分隔。这条命令的意思，就是指定 <code>SSH</code> 绑定到本地端口 <code>2121</code> 上，然后指定 <code>host3</code> 主机将所有的数据，转发到目标主机 <code>host2</code> 的 <code>21</code> 端口上。假定 <code>host2</code> 主机上运行了 <code>FTP</code> 服务，默认端口为 <code>21</code>。这样一来，我们只要连接 <code>host1</code> 主机上的 <code>2121</code> 端口，就等于连上了 <code>host2</code> 主机上的 <code>21</code> 端口，访问 <code>FTP</code> 服务了。</p>
-<p><strong>“本地端口转发”</strong>使得 <code>host1</code> 和 <code>host3</code> 之间仿佛形成一个数据传输的秘密隧道，因此又被称为<strong>“SSH 隧道”</strong>。</p>
+<p><strong>“本地端口转发”</strong>使得 <code>host1</code> 和 <code>host3</code> 之间仿佛形成一个数据传输的秘密隧道，因此又被称为<strong>“SSH 隧道”</strong>。如果你在 <code>~/.ssh/config</code> 文件配置对应主机名称，使用起来就更新加方便，直接使用配置的 <code>host</code> 名称即可完成端口转发的操作。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 我们在host1执行下面的命令</span>
 $ <span class="token function">ssh</span> -vv -N -L 2121:host2:21 host3
 
-<span class="token comment" spellcheck="true"># FTP服务转发</span>
+<span class="token comment" spellcheck="true"># 本地就可以连接远程FTP服务</span>
 $ <span class="token function">ftp</span> localhost:2121<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[3] 实用示例</strong></li>
@@ -618,15 +624,30 @@ $ <span class="token function">ssh</span> -p 9001 localhost<span aria-hidden="tr
 <h2 id="3-远程端口转发功能-R"><a href="#3-远程端口转发功能-R" class="headerlink" title="3. 远程端口转发功能 (-R)"></a>3. 远程端口转发功能 (-R)</h2><blockquote>
 <p><strong>你需要熟悉的骚操作终于来了，好好使用哈！</strong> =&gt; <strong><a href="http://www.ruanyifeng.com/blog/2011/12/ssh_port_forwarding.html" target="_blank" rel="noopener">参考链接地址</a></strong></p>
 </blockquote>
-<p><img src="/images/ssh-authenticity-and-use-2.png" alt="SSH服务原理和使用技巧"></p>
+<p><img src="/images/ssh-authenticity-and-use-2.png" alt="SSH服务原理和使用技巧 - 远程端口转发功能"></p>
+<p><img src="/images/ssh-authenticity-and-use-5.png" alt="SSH服务原理和使用技巧 - 远程端口转发功能"></p>
+<p><img src="/images/ssh-authenticity-and-use-7.png" alt="SSH服务原理和使用技巧 - 远程端口转发功能"></p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 格式说明</span>
-$ <span class="token function">ssh</span> -vv -N -R host1_port:host2_ip:host2_port host1_user@host1_ip -p host1_port
+<span class="token comment" spellcheck="true"># ssh -vv -NT -R [远程IP]:远程端口:目标IP:目标端口 中转主机用户:中转主机IP -p 中转主机端口</span>
 
-<span class="token comment" spellcheck="true"># 示例演示 - host3</span>
+<span class="token comment" spellcheck="true"># 注意事项</span>
+<span class="token comment" spellcheck="true"># 这里需要注意的是，这个远程IP地址默认不配置的话，使用本地的localhost作为默认值</span>
+<span class="token comment" spellcheck="true"># 但是如果中转主机使用localhost的话，我们的Host1就无法访问Host2了，所以需要绑定到主机IP上</span>
+<span class="token comment" spellcheck="true"># 如果host2使用的是云主机的话，需要在安全组里面将端口暴露出来，这样host1才可以在公网上访问</span>
+
+<span class="token comment" spellcheck="true"># 实验目的: 使host1的用户可以通过公网地址访问host3的服务(在host3主机上操作)</span>
 <span class="token comment" spellcheck="true"># host1: 192.168.100.100</span>
 <span class="token comment" spellcheck="true"># host2: 192.168.200.200</span>
 <span class="token comment" spellcheck="true"># host3: 192.168.300.300</span>
-$ <span class="token function">ssh</span> -vv -N -R 2121:192.168.200.200:21 root@192.168.100.100 -p 22<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">ssh</span> -vv -NT -R 0.0.0.0:2121:192.168.200.200:21 root@192.168.100.100 -p 22
+
+<span class="token comment" spellcheck="true"># 这时如果host1还是无法访问的话，则可能是因为ssh配置的问题(在host3主机上操作)</span>
+<span class="token comment" spellcheck="true"># 凭什么可以让远程服务器随便就暴露出一个端口呢？(因为安全问题) 所以ssh默认关闭了该选项</span>
+$ vim /etc/ssh/sshd_config
+GatewayPorts <span class="token function">yes</span>
+<span class="token comment" spellcheck="true"># 重启ssh服务</span>
+$ systemctl restart sshd<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
 <p>既然<strong>“本地端口转发”</strong>是指绑定本地端口的转发，那么<strong>“远程端口转发”</strong>当然是指绑定远程端口的转发。</p>
 <p>还是接着看上面那个例子，<code>host1</code> 与 <code>host2</code> 之间无法连通，必须借助 <code>host3</code> 转发。但是，特殊情况出现了，<code>host3</code> 是一台内网机器，它可以连接外网的 <code>host1</code> 主机，但是反过来就不行，外网的 <code>host1</code> 连不上内网的 <code>host3</code> 主机。这时，<strong>“本地端口转发”</strong>就不能用了，怎么办？</p>
 <p>解决办法是，既然 <code>host3</code> 可以连 <code>host1</code> 主机，那么就从 <code>host3</code> 上建立与 <code>host1</code> 的 <code>SSH</code> 连接，然后在 <code>host1</code> 上使用这条连接就可以了。</p>
@@ -644,7 +665,13 @@ $ <span class="token function">ftp</span> localhost:2121<span aria-hidden="true"
 $ <span class="token function">ssh</span> -vv -N -D local_host:local_port remote_user@remote_host -p remote_port
 
 <span class="token comment" spellcheck="true"># 示例演示</span>
-$ <span class="token function">ssh</span> -vv -N -D 0.0.0.0:8080 root@192.168.100.100 -p 22<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">ssh</span> -vv -D 8080 root@192.168.100.100 -p 22
+$ <span class="token function">ssh</span> -vv -N -D 0.0.0.0:8080 root@192.168.100.100 -p 22
+
+<span class="token comment" spellcheck="true"># 实验目的</span>
+<span class="token comment" spellcheck="true"># 在本地开一个8080端口，此时本机与100机器之间建立隧道</span>
+<span class="token comment" spellcheck="true"># 这个端口支持sock5协议，此时我们使用如下命令就可以走100作为代理机器了(流量转发)</span>
+$ curl --socks5 127.0.0.1:8080 http://www.google.com<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[1] 功能介绍</strong></li>
 </ul>
@@ -670,7 +697,7 @@ $ <span class="token function">ssh</span> -fN -D 0.0.0.0:1080 user@host<span ari
 <li><strong>[1] 使用-p 参数</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用-p参数: 表示指定远程SSH服务的端口号</span>
-$ <span class="token function">ssh</span> -p 5554 escape@zh.hello.com<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+$ <span class="token function">ssh</span> -p 5554 escape@www.escapelife.com<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[2] 使用-N/-T 参数</strong></li>
 </ul>
@@ -1245,7 +1272,7 @@ $ <span class="token function">ssh</span> -f -D 8080 host<span aria-hidden="true
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1098.6k</span>&nbsp;字
+                class="white-color">1099.1k</span>&nbsp;字
             
             
             
