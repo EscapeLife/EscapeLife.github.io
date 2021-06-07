@@ -466,7 +466,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    3.9k
+                    4k
                 </div>
                 
 
@@ -643,11 +643,19 @@ $ <span class="token function">ssh</span> -vv -NT -R 0.0.0.0:2121:192.168.200.20
 
 <span class="token comment" spellcheck="true"># 这时如果host1还是无法访问的话，则可能是因为ssh配置的问题(在host3主机上操作)</span>
 <span class="token comment" spellcheck="true"># 凭什么可以让远程服务器随便就暴露出一个端口呢？(因为安全问题) 所以ssh默认关闭了该选项</span>
+<span class="token comment" spellcheck="true"># 可以让sshd将远程端口转发绑定到非loopback地址，这样就可以允许远程主机连接了</span>
 $ vim /etc/ssh/sshd_config
 GatewayPorts <span class="token function">yes</span>
 
 <span class="token comment" spellcheck="true"># 重启ssh服务</span>
-$ systemctl restart sshd<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ systemctl restart sshd<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 没开启</span>
+$ <span class="token function">netstat</span> -tanlp <span class="token operator">|</span> <span class="token function">grep</span> 2121
+tcp        0        0        127.0.0.1:2121        0.0.0.0:*        LISTEN        -
+
+<span class="token comment" spellcheck="true"># 开启了</span>
+$ <span class="token function">netstat</span> -tanlp <span class="token operator">|</span> <span class="token function">grep</span> 2121
+tcp        0        0        0.0.0.0:2121        0.0.0.0:*        LISTEN        -<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <p>既然<strong>“本地端口转发”</strong>是指绑定本地端口的转发，那么<strong>“远程端口转发”</strong>当然是指绑定远程端口的转发。</p>
 <p>还是接着看上面那个例子，<code>host1</code> 与 <code>host2</code> 之间无法连通，必须借助 <code>host3</code> 转发。但是，特殊情况出现了，<code>host3</code> 是一台内网机器，它可以连接外网的 <code>host1</code> 主机，但是反过来就不行，外网的 <code>host1</code> 连不上内网的 <code>host3</code> 主机。这时，<strong>“本地端口转发”</strong>就不能用了，怎么办？</p>
