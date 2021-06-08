@@ -427,6 +427,14 @@
                                 <span class="chip bg-color">Linux</span>
                             </a>
                         
+                            <a href="/tags/pip/">
+                                <span class="chip bg-color">pip</span>
+                            </a>
+                        
+                            <a href="/tags/yum/">
+                                <span class="chip bg-color">yum</span>
+                            </a>
+                        
                     </div>
                     
                 </div>
@@ -455,21 +463,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-07-31
+                    2021-06-08
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.5k
+                    2.9k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    10 分
+                    12 分
                 </div>
                 
 
@@ -561,7 +569,9 @@ $ <span class="token function">mv</span> audit-libs-python-2.8.1-3.el7.x86_64.rp
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># CentOS</span>
 https://centos.pkgs.org/<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<p>总结下：虽然操作系统的大版本是一致的，但是对应小版本不一致可能会存在对应 <code>rpm</code> 包小版本的不一致，而导致存在依赖问题，导致安装时失败。</p>
+<ul>
+<li>总结下：虽然操作系统的大版本是一致的，但是对应小版本不一致可能会存在对应 <code>rpm</code> 包小版本的不一致，而导致存在依赖问题，导致安装时失败。</li>
+</ul>
 <hr>
 <h2 id="3-pip-离线安装包获取方法"><a href="#3-pip-离线安装包获取方法" class="headerlink" title="3. pip 离线安装包获取方法"></a>3. pip 离线安装包获取方法</h2><blockquote>
 <p><strong>下载软件包</strong></p>
@@ -725,6 +735,53 @@ $ yum <span class="token function">install</span> --downloadonly --downloaddir<s
 <span class="token comment" spellcheck="true"># 将rpm包下载上传到服务器上并使用下面的命令安装即可</span>
 $ yum -y <span class="token function">install</span> kernel-ml-4.12.4-1.el7.elrepo.x86_64.rpm
 $ yum -y <span class="token function">install</span> kernel-ml-devel-4.12.4-1.el7.elrepo.x86_64.rpm<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="6-pip-工具的相关问题汇总"><a href="#6-pip-工具的相关问题汇总" class="headerlink" title="6. pip 工具的相关问题汇总"></a>6. pip 工具的相关问题汇总</h2><blockquote>
+<p><strong>汇总日常使用 pip 工具的常见错误和对应处理方法！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[1: 问题]</strong> 在使用新版的 <code>pip</code> 工具(在<code>21+</code>的版本之后)安装某些库的时候，由于依赖库版本的不一致，<code>pip</code> 会不断尝试和、以此安装已经存在的各个版本，来确实是否符合要求，且安装期间不会抛出错误。这就导致，如果是 <code>CI</code> 工具触发的话，短时间之内并不会停止(一个小时后自动被工具终止)，导致问题不易排出且浪费机器性能。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 循环安装</span>
+$<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[1: 答案]</strong> 可以在手动处理的时候，加上如下参数，就可以在安装之后，迅速抛出异常。这样我们就可以根据抛出的异常冲突版本，来修改 <code>requirements.txt</code> 文件，最后解决该问题。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># --use-deprecated=legacy-resolver</span>
+$ pip3 <span class="token function">install</span> -r ./requirements.txt --upgrade --use-deprecated<span class="token operator">=</span>legacy-resolver<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<ul>
+<li><strong>[2: 问题]</strong> 安装 <code>psycopg2</code> 依赖包的时候，提示如下问题：</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息</span>
+$ pip3 <span class="token function">install</span> psycopg2<span class="token operator">==</span>2.8.4
+creating pip-egg-info\psycopg2.egg-info
+writing pip-egg-info\psycopg2.egg-info PKG-INFO
+writing top-level names to pip-egg-info psycopg2.egg-info top_level.txt
+writing dependency_links to pip-egg-info psycopg2.egg-info dependency_links.txt
+writing manifest <span class="token function">file</span> <span class="token string">'pip-egg-info\psycopg2.egg-info\SOURCES.txt'</span>
+warning: manifest_maker: standard <span class="token function">file</span> <span class="token string">'-c'</span> not found
+Error: pg_config executable not found.
+
+Please add the directory containing pg_config to the PATH
+or specify the full executable path with the option:
+    python setup.py build_ext --pg-config /path/to/pg_config build <span class="token punctuation">..</span>.
+
+or with the pg_config option <span class="token keyword">in</span> <span class="token string">'setup.cfg'</span><span class="token keyword">.</span>
+----------------------------------------
+Command python setup.py egg_info failed with error code 1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2: 答案]</strong> 后来在这个 <a href="https://stackoverflow.com/questions/5420789/how-to-install-psycopg2-with-pip-on-python" target="_blank" rel="noopener"><code>stackoverflow</code></a> 才知道了问题的原因，原来是系统少一个依赖包，导致的。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 前提条件</span>
+$ <span class="token function">sudo</span> apt <span class="token function">install</span> postgresql-client
+
+<span class="token comment" spellcheck="true"># Ubuntu - Python3</span>
+$ <span class="token function">sudo</span> apt <span class="token function">install</span> libpq-dev python3-dev
+
+<span class="token comment" spellcheck="true"># Ubuntu - Python2</span>
+$ <span class="token function">sudo</span> apt <span class="token function">install</span> libpq-dev python-dev
+$ <span class="token function">sudo</span> apt <span class="token function">install</span> build-essential<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -809,6 +866,14 @@ $ yum -y <span class="token function">install</span> kernel-ml-devel-4.12.4-1.el
                             
                                 <a href="/tags/Linux/">
                                     <span class="chip bg-color">Linux</span>
+                                </a>
+                            
+                                <a href="/tags/pip/">
+                                    <span class="chip bg-color">pip</span>
+                                </a>
+                            
+                                <a href="/tags/yum/">
+                                    <span class="chip bg-color">yum</span>
                                 </a>
                             
                         </div>
@@ -1275,7 +1340,7 @@ $ yum -y <span class="token function">install</span> kernel-ml-devel-4.12.4-1.el
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1100.5k</span>&nbsp;字
+                class="white-color">1101k</span>&nbsp;字
             
             
             
