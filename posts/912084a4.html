@@ -459,21 +459,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-05-19
+                    2021-06-10
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    7.4k
+                    7.6k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    35 分
+                    36 分
                 </div>
                 
 
@@ -508,7 +508,7 @@
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 创建本地存储库来存储备份(初始化需输入两次密码)</span>
 <span class="token comment" spellcheck="true"># 必须记住以后访问此存储库的密码，否则将永久丢失存储数据</span>
-$ restic init --repo /data/backup
+$ restic --repo /data/backup init
 
 <span class="token comment" spellcheck="true"># 将数据备份到存储库(需输入密码)</span>
 <span class="token comment" spellcheck="true"># 将备份/home/data文件夹到存储库/data/backup中</span>
@@ -549,6 +549,18 @@ $ restic -r /data/backup forget 6eda7c7d
 <span class="token comment" spellcheck="true"># 清除未引用的数据</span>
 <span class="token comment" spellcheck="true"># 快照中文件引用的数据仍然存储在存储库中</span>
 $ restic -r /data/backup prune<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] 使用 Restic 工具的示例演示 - 备份实例</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 保留的snapshot份数只能通过备份的任务来控制</span>
+$ restic --limit-upload<span class="token operator">=</span>30000 --password-file<span class="token operator">=</span>/data/passwd/restic_bj1_passwd \
+    -r sftp://root@45.45.45.45:22//data/restic_backup --no-lock<span class="token operator">=</span>True \
+    forget --keep-last 72 --path /data/app/data_cache
+
+<span class="token comment" spellcheck="true"># 一定加上--no-lock=True不然会相互影响</span>
+$ restic --limit-upload<span class="token operator">=</span>30000 --password-file<span class="token operator">=</span>/data/passwd/restic_bj1_passwd \
+    -r sftp://root@45.45.45.45:22//data/restic_backup --no-lock<span class="token operator">=</span>True \
+    backup /data/app/data_cache<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="1-工具的安装方式"><a href="#1-工具的安装方式" class="headerlink" title="1. 工具的安装方式"></a>1. 工具的安装方式</h2><blockquote>
 <p><strong>该工具提供多种平台的对应安装包！</strong></p>
@@ -668,12 +680,19 @@ $ ssh-copy-id -i ~/.ssh/id_rsa.pub root@192.168.100.2
 
 <span class="token comment" spellcheck="true"># 测试免密登录</span>
 $ <span class="token function">ssh</span> -vv root@192.168.100.2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash">$ restic -r sftp:user@host:/data/restic-repo init
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 初始化仓库</span>
+<span class="token comment" spellcheck="true"># 需要注意使用的sftp协议需要加//符号</span>
+<span class="token comment" spellcheck="true"># 需要注意远程服务器的路径默认是当前用户的家目录未开始的，如果需要从根目录要在前面加/来指定</span>
+$ restic -r sftp://user@host:port/data/restic-repo init
+$ restic --repo sftp://user@host:port/data/restic-repo init
 enter password <span class="token keyword">for</span> new repository:
 enter password again:
 created restic repository f1c6108821 at sftp:user@host:/data/restic-repo
 Please note that knowledge of your password is required to access the repository.
-Losing your password means that your data is irrecoverably lost.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+Losing your password means that your data is irrecoverably lost.
+
+<span class="token comment" spellcheck="true"># 同步数据</span>
+$ restic -r sftp://root@192.168.100.100:22//data/restic_backup --path /data2/Calliper_data/cached_pdf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[3] REST Server</strong><ul>
 <li>设置远程备份</li>
@@ -900,12 +919,13 @@ $ restic -r /data/restic-repo backup --ignore-inode /data/im-data<span aria-hidd
 </tr>
 </tbody></table>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># excludes.txt</span>
+excludes.txt
 
 <span class="token comment" spellcheck="true"># exclude go-files</span>
 *.go
 
 <span class="token comment" spellcheck="true"># exclude foo/x/y/z/bar foo/x/bar foo/bar</span>
-foo/**/bar<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+foo/**/bar<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 可以这样使用</span>
 $ restic -r /srv/restic-repo backup ~/work --exclude<span class="token operator">=</span><span class="token string">"*.c"</span> --exclude-file<span class="token operator">=</span>excludes.txt
 
@@ -931,8 +951,8 @@ $ restic -r /srv/restic-repo backup --files-from-raw /tmp/files_to_backup
 $ restic backup --files-from /tmp/files_to_backup /tmp/some_additional_file
 $ restic backup --files-from /tmp/glob-pattern --files-from-raw /tmp/generated-list /tmp/some_additional_file<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[4] 比较版本快照</strong><ul>
-<li><code>Restic</code> 有一个 <code>diff</code> 命令，它显示两个快照之间的差异，并显示一个统计信息，只需向命令传递两个快照 <code>id</code>。</li>
+<li><strong>[4] 比较版本快照 - 使用<code>diff</code>命令</strong><ul>
+<li>它显示两个快照之间的差异，并显示一个统计信息，只需向命令传递两个快照 <code>id</code></li>
 </ul>
 </li>
 </ul>
@@ -2074,7 +2094,7 @@ Global Flags:
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1103.4k</span>&nbsp;字
+                class="white-color">1103.6k</span>&nbsp;字
             
             
             
