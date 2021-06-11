@@ -459,21 +459,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-06-10
+                    2021-06-11
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    7.6k
+                    7.8k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    36 分
+                    37 分
                 </div>
                 
 
@@ -503,6 +503,10 @@
 <li><a href="https://github.com/Lobaro/restic-backup-docker" target="_blank" rel="noopener">restic-backup-docker - 官方推荐的第三方容器</a></li>
 </ul>
 <p><img src="../images/happy-use-restic-backup.png" alt="愉快的使用restic备份数据"></p>
+<hr>
+<h2 id="0-快速上手就够了"><a href="#0-快速上手就够了" class="headerlink" title="0. 快速上手就够了"></a>0. 快速上手就够了</h2><blockquote>
+<p><strong>后续查看命令的常规使用的话，看博客的这个快速上手，基本就够了！</strong></p>
+</blockquote>
 <ul>
 <li><strong>[1] 使用 Restic 工具的示例演示 - 备份</strong></li>
 </ul>
@@ -552,15 +556,26 @@ $ restic -r /data/backup prune<span aria-hidden="true" class="line-numbers-rows"
 <ul>
 <li><strong>[5] 使用 Restic 工具的示例演示 - 备份实例</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 保留的snapshot份数只能通过备份的任务来控制</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># init</span>
+$ restic --repo sftp://root@45.45.45.45:22//data/restic_backup init
+
+<span class="token comment" spellcheck="true"># backup</span>
+<span class="token comment" spellcheck="true"># 一定加上--no-lock=True不然会相互影响</span>
+$ restic --limit-upload<span class="token operator">=</span>30000 --password-file<span class="token operator">=</span>/data/passwd/restic_bj1_passwd \
+    -r sftp://root@45.45.45.45:22//data/restic_backup --no-lock<span class="token operator">=</span>True \
+    backup /data/app/data_cache
+
+<span class="token comment" spellcheck="true"># forget</span>
+<span class="token comment" spellcheck="true"># 保留的snapshot份数只能通过备份的任务来控制</span>
 $ restic --limit-upload<span class="token operator">=</span>30000 --password-file<span class="token operator">=</span>/data/passwd/restic_bj1_passwd \
     -r sftp://root@45.45.45.45:22//data/restic_backup --no-lock<span class="token operator">=</span>True \
     forget --keep-last 72 --path /data/app/data_cache
 
-<span class="token comment" spellcheck="true"># 一定加上--no-lock=True不然会相互影响</span>
-$ restic --limit-upload<span class="token operator">=</span>30000 --password-file<span class="token operator">=</span>/data/passwd/restic_bj1_passwd \
-    -r sftp://root@45.45.45.45:22//data/restic_backup --no-lock<span class="token operator">=</span>True \
-    backup /data/app/data_cache<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token comment" spellcheck="true"># 需要注意的问题</span>
+<span class="token comment" spellcheck="true"># 备份时: --no-lock=True 避免多个仓库同时备份时，远程仓库锁住</span>
+<span class="token comment" spellcheck="true"># 清除时: prune的时候会锁住远程备份仓库，导致测试备份的任务会挂掉</span>
+<span class="token comment" spellcheck="true"># 所以清除的操作，最好是在远程备份仓库进行，防止清除时扫描仓库索引，导致命令很慢</span>
+$ restic -r /data/restic_backup prune<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="1-工具的安装方式"><a href="#1-工具的安装方式" class="headerlink" title="1. 工具的安装方式"></a>1. 工具的安装方式</h2><blockquote>
 <p><strong>该工具提供多种平台的对应安装包！</strong></p>
@@ -692,7 +707,7 @@ Please note that knowledge of your password is required to access the repository
 Losing your password means that your data is irrecoverably lost.
 
 <span class="token comment" spellcheck="true"># 同步数据</span>
-$ restic -r sftp://root@192.168.100.100:22//data/restic_backup --path /data2/Calliper_data/cached_pdf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ restic -r sftp://root@192.168.100.100:22//data/restic_backup --path /data/app/data_cache<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[3] REST Server</strong><ul>
 <li>设置远程备份</li>
@@ -2094,7 +2109,7 @@ Global Flags:
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1103.6k</span>&nbsp;字
+                class="white-color">1103.7k</span>&nbsp;字
             
             
             
