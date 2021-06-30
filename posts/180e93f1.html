@@ -459,7 +459,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-01-25
+                    2021-06-30
                 </div>
                 
 
@@ -616,8 +616,9 @@ EOF</span>
 
 <span class="token comment" spellcheck="true"># 查看系统内核参数的方式</span>
 $ <span class="token function">sudo</span> sysctl -a <span class="token operator">|</span> <span class="token function">grep</span> xxx
+
 <span class="token comment" spellcheck="true"># 使内核参数配置文件生效</span>
-$ <span class="token function">sudo</span> sysctl -p /etc/sysctl.d/kubernetes.conf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> sysctl -p /etc/sysctl.d/kubernetes.conf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 设置系统时区为中国/上海</span>
 $ <span class="token function">sudo</span> timedatectl set-timezone Asia/Shanghai
 
@@ -713,7 +714,7 @@ Prot LocalAddress:Port Scheduler Flags
     <span class="token key atrule">horizontal-pod-autoscaler-sync-period</span><span class="token punctuation">:</span> <span class="token string">"10s"</span>
     <span class="token key atrule">node-monitor-grace-period</span><span class="token punctuation">:</span> <span class="token string">"10s"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>执行成功之后会输出如下信息，需要安装如下步骤操作下</strong><ul>
+<li><strong>执行成功之后会输出如下信息，需要按照如下步骤操作下</strong><ul>
 <li><strong>第一步</strong> 在 <code>kubectl</code> 默认控制和操作集群节点的时候，需要使用到 <code>CA</code> 的密钥，传输过程是通过 <code>TLS</code> 协议保障通讯的安全性。通过下面 <code>3</code> 行命令拷贝密钥信息到当前用户家目录下，这样 <code>kubectl</code> 执行时会首先访问 <code>.kube</code> 目录，使用这些授权信息访问集群。</li>
 <li><strong>第二步</strong> 之后添加 <code>worker</code> 节点时，要通过 <code>token</code> 才能保障安全性。因此，先把显示的这行命令保存下来，以备后续使用会用到。</li>
 </ul>
@@ -1098,20 +1099,27 @@ $ kubectl describe pod \
 NAME                        TYPE        CLUSTER-IP      EXTERNAL-IP   PORT<span class="token punctuation">(</span>S<span class="token punctuation">)</span>    AGE
 dashboard-metrics-scraper   ClusterIP   10.245.214.11    <span class="token operator">&lt;</span>none<span class="token operator">></span>        8000/TCP   26s
 kubernetes-dashboard        ClusterIP   10.245.161.146   <span class="token operator">&lt;</span>none<span class="token operator">></span>        443/TCP    26s<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<p>需要注意的是 <code>dashboard</code> 默认不允许外网访问，即使通过 <code>kubectl proxy</code> 允许外网访问。但 <code>dashboard</code> 又只允许 <code>HTTPS</code> 访问，这样 <code>kubeadm init</code> 时自签名的 <code>CA</code> 证书是不被浏览器承认的。</p>
-<p>我采用的方案是 <code>Nginx</code> 作为反向代理，使用 <code>Lets Encrypt</code> 提供的有效证书对外提供服务，再经由 <code>proxy_pass</code> 指令反向代理到 <code>kubectl proxy</code> 上，如下所示。此时，本地可经由 <code>8888</code> 访问到 <code>dashboard</code> 服务，再通过 <code>Nginx</code> 访问它。</p>
+<ul>
+<li><p>需要注意的是 <code>dashboard</code> 默认不允许外网访问，即使通过 <code>kubectl proxy</code> 允许外网访问。但 <code>dashboard</code> 又只允许 <code>HTTPS</code> 访问，这样 <code>kubeadm init</code> 时自签名的 <code>CA</code> 证书是不被浏览器承认的。</p>
+</li>
+<li><p>我采用的方案是 <code>Nginx</code> 作为反向代理，使用 <code>Lets Encrypt</code> 提供的有效证书对外提供服务，再经由 <code>proxy_pass</code> 指令反向代理到 <code>kubectl proxy</code> 上，如下所示。此时，本地可经由 <code>8888</code> 访问到 <code>dashboard</code> 服务，再通过 <code>Nginx</code> 访问它。</p>
+</li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 代理(可以使用supervisor)</span>
 $ kubectl proxy --accept-hosts<span class="token operator">=</span><span class="token string">'^*$'</span>
 $ kubectl proxy --port<span class="token operator">=</span>8888 --accept-hosts<span class="token operator">=</span><span class="token string">'^*$'</span>
-<span class="token comment" spellcheck="true"># 测试代理是否正常(默认监听在8001端口上)</span>
-$ curl -X GET -L http://localhost:8001
+$ kubectl proxy --port<span class="token operator">=</span>8888 --accept-hosts<span class="token operator">=</span><span class="token string">'k8s.escape.com,k8s.escape.cn,localhost'</span>
 
 <span class="token comment" spellcheck="true"># 本地(可以使用nginx)</span>
 proxy_pass http://localhost:8001<span class="token punctuation">;</span>
 proxy_pass http://localhost:8888<span class="token punctuation">;</span>
 
+<span class="token comment" spellcheck="true"># 测试代理是否正常(默认监听在8001端口上)</span>
+$ curl -X GET -L http://localhost:8001
+$ curl -X GET -L http://localhost:8888
+
 <span class="token comment" spellcheck="true"># 外网访问如下URL地址</span>
-https://mydomain/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/<span class="token comment" spellcheck="true">#/login</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+https://mydomain/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/<span class="token comment" spellcheck="true">#/login</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <ul>
 <li><strong>配置文件整理</strong><ul>
@@ -1121,7 +1129,6 @@ https://mydomain/api/v1/namespaces/kubernetes-dashboard/services/https:kubernete
 </li>
 </ul>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># k8s.conf</span>
-
 <span class="token keyword">client_max_body_size</span>     80M<span class="token punctuation">;</span>
 <span class="token keyword">client_body_buffer_size</span>  128k<span class="token punctuation">;</span>
 <span class="token keyword">proxy_connect_timeout</span>    <span class="token number">600</span><span class="token punctuation">;</span>
@@ -1144,9 +1151,8 @@ https://mydomain/api/v1/namespaces/kubernetes-dashboard/services/https:kubernete
         <span class="token keyword">proxy_set_header</span>   X<span class="token operator">-</span>Real<span class="token operator">-</span>IP         <span class="token variable">$remote_addr</span><span class="token punctuation">;</span>
         <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>localhost<span class="token punctuation">:</span><span class="token number">8001</span><span class="token operator">/</span>api<span class="token operator">/</span>v1<span class="token operator">/</span>namespaces<span class="token operator">/</span>kubernetes<span class="token operator">-</span>dashboard<span class="token operator">/</span>services<span class="token operator">/</span><span class="token keyword">https</span><span class="token punctuation">:</span>kubernetes<span class="token operator">-</span>dashboard<span class="token punctuation">:</span><span class="token operator">/</span><span class="token keyword">proxy</span><span class="token operator">/</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># k8s.conf</span>
-
 <span class="token punctuation">[</span>program:k8s-master<span class="token punctuation">]</span>
 command<span class="token operator">=</span>kubectl proxy --accept-hosts<span class="token operator">=</span><span class="token string">'^*$'</span>
 user<span class="token operator">=</span>vagrant
@@ -1160,7 +1166,7 @@ stdout_logfile_backups<span class="token operator">=</span>10
 stderr_logfile_maxbytes<span class="token operator">=</span>1MB
 stderr_logfile_backups<span class="token operator">=</span>10
 stderr_logfile<span class="token operator">=</span>/var/log/supervisor/k8s-stderr.log
-stdout_logfile<span class="token operator">=</span>/var/log/supervisor/k8s-stdout.log<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+stdout_logfile<span class="token operator">=</span>/var/log/supervisor/k8s-stdout.log<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <ul>
 <li><strong>配置文件如下所示</strong></li>
@@ -1500,8 +1506,7 @@ subjects:
 EOF<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 获取可用户于访问的token令牌</span>
 $ kubectl -n kubernetes-dashboard describe secret \
-    <span class="token punctuation">$(</span>kubectl -n kubernetes-dashboard get secret \
-    <span class="token operator">|</span> <span class="token function">grep</span> admin-user <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$1</span>}'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+    <span class="token punctuation">$(</span>kubectl -n kubernetes-dashboard get secret <span class="token operator">|</span> <span class="token function">grep</span> admin-user <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$1</span>}'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>登录界面展示</strong><ul>
 <li>针对 <code>Chrome</code> 浏览器，在空白处点击然后输入：<code>thisisunsafe</code></li>
