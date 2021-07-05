@@ -459,21 +459,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-05-31
+                    2021-07-05
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    7.3k
+                    7.7k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    29 分
+                    31 分
                 </div>
                 
 
@@ -1101,7 +1101,7 @@ nginx: <span class="token punctuation">[</span>alert<span class="token punctuati
     <span class="token keyword">include</span> <span class="token operator">/</span>etc<span class="token operator">/</span>nginx<span class="token operator">/</span>conf<span class="token punctuation">.</span>d<span class="token operator">/</span><span class="token operator">*</span><span class="token punctuation">.</span>conf<span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="18-Docker-绑定到-IPv6-地址"><a href="#18-Docker-绑定到-IPv6-地址" class="headerlink" title="18. Docker 绑定到 IPv6 地址"></a>18. Docker 绑定到 IPv6 地址</h2><blockquote>
+<h2 id="18-Docker-绑定到-IPv6-上"><a href="#18-Docker-绑定到-IPv6-上" class="headerlink" title="18. Docker 绑定到 IPv6 上"></a>18. Docker 绑定到 IPv6 上</h2><blockquote>
 <p><strong>Docker 服务在启动的时候，将地址绑定到 IPv6 地址上面了，提示报错信息！</strong></p>
 </blockquote>
 <ul>
@@ -1161,6 +1161,31 @@ $ /etc/init.d/networking restart
 
 <span class="token comment" spellcheck="true"># 最后检测是否已关闭IPv6</span>
 ip addr show <span class="token operator">|</span> <span class="token function">grep</span> net6<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="19-Docker-容器启动超时"><a href="#19-Docker-容器启动超时" class="headerlink" title="19. Docker 容器启动超时"></a>19. Docker 容器启动超时</h2><blockquote>
+<p><strong>Docker 服务在启动的时候，提示超时，被直接终止了！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 使用 <code>docker-compose</code> 启动容器的时候，等待了很久的时候(大约 <code>2-3</code> 分钟左右)，之后提示如下信息。通过阅读信息内容，可以看到是因为超时导致的，提示可以通过设置环境变量，加大超时的时间。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ docker-compose up -d
+ERROR: <span class="token keyword">for</span> xxx  UnixHTTPConnectionPool<span class="token punctuation">(</span>host<span class="token operator">=</span><span class="token string">'localhost'</span>, port<span class="token operator">=</span>None<span class="token punctuation">)</span>: Read timed out. <span class="token punctuation">(</span>read timeout<span class="token operator">=</span>70<span class="token punctuation">)</span>
+ERROR: An HTTP request took too long to complete. Retry with --verbose to obtain debug information.
+If you encounter this issue regularly because of slow network conditions, consider setting COMPOSE_HTTP_TIMEOUT to a higher value <span class="token punctuation">(</span>current value: 60<span class="token punctuation">)</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 按照提示设置的环境变量之后，再次启动发现确实可以正常启动了，但是还是能够感觉到有些慢。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> vim /etc/profile
+<span class="token function">export</span> COMPOSE_HTTP_TIMEOUT<span class="token operator">=</span>500
+<span class="token function">export</span> DOCKER_CLIENT_TIMEOUT<span class="token operator">=</span>500<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>排除了下启动流程，因为容器启动有映射目录到容器里面且目录大小比较大，所以怀疑是因为 <code>i/o</code> 导致的。随即使用 <code>iotop</code> 命令查看服务器目前的 <code>i/o</code> 情况，发现存在很多个 <code>rg</code> 命令，且都处于 <code>100%</code> 左右。查了下，发现是 <code>vscode</code> 远程服务器启动的搜索目录结构的进程，西八，有些坑呀！</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> iotop
+ 4269 be/4 escape     15.64 K/s    0.00 B/s  0.00 % 98.36 % rg --files --hidden
+ 4270 be/4 escape     28.15 K/s    0.00 B/s  0.00 % 97.46 % rg --files --hidden
+ 4272 be/4 escape     31.27 K/s    0.00 B/s  0.00 % 97.39 % rg --files --hidden
+ 4276 be/4 escape     34.40 K/s    0.00 B/s  0.00 % 96.98 % rg --files --hidden<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -1711,7 +1736,7 @@ ip addr show <span class="token operator">|</span> <span class="token function">
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1105.2k</span>&nbsp;字
+                class="white-color">1105.6k</span>&nbsp;字
             
             
             
