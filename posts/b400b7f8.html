@@ -459,21 +459,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-11-26
+                    2021-07-07
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.6k
+                    2.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    6 分
+                    8 分
                 </div>
                 
 
@@ -497,6 +497,10 @@
 <p><strong>纸上得来终觉浅，绝知此事要躬行。</strong></p>
 </blockquote>
 <p><code>Git</code> 是一个分布式版本控制软件，最初由 <strong>林纳斯·托瓦兹</strong> 创作，于 <code>2005</code> 年发布。最初目的是为更好地管理 <code>Linux</code> 内核开发。<code>Git</code> 在本地磁盘上就保存着所有有关当前项目的历史更新，处理速度快。<code>Git</code> 中的绝大多数操作都只需要访问本地文件和资源，不用实时联网。</p>
+<ul>
+<li><strong><code>Git LFS</code></strong>(<code>Large File Storage</code> - ⼤⽂件存储）是可以把⾳乐、图⽚、视频等指定的任意⽂件存在 <code>Git</code> 仓库之外，⽽在 <code>Git</code> 仓库中⽤⼀个占⽤空间 <code>1KB</code> 不到的⽂本指针来代替的⼩⼯具。通过把⼤⽂件存储在 <code>Git</code> 仓库之外，可以减⼩ <code>Git</code> 仓库本身的体积，使克隆 <code>Git</code> 仓库的速度加快，也使得 <code>Git</code> 不会因为仓库中充满⼤⽂件⽽损失性能。</li>
+<li>使⽤ <code>Git LFS</code>，在默认情况下，只有当前签出的 <code>commit</code> 下的 <code>LFS</code> 对象的当前版本会被下载。此外，我们也可以做配置，只取由 <code>Git LFS</code> 管理的某些特定⽂件的实际内容，⽽对于其他由 <code>Git LFS</code> 管理的⽂件则只保留⽂件指针，从⽽节省带宽，加快克隆仓库的速度；也可以配置⼀次获取⼤⽂件的最近版本，从⽽能⽅便地检查⼤⽂件的近期变动。</li>
+</ul>
 <p><img src="../images/fix-git-files-too-large.jpg" alt="解决.git目录过大问题"></p>
 <hr>
 <h2 id="1-问题描述"><a href="#1-问题描述" class="headerlink" title="1. 问题描述"></a>1. 问题描述</h2><blockquote>
@@ -609,6 +613,40 @@ $ java -jar bfg.jar --strip-blobs-bigger-than 50M  my-repo.git
 
 <span class="token comment" spellcheck="true"># 删除文件夹下所有的文件</span>
 $ java -jar bfg.jar --delete-folders doc  my-repo.git<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[方法四] 使用 migrate 命令优化 .git 目录</strong></li>
+</ul>
+<p>迁移已有的 <code>git</code> 仓库，使⽤ <code>git lfs</code> 来进行管理。重写历史后的提交需执⾏ <code>git commit --force</code>，请确认在本地的操作合适⽆误后再进⾏提交。如有迁移⾄ <code>git lfs</code> 前的仓库有多份拷⻉，其他拷⻉可能需要执⾏ <code>git reset --hard origin/master</code> 来重置其本地的分⽀，注意执⾏ <code>git reset --hard</code> 命令将会丢失本地的改动。</p>
+<table>
+<thead>
+<tr>
+<th align="left">编号</th>
+<th align="center">命令</th>
+<th>含义解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">1</td>
+<td align="center"><code>git lfs migrate</code></td>
+<td>用来将当前已经被 GIT 储存库(.git)保存的文件以 LFS 文件的形式保存</td>
+</tr>
+</tbody></table>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 重写master分⽀</span>
+<span class="token comment" spellcheck="true"># 将历史提交(指的是.git目录)中的*.zip都⽤lfs进⾏管理</span>
+$ <span class="token function">git</span> lfs migrate <span class="token function">import</span> --include-ref<span class="token operator">=</span>master --include<span class="token operator">=</span><span class="token string">"*.zip"</span>
+
+<span class="token comment" spellcheck="true"># 重写所有分⽀及标签</span>
+<span class="token comment" spellcheck="true"># 将历史提交(指的是.git目录)中的*.rar,*.zip都⽤lfs进⾏管理</span>
+$ <span class="token function">git</span> lfs migrate <span class="token function">import</span> --everything --include<span class="token operator">=</span><span class="token string">"*.rar,*.zip"</span>
+
+<span class="token comment" spellcheck="true"># 切换后需要把切换之后的本地分支提交到远程仓库了，需要手动push更新远程仓库中的各个分支</span>
+$ <span class="token function">git</span> lfs push --force
+
+<span class="token comment" spellcheck="true"># 切换成功后，GIT仓库的大小可能并没有变化</span>
+<span class="token comment" spellcheck="true"># 主要原因可能是之前的提交还在，因此需要做一些清理工作</span>
+<span class="token comment" spellcheck="true"># 如果不是历史记录非常重要的仓库，建议不要像上述这么做，而是重新建立一个新的仓库</span>
+$ <span class="token function">git</span> reflog expire --expire-unreachable<span class="token operator">=</span>now --all
+$ <span class="token function">git</span> gc --prune<span class="token operator">=</span>now<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="4-总结教训"><a href="#4-总结教训" class="headerlink" title="4. 总结教训"></a>4. 总结教训</h2><blockquote>
 <p><strong>勤于思考，必中头榜！</strong></p>
@@ -1199,7 +1237,7 @@ node_modules
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1105.6k</span>&nbsp;字
+                class="white-color">1106.3k</span>&nbsp;字
             
             
             
