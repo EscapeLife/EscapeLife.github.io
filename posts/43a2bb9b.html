@@ -459,21 +459,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-07-05
+                    2021-07-09
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    7.7k
+                    8k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    31 分
+                    32 分
                 </div>
                 
 
@@ -1186,6 +1186,33 @@ If you encounter this issue regularly because of slow network conditions, consid
  4270 be/4 escape     28.15 K/s    0.00 B/s  0.00 % 97.46 % rg --files --hidden
  4272 be/4 escape     31.27 K/s    0.00 B/s  0.00 % 97.39 % rg --files --hidden
  4276 be/4 escape     34.40 K/s    0.00 B/s  0.00 % 96.98 % rg --files --hidden<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="20-Docker-端口网络限制"><a href="#20-Docker-端口网络限制" class="headerlink" title="20. Docker 端口网络限制"></a>20. Docker 端口网络限制</h2><blockquote>
+<p><strong>如果发现服务都一切正常，但是无法无法访问的话，则多为网络问题！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 启用服务之后，登录跳转发现直接 <code>502</code> 报错了。排除了配置等相关原因都没有任何问题(做过相关测试)，这就非常奇怪了！</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 部署服务架构</span>
+nginx<span class="token punctuation">(</span>80<span class="token punctuation">)</span> -<span class="token operator">></span> web1<span class="token punctuation">(</span>8080<span class="token punctuation">)</span>
+          -<span class="token operator">></span> web2<span class="token punctuation">(</span>8081<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 报错信息如下所示</span>
+nginx connect<span class="token punctuation">(</span><span class="token punctuation">)</span> failed <span class="token punctuation">(</span>113: No route to host<span class="token punctuation">)</span> <span class="token keyword">while</span> connecting to upstream<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 根据错误信息可知，是因为没有路由到指定的 <code>host</code> 导致了，随即看了下防火墙是开着的，看了日志发现被过滤掉了，西八！问题找到了，现在需要做的就是，要么添加防火墙规则，要么关闭防火墙。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 检查开放的端口</span>
+$ <span class="token function">sudo</span> firewall-cmd --permanent --zone<span class="token operator">=</span>public --list-ports
+
+<span class="token comment" spellcheck="true"># 开启需要路由的端口</span>
+$ <span class="token function">sudo</span> firewall-cmd --permanent --zone<span class="token operator">=</span>public --add-port<span class="token operator">=</span>8080/tcp
+$ <span class="token function">sudo</span> firewall-cmd --permanent --zone<span class="token operator">=</span>public --add-port<span class="token operator">=</span>8081/tcp<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 关闭防火墙</span>
+$ <span class="token function">sudo</span> systemctl stop firewalld.service
+
+<span class="token comment" spellcheck="true"># 禁用自启动</span>
+$ <span class="token function">sudo</span> systemctl disable firewalld.service<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -1736,7 +1763,7 @@ If you encounter this issue regularly because of slow network conditions, consid
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1106.3k</span>&nbsp;字
+                class="white-color">1106.6k</span>&nbsp;字
             
             
             
