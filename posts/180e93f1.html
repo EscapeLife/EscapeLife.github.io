@@ -599,7 +599,7 @@ $ <span class="token function">sudo</span> swapoff -a
 
 <span class="token comment" spellcheck="true"># 为K8S来调整内核参数</span>
 $ <span class="token function">sudo</span> <span class="token function">touch</span> /etc/sysctl.d/kubernetes.conf
-$ <span class="token function">sudo</span> <span class="token function">cat</span> <span class="token operator">&gt;</span> /etc/sysctl.d/kubernetes.conf <span class="token operator">&lt;&lt;</span><span class="token string">EOF
+$ <span class="token function">sudo</span> <span class="token function">cat</span> <span class="token operator">></span> /etc/sysctl.d/kubernetes.conf <span class="token operator">&lt;&lt;</span><span class="token string">EOF
 net.bridge.bridge-nf-call-iptables = 1 # 开启网桥模式(必须)
 net.bridge.bridge-nf-call-ip6tables = 1 # 开启网桥模式(必须)
 net.ipv6.conf.all.disable_ipv6 = 1 # 关闭IPv6协议(必须)
@@ -635,7 +635,7 @@ $ <span class="token function">sudo</span> timedatectl set-local-rtc 0<span aria
 $ modprobe br_netfilter
 
 <span class="token comment" spellcheck="true"># 修改配置</span>
-$ <span class="token function">cat</span> <span class="token operator">&gt;</span> /etc/sysconfig/modules/ipvs.modules <span class="token operator">&lt;&lt;</span><span class="token string">EOF
+$ <span class="token function">cat</span> <span class="token operator">></span> /etc/sysconfig/modules/ipvs.modules <span class="token operator">&lt;&lt;</span><span class="token string">EOF
 #!/bin/bash
 modprobe -- ip_vs
 modprobe -- ip_vs_rr
@@ -686,7 +686,7 @@ $ ip route show
 $ ipvsadm -L -n
 IP Virtual Server version 1.2.1 <span class="token punctuation">(</span>size<span class="token operator">=</span>4096<span class="token punctuation">)</span>
 Prot LocalAddress:Port Scheduler Flags
-  -<span class="token operator">&gt;</span> RemoteAddress:Port           Forward Weight ActiveConn InActConn<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+  -<span class="token operator">></span> RemoteAddress:Port           Forward Weight ActiveConn InActConn<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>配置文件定义</strong><ul>
 <li>接口使用了 <code>v1beta2</code> 版本</li>
@@ -698,7 +698,7 @@ Prot LocalAddress:Port Scheduler Flags
 </li>
 </ul>
 <pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token comment" spellcheck="true"># kubeadm-config.yaml</span>
-<span class="token comment" spellcheck="true"># sudo kubeadm config print init-defaults &gt; kubeadm-config.yaml</span>
+<span class="token comment" spellcheck="true"># sudo kubeadm config print init-defaults > kubeadm-config.yaml</span>
 <span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> kubeadm.k8s.io/v1beta2
 <span class="token key atrule">imageRepository</span><span class="token punctuation">:</span> registry.aliyuncs.com/google_containers
 <span class="token key atrule">kind</span><span class="token punctuation">:</span> ClusterConfiguration
@@ -745,8 +745,8 @@ kubeadm <span class="token function">join</span> 192.168.30.30:6443 \
 <pre class="line-numbers language-bash"><code class="language-bash">$ kubectl get nodes
 NAME         STATUS     ROLES                  AGE   VERSION
 k8s-master   NotReady   control-plane,master   62m   v1.20.2
-k8s-node1    NotReady   <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>                 82m   v1.20.2
-k8s-node2    NotReady   <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>                 82m   v1.20.2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+k8s-node1    NotReady   <span class="token operator">&lt;</span>none<span class="token operator">></span>                 82m   v1.20.2
+k8s-node2    NotReady   <span class="token operator">&lt;</span>none<span class="token operator">></span>                 82m   v1.20.2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看token令牌</span>
 $ <span class="token function">sudo</span> kubeadm token list
 
@@ -755,13 +755,13 @@ $ <span class="token function">sudo</span> kubeadm token create
 
 <span class="token comment" spellcheck="true"># 忘记sha编码</span>
 $ openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt \
-    <span class="token operator">|</span> openssl rsa -pubin -outform der 2<span class="token operator">&gt;</span>/dev/null \
+    <span class="token operator">|</span> openssl rsa -pubin -outform der 2<span class="token operator">></span>/dev/null \
     <span class="token operator">|</span> openssl dgst -sha256 -hex <span class="token operator">|</span> <span class="token function">sed</span> <span class="token string">'s/^.* //'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 生成一个新的 token 令牌(比上面的方便)</span>
 $ kubeadm token generate
 
 <span class="token comment" spellcheck="true"># 直接生成 join 命令(比上面的方便)</span>
-$ kubeadm token create <span class="token operator">&lt;</span>token_generate<span class="token operator">&gt;</span> --print-join-command --ttl<span class="token operator">=</span>0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ kubeadm token create <span class="token operator">&lt;</span>token_generate<span class="token operator">></span> --print-join-command --ttl<span class="token operator">=</span>0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>执行完成之后可以通过如下命令，查看主节点信息</strong><ul>
 <li>默认生成四个命名空间<ul>
@@ -1097,8 +1097,8 @@ $ kubectl describe pod \
     --namespace<span class="token operator">=</span>kubernetes-dashboard<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash">$ kubectl get svc -n kubernetes-dashboard
 NAME                        TYPE        CLUSTER-IP      EXTERNAL-IP   PORT<span class="token punctuation">(</span>S<span class="token punctuation">)</span>    AGE
-dashboard-metrics-scraper   ClusterIP   10.245.214.11    <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>        8000/TCP   26s
-kubernetes-dashboard        ClusterIP   10.245.161.146   <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>        443/TCP    26s<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+dashboard-metrics-scraper   ClusterIP   10.245.214.11    <span class="token operator">&lt;</span>none<span class="token operator">></span>        8000/TCP   26s
+kubernetes-dashboard        ClusterIP   10.245.161.146   <span class="token operator">&lt;</span>none<span class="token operator">></span>        443/TCP    26s<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><p>需要注意的是 <code>dashboard</code> 默认不允许外网访问，即使通过 <code>kubectl proxy</code> 允许外网访问。但 <code>dashboard</code> 又只允许 <code>HTTPS</code> 访问，这样 <code>kubeadm init</code> 时自签名的 <code>CA</code> 证书是不被浏览器承认的。</p>
 </li>
@@ -1544,7 +1544,7 @@ $ kubectl create clusterrolebinding \
 $ kubectl get secret -n kube-system
 
 <span class="token comment" spellcheck="true"># 通过上边命令获取到dashboard-admin-token-slfcr信息</span>
-$ kubectl describe secret <span class="token operator">&lt;</span>dashboard-admin-token-slfcr<span class="token operator">&gt;</span> -n kube-system
+$ kubectl describe secret <span class="token operator">&lt;</span>dashboard-admin-token-slfcr<span class="token operator">></span> -n kube-system
 
 <span class="token comment" spellcheck="true"># 浏览器访问登录并把token粘贴进去登录即可</span>
 https://192.168.30.30:8080/
@@ -2111,7 +2111,7 @@ $ kubectl describe secrets -n kube-system \
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1116.2k</span>&nbsp;字
+                class="white-color">1107.7k</span>&nbsp;字
             
             
             
