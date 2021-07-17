@@ -455,14 +455,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-02-04
+                    2021-07-17
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.5k
+                    1.6k
                 </div>
                 
 
@@ -489,7 +489,10 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p><code>Nginx</code> 是什么 <code>"engine x"</code> 是一个开源的，支持高性能、高并发的 <code>Web</code> 服务和代理服务软件。它是由俄罗斯人 <code>Igor Sysoev</code> 开发的，作者将源代码以类 <code>BSD</code> 许可的形式开源出来供全球使用。</p>
+                <blockquote>
+<p><strong>Nginx 是一款轻量级的 Web 服务器和反向代理服务器！</strong></p>
+</blockquote>
+<p><code>Nginx</code> 是什么 <code>"engine x"</code> 是一个开源的，支持高性能、高并发的 <code>Web</code> 服务和代理服务软件。它是由俄罗斯人 <code>Igor Sysoev</code> 开发的，作者将源代码以类 <code>BSD</code> 许可的形式开源出来供全球使用。</p>
 <p><img src="../images/nginx-pass-vars.jpg" alt="Nginx服务变量传递 - HEADER的定义"></p>
 <hr>
 <h2 id="1-代理服务设置"><a href="#1-代理服务设置" class="headerlink" title="1. 代理服务设置"></a>1. 代理服务设置</h2><blockquote>
@@ -511,22 +514,24 @@
 </ul>
 </li>
 <li><strong><code>X-Forwarded-For $proxy_add_x_forwarded_for</code></strong><ul>
-<li>这个 Header 和<code>X-Real-IP</code>类似</li>
+<li>这个 <code>Header</code> 和<code>X-Real-IP</code>类似</li>
 <li>但它在多层代理时会包含真实客户端及中间每个代理服务器的 <code>IP</code> 地址</li>
 </ul>
 </li>
 </ul>
 <p>关于 <code>Nginx</code> 相关的变量定义、使用方式、对应解释，我们可以通过查阅 <a href="http://nginx.org/en/docs/varindex.html" target="_blank" rel="noopener"><strong>官方的变量列表进行查看</strong></a> 从而获取到我们所需要使用的变量，加以使用。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">proxy_set_header</span> Host <span class="token variable">$host</span><span class="token punctuation">;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 前置Nginx服务配置</span>
+<span class="token keyword">proxy_set_header</span> Host <span class="token variable">$host</span><span class="token punctuation">;</span>
 <span class="token keyword">proxy_set_header</span> X<span class="token operator">-</span>Forwarded<span class="token operator">-</span>Proto <span class="token variable">$scheme</span><span class="token punctuation">;</span>
 <span class="token keyword">proxy_set_header</span> X<span class="token operator">-</span>Real<span class="token operator">-</span>IP <span class="token variable">$remote_addr</span><span class="token punctuation">;</span>
-<span class="token keyword">proxy_set_header</span> X<span class="token operator">-</span>Forwarded<span class="token operator">-</span>For <span class="token variable">$proxy_add_x_forwarded_for</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token keyword">proxy_set_header</span> X<span class="token operator">-</span>Forwarded<span class="token operator">-</span>For <span class="token variable">$proxy_add_x_forwarded_for</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>但是，如果我们在后置 <code>Nginx</code> 服务上面也这样配置的话，然后通过浏览器或者命令行工具进行请求的话，会发现获取的 <code>Host</code> 并不是真实客户端的，而是前置 <code>Nginx</code> 服务的地址。同理，对应的 <code>IP</code> 还是本地的 <code>IP</code> 而非真实客户端 <code>IP</code> 地址。</p>
-<p>到这里，我们来完事一下后置 <code>Nginx</code> 的对应配置，来完成获取客户端信息的收集。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">proxy_set_header</span> Host <span class="token variable">$http_host</span><span class="token punctuation">;</span>
-<span class="token keyword">proxy_set_header</span> X<span class="token operator">-</span>Forwarded<span class="token operator">-</span>Proto <span class="token variable">$http_x_forwarded_protos</span><span class="token punctuation">;</span>
+<p>到这里，我们来完善一下后置 <code>Nginx</code> 的对应配置，来完成获取客户端信息的收集。</p>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 后置Nginx服务配置</span>
+<span class="token keyword">proxy_set_header</span> Host <span class="token variable">$http_host</span><span class="token punctuation">;</span>
+<span class="token keyword">proxy_set_header</span> X<span class="token operator">-</span>Forwarded<span class="token operator">-</span>Proto <span class="token variable">$http_x_forwarded_proto</span><span class="token punctuation">;</span>
 <span class="token keyword">proxy_set_header</span> X<span class="token operator">-</span>Real<span class="token operator">-</span>IP <span class="token variable">$http_x_real_ip</span><span class="token punctuation">;</span>
-<span class="token keyword">proxy_set_header</span> X<span class="token operator">-</span>Forwarded<span class="token operator">-</span>For <span class="token variable">$http_x_forwarded_for</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token keyword">proxy_set_header</span> X<span class="token operator">-</span>Forwarded<span class="token operator">-</span>For <span class="token variable">$http_x_forwarded_for</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="2-变量传递规则"><a href="#2-变量传递规则" class="headerlink" title="2. 变量传递规则"></a>2. 变量传递规则</h2><blockquote>
 <p><strong>host -&gt; $http_host</strong> &gt; <strong>所有请求头里面的 Key 再 Nginx 里面都可以通过小写和下划线来让 Nginx 读取</strong></p>
