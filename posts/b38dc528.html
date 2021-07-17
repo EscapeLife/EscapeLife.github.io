@@ -459,21 +459,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-03-31
+                    2021-07-17
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    772
+                    966
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    2 分
+                    3 分
                 </div>
                 
 
@@ -503,32 +503,72 @@
 <p><strong>报错信息：Request Request Header Or Cookie Too Large</strong></p>
 </blockquote>
 <ul>
-<li><strong>[问题起因]</strong> 服务新建之后，在其他用户登录网页的时候，页面提示 <code>400: Bad Request</code> 报错错误，大致如下所示：</li>
+<li><strong>[问题起因]</strong> 服务新建之后，其他用户登录网页的时候，页面提示 <code>400: Bad Request</code> 错误，大致如下所示：</li>
 </ul>
 <p><img src="../images/nginx-diseases-all-list-01.png" alt="Nginx疑难杂症汇总 - 提示Cookie长度超限"></p>
 <ul>
-<li><strong>[解决方法]</strong> 后来发现，是因为多个服务公用同一个域名导致在该域名下面存储的 <code>Cookie</code> 太多导致的，可以设置如下两个参数来缓解该问题的出现。<ul>
+<li><p><strong>[解决方法]</strong> 后来发现，是因为多个服务公用同一个域名导致在该域名下面存储的 <code>Cookie</code> 太多导致的，可以设置如下两个参数来缓解该问题的出现。</p>
+<ul>
 <li><a href="http://nginx.org/en/docs/http/ngx_http_core_module.html#client_header_buffer_size" target="_blank" rel="noopener">client_header_buffer_size</a></li>
 <li><a href="http://nginx.org/en/docs/http/ngx_http_core_module.html#large_client_header_buffers" target="_blank" rel="noopener">large_client_header_buffers</a></li>
 </ul>
 </li>
+<li><p>设置读取客户端请求头的缓冲区大小。对于大多数请求，<code>1K</code> 字节的缓冲区就足够了。但是，如果一个请求包含很长的 <code>cookie</code>，或者来自 <code>WAP</code> 客户端，那么它可能不适合 <code>1K</code>。如果请求行或请求头字段不适合这个缓冲区，那么将分配更大的缓冲区，由 <code>large_client_header_buffers</code> 指令配置。</p>
+</li>
 </ul>
-<p>设置读取客户端请求头的缓冲区大小。对于大多数请求，1K 字节的缓冲区就足够了。但是，如果一个请求包含很长的 <code>cookie</code>，或者来自 <code>WAP</code> 客户端，那么它可能不适合 <code>1K</code>。如果请求行或请求头字段不适合这个缓冲区，那么将分配更大的缓冲区，由 <code>large_client_header_buffers</code> 指令配置。</p>
 <p><img src="../images/nginx-diseases-all-list-02.png" alt="Nginx疑难杂症汇总 - client_header_buffer_size"></p>
-<p>设置用于读取大型的客户端请求头的缓冲区的最大数量和大小。请求行不能超过一个缓冲区的大小，否则会向客户端返回 <code>414</code>（<code>Request-URI Too Large</code>）错误。请求头字段也不能超过一个缓冲区的大小，否则会将 <code>400</code>（<code>Bad Request</code>）错误返回给客户端，缓冲区仅按需分配。默认情况下，缓冲区大小等于 <code>8K</code> 字节。 如果在请求处理结束后将连接转换为保持活动状态，则会释放这些缓冲区。</p>
+<ul>
+<li>设置用于读取大型的客户端请求头的缓冲区的最大数量和大小。请求行不能超过一个缓冲区的大小，否则会向客户端返回 <code>414</code>（<code>Request-URI Too Large</code>）错误。请求头字段也不能超过一个缓冲区的大小，否则会将 <code>400</code>（<code>Bad Request</code>）错误返回给客户端，缓冲区仅按需分配。默认情况下，缓冲区大小等于 <code>8K</code> 字节。 如果在请求处理结束后将连接转换为保持活动状态，则会释放这些缓冲区。</li>
+</ul>
 <p><img src="../images/nginx-diseases-all-list-03.png" alt="Nginx疑难杂症汇总 - large_client_header_buffers"></p>
-<p>后来网上找到了，对 <code>nginx</code> 处理 <code>header</code> 时的方法，大致如下所示：</p>
+<ul>
+<li>后来网上找到了，对 <code>nginx</code> 处理 <code>header</code> 时的方法，大致如下所示：</li>
+</ul>
 <ol>
 <li>先处理请求的 request_line，之后才是 <code>request_header</code>。</li>
 <li>这两者的 <code>buffer</code> 分配策略相同。</li>
 <li>先根据 <code>client_header_buffer_size</code> 配置的值分配一个 <code>buffer</code>，如果分配的 <code>buffer</code> 无法容纳 <code>request_line</code>/<code>request_header</code>，那么就会再次根据 <code>large_client_header_buffers</code> 配置的参数分配 <code>large_buffer</code>，如果 <code>large_buffer</code> 还是无法容纳，那么就会返回 <code>414</code>/<code>400</code> 错误。</li>
 </ol>
-<p>根据对手册的理解，这两个指令在配置 <code>header_buffer</code> 时的使用场景是不同的，个人理解如下：</p>
+<ul>
+<li>根据对手册的理解，这两个指令在配置 <code>header_buffer</code> 时的使用场景是不同的，个人理解如下：</li>
+</ul>
 <ol>
 <li>如果你的请求中的 <code>header</code> 都很大，那么应该使用 <code>client_header_buffer_size</code>，这样能减少一次内存分配。</li>
 <li>如果你的请求中只有少量请求 <code>header</code> 很大，那么应该使用 <code>large_client_header_buffers</code>，因为这样就仅需在处理大 <code>header</code> 时才会分配更多的空间，从而减少无谓的内存空间浪费。</li>
 </ol>
 <hr>
+<h2 id="2-开启转发-Delete-方法"><a href="#2-开启转发-Delete-方法" class="headerlink" title="2. 开启转发 Delete 方法"></a>2. 开启转发 Delete 方法</h2><blockquote>
+<p><strong>老版本 Nginx 默认不转发 put/delete 等方法</strong></p>
+</blockquote>
+<ul>
+<li><p><strong>[问题起因]</strong> 使用 <code>Nginx</code> 代理网盘服务，但是操作删除文件的时候，提示有问题。</p>
+</li>
+<li><p><strong>[解决方法]</strong> <code>ngx_http_dav_module</code> 模块是为通过 <a href="https://www.zhihu.com/question/30719209" target="_blank" rel="noopener"><code>WebDAV</code></a> 协议自动管理文件而设计的，该模块处理 <code>HTTP</code> 和 <code>WebDAV</code> 的请求方法 <code>PUT</code>、<code>DELETE</code>、<code>MKCOL</code>、<code>COPY</code> 和 <code>MOVE</code>。默认情况下，该模块不会构建，需要使用编译参数 <code>-–with-http_dav_module</code> 开启。需要额外 <code>WebDAV</code> 方法的 <code>WebDAV</code> 客户端操作，在该模块中不会起作用。</p>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 示例配置</span>
+location / <span class="token punctuation">{</span>
+    root                    /data/www<span class="token punctuation">;</span>
+
+    client_body_temp_path   /data/client_temp<span class="token punctuation">;</span>
+
+    dav_methods PUT DELETE  MKCOL COPY MOVE<span class="token punctuation">;</span>
+
+    create_full_put_path    on<span class="token punctuation">;</span>
+    dav_access              group:rw  all:r<span class="token punctuation">;</span>
+
+    limit_except GET <span class="token punctuation">{</span>
+        allow 192.168.1.0/32<span class="token punctuation">;</span>
+        deny  all<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="3-参考链接地址"><a href="#3-参考链接地址" class="headerlink" title="3. 参考链接地址"></a>3. 参考链接地址</h2><blockquote>
+<p><strong>送人玫瑰，手有余香！</strong></p>
+</blockquote>
+<ul>
+<li><a href="https://blog.lyz810.com/article/2016/05/ngx_http_dav_module_doc_zh-cn" target="_blank" rel="noopener">Nginx 中文文档 - ngx_http_dav_module</a></li>
+</ul>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -1087,7 +1127,7 @@
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1109.6k</span>&nbsp;字
+                class="white-color">1109.8k</span>&nbsp;字
             
             
             
