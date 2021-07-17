@@ -463,14 +463,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-07-16
+                    2021-07-17
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.5k
+                    1.8k
                 </div>
                 
 
@@ -502,7 +502,7 @@
 </blockquote>
 <p><img src="../images/https_cors_http.png" alt="HTTPS跨越问题处理方法"></p>
 <hr>
-<h2 id="1-同源策略之不同协议"><a href="#1-同源策略之不同协议" class="headerlink" title="1. 同源策略之不同协议"></a>1. 同源策略之不同协议</h2><blockquote>
+<h2 id="1-同源策略之使用不同的协议"><a href="#1-同源策略之使用不同的协议" class="headerlink" title="1. 同源策略之使用不同的协议"></a>1. 同源策略之使用不同的协议</h2><blockquote>
 <p><strong>问题起因：两个服务使用的同一域名但不同协议</strong></p>
 </blockquote>
 <ul>
@@ -565,10 +565,22 @@
 <p><strong>问题经过：配置 Nginx 服务间接使用</strong></p>
 </blockquote>
 <ul>
-<li><p>排查问题时发现，在 <code>iframe</code> 中确实是正确配置了相关单点登录的跳转地址，且本地直接访问地址是可以通过测试的，但是通过 <code>Network</code> 发现，紧接着有 <code>302</code> 跳转了一次，随即提示 <code>401</code> 权限错误。</p>
-</li>
-<li><p>解决方法还是一样的，通过在 <code>Nginx</code> 中代理相关请求到 <code>B</code> 系统上，来间接使用并避免同源策略导致的登录异常问题。</p>
-</li>
+<li>排查问题时发现，在 <code>iframe</code> 中确实是正确配置了相关单点登录的跳转地址，且本地直接访问地址是可以通过测试的，但是通过 <code>Network</code> 发现，紧接着有 <code>302</code> 跳转了一次，随即提示 <code>401</code> 权限错误。</li>
+</ul>
+<p><img src="../images/https_cors_http_2.png" alt="HTTPS跨越问题处理方法 - 浏览器同源策略"></p>
+<ul>
+<li>发现要是 <code>iframe</code> 的地址和父级的地址不同源，项目登录时无法设置 <code>cookie</code>，则就是因为这个原因导致请求在 <code>302</code> 跳转之后出现了权限问题(没有把设置的 <code>cookie</code> 信息带过去)。</li>
+<li>从 <code>Chrome51</code> 开始，浏览器的 <code>cookie</code> 新增加了一个 <code>SameSite</code> 属性，用来防止 <code>CSRF</code> 攻击和用户追踪。该设置当前默认是关闭的，但在 <code>Chrome80</code> 之后，该功能默认已开启。所以当你无法使用某些网站第三方登录功能的时候，请查看一下是否受到了该设置的影响。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 接口设置cookie时提示</span>
+this set-cookie didnot specify a <span class="token string">"sameSite"</span> attribute and was defaulted to <span class="token string">"sameSite=Lax"</span> and broke
+the same rules specified <span class="token keyword">in</span> the SameSiteLax value<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>解决方法一</strong> 打开 Chrome 设置禁用对应配置项，然后重启浏览器。</li>
+</ul>
+<p><img src="../images/https_cors_http_3.png" alt="HTTPS跨越问题处理方法 - 浏览器同源策略"></p>
+<ul>
+<li><strong>解决方法二</strong> 通过在 <code>Nginx</code> 中代理相关请求到 <code>B</code> 系统上，来间接使用并避免同源策略导致的登录异常问题。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash">location /xxx/xxx/ <span class="token punctuation">{</span>
     proxy_http_version 1.1<span class="token punctuation">;</span>
@@ -624,7 +636,14 @@ http://www.domain2.com/b.js        不同域名                         不允�
 <li><code>WebSocket</code>协议跨域</li>
 </ol>
 <hr>
-<h2 id="4-最后的陈述总结"><a href="#4-最后的陈述总结" class="headerlink" title="4. 最后的陈述总结"></a>4. 最后的陈述总结</h2><p>比如你有 <code>API</code> 等对外服务，早期开放了 <code>HTTP</code> 调用的接口。那么很遗憾，当我们升级到 <code>HTTPS</code> 的时候，能做的事情是通过公告、邮件等方式告知第三方，我们在特定时间后就不在支持 <code>HTTP</code> 服务，希望第三方支持 <code>HTTPS</code> 调用。或者如果安全性不重要的话，那么就同时支持 <code>HTTP/HTTPS</code> 调用。苹果 <code>HTTPS</code> 的公告 <code>App Transport Security</code> 就是很好的例子，而实际上 <code>App</code> 内部还是留了开启 <code>HTTP</code> 请求的设置。</p>
+<h2 id="4-最后陈述总结"><a href="#4-最后陈述总结" class="headerlink" title="4. 最后陈述总结"></a>4. 最后陈述总结</h2><p>比如你有 <code>API</code> 等对外服务，早期开放了 <code>HTTP</code> 调用的接口。那么很遗憾，当我们升级到 <code>HTTPS</code> 的时候，能做的事情是通过公告、邮件等方式告知第三方，我们在特定时间后就不在支持 <code>HTTP</code> 服务，希望第三方支持 <code>HTTPS</code> 调用。或者如果安全性不重要的话，那么就同时支持 <code>HTTP/HTTPS</code> 调用。苹果 <code>HTTPS</code> 的公告 <code>App Transport Security</code> 就是很好的例子，而实际上 <code>App</code> 内部还是留了开启 <code>HTTP</code> 请求的设置。</p>
+<hr>
+<h2 id="5-参考链接记录"><a href="#5-参考链接记录" class="headerlink" title="5. 参考链接记录"></a>5. 参考链接记录</h2><blockquote>
+<p><strong>送人玫瑰，手有余香！</strong></p>
+</blockquote>
+<ul>
+<li><a href="https://www.cnblogs.com/gxp69/p/12565927.html" target="_blank" rel="noopener">Chrome80 中 Iframe 跨域 Cookie 的 Samesite 问题</a></li>
+</ul>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -1183,7 +1202,7 @@ http://www.domain2.com/b.js        不同域名                         不允�
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1109.4k</span>&nbsp;字
+                class="white-color">1109.6k</span>&nbsp;字
             
             
             
