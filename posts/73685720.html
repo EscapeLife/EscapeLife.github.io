@@ -427,6 +427,14 @@
                                 <span class="chip bg-color">Nginx</span>
                             </a>
                         
+                            <a href="/tags/SOP/">
+                                <span class="chip bg-color">SOP</span>
+                            </a>
+                        
+                            <a href="/tags/CSFR/">
+                                <span class="chip bg-color">CSFR</span>
+                            </a>
+                        
                     </div>
                     
                 </div>
@@ -455,21 +463,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-11-23
+                    2021-07-16
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.2k
+                    1.5k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    4 分
+                    6 分
                 </div>
                 
 
@@ -494,12 +502,18 @@
 </blockquote>
 <p><img src="../images/https_cors_http.png" alt="HTTPS跨越问题处理方法"></p>
 <hr>
-<h2 id="1-起因"><a href="#1-起因" class="headerlink" title="1. 起因"></a>1. 起因</h2><ul>
+<h2 id="1-同源策略之不同协议"><a href="#1-同源策略之不同协议" class="headerlink" title="1. 同源策略之不同协议"></a>1. 同源策略之不同协议</h2><blockquote>
+<p><strong>问题起因：两个服务使用的同一域名但不同协议</strong></p>
+</blockquote>
+<ul>
 <li>因为公司有一个产品需要在网站内部引入外部文档，提供的是 <code>HTTP</code> 的地址。我们测试环境使用的也是 <code>HTTP</code> 的网址，所以测试不存在问题，可以正常显示外部文档内容。但是更新到正式环境之后，发现原本能够访问的文档不能访问。后来发现我们正式环境使用的是 <code>HTTPS</code> 的域名，因为浏览器同源策略的问题导致无法访问。</li>
 </ul>
 <p><img src="../images/https_cors_http_1.png" alt="HTTPS跨越问题处理方法 - 浏览器同源策略"></p>
 <hr>
-<h2 id="2-经过"><a href="#2-经过" class="headerlink" title="2. 经过"></a>2. 经过</h2><ul>
+<blockquote>
+<p><strong>问题经过：配置 Nginx 服务间接使用</strong></p>
+</blockquote>
+<ul>
 <li>因为浏览器同源策略的问题，导致在 <code>HTTPS</code> 的网站中无法引用 <code>HTTP</code> 网站的资源。所以，只能配置 <code>Nginx</code> 使访问的时候，间接的通过代理的方式来访问对应的资源。</li>
 </ul>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
@@ -541,7 +555,30 @@
 <li>重载配置文件，访问内容，正常了。后来发现是数据库中存储的就是一个假地址，很是尴尬。</li>
 </ul>
 <hr>
-<h2 id="3-科普"><a href="#3-科普" class="headerlink" title="3. 科普"></a>3. 科普</h2><blockquote>
+<h2 id="2-同源策略之-Cookie-无法读取"><a href="#2-同源策略之-Cookie-无法读取" class="headerlink" title="2. 同源策略之 Cookie 无法读取"></a>2. 同源策略之 Cookie 无法读取</h2><blockquote>
+<p><strong>问题起因：两个服务使用的不同域名且不同协议</strong></p>
+</blockquote>
+<ul>
+<li>需要部署了两个系统，<code>A</code> 系统和 <code>B</code> 系统，其中 <code>B</code> 系统需要通过 <code>iframe</code> 的方式嵌入到 <code>A</code> 系统中，通过配置单点登录的方式，使用户通过 <code>A</code> 系统来使用 <code>B</code> 系统的服务。但是，等到服务配置完成之后，点击跳转的时候提示 <code>401</code> 错误。排除了，<code>Token</code> 过期和用户没有登录的可能，那就一定是权限哪里配置存在了问题。</li>
+</ul>
+<blockquote>
+<p><strong>问题经过：配置 Nginx 服务间接使用</strong></p>
+</blockquote>
+<ul>
+<li><p>排查问题时发现，在 <code>iframe</code> 中确实是正确配置了相关单点登录的跳转地址，且本地直接访问地址是可以通过测试的，但是通过 <code>Network</code> 发现，紧接着有 <code>302</code> 跳转了一次，随即提示 <code>401</code> 权限错误。</p>
+</li>
+<li><p>解决方法还是一样的，通过在 <code>Nginx</code> 中代理相关请求到 <code>B</code> 系统上，来间接使用并避免同源策略导致的登录异常问题。</p>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">location /xxx/xxx/ <span class="token punctuation">{</span>
+    proxy_http_version 1.1<span class="token punctuation">;</span>
+    proxy_pass_header Server<span class="token punctuation">;</span>
+    proxy_set_header Host <span class="token variable">$http_host</span><span class="token punctuation">;</span>
+    proxy_set_header X-Real-IP <span class="token variable">$remote_addr</span><span class="token punctuation">;</span>
+    proxy_set_header X-Scheme <span class="token variable">$scheme</span><span class="token punctuation">;</span>
+    proxy_pass http://www.xxx.xxx<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="3-关于同源策略的相关科普"><a href="#3-关于同源策略的相关科普" class="headerlink" title="3. 关于同源策略的相关科普"></a>3. 关于同源策略的相关科普</h2><blockquote>
 <p><a href="https://segmentfault.com/a/1190000011145364" target="_blank" rel="noopener"><strong>参考链接地址：点击即可</strong></a></p>
 </blockquote>
 <p><strong>[1] 什么是同源策略？</strong></p>
@@ -587,8 +624,7 @@ http://www.domain2.com/b.js        不同域名                         不允�
 <li><code>WebSocket</code>协议跨域</li>
 </ol>
 <hr>
-<h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a>4. 总结</h2><p>比如你有 <code>API</code> 等对外服务，早期开放了 <code>HTTP</code> 调用的接口。那么很遗憾，当我们升级到 <code>HTTPS</code>的时候，能做的事情是通过公告、邮件等方式告知第三方，我们在特定时间后就不在支持 <code>HTTP</code>服务，希望第三方支持 <code>HTTPS</code> 调用。或者如果安全性不重要的话，那么就同时支持 <code>HTTP/HTTPS</code> 调用。</p>
-<p>苹果 <code>HTTPS</code> 的公告 <code>App Transport Security</code> 就是很好的例子，而实际上 <code>App</code> 内部还是留了开启 <code>HTTP</code> 请求的设置。</p>
+<h2 id="4-最后的陈述总结"><a href="#4-最后的陈述总结" class="headerlink" title="4. 最后的陈述总结"></a>4. 最后的陈述总结</h2><p>比如你有 <code>API</code> 等对外服务，早期开放了 <code>HTTP</code> 调用的接口。那么很遗憾，当我们升级到 <code>HTTPS</code> 的时候，能做的事情是通过公告、邮件等方式告知第三方，我们在特定时间后就不在支持 <code>HTTP</code> 服务，希望第三方支持 <code>HTTPS</code> 调用。或者如果安全性不重要的话，那么就同时支持 <code>HTTP/HTTPS</code> 调用。苹果 <code>HTTPS</code> 的公告 <code>App Transport Security</code> 就是很好的例子，而实际上 <code>App</code> 内部还是留了开启 <code>HTTP</code> 请求的设置。</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -673,6 +709,14 @@ http://www.domain2.com/b.js        不同域名                         不允�
                             
                                 <a href="/tags/Nginx/">
                                     <span class="chip bg-color">Nginx</span>
+                                </a>
+                            
+                                <a href="/tags/SOP/">
+                                    <span class="chip bg-color">SOP</span>
+                                </a>
+                            
+                                <a href="/tags/CSFR/">
+                                    <span class="chip bg-color">CSFR</span>
                                 </a>
                             
                         </div>
@@ -1139,7 +1183,7 @@ http://www.domain2.com/b.js        不同域名                         不允�
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1109k</span>&nbsp;字
+                class="white-color">1109.4k</span>&nbsp;字
             
             
             
