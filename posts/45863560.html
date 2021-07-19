@@ -365,7 +365,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-12-09
+                    2021-07-19
                 </div>
                 
 
@@ -407,41 +407,41 @@
 <ul>
 <li><strong>[1] 问题现象</strong></li>
 </ul>
-<p>今天发现 <code>CI</code> 监控发生告警，显示有一个服务的 <code>runtime</code> 镜像打包失败了。通过查看对应 <code>pipeline</code> 的打包日志，并没有发现是因为什么导致的，只是显示没有知道可用的 <code>pip3</code> 命令。随即，自己手动启动了一个 <code>ubuntu:18.04</code> 的基础镜像做测试，发现根据对应的 <code>Dockerfile</code> 执行下来，完全是没有问题的。这就很奇怪了？</p>
+<p>今天发现 <code>CI</code> 监控发送了一条告警，显示有一个服务的 <code>runtime</code> 镜像打包失败了。通过查看对应自动化工具 <code>GoCD</code> 的 <code>pipeline</code> 的打包日志，并没有发现是因为什么导致的，只是显示没有可用的 <code>pip3</code> 命令。随即，自己手动启动了一个 <code>ubuntu:18.04</code> 的基础镜像做测试，发现根据对应的 <code>Dockerfile</code> 执行下来，完全是没有问题的。这就很奇怪了？</p>
 <p><img src="../images/shell-pile-command-return-code-3.png" alt="奇怪的Shell管道返回值"></p>
 <ul>
 <li><strong>[2] 问题原因</strong></li>
 </ul>
-<p>后来，在故障的那个 <code>pipeline</code> 对应的服务器上面，手动 <code>build</code> 镜像，发现还是会出现无法找到可用的 <code>pip3</code> 命令的报错。如果找不到 <code>pip3</code> 命令的话，肯定是安装 <code>pip3</code> 的时候发生的错了。随即，看了下对应的 <code>Dockerfile</code> 文件，发现了如下安装步骤。</p>
+<p>后来，在故障的那个 <code>pipeline</code> 对应的服务器上面，手动 <code>build</code> 镜像，发现还是会出现无法找到可用的 <code>pip3</code> 命令的报错。如果找不到 <code>pip3</code> 命令的话，肯定是安装 <code>pip3</code> 的时候发生的错了。随即，看了下对应的 <code>Dockerfile</code> 文件，是如下安装步骤。</p>
 <pre class="line-numbers language-dockerfile"><code class="language-dockerfile">RUN sed -i s/archive.ubuntu.com/mirrors.aliyun.com/g /etc/apt/sources.list && \
     apt update -y && \
     apt update -y && \
         python3.6-dev \
         python3-distutils \
         ......
-    wget -qO - http://site.escapelife.me/python/12345...67 | python3 - && \
+    wget -qO - http://fm.escapelife.site/python/12345...67 | python3 - && \
     pip3 install cython invoke supervisor --upgrade --no-cache-dir && \
     ......<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>测试了下 <code>wget</code> 是否可以成功下载到对应的文件，发现无法解析到对应域名，所以导致并没有下载到想打的东西。又因为后面的管道命令，导致对应的报错并没有显示出来，返回码还是正确的。后面，发现是国内的 <code>DNS</code> 搞事情导致反解析域名到 <code>IP</code> 地址出了问题。将服务器的 <code>DNS</code> 修改之后，再次重跑 <code>CI</code>，即可正常运行了。</p>
+<p>于是，手动测试了下 <code>wget</code> 看是否可以成功下载到对应的文件，发现无法解析到对应域名，导致并没有下载到想要下载的东西。又因为后面的管道命令，导致对应的报错并没有显示出来，返回码还是正确的。后面，发现是国内的 <code>DNS</code> 搞事情导致反解析域名到 <code>IP</code> 地址出了问题。将服务器的 <code>DNS</code> 修改之后，再次重跑 <code>CI</code>，即可正常运行了。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 发现wget命令返回4的错误码</span>
-➜ <span class="token function">wget</span> -qO - http://site.escapelife.me/python/1234567
+➜ <span class="token function">wget</span> -qO - http://fm.escapelife.site/python/1234567
 ➜ <span class="token keyword">echo</span> <span class="token variable">$?</span>
 4
 
 <span class="token comment" spellcheck="true"># 但是加了管道之后错误码没有了</span>
-➜ <span class="token function">wget</span> -qO - http://site.escapelife.me/python/12345<span class="token punctuation">..</span>.67 <span class="token operator">|</span> python3 -
+➜ <span class="token function">wget</span> -qO - http://fm.escapelife.site/python/12345<span class="token punctuation">..</span>.67 <span class="token operator">|</span> python3 -
 ➜ <span class="token keyword">echo</span> <span class="token variable">$?</span>
 0
 
 <span class="token comment" spellcheck="true"># 将wget的参数去掉可以看到解析域名发生错误</span>
-➜ <span class="token function">wget</span> http://site.escapelife.me/python/12345<span class="token punctuation">..</span>.67
---2020-02-24 13:03:23--  http://site.escapelife.me/python/12345<span class="token punctuation">..</span>.67
-Resolving site.escapelife.me <span class="token punctuation">(</span>site.escapelife.me<span class="token punctuation">)</span><span class="token punctuation">..</span>. failed: nodename nor servname provided, or not known.
-wget: unable to resolve host address ‘site.escapelife.me’<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+➜ <span class="token function">wget</span> http://fm.escapelife.site/python/12345<span class="token punctuation">..</span>.67
+--2020-02-24 13:03:23--  http://fm.escapelife.site/python/12345<span class="token punctuation">..</span>.67
+Resolving fm.escapelife.site <span class="token punctuation">(</span>fm.escapelife.site<span class="token punctuation">)</span><span class="token punctuation">..</span>. failed: nodename nor servname provided, or not known.
+wget: unable to resolve host address ‘fm.escapelife.site’<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[3] 解决办法</strong></li>
 </ul>
-<p>上述问题的发生主要是因为国内的 <code>DNS</code> 抽风引起的，解决的方式就是将对应服务器上面的 <code>DNS</code> 统一修改为 <code>8.8.4.4</code> 的国外地址，即可正常使用了。当然，修改 <code>DNS</code> 的方式也是有多种可以选择的。我们知道在 <code>build</code> 镜像的时候，发现并没有 <code>--dns</code> 这样一个参数让我们选择的，那我们该怎么设置 <code>DNS</code> 呢？以下是两种设置方式，生效顺序是 <code>--dns</code> &gt; <code>daemon.json</code> &gt; <code>resolv.conf</code>。</p>
+<p>上述问题的发生主要是因为国内的 <code>DNS</code> 抽风引起的，解决的方式就是将对应服务器上面的 <code>DNS</code> 统一修改为 <code>8.8.4.4</code> 的国外地址，即可正常使用了。当然，修改 <code>DNS</code> 的方式也是有多种可以选择的。我们知道在 <code>build</code> 镜像的时候，发现并没有 <code>--dns</code> 这样一个参数让我们选择的，那我们该怎么设置 <code>DNS</code> 呢？以下是两种设置方式，生效顺序是 <code>--dns &gt; daemon.json &gt; resolv.conf</code>。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># [方式一] 使用本机的DNS</span>
 <span class="token comment" spellcheck="true"># 对于docker来说，它默认是映射主机的DNS地址</span>
 $ <span class="token function">sudo</span> <span class="token function">cat</span> /ect/resolv.conf
@@ -457,7 +457,7 @@ $ <span class="token function">sudo</span> <span class="token function">cat</spa
 
 <span class="token comment" spellcheck="true"># 启动容器的时候指定</span>
 $ docker run -it --rm --dns<span class="token operator">=</span>8.8.4.4 --entrypoint<span class="token operator">=</span>/bin/bash ubuntu:18.04<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>还没完，指的注意的是，为什么管道可以淹没前一个命令的错误码呢？这是一个值得深究的问题。通过 <code>Google</code> 的查找，找到如下链接，就讲述如何获取被管道连接到另一个进程的退出状态。=&gt; <a href="https://unix.stackexchange.com/questions/14270/get-exit-status-of-process-thats-piped-to-another" target="_blank" rel="noopener">Get exit status of process that’s piped to another</a></p>
+<p>还没完，指的注意的是，为什么管道可以淹没前一个命令的错误码呢？这是一个非常值得深究的问题！通过 <code>Google</code> 的查找，找到如下链接，就是讲述如何获取被管道连接到另一个进程的退出状态。=&gt; <a href="https://unix.stackexchange.com/questions/14270/get-exit-status-of-process-thats-piped-to-another" target="_blank" rel="noopener">Get exit status of process that’s piped to another</a></p>
 <p><img src="../images/shell-pile-command-return-code-1.png" alt="奇怪的Shell管道返回值"></p>
 <p>这种情况下，我们知道可以使用 <code>$PIPESTATUS</code> 来获取管道中每个命令的返回码。其中 <code>PIPESTATUS</code> 是一个数组，第一条命令的返回码存储在 <code>${PIPESTATUS[0]}</code>，以此类推。同时需要注意的是，每执行一条命令 <code>PIPESTATUS</code> 数组都会更新其值为上一条命令的返回码。</p>
 <p><img src="../images/shell-pile-command-return-code-2.png" alt="奇怪的Shell管道返回值"></p>
