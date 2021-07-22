@@ -302,7 +302,7 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/images/upgrade-cudnn-version.png')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/connect-to-ssh-with-gg.png')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
@@ -331,6 +331,14 @@
                         
                             <a href="/tags/SSH/">
                                 <span class="chip bg-color">SSH</span>
+                            </a>
+                        
+                            <a href="/tags/Google/">
+                                <span class="chip bg-color">Google</span>
+                            </a>
+                        
+                            <a href="/tags/Authenticator/">
+                                <span class="chip bg-color">Authenticator</span>
                             </a>
                         
                     </div>
@@ -368,14 +376,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    429
+                    706
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    3 分
                 </div>
                 
 
@@ -399,62 +407,107 @@
 <p><strong>cuDNN 是基于 CUDA 的深度学习 GPU 加速库</strong></p>
 </blockquote>
 <p>目前来说，<strong>二次验证</strong>(这里就不做过多解释了)是比较常用的安全手段，通过设置二次验证(谷歌或其他工具)，就可以有效的避免账户密码的泄露导致的安全问题。因为，每次登陆前都需要获取一次性验证码，如果没有验证码的话就无法成功登陆。</p>
-<p><img src="../images/upgrade-cudnn-version.png" alt="SSH登录启用二次身份验证"></p>
+<p><img src="../images/connect-to-ssh-with-gg.png" alt="SSH登录启用二次身份验证"></p>
 <hr>
 <ul>
-<li><strong>[] 配置 SSH 服务</strong></li>
+<li><strong>[1] 安装 PAM 模块</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将禁用密码身份验证 - 禁用密码验证</span>
-$ <span class="token function">sudo</span> vim /etc/pam.d/sshd
-<span class="token comment" spellcheck="true"># @include common-auth</span>
-auth required pam_google_authenticator.so nullok<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 修改SSH配置文件</span>
-$ <span class="token function">sudo</span> vim /etc/ssh/sshd_config
-ChallengeResponseAuthentication <span class="token function">yes</span>
-PubkeyAuthentication <span class="token function">yes</span>
-PasswordAuthentication no
-AuthenticationMethods publickey,keyboard-interactive<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 重启SSH服务</span>
-$ <span class="token function">sudo</span> systemctl restart ssh.service<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 时间与客户端进行校验</span>
+$ ntpdate pool.ntp.org<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[]</strong></li>
-</ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<ul>
-<li><strong>[]</strong></li>
-</ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<ul>
-<li><strong>[] 安装 PAM 模块</strong></li>
+<li><strong>[2] 安装 PAM 模块</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Ubuntu</span>
 $ <span class="token function">sudo</span> apt <span class="token function">install</span> -y libpam-google-authenticator
 
 <span class="token comment" spellcheck="true"># CentOS7</span>
-$<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ yum <span class="token function">install</span> -y epel-release
+$ yum <span class="token function">install</span> -y google-authenticator<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[] 生成二次验证代码</strong></li>
+<li><strong>[3] 生成二次验证代码</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 生成验证码</span>
+<span class="token comment" spellcheck="true"># 哪个账号需要动态验证码，请切换到该账号下操作</span>
+
 <span class="token comment" spellcheck="true"># -t: 使用 TOTP 验证</span>
 <span class="token comment" spellcheck="true"># -f: 将配置保存到 ~/.google_authenticator 文件里面</span>
 <span class="token comment" spellcheck="true"># -d: 不允许重复使用以前使用的令牌</span>
 <span class="token comment" spellcheck="true"># -w 3: 使用令牌进行身份验证以进行时钟偏移</span>
 <span class="token comment" spellcheck="true"># -e 10: 生成 10 个紧急备用代码</span>
 <span class="token comment" spellcheck="true"># -r 3 -R 30: 限速 - 每 30 秒允许 3 次登录</span>
-$ google-authenticator -t -f -d -w 3 -e 10 -r 3 -R 30<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ google-authenticator -t -f -d -w 3 -e 10 -r 3 -R 30
+Warning: pasting the following URL into your browser exposes the OTP secret to Google:
+  https://www.google.com/chart?chs<span class="token operator">=</span>200x200<span class="token operator">&amp;</span>chld<span class="token operator">=</span>M<span class="token operator">|</span>0<span class="token operator">&amp;</span>cht<span class="token operator">=</span>qr<span class="token operator">&amp;</span>chl<span class="token operator">=</span>otpauth://totp/vagrant@vagrant%3Fsecret%3DKZ7QPA11115XTQJQGBFWAIUJBY%26issuer%3Dvagrant
+Your new secret key is: KZ7xxx7EI5123xxx123
+Your verification code is 90xx71
+Your emergency scratch codes are:
+  1571xx03
+  9968xx56
+  2319xx89
+  8321xx97
+  9730xx15
+  3424xx23
+  5667xx03
+  9408xx86
+  7502xx41
+  4677xx14<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[] 配置 sudo 二次验证</strong></li>
+<li><strong>[4] 配置 SSH 服务启用两步验证</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 启用两步验证</span>
+$ <span class="token function">sudo</span> vim /etc/pam.d/sshd
+<span class="token comment" spellcheck="true"># @include common-auth  # 将禁用密码身份验证</span>
+auth required pam_google_authenticator.so  <span class="token comment" spellcheck="true"># 禁用密码验证</span>
+
+<span class="token comment" spellcheck="true"># 修改SSH配置文件</span>
+$ <span class="token function">sudo</span> vim /etc/ssh/sshd_config
+Port 1090
+ChallengeResponseAuthentication <span class="token function">yes</span>
+PubkeyAuthentication <span class="token function">yes</span>
+PasswordAuthentication no
+AuthenticationMethods publickey,keyboard-interactive
+
+<span class="token comment" spellcheck="true"># 重启SSH服务</span>
+$ <span class="token function">sudo</span> systemctl restart ssh.service<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] 配置 sudo 二次验证</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 保存并退出</span>
 $ <span class="token function">sudo</span> vim /etc/pam.d/common-auth
-auth required pam_google_authenticator.so nullok<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+auth required pam_google_authenticator.so
+
+<span class="token comment" spellcheck="true"># 重启SSH服务</span>
+$ <span class="token function">sudo</span> systemctl restart ssh.service<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[]</strong></li>
+<li><strong>[6] 手机安装 Google 身份验证器</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash">1. 通过此工具扫描上一步生成的二维码图形，获取动态验证码
+2. 之后，就可以使用手机进行二次认证了，才能登陆服务器了<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[] 从二次验证锁定中恢复</strong></li>
+<li><strong>[7] 使用 fail2ban 去屏蔽多次尝试密码的 IP</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 安装软件</span>
+$ <span class="token function">sudo</span> apt <span class="token function">install</span> -y fail2ban<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 配置文件</span>
+$ vim /etc/fail2ban/jail.local
+<span class="token punctuation">[</span>DEFAULT<span class="token punctuation">]</span>
+ignoreip <span class="token operator">=</span> 127.0.0.1/8
+bantime  <span class="token operator">=</span> 86400
+findtime <span class="token operator">=</span> 600
+maxretry <span class="token operator">=</span> 5
+banaction <span class="token operator">=</span> firewallcmd-ipset
+action <span class="token operator">=</span> %<span class="token punctuation">(</span>action_mwl<span class="token punctuation">)</span>s
+
+<span class="token punctuation">[</span>sshd<span class="token punctuation">]</span>
+enabled <span class="token operator">=</span> <span class="token boolean">true</span>
+filter  <span class="token operator">=</span> sshd
+port    <span class="token operator">=</span> 1090
+action <span class="token operator">=</span> %<span class="token punctuation">(</span>action_mwl<span class="token punctuation">)</span>s
+logpath <span class="token operator">=</span> /var/log/secure<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 重启服务</span>
+$ systemctl restart fail2ban<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[8] 从二次验证锁定中恢复</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 禁用特定用户的二步验证(无法访问身份验证器应用程序)</span>
 $ <span class="token function">sudo</span> vim /etc/ssh/sshd_config
@@ -547,6 +600,14 @@ $ <span class="token function">sudo</span> systemctl restart ssh.service<span ar
                             
                                 <a href="/tags/SSH/">
                                     <span class="chip bg-color">SSH</span>
+                                </a>
+                            
+                                <a href="/tags/Google/">
+                                    <span class="chip bg-color">Google</span>
+                                </a>
+                            
+                                <a href="/tags/Authenticator/">
+                                    <span class="chip bg-color">Authenticator</span>
                                 </a>
                             
                         </div>
@@ -911,7 +972,7 @@ $ <span class="token function">sudo</span> systemctl restart ssh.service<span ar
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1112.3k</span>&nbsp;字
+                class="white-color">1112.6k</span>&nbsp;字
             
             
             
