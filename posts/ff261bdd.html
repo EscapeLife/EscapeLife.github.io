@@ -365,14 +365,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-07-20
+                    2021-07-22
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    732
+                    796
                 </div>
                 
 
@@ -405,7 +405,8 @@
 <ul>
 <li>打包镜像完成之后，启动服务的时候，发现容器里面的服务无法正常启动。随即，手动执行了下，发现如下报错信息：</li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash">root@42ebf5we93bd: /opt/app<span class="token comment" spellcheck="true"># python3 -m run_web</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 运行程序</span>
+root@42ebf5we93bd: /opt/app<span class="token comment" spellcheck="true"># python3 -m run_web</span>
 Traceback <span class="token punctuation">(</span>most recent call last<span class="token punctuation">)</span>:
     File <span class="token string">"/usr/bin/python3.6/runpy.py"</span>, line 193, <span class="token keyword">in</span> _run_module_as_main
         <span class="token string">"__main__"</span>, mod_spec<span class="token punctuation">)</span>
@@ -417,7 +418,7 @@ Traceback <span class="token punctuation">(</span>most recent call last<span cla
         from app <span class="token function">import</span> config
     File <span class="token string">"/opt/app/config.py"</span>, line 8, <span class="token keyword">in</span> <span class="token operator">&lt;</span>module<span class="token operator">></span>
         from app.common.crypto_util <span class="token function">import</span> xxx_encrypt
-ImportError: cannot <span class="token function">import</span> name <span class="token string">'xxx_encrypt'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+ImportError: cannot <span class="token function">import</span> name <span class="token string">'xxx_encrypt'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>通过查看 <code>Python</code> 的堆栈信息，可以判断出，是因为循环引入导致的。<ul>
 <li><code>A</code> 模块 -&gt; <code>B</code> 模块</li>
@@ -448,7 +449,8 @@ ImportError: cannot <span class="token function">import</span> name <span class=
 <ul>
 <li>然后，你在运行的时候，就会出现以下的错误信息。这就和我们上述遇到的问题是一样的，这就是循环引用导致的，上述代码可以帮助我们很好的理解这个问题。</li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash">$ python3 module_a.py
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 循环引用</span>
+$ python3 module_a.py
 Traceback <span class="token punctuation">(</span>most recent call last<span class="token punctuation">)</span>:
   File <span class="token string">"module_a.py"</span>, line 1, <span class="token keyword">in</span> <span class="token operator">&lt;</span>module<span class="token operator">></span>
     from module_b <span class="token function">import</span> fun_b
@@ -456,7 +458,7 @@ Traceback <span class="token punctuation">(</span>most recent call last<span cla
     from module_a <span class="token function">import</span> fun_c
   File <span class="token string">"/Users/escape/Fuckcode/escape/Scripts/module_a.py"</span>, line 1, <span class="token keyword">in</span> <span class="token operator">&lt;</span>module<span class="token operator">></span>
     from module_b <span class="token function">import</span> fun_b
-ImportError: cannot <span class="token function">import</span> name <span class="token string">'fun_b'</span> from partially initialized module <span class="token string">'module_b'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+ImportError: cannot <span class="token function">import</span> name <span class="token string">'fun_b'</span> from partially initialized module <span class="token string">'module_b'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <blockquote>
 <p><strong>解决：如何避免在写代码的时候，出现循环引入的问题！</strong></p>
@@ -498,7 +500,9 @@ ImportError: cannot <span class="token function">import</span> name <span class=
 </ul>
 </li>
 </ul>
-<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">fun_a</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># module_a</span>
+
+<span class="token keyword">def</span> <span class="token function">fun_a</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'-> fun_a'</span><span class="token punctuation">)</span>
     <span class="token keyword">from</span> module_b <span class="token keyword">import</span> fun_b
     fun_b<span class="token punctuation">(</span><span class="token punctuation">)</span>
@@ -507,7 +511,7 @@ ImportError: cannot <span class="token function">import</span> name <span class=
     <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'-> fun_c'</span><span class="token punctuation">)</span>
 
 <span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
-    fun_a<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    fun_a<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法三]</strong> 重新设计代码结构 - 将代码和并或者分离<ul>
 <li><code>.py</code></li>
@@ -516,7 +520,7 @@ ImportError: cannot <span class="token function">import</span> name <span class=
 </ul>
 </li>
 </ul>
-<p>首先，出现这种问题是因为没有规划好层级，哪些模块和哪些模块逻辑上应该在一起，哪些模块是公共的依赖项，哪些是实际的业务代码。循环引用是小问题，代码以后难维护、理不清实现的逻辑才是大问题。治本的还是要重新划分模块，逻辑理顺了就不会出现循环 <code>import</code> 的问题。</p>
+<p>首先，出现这种问题是因为没有规划好层级，哪些模块和哪些模块逻辑上应该在一起，哪些模块是公共的依赖项，哪些是实际的业务代码。其次，就是需要注意对应的 <code>Python</code> 代码是否需要编写成为加密的 <code>pyc</code> 或者 <code>so</code> 文件，如果需要的话，就需要选择合适的处理方法，进行解决。最好，循环引用是小问题，代码以后难维护、理不清实现的逻辑才是大问题。治本的还是要重新划分模块，逻辑理顺了就不会出现循环 <code>import</code> 的问题。</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -977,7 +981,7 @@ ImportError: cannot <span class="token function">import</span> name <span class=
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1111.8k</span>&nbsp;字
+                class="white-color">1112.3k</span>&nbsp;字
             
             
             

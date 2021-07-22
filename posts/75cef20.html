@@ -4,7 +4,7 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
-    <meta name="keywords" content="Shell使用命令汇总, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
+    <meta name="keywords" content="SSH登录启用二次身份验证, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Shell使用命令汇总 | Escape</title>
+    <title>SSH登录启用二次身份验证 | Escape</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -302,12 +302,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/images/shell-uses-command-summary.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/images/upgrade-cudnn-version.png')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Shell使用命令汇总</h1>
+                    <h1 class="description center-align post-title">SSH登录启用二次身份验证</h1>
                 </div>
             </div>
         </div>
@@ -329,8 +329,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/Shell/">
-                                <span class="chip bg-color">Shell</span>
+                            <a href="/tags/SSH/">
+                                <span class="chip bg-color">SSH</span>
                             </a>
                         
                     </div>
@@ -341,8 +341,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Shell脚本攻略/" class="post-category">
-                                Shell脚本攻略
+                            <a href="/categories/Linux运维之路/" class="post-category">
+                                Linux运维之路
                             </a>
                         
                     </div>
@@ -354,21 +354,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2018-11-12
+                    2021-07-14
                 </div>
                 
 
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-12-14
+                    2021-07-22
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    202
+                    429
                 </div>
                 
 
@@ -396,34 +396,73 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <blockquote>
-<p><strong>本文主要汇总日常使用当中，常用的命令组合方式，来提高查询和系统管理能力！</strong></p>
+<p><strong>cuDNN 是基于 CUDA 的深度学习 GPU 加速库</strong></p>
 </blockquote>
-<p><img src="../images/shell-uses-command-summary.jpg" alt="Shell使用命令汇总"></p>
+<p>目前来说，<strong>二次验证</strong>(这里就不做过多解释了)是比较常用的安全手段，通过设置二次验证(谷歌或其他工具)，就可以有效的避免账户密码的泄露导致的安全问题。因为，每次登陆前都需要获取一次性验证码，如果没有验证码的话就无法成功登陆。</p>
+<p><img src="../images/upgrade-cudnn-version.png" alt="SSH登录启用二次身份验证"></p>
 <hr>
 <ul>
-<li><strong>获取本机 IP 地址</strong></li>
+<li><strong>[] 配置 SSH 服务</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">ifconfig</span> eth0 <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">"inet addr"</span> <span class="token operator">|</span> <span class="token function">awk</span> -F: <span class="token string">'{print <span class="token variable">$2</span>}'</span> <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$1</span>}'</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将禁用密码身份验证 - 禁用密码验证</span>
+$ <span class="token function">sudo</span> vim /etc/pam.d/sshd
+<span class="token comment" spellcheck="true"># @include common-auth</span>
+auth required pam_google_authenticator.so nullok<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 修改SSH配置文件</span>
+$ <span class="token function">sudo</span> vim /etc/ssh/sshd_config
+ChallengeResponseAuthentication <span class="token function">yes</span>
+PubkeyAuthentication <span class="token function">yes</span>
+PasswordAuthentication no
+AuthenticationMethods publickey,keyboard-interactive<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 重启SSH服务</span>
+$ <span class="token function">sudo</span> systemctl restart ssh.service<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>查看内存占用最多</strong></li>
+<li><strong>[]</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">ps</span> -aux <span class="token operator">|</span> <span class="token function">sort</span> -k4nr <span class="token operator">|</span> <span class="token function">head</span> -5<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <ul>
-<li><strong>查使用 CPU 最多的进程</strong></li>
+<li><strong>[]</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">ps</span> -aux <span class="token operator">|</span> <span class="token function">sort</span> -k3nr <span class="token operator">|</span> <span class="token function">head</span> -5<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <ul>
-<li><strong>查看 TCP 连接状态</strong></li>
+<li><strong>[] 安装 PAM 模块</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">netstat</span> -n <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'/^tcp/ {++S[<span class="token variable">$NF</span>]} END {for(a in S) print a, S[a]}'</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Ubuntu</span>
+$ <span class="token function">sudo</span> apt <span class="token function">install</span> -y libpam-google-authenticator
+
+<span class="token comment" spellcheck="true"># CentOS7</span>
+$<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>找查较多的 SYN 连接</strong></li>
+<li><strong>[] 生成二次验证代码</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">netstat</span> -an <span class="token operator">|</span> <span class="token function">grep</span> SYN <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$5</span>}'</span> <span class="token operator">|</span> <span class="token function">awk</span> -F: <span class="token string">'{print <span class="token variable">$1</span>}'</span> <span class="token operator">|</span> <span class="token function">sort</span> <span class="token operator">|</span> <span class="token function">uniq</span> -c <span class="token operator">|</span><span class="token function">sort</span> -nr <span class="token operator">|</span> <span class="token function">more</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 生成验证码</span>
+<span class="token comment" spellcheck="true"># -t: 使用 TOTP 验证</span>
+<span class="token comment" spellcheck="true"># -f: 将配置保存到 ~/.google_authenticator 文件里面</span>
+<span class="token comment" spellcheck="true"># -d: 不允许重复使用以前使用的令牌</span>
+<span class="token comment" spellcheck="true"># -w 3: 使用令牌进行身份验证以进行时钟偏移</span>
+<span class="token comment" spellcheck="true"># -e 10: 生成 10 个紧急备用代码</span>
+<span class="token comment" spellcheck="true"># -r 3 -R 30: 限速 - 每 30 秒允许 3 次登录</span>
+$ google-authenticator -t -f -d -w 3 -e 10 -r 3 -R 30<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>查找较多 time_wait 连接</strong></li>
+<li><strong>[] 配置 sudo 二次验证</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">netstat</span> -n <span class="token operator">|</span> <span class="token function">grep</span> TIME_WAIT <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$5</span>}'</span> <span class="token operator">|</span> <span class="token function">sort</span> <span class="token operator">|</span> <span class="token function">uniq</span> -c <span class="token operator">|</span> <span class="token function">sort</span> -rn <span class="token operator">|</span> <span class="token function">head</span> -n 20<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 保存并退出</span>
+$ <span class="token function">sudo</span> vim /etc/pam.d/common-auth
+auth required pam_google_authenticator.so nullok<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[]</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ul>
+<li><strong>[] 从二次验证锁定中恢复</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 禁用特定用户的二步验证(无法访问身份验证器应用程序)</span>
+$ <span class="token function">sudo</span> vim /etc/ssh/sshd_config
+AuthenticationMethods publickey,keyboard-interactive
+AuthenticationMethods publickey
+
+<span class="token comment" spellcheck="true"># 重启SSH服务</span>
+$ <span class="token function">sudo</span> systemctl restart ssh.service<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -468,7 +507,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://escapelife.github.io/posts/b79ad15.html">https://escapelife.github.io/posts/b79ad15.html</a>
+                    <a href="https://escapelife.github.io/posts/75cef20.html">https://escapelife.github.io/posts/75cef20.html</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -506,8 +545,8 @@
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/Shell/">
-                                    <span class="chip bg-color">Shell</span>
+                                <a href="/tags/SSH/">
+                                    <span class="chip bg-color">SSH</span>
                                 </a>
                             
                         </div>
@@ -681,12 +720,12 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/posts/e8431cda.html">
+                <a href="/posts/6cc0b7a.html">
                     <div class="card-image">
                         
-                        <img src="/images/linux-learn-bash.png" class="responsive-img" alt="Shell脚本攻略之小试牛刀">
+                        <img src="/images/2021_journal_07_month.jpg" class="responsive-img" alt="2021年第三季度总结">
                         
-                        <span class="card-title">Shell脚本攻略之小试牛刀</span>
+                        <span class="card-title">2021年第三季度总结</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -697,14 +736,14 @@
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2018-11-17
+                            <i class="far fa-clock fa-fw icon-date"></i>2021-09-30
                         </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Shell脚本攻略/" class="post-category">
-                                    Shell脚本攻略
+                            <a href="/categories/Cycle月度总结/" class="post-category">
+                                    Cycle月度总结
                                 </a>
                             
                             
@@ -714,8 +753,8 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Shell/">
-                        <span class="chip bg-color">Shell</span>
+                    <a href="/tags/Journal/">
+                        <span class="chip bg-color">Journal</span>
                     </a>
                     
                 </div>
@@ -729,12 +768,12 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/posts/29dc6fe8.html">
+                <a href="/posts/fa8d7cc4.html">
                     <div class="card-image">
                         
-                        <img src="/images/docker-user-commands.png" class="responsive-img" alt="Docker常用命令">
+                        <img src="/images/2021_journal_04_month.jpg" class="responsive-img" alt="2021年第二季度总结">
                         
-                        <span class="card-title">Docker常用命令</span>
+                        <span class="card-title">2021年第二季度总结</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -745,14 +784,14 @@
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2018-11-11
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-06-30
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Docker学习攻略/" class="post-category">
-                                    Docker学习攻略
+                            <a href="/categories/Cycle月度总结/" class="post-category">
+                                    Cycle月度总结
                                 </a>
                             
                             
@@ -762,8 +801,8 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Docker/">
-                        <span class="chip bg-color">Docker</span>
+                    <a href="/tags/Journal/">
+                        <span class="chip bg-color">Journal</span>
                     </a>
                     
                 </div>
@@ -872,7 +911,7 @@
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1111.8k</span>&nbsp;字
+                class="white-color">1112.3k</span>&nbsp;字
             
             
             
