@@ -470,14 +470,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    3.9k
+                    4.4k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    16 分
+                    18 分
                 </div>
                 
 
@@ -743,6 +743,7 @@ $ <span class="token function">sudo</span> <span class="token function">apt-get<
 <span class="token comment" spellcheck="true"># CentOS</span>
 $ <span class="token function">sudo</span> yum <span class="token function">install</span> goaccess<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><img src="../images/linux-goaccess-tool-1.jpg" alt="GoAccess-Web日志分析工具"></p>
+<hr>
 <h2 id="3-容器部署"><a href="#3-容器部署" class="headerlink" title="3. 容器部署"></a>3. 容器部署</h2><blockquote>
 <p><strong>一种更加快速、高效、便捷的部署方式 =&gt; <a href="https://hub.docker.com/r/allinurl/goaccess" target="_blank" rel="noopener">参考链接</a></strong></p>
 </blockquote>
@@ -773,6 +774,199 @@ $ <span class="token function">cat</span> access.log <span class="token operator
 
 <span class="token comment" spellcheck="true"># 修改了配置文件只需重启容器即可</span>
 $ docker restart goaccess<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 自定义日志格式</strong><ul>
+<li>网上大部分说的都是使用 <code>GoAccess</code> 解析固定的 <code>nginx-log_format</code> 格式</li>
+<li>但是日常工作中，我们常常会自定义一些特殊的日志格式，这时就需要自定义日志格式了</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 自定义日志格式</span>
+log_format  main  <span class="token string">'<span class="token variable">$remote_addr</span> - <span class="token variable">$remote_user</span> [<span class="token variable">$time_local</span>] "<span class="token variable">$request</span>" '</span>
+                  <span class="token string">'<span class="token variable">$status</span> <span class="token variable">$body_bytes_sent</span> "<span class="token variable">$http_referer</span>" '</span>
+                  <span class="token string">'"<span class="token variable">$http_user_agent</span>" "<span class="token variable">$http_x_forwarded_for</span>" <span class="token variable">$upstream_addr</span> <span class="token variable">$request_time</span>'</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true"># 解析后的日志格式 - goaccess.conf</span>
+time-format  %T
+date-format  %d/%b/%Y
+log-format   %h - %^ <span class="token punctuation">[</span>%d:%t %^<span class="token punctuation">]</span> <span class="token string">"%r"</span> %s %b <span class="token string">"%R"</span> - %^<span class="token string">"%u"</span> - %^ %T
+
+<span class="token comment" spellcheck="true"># 解析生成报告</span>
+goaccess -a -c -d -f /xxx/access.log -p /xxx/goaccess.conf <span class="token operator">></span> report.html
+
+<span class="token comment" spellcheck="true"># 解析生成报告</span>
+<span class="token function">cat</span> access.log <span class="token operator">|</span> docker run --rm -i \
+    -e LANG<span class="token operator">=</span><span class="token variable">$LANG</span> allinurl/goaccess -a -o html \
+    --date-format<span class="token operator">=</span>%d/%b/%Y --time-format<span class="token operator">=</span>%H:%M:%S \
+    --log-format<span class="token operator">=</span><span class="token string">'%h - %^ [%d:%t %^] "%r" %s %b %^ %T %^ "%R" "%u"'</span> \
+    - <span class="token operator">></span> report.html<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] 日志格式定义</strong><ul>
+<li>原始的 <code>log_format</code> 配置的字符中有一个空格，解析后的 <code>log_format</code> 就必须有一个空格</li>
+</ul>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>日志格式</th>
+<th>对应含义</th>
+<th>字段是否必须</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><code>%x</code></td>
+<td>匹配 time-format 和 date-format 变量的日期和时间字段</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>%t</code> - <code>$time_local</code></td>
+<td>匹配 time-format 变量的时间字段</td>
+<td>-</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>%d</code> - <code>$time_local</code></td>
+<td>匹配 date-format 变量的日期字段</td>
+<td>必须存在</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>%v</code> - <code>$http_host</code></td>
+<td>根据 canonical 名称设定的服务器名称</td>
+<td>-</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>%e</code></td>
+<td>请求文档时由 HTTP 验证决定的用户 ID</td>
+<td>-</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>%C</code></td>
+<td>服务器所服务对象的缓存状态</td>
+<td>-</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>%h</code></td>
+<td>主机(客户端 IP 地址，IPv4 或者 IPv6)</td>
+<td>必须存在</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>%r</code> - <code>$request</code></td>
+<td>客户端请求的 URL 地址；获取完整的请求</td>
+<td>必须存在</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>%m</code></td>
+<td>请求的方法</td>
+<td>-</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>%U</code></td>
+<td>请求的 URL</td>
+<td>-</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>%q</code></td>
+<td>查询字符串</td>
+<td>-</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>%H</code> - <code>$remote_addr</code></td>
+<td>请求协议</td>
+<td>-</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>%s</code> - <code>$status</code></td>
+<td>服务器回传客户端的状态码</td>
+<td>-</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>%b</code> - <code>$body_bytes_sent</code></td>
+<td>回传客户端的对象的大小</td>
+<td>-</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>%R</code> - <code>$http_referer</code></td>
+<td>HTTP 请求的 “Referer” 值</td>
+<td>-</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>%u</code> - <code>$http_user_agent</code></td>
+<td>HTTP 请求的 “UserAgent” 值</td>
+<td>-</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>%K</code></td>
+<td>选择的 TLS 加密设置</td>
+<td>-</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>%k</code></td>
+<td>选择的 TLS 加密设置</td>
+<td>-</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>%M</code></td>
+<td>所请求资源的 MIME 类型</td>
+<td>-</td>
+</tr>
+<tr>
+<td>20</td>
+<td><code>%D</code></td>
+<td>处理请求的时间消耗；使用微秒计算</td>
+<td>-</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>%T</code> - <code>$request_time</code></td>
+<td>处理请求的时间消耗；使用带秒和毫秒计算</td>
+<td>-</td>
+</tr>
+<tr>
+<td>22</td>
+<td><code>%L</code></td>
+<td>处理请求的时间消耗；使用十进制数表示的毫秒计算</td>
+<td>-</td>
+</tr>
+<tr>
+<td>23</td>
+<td><code>%^</code></td>
+<td>忽略此字段</td>
+<td>-</td>
+</tr>
+<tr>
+<td>24</td>
+<td><code>%~</code></td>
+<td>继续解析日志字符串直到找到一个非空字符</td>
+<td>-</td>
+</tr>
+<tr>
+<td>25</td>
+<td><code>~h</code></td>
+<td>在 X-Forwarded-For 字段中的主机</td>
+<td>-</td>
+</tr>
+</tbody></table>
+<hr>
 <h2 id="4-使用方式"><a href="#4-使用方式" class="headerlink" title="4. 使用方式"></a>4. 使用方式</h2><blockquote>
 <p><strong><a href="https://goaccess.io/" target="_blank" rel="noopener">https://goaccess.io/</a></strong></p>
 </blockquote>
@@ -837,7 +1031,7 @@ time-format %H:%M:%S
 date-format %d/%b/%Y
 log-format %h %^<span class="token punctuation">[</span>%d:%t %^<span class="token punctuation">]</span> <span class="token string">"%r"</span> %s %b <span class="token string">"%R"</span> <span class="token string">"%u"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash">%%    一个文字的 %
-%a    当前locale 的星期名缩写<span class="token punctuation">(</span>例如： 日，代表星期日<span class="token punctuation">)</span>
+%a    当前locale 的星期名缩写<span class="token punctuation">(</span>例如：日，代表星期日<span class="token punctuation">)</span>
 %A    当前locale 的星期名全称 <span class="token punctuation">(</span>如：星期日<span class="token punctuation">)</span>
 %b    当前locale 的月名缩写 <span class="token punctuation">(</span>如：一，代表一月<span class="token punctuation">)</span>
 %B    当前locale 的月名全称 <span class="token punctuation">(</span>如：一月<span class="token punctuation">)</span>
@@ -1533,7 +1727,7 @@ $ goaccess --load-from-disk --keep-db-files<span aria-hidden="true" class="line-
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1117.7k</span>&nbsp;字
+                class="white-color">1118.2k</span>&nbsp;字
             
             
             
