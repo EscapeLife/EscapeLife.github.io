@@ -459,21 +459,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-07-09
+                    2021-08-12
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    8k
+                    8.1k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    32 分
+                    33 分
                 </div>
                 
 
@@ -854,12 +854,22 @@ $ docker run -d -p 80:80 --network<span class="token operator">=</span>host <spa
 $ inv app.user_op --name<span class="token operator">=</span>zhangsan
 Bus error <span class="token punctuation">(</span>core dumped<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[解决方法]</strong> 原因是在 <code>docker</code> 运行的时候，<code>shm</code> 分区设置太小导致 <code>share memory</code> 不够。不设置 <code>–shm-size</code> 参数时，<code>docker</code> 给容器默认分配的 <code>shm</code> 大小为 <code>64M</code>，导致程序启动时不足。</li>
+<li><strong>[解决方法]</strong> 原因是在 <code>docker</code> 运行的时候，<code>shm</code> 分区设置太小导致 <code>share memory</code> 不够。不设置 <code>--shm-size</code> 参数时，<code>docker</code> 给容器默认分配的 <code>shm</code> 大小为 <code>64M</code>，导致程序启动时不足。具体原因还是因为安装 <code>pytorch</code> 包导致了，多进程跑任务的时候，<code>docker</code> 容器分配的共享内存太小，导致 <code>torch</code> 要在 <code>tmpfs</code> 上面放模型数据用于子线程的 <a href="https://github.com/pytorch/pytorch/issues/2244" target="_blank" rel="noopener">共享不足</a>，就出现报错了。</li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 启动docker的时候加上--shm-size参数(单位为b,k,m或g)</span>
-$ docker run -it --rm --shm-size<span class="token operator">=</span>200m pytorch/pytorch:latest<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 问题原因</span>
+root@18<span class="token punctuation">..</span>.35:/opt/app<span class="token comment" spellcheck="true"># df -TH</span>
+Filesystem     Type     Size  Used Avail Use% Mounted on
+overlay        overlay  2.0T  221G  1.4T   3% /
+tmpfs          tmpfs     68M     0   68M   0% /dev
+shm            tmpfs     68M   41k   68M   1% /dev/shm
+
+<span class="token comment" spellcheck="true"># 启动docker的时候加上--shm-size参数(单位为b,k,m或g)</span>
+$ docker run -it --rm --shm-size<span class="token operator">=</span>200m pytorch/pytorch:latest
+
+<span class="token comment" spellcheck="true"># 在docker-compose添加对应配置</span>
+$ shm_size: <span class="token string">'2gb'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[解决方法]</strong> 还有一种情况就是容器内的磁盘空间不足，也会导致 <code>bus error</code> 的报错，所以清除多余文件或者目录，就可以解决了。</li>
+<li><strong>[解决方法]</strong> 还有一种情况就是容器内的磁盘空间不足，也会导致 <code>bus error</code> 这样的报错，所以如果出现了，清除多余文件和目录或者分配一个大的磁盘空间，就可以解决了。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 磁盘空间不足</span>
 $ <span class="token function">df</span> -Th
@@ -1763,7 +1773,7 @@ $ <span class="token function">sudo</span> systemctl disable firewalld.service<s
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1119.8k</span>&nbsp;字
+                class="white-color">1119.9k</span>&nbsp;字
             
             
             
