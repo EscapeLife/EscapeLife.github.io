@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 
 
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
     <meta charset="utf-8">
     <meta name="keywords" content="Linux安全之iptables自定义链, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
@@ -29,6 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
+<meta name="generator" content="Hexo 5.4.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -345,7 +348,7 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Linux入门基础/" class="post-category">
+                            <a href="/categories/Linux%E5%85%A5%E9%97%A8%E5%9F%BA%E7%A1%80/" class="post-category">
                                 Linux入门基础
                             </a>
                         
@@ -436,7 +439,8 @@ $ <span class="token function">sudo</span> iptables -t filter -N IN_WEB
 $ <span class="token function">sudo</span> iptables -t filter -nvL
 Chain IN_WEB <span class="token punctuation">(</span>0 references<span class="token punctuation">)</span>
 pkts    bytes    target    prot    opt    <span class="token keyword">in</span>    out    <span class="token function">source</span>    destination
-<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>自定义链创建完成后，查看 <code>filter</code> 表中的链。发现自定义链已经被创建，而且这条自定义链的引用计数为 <code>0</code> (<code>0 references</code>)，也就是说，这条自定义链还没有被任何默认链所引用。所以，即使 <code>IN_WEB</code> 中配置了规则，也不会生效。</p>
 <p>自定义链已经创建完毕，现在我们就可以直接在自定义链中配置规则了。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 对自定义链的操作与对默认链的操作基本一致</span>
@@ -449,12 +453,14 @@ Chain IN_WEB <span class="token punctuation">(</span>0 references<span class="to
 pkts bytes target    prot opt <span class="token keyword">in</span>    out    <span class="token function">source</span>              destination
     0    0 REJECT    all  --  *      *      192.168.31.140      0.0.0.0/0          reject-with icmp-port-unreachable
     0    0 REJECT    all  --  *      *      192.168.31.139      0.0.0.0/0          reject-with icmp-port-unreachable
-<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>自定义链中已经有了一些规则，但是现在这些规则无法匹配到任何报文，因为我们并没有在任何默认链中引用它。既然 <code>IN_WEB</code> 链是为了针对 <code>Web</code> 服务的入站规则而创建的，那么这些规则应该去匹配入站的报文，所以我们应该用 <code>INPUT</code> 链去引用它。</p>
 <p>当然，自定义链在哪里创建，应该被哪条默认链引用，取决于实际的工作场景，因为此处示例的规则是匹配入站报文，所以在 <code>INPUT</code> 链中引用自定义链。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 定义引用规则，使用-j指定自定义链</span>
 <span class="token comment" spellcheck="true"># 在INPUT链中添加了一条规则，访问本机80端口的tcp报文将会被这条规则匹配到IN_WEB链</span>
-$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp --dport 80 -j IN_WEB<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp --dport 80 -j IN_WEB
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看定义的引用规则</span>
 $ <span class="token function">sudo</span> iptables -t filter -nvL
 Chain INPUT <span class="token punctuation">(</span>policy ACCEPT 0 packets, 0 bytes<span class="token punctuation">)</span>
@@ -465,7 +471,8 @@ Chain IN_WEB <span class="token punctuation">(</span>1 references<span class="to
 pkts bytes target    prot opt <span class="token keyword">in</span>    out    <span class="token function">source</span>              destination
     0    0 REJECT    all  --  *      *      192.168.31.140      0.0.0.0/0          reject-with icmp-port-unreachable
     0    0 REJECT    all  --  *      *      192.168.31.139      0.0.0.0/0          reject-with icmp-port-unreachable
-<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>我们使用 <code>-j</code> 选项指定动作，而此处，我们将<strong>动作</strong>替换为了<strong>自定义链</strong>。当 <code>-j</code> 对应的值为一个自定义链时，就表示被当前规则匹配到的报文将交由对应的自定义链处理，具体怎样处理取决于自定义链中的规则。</p>
 <p>当 <code>IN_WEB</code> 自定义链被 <code>INPUT</code> 链引用以后，可以发现，<code>IN_WEB</code> 链的引用计数已经变为 <code>1</code>，表示这条自定义链已经被引用了 <code>1</code> 次，自定义链还可以引用其他的自定义链。</p>
 <p>那么此刻，我们在 <code>192.168.31.140</code> 上尝试访问本机的 <code>80</code> 端口，已经被拒绝访问，证明刚才自定义链中的规则已经生效了。</p>
@@ -475,7 +482,8 @@ pkts bytes target    prot opt <span class="token keyword">in</span>    out    <s
 </ul>
 <p>过了一段时间，我们发现 <code>IN_WEB</code> 这个名字不太合适，我们想要将这条自定义链重命名，把名字改成 <code>WEB</code>。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 自定义链重命名</span>
-$ <span class="token function">sudo</span> iptables -t filter -E IN_WEB WEB<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> iptables -t filter -E IN_WEB WEB
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看定义的引用规则</span>
 $ <span class="token function">sudo</span> iptables -t filter -nvL
 Chain INPUT <span class="token punctuation">(</span>policy ACCEPT 0 packets, 0 bytes<span class="token punctuation">)</span>
@@ -485,7 +493,8 @@ pkts bytes target    prot opt <span class="token keyword">in</span>    out    <s
 Chain WEB <span class="token punctuation">(</span>1 references<span class="token punctuation">)</span>
 pkts bytes target    prot opt <span class="token keyword">in</span>    out    <span class="token function">source</span>              destination
     0    0 REJECT    all  --  *      *      192.168.31.140      0.0.0.0/0          reject-with icmp-port-unreachable
-    0    0 REJECT    all  --  *      *      192.168.31.139      0.0.0.0/0          reject-with icmp-port-unreachable<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    0    0 REJECT    all  --  *      *      192.168.31.139      0.0.0.0/0          reject-with icmp-port-unreachable
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <ul>
 <li><strong>【5】用户自定义链删除</strong></li>
@@ -503,7 +512,8 @@ $ <span class="token function">sudo</span> iptables -t filter -D INPUT 1
 $ <span class="token function">sudo</span> iptables -t filter -F WEB
 
 <span class="token comment" spellcheck="true"># (3) 删除自定义链</span>
-$ <span class="token function">sudo</span> iptables -t filter -X WEB<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> iptables -t filter -X WEB
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <ul>
 <li><strong>【6】实战演示</strong></li>
@@ -521,7 +531,8 @@ $ <span class="token function">sudo</span> iptables -A clean_in -d 172.16.255.25
 <span class="token comment" spellcheck="true"># 禁止非法包</span>
 $ <span class="token function">sudo</span> iptables -A clean_in -p tcp <span class="token operator">!</span> --syn -m state --state NEW -j DROP
 $ <span class="token function">sudo</span> iptables -A clean_in -p tcp --tcp-flags ALL ALL -j DROP
-$ <span class="token function">sudo</span> iptables -A clean_in -p tcp --tcp-flags ALL NONE -j DROP<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> iptables -A clean_in -p tcp --tcp-flags ALL NONE -j DROP
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true">#（1）如果是外网访问本地地址172.16.100.7则交给自定义链clean_in处理</span>
 $ <span class="token function">sudo</span> iptables -A INPUT -d 172.16.100.7 -j clean_in
 
@@ -539,26 +550,9 @@ $ <span class="token function">sudo</span> iptables -A INPUT  -i eth0 -p udp --d
 $ <span class="token function">sudo</span> iptables -A INPUT  -i eth0 -m multiport -p tcp --dports 1433,4899 -j DROP
 
 <span class="token comment" spellcheck="true"># icmp速率限制</span>
-$ <span class="token function">sudo</span> iptables -A INPUT  -p icmp -m limit --limit 10/second -j ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
+$ <span class="token function">sudo</span> iptables -A INPUT  -p icmp -m limit --limit 10/second -j ACCEPT
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
                 
             </div>
             <hr/>
@@ -794,6 +788,8 @@ $ <span class="token function">sudo</span> iptables -A INPUT  -p icmp -m limit -
 
     
 
+    
+
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
@@ -823,7 +819,7 @@ $ <span class="token function">sudo</span> iptables -A INPUT  -p icmp -m limit -
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Linux入门基础/" class="post-category">
+                            <a href="/categories/Linux%E5%85%A5%E9%97%A8%E5%9F%BA%E7%A1%80/" class="post-category">
                                     Linux入门基础
                                 </a>
                             
@@ -875,7 +871,7 @@ $ <span class="token function">sudo</span> iptables -A INPUT  -p icmp -m limit -
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Linux入门基础/" class="post-category">
+                            <a href="/categories/Linux%E5%85%A5%E9%97%A8%E5%9F%BA%E7%A1%80/" class="post-category">
                                     Linux入门基础
                                 </a>
                             
@@ -987,7 +983,9 @@ $ <span class="token function">sudo</span> iptables -A INPUT  -p icmp -m limit -
 <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
 
     
-    <div class="container row center-align" style="margin-bottom: 15px !important;">
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
@@ -999,70 +997,82 @@ $ <span class="token function">sudo</span> iptables -A INPUT  -p icmp -m limit -
             |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1121.5k</span>&nbsp;字
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1101.7k</span>
             
             
             
+                
             
             
-            
-            <span id="busuanzi_container_site_pv">
-                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
-                    class="white-color"></span>&nbsp;次
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
             </span>
             
             
-            <span id="busuanzi_container_site_uv">
-                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
-                    class="white-color"></span>&nbsp;人
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
             </span>
             
             <br>
+
+            <!-- 运行天数提醒. -->
             
-            <span id="sitetime">载入运行时间...</span>
-            <script>
-                function siteTime() {
-                    var seconds = 1000;
-                    var minutes = seconds * 60;
-                    var hours = minutes * 60;
-                    var days = hours * 24;
-                    var years = days * 365;
-                    var today = new Date();
-                    var startYear = "2017";
-                    var startMonth = "2";
-                    var startDate = "14";
-                    var startHour = "0";
-                    var startMinute = "0";
-                    var startSecond = "0";
-                    var todayYear = today.getFullYear();
-                    var todayMonth = today.getMonth() + 1;
-                    var todayDate = today.getDate();
-                    var todayHour = today.getHours();
-                    var todayMinute = today.getMinutes();
-                    var todaySecond = today.getSeconds();
-                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
-                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
-                    var diff = t2 - t1;
-                    var diffYears = Math.floor(diff / years);
-                    var diffDays = Math.floor((diff / days) - diffYears * 365);
-                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
-                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
-                        minutes);
-                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
-                        diffMinutes * minutes) / seconds);
-                    if (startYear == todayYear) {
-                        document.getElementById("year").innerHTML = todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
-                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
-                    } else {
-                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
-                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2017";
+                        var startMonth = "2";
+                        var startDate = "14";
+                        var startHour = "0";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
                     }
-                }
-                setInterval(siteTime, 1000);
-            </script>
+
+                    calcSiteTime();
+                </script>
             
             <br>
             

@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 
 
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
     <meta charset="utf-8">
     <meta name="keywords" content="Docker疑难杂症汇总, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
@@ -29,6 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
+<meta name="generator" content="Hexo 5.4.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -439,7 +442,7 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Docker学习攻略/" class="post-category">
+                            <a href="/categories/Docker%E5%AD%A6%E4%B9%A0%E6%94%BB%E7%95%A5/" class="post-category">
                                 Docker学习攻略
                             </a>
                         
@@ -473,7 +476,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    33 分
+                    32 分
                 </div>
                 
 
@@ -505,7 +508,7 @@
 <ul>
 <li><p><strong>[问题起因]</strong> 今天通过监控系统，发现公司其中一台服务器的磁盘快慢，随即上去看了下，发现 <code>/var/lib/docker</code> 这个目录特别大。由上述原因，我们都知道，在 <code>/var/lib/docker</code> 中存储的都是相关于容器的存储，所以也不能随便的将其删除掉。</p>
 </li>
-<li><p>那就准备迁移 <code>docker</code> 的存储目录吧，或者对 <code>/var</code> 设备进行扩容来达到相同的目的。更多关于 <code>dockerd</code> 的详细参数，请点击查看 <a href="https://docs.docker.com/engine/reference/commandline/dockerd/" target="_blank" rel="noopener"><strong>官方文档</strong></a> 地址。</p>
+<li><p>那就准备迁移 <code>docker</code> 的存储目录吧，或者对 <code>/var</code> 设备进行扩容来达到相同的目的。更多关于 <code>dockerd</code> 的详细参数，请点击查看 <a target="_blank" rel="noopener" href="https://docs.docker.com/engine/reference/commandline/dockerd/"><strong>官方文档</strong></a> 地址。</p>
 </li>
 <li><p>但是需要注意的一点就是，尽量不要用软链， 因为一些 <code>docker</code> 容器编排系统不支持这样做，比如我们所熟知的 <code>k8s</code> 就在内。</p>
 </li>
@@ -514,7 +517,8 @@
 ERROR：cannot  create temporary directory<span class="token operator">!</span>
 
 <span class="token comment" spellcheck="true"># 查看系统存储情况</span>
-$ <span class="token function">du</span> -h --max-depth<span class="token operator">=</span>1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">du</span> -h --max-depth<span class="token operator">=</span>1
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法 1] 添加软链接</strong></li>
 </ul>
@@ -528,19 +532,22 @@ $ <span class="token function">sudo</span> <span class="token function">mv</span
 $ <span class="token function">sudo</span> <span class="token function">ln</span> -s /data/docker /var/lib/docker
 
 <span class="token comment" spellcheck="true"># 4.启动docker服务</span>
-$ <span class="token function">sudo</span> systemctl start docker<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> systemctl start docker
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法 2] 改动 docker 配置文件</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 3.改动docker启动配置文件</span>
 $ <span class="token function">sudo</span> vim /lib/systemd/system/docker.service
-ExecStart<span class="token operator">=</span>/usr/bin/dockerd --graph<span class="token operator">=</span>/data/docker/<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+ExecStart<span class="token operator">=</span>/usr/bin/dockerd --graph<span class="token operator">=</span>/data/docker/
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 3.改动docker启动配置文件</span>
 $ <span class="token function">sudo</span> vim /etc/docker/daemon.json
 <span class="token punctuation">{</span>
     <span class="token string">"live-restore"</span><span class="token keyword">:</span> true,
     <span class="token string">"graph"</span><span class="token keyword">:</span> <span class="token punctuation">[</span> <span class="token string">"/data/docker/"</span> <span class="token punctuation">]</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[操作注意事项]</strong> 在迁移 <code>docker</code> 目录的时候注意使用的命令，要么使用 <code>mv</code> 命令直接移动，要么使用 <code>cp</code> 命令复制文件，但是需要注意同时复制文件权限和对应属性，不然在使用的时候可能会存在权限问题。如果容器中，也是使用 <code>root</code> 用户，则不会存在该问题，但是也是需要按照正确的操作来迁移目录。</li>
 </ul>
@@ -548,14 +555,15 @@ $ <span class="token function">sudo</span> vim /etc/docker/daemon.json
 $ <span class="token function">sudo</span> <span class="token function">mv</span> /var/lib/docker /data/docker
 
 <span class="token comment" spellcheck="true"># 使用cp命令</span>
-$ <span class="token function">sudo</span> <span class="token function">cp</span> -arv /data/docker /data2/docker<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> <span class="token function">cp</span> -arv /data/docker /data2/docker
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>下图中，就是因为启动的容器使用的是普通用户运行进程的，且在运行当中需要使用 <code>/tmp</code> 目录，结果提示没有权限。在我们导入容器镜像的时候，其实是会将容器启动时需要的各个目录的权限和属性都赋予了。如果我们直接是 <code>cp</code> 命令单纯复制文件内容的话，就会出现属性不一致的情况，同时还会有一定的安全问题。</li>
 </ul>
 <p><img src="../images/docker-have-some-trouble-3.png" alt="Docker迁移存储目录"></p>
 <hr>
 <h2 id="2-Docker-设备空间不足"><a href="#2-Docker-设备空间不足" class="headerlink" title="2. Docker 设备空间不足"></a>2. Docker 设备空间不足</h2><blockquote>
-<p><a href="https://stackoverflow.com/questions/50140939/increase-docker-container-size-from-default-10gb-on-rhel7/52971594#52971594" target="_blank" rel="noopener"><strong>Increase Docker container size from default 10GB on rhel7.</strong></a></p>
+<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/50140939/increase-docker-container-size-from-default-10gb-on-rhel7/52971594#52971594"><strong>Increase Docker container size from default 10GB on rhel7.</strong></a></p>
 </blockquote>
 <ul>
 <li><strong>[问题起因一]</strong> 容器在导入或者启动的时候，如果提示磁盘空间不足的，那么多半是真的因为物理磁盘空间真的有问题导致的。如下所示，我们可以看到 <code>/</code> 分区确实满了。</li>
@@ -565,7 +573,8 @@ $ <span class="token function">df</span> -Th
 Filesystem    Size    Used    Avail    Use%    Mounted on
 /dev/vda1      40G     40G       0G    100%    /
 tmpfs         7.8G       0     7.8G      0%    /dev/shm
-/dev/vdb1     493G    289G     179G     62%    /mnt<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+/dev/vdb1     493G    289G     179G     62%    /mnt
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>如果发现真的是物理磁盘空间满了的话，就需要查看到底是什么占据了如此大的空间，导致因为容器没有空间无法启动。其中，<code>docker</code> 自带的命令就是一个很好的能够帮助我们发现问题的工具。</li>
 </ul>
@@ -585,15 +594,17 @@ Storage Driver: devicemapper
  Data Space Total: 107.4 GB
  Data Space Available: 16.78 MB
  Metadata Space Used: 2.073 MB
- Metadata Space Total: 2.147 GB<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+ Metadata Space Total: 2.147 GB
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[解决方法]</strong>通过查看信息，我们知道正是因为 <code>docker</code> 可用的磁盘空间不足，所以导致启动的时候没有足够的空间进行加载启动镜像。解决的方法也很简单，第一就是清理无效数据文件释放磁盘空间(<strong>清除日志</strong>)，第二就是修改 <code>docker</code> 数据的存放路径(<strong>大分区</strong>)。</li>
+<li>**[解决方法]**通过查看信息，我们知道正是因为 <code>docker</code> 可用的磁盘空间不足，所以导致启动的时候没有足够的空间进行加载启动镜像。解决的方法也很简单，第一就是清理无效数据文件释放磁盘空间(<strong>清除日志</strong>)，第二就是修改 <code>docker</code> 数据的存放路径(<strong>大分区</strong>)。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 显示哪些容器目录具有最大的日志文件</span>
 $ <span class="token function">du</span> -d1 -h /var/lib/docker/containers <span class="token operator">|</span> <span class="token function">sort</span> -h
 
 <span class="token comment" spellcheck="true"># 清除您选择的容器日志文件的内容</span>
-$ <span class="token function">cat</span> /dev/null <span class="token operator">></span> /var/lib/docker/containers/container_id/container_log_name<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">cat</span> /dev/null <span class="token operator">></span> /var/lib/docker/containers/container_id/container_log_name
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <ul>
 <li><p><strong>[问题起因二]</strong> 显然我遇到的不是上一种情况，而是在启动容器的时候，容器启动之后不久就显示是 <code>unhealthy</code> 的状态，通过如下日志发现，原来是复制配置文件启动的时候，提示磁盘空间不足。</p>
@@ -607,7 +618,8 @@ $ <span class="token function">cat</span> /dev/null <span class="token operator"
 cp: cannot create regular <span class="token function">file</span> <span class="token string">'/etc/supervisor/conf.d/grpc-app-demo.conf'</span><span class="token keyword">:</span> No space left on device
 cp: cannot create regular <span class="token function">file</span> <span class="token string">'/etc/supervisor/conf.d/grpc-app-demo.conf'</span><span class="token keyword">:</span> No space left on device
 cp: cannot create regular <span class="token function">file</span> <span class="token string">'/etc/supervisor/conf.d/grpc-app-demo.conf'</span><span class="token keyword">:</span> No space left on device
-cp: cannot create regular <span class="token function">file</span> <span class="token string">'/etc/supervisor/conf.d/grpc-app-demo.conf'</span><span class="token keyword">:</span> No space left on device<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+cp: cannot create regular <span class="token function">file</span> <span class="token string">'/etc/supervisor/conf.d/grpc-app-demo.conf'</span><span class="token keyword">:</span> No space left on device
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法 1] 改动 docker 启动配置文件</strong></li>
 </ul>
@@ -615,7 +627,8 @@ cp: cannot create regular <span class="token function">file</span> <span class="
 <span class="token punctuation">{</span>
     <span class="token string">"live-restore"</span><span class="token keyword">:</span> true,
     <span class="token string">"storage-opt"</span><span class="token keyword">:</span> <span class="token punctuation">[</span> <span class="token string">"dm.basesize=20G"</span> <span class="token punctuation">]</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法 2] 改动 systemctl 的 docker 启动文件</strong></li>
 </ul>
@@ -637,13 +650,15 @@ ExecStart<span class="token operator">=</span>/usr/bin/dockerd --storage-opt dm.
 $ <span class="token function">sudo</span> systemctl start docker
 
 <span class="token comment" spellcheck="true"># 5.reload daemon</span>
-$ <span class="token function">sudo</span> systemctl daemon-reload<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> systemctl daemon-reload
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <ul>
 <li><strong>[问题起因三]</strong> 还有一种情况也会让容器无法启动，并提示磁盘空间不足，但是使用命令查看发现并不是因为物理磁盘真的不足导致的。而是，因为对于分区的 <code>inode</code> 节点数满了导致的。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息</span>
-No space left on device<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+No space left on device
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法]</strong> 因为 <code>ext3</code> 文件系统使用 <code>inode table</code> 存储 <code>inode</code> 信息，而 <code>xfs</code> 文件系统使用 <code>B+ tree</code> 来进行存储。考虑到性能问题，默认情况下这个 <code>B+ tree</code> 只会使用前 <code>1TB</code> 空间，当这 <code>1TB</code> 空间被写满后，就会导致无法写入 <code>inode</code> 信息，报磁盘空间不足的错误。我们可以在 <code>mount</code> 时，指定 <code>inode64</code> 即可将这个 <code>B+ tree</code> 使用的空间扩展到整个文件系统。</li>
 </ul>
@@ -651,9 +666,10 @@ No space left on device<span aria-hidden="true" class="line-numbers-rows"><span>
 $ <span class="token function">sudo</span> <span class="token function">df</span> -i
 
 <span class="token comment" spellcheck="true"># 尝试重新挂载</span>
-$ <span class="token function">sudo</span> <span class="token function">mount</span> -o remount -o noatime,nodiratime,inode64,nobarrier /dev/vda1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> <span class="token function">mount</span> -o remount -o noatime,nodiratime,inode64,nobarrier /dev/vda1
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><p><strong>[补充知识]</strong> 文件储存在硬盘上，硬盘的最小存储单位叫做<strong>“扇区”(<code>Sector</code>)</strong>。每个扇区储存 <code>512</code> 字节(相当于<code>0.5KB</code>)。操作系统读取硬盘的时候，不会一个个扇区地读取，这样效率太低，而是一次性连续读取多个扇区，即一次性读取一个<strong>“块”(<code>block</code>)</strong>。这种由多个扇区组成的”块”，是文件存取的最小单位。”块”的大小，最常见的是<code>4KB</code>，即连续八个 <code>sector</code> 组成一个 <code>block</code> 块。文件数据都储存在”块”中，那么很显然，我们还必须找到一个地方储存文件的元信息，比如文件的创建者、文件的创建日期、文件的大小等等。这种储存文件元信息的区域就叫做<strong>“索引节点”(<code>inode</code>)</strong>。每一个文件都有对应的 <code>inode</code>，里面包含了除了文件名以外的所有文件信息。</p>
+<li><p><strong>[补充知识]</strong> 文件储存在硬盘上，硬盘的最小存储单位叫做**”扇区”(<code>Sector</code>)<strong>。每个扇区储存 <code>512</code> 字节(相当于<code>0.5KB</code>)。操作系统读取硬盘的时候，不会一个个扇区地读取，这样效率太低，而是一次性连续读取多个扇区，即一次性读取一个</strong>“块”(<code>block</code>)<strong>。这种由多个扇区组成的”块”，是文件存取的最小单位。”块”的大小，最常见的是<code>4KB</code>，即连续八个 <code>sector</code> 组成一个 <code>block</code> 块。文件数据都储存在”块”中，那么很显然，我们还必须找到一个地方储存文件的元信息，比如文件的创建者、文件的创建日期、文件的大小等等。这种储存文件元信息的区域就叫做</strong>“索引节点”(<code>inode</code>)**。每一个文件都有对应的 <code>inode</code>，里面包含了除了文件名以外的所有文件信息。</p>
 </li>
 <li><p><code>inode</code> 也会消耗硬盘空间，所以硬盘格式化的时候，操作系统自动将硬盘分成两个区域。一个是数据区，存放文件数据；另一个是 <code>inode</code> 区(<code>inode table</code>)，存放 <code>inode</code> 所包含的信息。每个 <code>inode</code> 节点的大小，一般是 <code>128</code> 字节或 <code>256</code> 字节。<code>inode</code> 节点的总数，在格式化时就给定，一般是每<code>1KB</code>或每<code>2KB</code>就设置一个 <code>inode</code> 节点。</p>
 </li>
@@ -675,7 +691,8 @@ Filesystem                 Inodes   IUsed     IFree IUse% Mounted on
 udev                     16478355     801  16477554    1% /dev
 tmpfs                    16487639    2521  16485118    1% /run
 /dev/sdc2               244162560 4788436 239374124    2% /
-tmpfs                    16487639       5  16487634    1% /dev/shm<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+tmpfs                    16487639       5  16487634    1% /dev/shm
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="3-Docker-缺共享链接库"><a href="#3-Docker-缺共享链接库" class="headerlink" title="3. Docker 缺共享链接库"></a>3. Docker 缺共享链接库</h2><blockquote>
 <p><strong>Docker 命令需要对/tmp 目录下面有访问权限</strong></p>
@@ -685,12 +702,14 @@ tmpfs                    16487639       5  16487634    1% /dev/shm<span aria-hid
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 提示错误信息</span>
 $ docker-compose --version
-error <span class="token keyword">while</span> loading shared libraries: libz.so.1: failed to map segment from shared object: Operation not permitted<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+error <span class="token keyword">while</span> loading shared libraries: libz.so.1: failed to map segment from shared object: Operation not permitted
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法]</strong> 后来发现，是因为系统中 <code>docker</code> 没有对 <code>/tmp</code> 目录的访问权限导致，需要重新将其挂载一次，就可以解决了。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 重新挂载</span>
-$ <span class="token function">sudo</span> <span class="token function">mount</span> /tmp -o remount,exec<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> <span class="token function">mount</span> /tmp -o remount,exec
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="4-Docker-容器文件损坏"><a href="#4-Docker-容器文件损坏" class="headerlink" title="4. Docker 容器文件损坏"></a>4. Docker 容器文件损坏</h2><blockquote>
 <p><strong>对 dockerd 的配置有可能会影响到系统稳定</strong></p>
@@ -699,7 +718,8 @@ $ <span class="token function">sudo</span> <span class="token function">mount</s
 <li><strong>[问题起因]</strong> 容器文件损坏，经常会导致容器无法操作。正常的 <code>docker</code> 命令已经无法操控这台容器了，无法关闭、重启、删除。正巧，前天就需要这个的问题，主要的原因是因为重新对 <code>docker</code> 的默认容器进行了重新的分配限制导致的。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 操作容器遇到类似的错误</span>
-b<span class="token string">'devicemapper: Error running deviceCreate (CreateSnapDeviceRaw) dm_task_run failed'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+b<span class="token string">'devicemapper: Error running deviceCreate (CreateSnapDeviceRaw) dm_task_run failed'</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法]</strong> 可以通过以下操作将容器删除/重建。</li>
 </ul>
@@ -714,7 +734,8 @@ $ <span class="token function">sudo</span> thin_check /var/lib/docker/devicemapp
 $ <span class="token function">sudo</span> thin_check --clear-needs-check-flag /var/lib/docker/devicemapper/devicemapper/metadata
 
 <span class="token comment" spellcheck="true"># 4.重启docker</span>
-$ <span class="token function">sudo</span> systemctl start docker<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> systemctl start docker
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="5-Docker-容器优雅重启"><a href="#5-Docker-容器优雅重启" class="headerlink" title="5. Docker 容器优雅重启"></a>5. Docker 容器优雅重启</h2><blockquote>
 <p><strong>不停止服务器上面运行的容器，重启 dockerd 服务是多么好的一件事</strong></p>
@@ -736,7 +757,8 @@ $ <span class="token function">sudo</span> dockerd --live-restore
 $ <span class="token function">sudo</span> systemctl reload docker
 
 <span class="token comment" spellcheck="true"># 但是对应网络的设置需要restart才能生效</span>
-$ <span class="token function">sudo</span> systemctl restart docker<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> systemctl restart docker
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法]</strong> 可以通过以下操作将容器删除/重建。</li>
 </ul>
@@ -759,7 +781,8 @@ $ <span class="token function">sudo</span> systemctl restart docker<span aria-hi
             <span class="token property">"size"</span><span class="token operator">:</span><span class="token number">24</span>
         <span class="token punctuation">}</span>
     <span class="token punctuation">]</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="6-Docker-容器无法删除"><a href="#6-Docker-容器无法删除" class="headerlink" title="6. Docker 容器无法删除"></a>6. Docker 容器无法删除</h2><blockquote>
 <p><strong>找不到对应容器进程是最吓人的</strong></p>
@@ -769,7 +792,8 @@ $ <span class="token function">sudo</span> systemctl restart docker<span aria-hi
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 删除容器</span>
 $ <span class="token function">sudo</span> docker <span class="token function">rm</span> -f f8e8c3<span class="token punctuation">..</span>
-Error response from daemon: Conflict, cannot remove the default name of the container<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+Error response from daemon: Conflict, cannot remove the default name of the container
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法]</strong> 找到 <code>/var/lib/docker/containers/</code> 下的对应容器的文件夹，将其删除，然后重启一下 <code>dockerd</code> 即可。我们会发现，之前无法删除的容器没有了。</li>
 </ul>
@@ -777,7 +801,8 @@ Error response from daemon: Conflict, cannot remove the default name of the cont
 $ <span class="token function">sudo</span> <span class="token function">rm</span> -rf /var/lib/docker/containers/f8e8c3<span class="token punctuation">..</span>.65720
 
 <span class="token comment" spellcheck="true"># 重启服务</span>
-$ <span class="token function">sudo</span> systemctl restart docker.service<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> systemctl restart docker.service
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="7-Docker-容器中文异常"><a href="#7-Docker-容器中文异常" class="headerlink" title="7. Docker 容器中文异常"></a>7. Docker 容器中文异常</h2><blockquote>
 <p><strong>容器存在问题话，记得优先在官网查询</strong></p>
@@ -789,17 +814,20 @@ $ <span class="token function">sudo</span> systemctl restart docker.service<span
 root@b18f56aa1e15:<span class="token comment" spellcheck="true"># locale -a</span>
 C
 C.UTF-8
-POSIX<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+POSIX
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法]</strong> <code>Docker</code> 部署的 <code>MySQL</code> 系统使用的是 <code>POSIX</code> 字符集。然而 <code>POSIX</code> 字符集是不支持中文的，而 <code>C.UTF-8</code> 是支持中文的只要把系统中的环境 <code>LANG</code> 改为 <code>"C.UTF-8"</code> 格式即可解决问题。同理，在 <code>K8S</code> 进入 <code>pod</code> 不能输入中文也可用此方法解决。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 临时解决</span>
-docker <span class="token function">exec</span> -it some-mysql <span class="token function">env</span> LANG<span class="token operator">=</span>C.UTF-8 /bin/bash<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+docker <span class="token function">exec</span> -it some-mysql <span class="token function">env</span> LANG<span class="token operator">=</span>C.UTF-8 /bin/bash
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 永久解决</span>
 docker run --name some-mysql \
     -e MYSQL_ROOT_PASSWORD<span class="token operator">=</span>my-secret-pw \
     -d mysql:tag --character-set-server<span class="token operator">=</span>utf8mb4 \
-    --collation-server<span class="token operator">=</span>utf8mb4_unicode_ci<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    --collation-server<span class="token operator">=</span>utf8mb4_unicode_ci
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="8-Docker-容器网络互通"><a href="#8-Docker-容器网络互通" class="headerlink" title="8. Docker 容器网络互通"></a>8. Docker 容器网络互通</h2><blockquote>
 <p><strong>了解 Docker 的四种网络模型</strong></p>
@@ -808,14 +836,16 @@ docker run --name some-mysql \
 <li><strong>[问题起因]</strong> 在本机部署 <code>Nginx</code> 容器想代理本机启动的 <code>Python</code> 后端服务程序，但是对代码服务如下的配置，结果访问的时候一直提示 <code>502</code> 错误。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 启动Nginx服务</span>
-$ docker run -d -p 80:80 <span class="token variable">$PWD</span>:/etc/nginx nginx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+$ docker run -d -p 80:80 <span class="token variable">$PWD</span>:/etc/nginx nginx
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
     <span class="token keyword">location</span> <span class="token operator">/</span>api <span class="token punctuation">{</span>
         <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>localhost<span class="token punctuation">:</span><span class="token number">8080</span>
     <span class="token punctuation">}</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><p><strong>[解决方法]</strong> 后面发现是因为 <code>nginx.conf</code> 配置文件中的 <code>localhost</code> 配置的有问题，由于 <code>Nginx</code> 是在容器中运行，所以 <code>localhost</code> 为容器中的 <code>localhost</code>，而非本机的 <code>localhost</code>，所以导致无法访问。</p>
 </li>
@@ -829,20 +859,23 @@ docker0: <span class="token operator">&lt;</span>BROADCAST,MULTICAST,UP,LOWER_UP
     inet 172.17.0.1/16 scope global docker0
        valid_lft forever preferred_lft forever
     inet6 fe80::42:d5ff:fe4c:f21e/64 scope <span class="token function">link</span>
-       valid_lft forever preferred_lft forever<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+       valid_lft forever preferred_lft forever
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
     <span class="token keyword">location</span> <span class="token operator">/</span>api <span class="token punctuation">{</span>
         <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">172.17</span><span class="token punctuation">.</span><span class="token number">0.1</span><span class="token punctuation">:</span><span class="token number">8080</span>
     <span class="token punctuation">}</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>当容器使用 <code>host</code> 网络时，容器与宿主共用网络，这样就能在容器中访问宿主机网络，那么容器的 <code>localhost</code> 就是宿主机的 <code>localhost</code> 了。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 服务的启动方式有所改变(没有映射出来端口)</span>
 <span class="token comment" spellcheck="true"># 因为本身与宿主机共用了网络，宿主机暴露端口等同于容器中暴露端口</span>
-$ docker run -d -p 80:80 --network<span class="token operator">=</span>host <span class="token variable">$PWD</span>:/etc/nginx nginxx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+$ docker run -d -p 80:80 --network<span class="token operator">=</span>host <span class="token variable">$PWD</span>:/etc/nginx nginxx
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="9-Docker-容器总线错误"><a href="#9-Docker-容器总线错误" class="headerlink" title="9. Docker 容器总线错误"></a>9. Docker 容器总线错误</h2><blockquote>
 <p><strong>总线错误看到的时候还是挺吓人了</strong></p>
@@ -852,9 +885,10 @@ $ docker run -d -p 80:80 --network<span class="token operator">=</span>host <spa
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 总线报错</span>
 $ inv app.user_op --name<span class="token operator">=</span>zhangsan
-Bus error <span class="token punctuation">(</span>core dumped<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+Bus error <span class="token punctuation">(</span>core dumped<span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[解决方法]</strong> 原因是在 <code>docker</code> 运行的时候，<code>shm</code> 分区设置太小导致 <code>share memory</code> 不够。不设置 <code>--shm-size</code> 参数时，<code>docker</code> 给容器默认分配的 <code>shm</code> 大小为 <code>64M</code>，导致程序启动时不足。具体原因还是因为安装 <code>pytorch</code> 包导致了，多进程跑任务的时候，<code>docker</code> 容器分配的共享内存太小，导致 <code>torch</code> 要在 <code>tmpfs</code> 上面放模型数据用于子线程的 <a href="https://github.com/pytorch/pytorch/issues/2244" target="_blank" rel="noopener">共享不足</a>，就出现报错了。</li>
+<li><strong>[解决方法]</strong> 原因是在 <code>docker</code> 运行的时候，<code>shm</code> 分区设置太小导致 <code>share memory</code> 不够。不设置 <code>--shm-size</code> 参数时，<code>docker</code> 给容器默认分配的 <code>shm</code> 大小为 <code>64M</code>，导致程序启动时不足。具体原因还是因为安装 <code>pytorch</code> 包导致了，多进程跑任务的时候，<code>docker</code> 容器分配的共享内存太小，导致 <code>torch</code> 要在 <code>tmpfs</code> 上面放模型数据用于子线程的 <a target="_blank" rel="noopener" href="https://github.com/pytorch/pytorch/issues/2244">共享不足</a>，就出现报错了。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 问题原因</span>
 root@18<span class="token punctuation">..</span>.35:/opt/app<span class="token comment" spellcheck="true"># df -TH</span>
@@ -867,7 +901,8 @@ shm            tmpfs     68M   41k   68M   1% /dev/shm
 $ docker run -it --rm --shm-size<span class="token operator">=</span>200m pytorch/pytorch:latest
 
 <span class="token comment" spellcheck="true"># 在docker-compose添加对应配置</span>
-$ shm_size: <span class="token string">'2gb'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ shm_size: <span class="token string">'2gb'</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法]</strong> 还有一种情况就是容器内的磁盘空间不足，也会导致 <code>bus error</code> 这样的报错，所以如果出现了，清除多余文件和目录或者分配一个大的磁盘空间，就可以解决了。</li>
 </ul>
@@ -875,7 +910,8 @@ $ shm_size: <span class="token string">'2gb'</span><span aria-hidden="true" clas
 $ <span class="token function">df</span> -Th
 Filesystem     Type     Size  Used Avail Use% Mounted on
 overlay        overlay    1T    1T    0G 100% /
-shm            tmpfs     64M   24K   64M   1% /dev/shm<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+shm            tmpfs     64M   24K   64M   1% /dev/shm
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="10-Docker-NFS-挂载报错"><a href="#10-Docker-NFS-挂载报错" class="headerlink" title="10. Docker NFS 挂载报错"></a>10. Docker NFS 挂载报错</h2><blockquote>
 <p><strong>总线错误看到的时候还是挺吓人了</strong></p>
@@ -887,21 +923,24 @@ shm            tmpfs     64M   24K   64M   1% /dev/shm<span aria-hidden="true" c
 Traceback <span class="token punctuation">(</span>most recent call last<span class="token punctuation">)</span>:
     <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
     File <span class="token string">"xxx/utils/storage.py"</span>, line 34, <span class="token keyword">in</span> xxx.utils.storage.LocalStorage.read_file
-OSError: <span class="token punctuation">[</span>Errno 9<span class="token punctuation">]</span> Bad <span class="token function">file</span> descriptor<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+OSError: <span class="token punctuation">[</span>Errno 9<span class="token punctuation">]</span> Bad <span class="token function">file</span> descriptor
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 文件加锁代码</span>
 <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
     <span class="token keyword">with</span> open<span class="token punctuation">(</span>self<span class="token punctuation">.</span>mount<span class="token punctuation">(</span>path<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">'rb'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> fileobj<span class="token punctuation">:</span>
         fcntl<span class="token punctuation">.</span>flock<span class="token punctuation">(</span>fileobj<span class="token punctuation">,</span> fcntl<span class="token punctuation">.</span>LOCK_EX<span class="token punctuation">)</span>
         data <span class="token operator">=</span> fileobj<span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span>
     <span class="token keyword">return</span> data
-<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法]</strong> 从下面的信息得知，要在 <code>Linux</code> 中使用 <code>flock()</code> 的话，就需要升级内核版本到 <code>2.6.11+</code> 才行。后来才发现，这实际上是由 <code>RedHat</code> 內核中的一个错误引起的，并在 <code>kernel-3.10.0-693.18.1.el7</code> 版本中得到修复。 所以对于 <code>NFSv3</code> 和 <code>NFSv4</code> 服务而已，就需要升级 <code>Linux</code> 内核版本才能够解决这个问题。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># https://t.codebug.vip/questions-930901.htm</span>
 $ In Linux kernels up to 2.6.11, flock<span class="token punctuation">(</span><span class="token punctuation">)</span> does not lock files over NFS <span class="token punctuation">(</span>i.e.,
 the scope of locks was limited to the local system<span class="token punctuation">)</span>. <span class="token punctuation">[</span><span class="token punctuation">..</span>.<span class="token punctuation">]</span> Since Linux 2.6.12,
-NFS clients support flock<span class="token punctuation">(</span><span class="token punctuation">)</span> locks by emulating them as byte-range locks on the entire file.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+NFS clients support flock<span class="token punctuation">(</span><span class="token punctuation">)</span> locks by emulating them as byte-range locks on the entire file.
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="11-Docker-默认使用网段"><a href="#11-Docker-默认使用网段" class="headerlink" title="11. Docker 默认使用网段"></a>11. Docker 默认使用网段</h2><blockquote>
 <p><strong>启动的容器网络无法相互通信，很是奇怪！</strong></p>
@@ -927,7 +966,8 @@ $ <span class="token function">cat</span> /etc/docker/daemon.json
             <span class="token string">"runtimeArgs"</span><span class="token keyword">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
         <span class="token punctuation">}</span>
     <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="12-Docker-服务启动串台"><a href="#12-Docker-服务启动串台" class="headerlink" title="12. Docker 服务启动串台"></a>12. Docker 服务启动串台</h2><blockquote>
 <p><strong>使用 docker-compose 命令各自启动两组服务，发现服务会串台！</strong></p>
@@ -937,7 +977,8 @@ $ <span class="token function">cat</span> /etc/docker/daemon.json
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 服务目录结构如下所示</span>
 A: /data1/app/docker-compose.yml
-B: /data2/app/docker-compose.yml<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+B: /data2/app/docker-compose.yml
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法]</strong> 发现 <code>A</code> 和 <code>B</code> 两组服务会串台的原因，原来是 <code>docker-compose</code> 会给启动的容器加 <code>label</code> 标签，然后根据这些 <code>label</code> 标签来识别和判断对应的容器服务是由谁启动的、谁来管理的，等等。而这里，我们需要关注的 <code>label</code> 变量是 <code>com.docker.compose.project</code>，其对应的值是使用启动配置文件的目录的最底层子目录名称，即上面的 <code>app</code> 就是对应的值。我们可以发现， <code>A</code> 和 <code>B</code> 两组服务对应的值都是 <code>app</code>，所以启动的时候被认为是同一个，这就出现了上述的问题。如果需要深入了解的话，可以去看对应源代码。</li>
 </ul>
@@ -947,12 +988,14 @@ A: /data/app1/docker-compose.yml
 B: /data/app2/docker-compose.yml
 
 A: /data1/app-old/docker-compose.yml
-B: /data2/app-new/docker-compose.yml<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+B: /data2/app-new/docker-compose.yml
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>或者使用 <code>docker-compose</code> 命令提供的参数 <code>-p</code> 来规避该问题的发生。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 指定项目项目名称</span>
-$ docker-compose -f ./docker-compose.yml -p app1 up -d<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+$ docker-compose -f ./docker-compose.yml -p app1 up -d
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="13-Docker-命令调用报错"><a href="#13-Docker-命令调用报错" class="headerlink" title="13. Docker 命令调用报错"></a>13. Docker 命令调用报错</h2><blockquote>
 <p><strong>在编写脚本的时候常常会执行 docker 相关的命令，但是需要注意使用细节！</strong></p>
@@ -965,7 +1008,8 @@ $ docker-compose -f ./docker-compose.yml -p app1 up -d<span aria-hidden="true" c
 <li>随即，查看了脚本发现报错地方是执行了一个 <code>exec</code> 的 <code>docker</code> 命令，大致如下所示。很奇怪的是，手动执行或直接调脚本的时候，怎么都是没有问题的，但是等到 <code>CI</code> 调用的时候怎么都是有问题。后来好好看下下面这个命令，注意到 <code>-it</code> 这个参数了。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 脚本调用docker命令</span>
-docker <span class="token function">exec</span> -it <span class="token operator">&lt;</span>container_name<span class="token operator">></span> psql -Upostgres <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+docker <span class="token function">exec</span> -it <span class="token operator">&lt;</span>container_name<span class="token operator">></span> psql -Upostgres <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
 <li>我们可以一起看下 <code>exec</code> 命令的这两个参数，自然就差不多理解了。</li>
 </ul>
@@ -989,7 +1033,7 @@ docker <span class="token function">exec</span> -it <span class="token operator"
 </tr>
 </tbody></table>
 <ul>
-<li><strong>[解决方法]</strong> <code>docker exec</code> 的参数 <code>-t</code> 是指 <code>Allocate a pseudo-TTY</code> 的意思，而 <code>CI</code> 在执行 <code>job</code> 的时候并不是在 <code>TTY</code> 终端中执行，所以 <code>-t</code> 这个参数会报错。同时在 『<a href="https://stackoverflow.com/questions/43099116/error-the-input-device-is-not-a-tty" target="_blank" rel="noopener">stackoverflow</a>』也有人给出原因，可以自行查看。</li>
+<li><strong>[解决方法]</strong> <code>docker exec</code> 的参数 <code>-t</code> 是指 <code>Allocate a pseudo-TTY</code> 的意思，而 <code>CI</code> 在执行 <code>job</code> 的时候并不是在 <code>TTY</code> 终端中执行，所以 <code>-t</code> 这个参数会报错。同时在 『<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/43099116/error-the-input-device-is-not-a-tty">stackoverflow</a>』也有人给出原因，可以自行查看。</li>
 </ul>
 <p><img src="../images/docker-have-some-trouble-6.png" alt="Docker命令调用报错"></p>
 <hr>
@@ -1002,7 +1046,8 @@ docker <span class="token function">exec</span> -it <span class="token operator"
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Crontab定时任务</span>
 0 */6 * * * \
     docker <span class="token function">exec</span> -it <span class="token operator">&lt;</span>container_name<span class="token operator">></span> sh -c \
-        <span class="token string">'exec mysqldump --all-databases -uroot -ppassword ......'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+        <span class="token string">'exec mysqldump --all-databases -uroot -ppassword ......'</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法]</strong> 后来发现是因为执行的 <code>docker</code> 命令多个 <code>-i</code> 导致的。因为 <code>Crontab</code> 命令执行的时候，并不是交互式的，所以需要把这个去掉才可以。总结就是，如果你需要回显的话则需要 <code>-t</code> 选项，如果需要交互式会话则需要 <code>-i</code> 选项。</li>
 </ul>
@@ -1032,7 +1077,7 @@ docker <span class="token function">exec</span> -it <span class="token operator"
 <ul>
 <li><p><strong>[问题起因]</strong> 使用过 <code>compose</code> 的同学可能都遇到过，我们在编写启动配置文件的时候，添加环境变量的时候到底是使用单引号、双引号还是不使用引号。时间长了，可能我们总是三者是一样的，可以相互使用。但是，直到最后我们发现坑越来越多，越来越隐晦。</p>
 </li>
-<li><p>反正我是遇到过很多是因为添加引号导致的服务启动问题，后来得出的结论就是一律不适用引号。裸奔，体验前所未有的爽快！直到现在看到了 <code>Github</code> 中对应的 <a href="https://github.com/docker/compose/issues/2854" target="_blank" rel="noopener">issus</a> 之后，才终于破案了。</p>
+<li><p>反正我是遇到过很多是因为添加引号导致的服务启动问题，后来得出的结论就是一律不适用引号。裸奔，体验前所未有的爽快！直到现在看到了 <code>Github</code> 中对应的 <a target="_blank" rel="noopener" href="https://github.com/docker/compose/issues/2854">issus</a> 之后，才终于破案了。</p>
 </li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># TESTVAR="test"</span>
@@ -1042,7 +1087,8 @@ docker <span class="token function">exec</span> -it <span class="token operator"
 在Compose中进行引用TESTVAR变量，可以找到
 
 <span class="token comment" spellcheck="true"># docker run -it --rm -e TESTVAR="test" test:latest</span>
-后来发现docker本身其实已经正确地处理了引号的使用<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+后来发现docker本身其实已经正确地处理了引号的使用
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法]</strong> 得到的结论就是，因为 <code>Compose</code> 解析 <code>yaml</code> 配置文件，发现引号也进行了解释包装。这就导致原本的 <code>TESTVAR="test"</code> 被解析成了 <code>'TESTVAR="test"'</code>，所以我们在引用的时候就无法获取到对应的值。现在解决方法就是，不管是我们直接在配置文件添加环境变量或者使用 <code>env_file</code> 配置文件，能不使用引号就不适用引号。</li>
 </ul>
@@ -1059,7 +1105,8 @@ Error response from daemon: conflict: unable to delete 3ccxxxx2e862 <span class=
 
 <span class="token comment" spellcheck="true"># 强制删除</span>
 $ dcoker rmi -f 3ccxxxx2e862
-Error response from daemon: conflict: unable to delete 3ccxxxx2e862 <span class="token punctuation">(</span>cannot be forced<span class="token punctuation">)</span> - image has dependent child images<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+Error response from daemon: conflict: unable to delete 3ccxxxx2e862 <span class="token punctuation">(</span>cannot be forced<span class="token punctuation">)</span> - image has dependent child images
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法]</strong> 后来才发现，出现这个原因主要是因为 <code>TAG</code>，即存在其他镜像引用了这个镜像。这里我们可以使用如下命令查看对应镜像文件的依赖关系，然后根据对应 <code>TAG</code> 来删除镜像。</li>
 </ul>
@@ -1067,9 +1114,11 @@ Error response from daemon: conflict: unable to delete 3ccxxxx2e862 <span class=
 $ docker image inspect --format<span class="token operator">=</span><span class="token string">'{{.RepoTags}} {{.Id}} {{.Parent}}'</span> <span class="token variable"><span class="token variable">$(</span>docker image <span class="token function">ls</span> -q --filter since<span class="token operator">=</span><span class="token operator">&lt;</span>image_id<span class="token operator">></span><span class="token variable">)</span></span>
 
 <span class="token comment" spellcheck="true"># 根据TAG删除镜像</span>
-$ docker rmi -f c565xxxxc87f<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ docker rmi -f c565xxxxc87f
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 删除悬空镜像</span>
-$ docker rmi <span class="token punctuation">$(</span>docker images --filter <span class="token string">"dangling=true"</span> -q --no-trunc<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+$ docker rmi <span class="token punctuation">$(</span>docker images --filter <span class="token string">"dangling=true"</span> -q --no-trunc<span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="17-Docker-普通用户切换"><a href="#17-Docker-普通用户切换" class="headerlink" title="17. Docker 普通用户切换"></a>17. Docker 普通用户切换</h2><blockquote>
 <p><strong>切换 Docker 启动用户的话，还是需要注意下权限问题的！</strong></p>
@@ -1079,7 +1128,8 @@ $ docker rmi <span class="token punctuation">$(</span>docker images --filter <sp
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Nginx报错信息</span>
 nginx: <span class="token punctuation">[</span>alert<span class="token punctuation">]</span> could not <span class="token function">open</span> error log file: open<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token string">"/var/log/nginx/error.log"</span> failed <span class="token punctuation">(</span>13: Permission denied<span class="token punctuation">)</span>
-2020/11/12 15:25:47 <span class="token punctuation">[</span>emerg<span class="token punctuation">]</span> 23<span class="token comment" spellcheck="true">#23: mkdir() "/var/cache/nginx/client_temp" failed (13: Permission denied)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+2020/11/12 15:25:47 <span class="token punctuation">[</span>emerg<span class="token punctuation">]</span> 23<span class="token comment" spellcheck="true">#23: mkdir() "/var/cache/nginx/client_temp" failed (13: Permission denied)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法]</strong> 后来发现还是 <code>nginx.conf</code> 配置文件，配置的有问题，需要将 <code>Nginx</code> 服务启动时候需要的文件都配置到一个无权限的目录，即可解决。</li>
 </ul>
@@ -1109,7 +1159,8 @@ nginx: <span class="token punctuation">[</span>alert<span class="token punctuati
     uwsgi_temp_path        <span class="token operator">/</span>tmp<span class="token operator">/</span>uwsgi_temp<span class="token punctuation">;</span>
 
     <span class="token keyword">include</span> <span class="token operator">/</span>etc<span class="token operator">/</span>nginx<span class="token operator">/</span>conf<span class="token punctuation">.</span>d<span class="token operator">/</span><span class="token operator">*</span><span class="token punctuation">.</span>conf<span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="18-Docker-绑定到-IPv6-上"><a href="#18-Docker-绑定到-IPv6-上" class="headerlink" title="18. Docker 绑定到 IPv6 上"></a>18. Docker 绑定到 IPv6 上</h2><blockquote>
 <p><strong>Docker 服务在启动的时候，将地址绑定到 IPv6 地址上面了，提示报错信息！</strong></p>
@@ -1119,13 +1170,15 @@ nginx: <span class="token punctuation">[</span>alert<span class="token punctuati
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Docker的报错信息</span>
 docker run -p 80:80 nginx:alpine succeeds. Previously, this was failing with Error \
-starting userland proxy: listen tcp6 <span class="token punctuation">[</span>::<span class="token punctuation">]</span>:80: socket: address family not supported by protocol.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+starting userland proxy: listen tcp6 <span class="token punctuation">[</span>::<span class="token punctuation">]</span>:80: socket: address family not supported by protocol.
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[解决方法]</strong> 通过如上所示的报错信息，可以看到服务的启动端口绑定到了 <code>tcp6</code> 上面了，但是对应的 <code>socket</code> 发现系统本身并不支持。这时，我们一看下对应的操作系统 <code>ipv6</code> 的设置，发现系统禁用了，所有的 <code>ipv6</code> 地址。需要了解的朋友，可以参考 <a href="https://github.com/moby/moby/pull/42322" target="_blank" rel="noopener">fix port forwarding with ipv6.disable=1</a> 和 <a href="https://github.com/moby/moby/issues/42288" target="_blank" rel="noopener">cannot start if ipv6 is disabled on host</a> 这两个 <code>issus</code> 来获取更多信息。</li>
+<li><strong>[解决方法]</strong> 通过如上所示的报错信息，可以看到服务的启动端口绑定到了 <code>tcp6</code> 上面了，但是对应的 <code>socket</code> 发现系统本身并不支持。这时，我们一看下对应的操作系统 <code>ipv6</code> 的设置，发现系统禁用了，所有的 <code>ipv6</code> 地址。需要了解的朋友，可以参考 <a target="_blank" rel="noopener" href="https://github.com/moby/moby/pull/42322">fix port forwarding with ipv6.disable=1</a> 和 <a target="_blank" rel="noopener" href="https://github.com/moby/moby/issues/42288">cannot start if ipv6 is disabled on host</a> 这两个 <code>issus</code> 来获取更多信息。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 操作系统配置</span>
 $ <span class="token function">cat</span> /etc/sysctl.conf <span class="token operator">|</span> <span class="token function">grep</span> ipv6
-net.ipv6.conf.all.disable_ipv6<span class="token operator">=</span>1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+net.ipv6.conf.all.disable_ipv6<span class="token operator">=</span>1
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[方法一]</strong> 最为简单的解决方法，就是在 <code>docker-compose.yml</code> 文件中，手动指定将对应服务的端口绑定到 <code>ipv4</code> 上面，如下所示。</li>
 </ul>
@@ -1144,7 +1197,8 @@ net.ipv6.conf.all.disable_ipv6<span class="token operator">=</span>1<span aria-h
       <span class="token punctuation">-</span> app_network
 
 <span class="token key atrule">networks</span><span class="token punctuation">:</span>
-  app_network<span class="token punctuation">:</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+  <span class="token key atrule">app_network</span><span class="token punctuation">:</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[方法二]</strong> 或者修改 <code>/etc/docker/daemon.json</code> 文件，在配置中，阻止 <code>Docker</code> 错误的将端口映射到 <code>IPv6</code> 上，即可达到同样的效果，且不用再次修改多个服务的启动配置文件了。</li>
 </ul>
@@ -1156,9 +1210,10 @@ $ vim /etc/docker/daemon.json
 <span class="token punctuation">}</span>
 
 <span class="token comment" spellcheck="true"># 重启服务</span>
-$ systemctl reload docker<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ systemctl reload docker
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[方法三]</strong> <code>Docker</code> 默认情况下会同时将端口映射于 <code>IPv4</code> 与 <code>IPv6</code> 两者上，而且有的时候会出现只绑定到了 <code>IPv6</code>，导致服务无法正常访问的情况。现在通用的始终还是 <code>IPv4</code> 地址，因此最简单的做法就是关闭 <code>IPv6</code> 地址。详细的配置，可以参考 <a href="https://github.com/moby/moby/issues/2174" target="_blank" rel="noopener">Port redirecting binding to IPv6 but not IPv4 interfaces</a> 这个 <code>issus</code> 地址。</li>
+<li><strong>[方法三]</strong> <code>Docker</code> 默认情况下会同时将端口映射于 <code>IPv4</code> 与 <code>IPv6</code> 两者上，而且有的时候会出现只绑定到了 <code>IPv6</code>，导致服务无法正常访问的情况。现在通用的始终还是 <code>IPv4</code> 地址，因此最简单的做法就是关闭 <code>IPv6</code> 地址。详细的配置，可以参考 <a target="_blank" rel="noopener" href="https://github.com/moby/moby/issues/2174">Port redirecting binding to IPv6 but not IPv4 interfaces</a> 这个 <code>issus</code> 地址。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 修改系统配置</span>
 <span class="token keyword">echo</span> <span class="token string">'1'</span> <span class="token operator">></span> /proc/sys/net/ipv6/conf/lo/disable_ipv6
@@ -1170,7 +1225,8 @@ $ systemctl reload docker<span aria-hidden="true" class="line-numbers-rows"><spa
 $ /etc/init.d/networking restart
 
 <span class="token comment" spellcheck="true"># 最后检测是否已关闭IPv6</span>
-ip addr show <span class="token operator">|</span> <span class="token function">grep</span> net6<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+ip addr show <span class="token operator">|</span> <span class="token function">grep</span> net6
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="19-Docker-容器启动超时"><a href="#19-Docker-容器启动超时" class="headerlink" title="19. Docker 容器启动超时"></a>19. Docker 容器启动超时</h2><blockquote>
 <p><strong>Docker 服务在启动的时候，提示超时，被直接终止了！</strong></p>
@@ -1181,13 +1237,15 @@ ip addr show <span class="token operator">|</span> <span class="token function">
 <pre class="line-numbers language-bash"><code class="language-bash">$ docker-compose up -d
 ERROR: <span class="token keyword">for</span> xxx  UnixHTTPConnectionPool<span class="token punctuation">(</span>host<span class="token operator">=</span><span class="token string">'localhost'</span>, port<span class="token operator">=</span>None<span class="token punctuation">)</span>: Read timed out. <span class="token punctuation">(</span>read timeout<span class="token operator">=</span>70<span class="token punctuation">)</span>
 ERROR: An HTTP request took too long to complete. Retry with --verbose to obtain debug information.
-If you encounter this issue regularly because of slow network conditions, consider setting COMPOSE_HTTP_TIMEOUT to a higher value <span class="token punctuation">(</span>current value: 60<span class="token punctuation">)</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+If you encounter this issue regularly because of slow network conditions, consider setting COMPOSE_HTTP_TIMEOUT to a higher value <span class="token punctuation">(</span>current value: 60<span class="token punctuation">)</span>.
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法]</strong> 按照提示设置的环境变量之后，再次启动发现确实可以正常启动了，但是还是能够感觉到有些慢。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> vim /etc/profile
 <span class="token function">export</span> COMPOSE_HTTP_TIMEOUT<span class="token operator">=</span>500
-<span class="token function">export</span> DOCKER_CLIENT_TIMEOUT<span class="token operator">=</span>500<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<span class="token function">export</span> DOCKER_CLIENT_TIMEOUT<span class="token operator">=</span>500
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>排除了下启动流程，因为容器启动有映射目录到容器里面且目录大小比较大，所以怀疑是因为 <code>i/o</code> 导致的。随即使用 <code>iotop</code> 命令查看服务器目前的 <code>i/o</code> 情况，发现存在很多个 <code>rg</code> 命令，且都处于 <code>100%</code> 左右。查了下，发现是 <code>vscode</code> 远程服务器启动的搜索目录结构的进程，西八，有些坑呀！</li>
 </ul>
@@ -1195,7 +1253,8 @@ If you encounter this issue regularly because of slow network conditions, consid
  4269 be/4 escape     15.64 K/s    0.00 B/s  0.00 % 98.36 % rg --files --hidden
  4270 be/4 escape     28.15 K/s    0.00 B/s  0.00 % 97.46 % rg --files --hidden
  4272 be/4 escape     31.27 K/s    0.00 B/s  0.00 % 97.39 % rg --files --hidden
- 4276 be/4 escape     34.40 K/s    0.00 B/s  0.00 % 96.98 % rg --files --hidden<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+ 4276 be/4 escape     34.40 K/s    0.00 B/s  0.00 % 96.98 % rg --files --hidden
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="20-Docker-端口网络限制"><a href="#20-Docker-端口网络限制" class="headerlink" title="20. Docker 端口网络限制"></a>20. Docker 端口网络限制</h2><blockquote>
 <p><strong>如果发现服务都一切正常，但是无法无法访问的话，则多为网络问题！</strong></p>
@@ -1208,7 +1267,8 @@ nginx<span class="token punctuation">(</span>80<span class="token punctuation">)
           -<span class="token operator">></span> web2<span class="token punctuation">(</span>8081<span class="token punctuation">)</span>
 
 <span class="token comment" spellcheck="true"># 报错信息如下所示</span>
-nginx connect<span class="token punctuation">(</span><span class="token punctuation">)</span> failed <span class="token punctuation">(</span>113: No route to host<span class="token punctuation">)</span> <span class="token keyword">while</span> connecting to upstream<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+nginx connect<span class="token punctuation">(</span><span class="token punctuation">)</span> failed <span class="token punctuation">(</span>113: No route to host<span class="token punctuation">)</span> <span class="token keyword">while</span> connecting to upstream
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法]</strong> 根据错误信息可知，是因为没有路由到指定的 <code>host</code> 导致了，随即看了下防火墙是开着的，看了日志发现被过滤掉了，西八！问题找到了，现在需要做的就是，要么添加防火墙规则，要么关闭防火墙。</li>
 </ul>
@@ -1217,31 +1277,15 @@ $ <span class="token function">sudo</span> firewall-cmd --permanent --zone<span 
 
 <span class="token comment" spellcheck="true"># 开启需要路由的端口</span>
 $ <span class="token function">sudo</span> firewall-cmd --permanent --zone<span class="token operator">=</span>public --add-port<span class="token operator">=</span>8080/tcp
-$ <span class="token function">sudo</span> firewall-cmd --permanent --zone<span class="token operator">=</span>public --add-port<span class="token operator">=</span>8081/tcp<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> firewall-cmd --permanent --zone<span class="token operator">=</span>public --add-port<span class="token operator">=</span>8081/tcp
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 关闭防火墙</span>
 $ <span class="token function">sudo</span> systemctl stop firewalld.service
 
 <span class="token comment" spellcheck="true"># 禁用自启动</span>
-$ <span class="token function">sudo</span> systemctl disable firewalld.service<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
+$ <span class="token function">sudo</span> systemctl disable firewalld.service
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
                 
             </div>
             <hr/>
@@ -1477,6 +1521,8 @@ $ <span class="token function">sudo</span> systemctl disable firewalld.service<s
 
     
 
+    
+
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
@@ -1506,7 +1552,7 @@ $ <span class="token function">sudo</span> systemctl disable firewalld.service<s
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Linux命令使用/" class="post-category">
+                            <a href="/categories/Linux%E5%91%BD%E4%BB%A4%E4%BD%BF%E7%94%A8/" class="post-category">
                                     Linux命令使用
                                 </a>
                             
@@ -1558,7 +1604,7 @@ $ <span class="token function">sudo</span> systemctl disable firewalld.service<s
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Docker学习攻略/" class="post-category">
+                            <a href="/categories/Docker%E5%AD%A6%E4%B9%A0%E6%94%BB%E7%95%A5/" class="post-category">
                                     Docker学习攻略
                                 </a>
                             
@@ -1760,7 +1806,9 @@ $ <span class="token function">sudo</span> systemctl disable firewalld.service<s
 <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
 
     
-    <div class="container row center-align" style="margin-bottom: 15px !important;">
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
@@ -1772,70 +1820,82 @@ $ <span class="token function">sudo</span> systemctl disable firewalld.service<s
             |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1121.5k</span>&nbsp;字
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1101.7k</span>
             
             
             
+                
             
             
-            
-            <span id="busuanzi_container_site_pv">
-                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
-                    class="white-color"></span>&nbsp;次
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
             </span>
             
             
-            <span id="busuanzi_container_site_uv">
-                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
-                    class="white-color"></span>&nbsp;人
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
             </span>
             
             <br>
+
+            <!-- 运行天数提醒. -->
             
-            <span id="sitetime">载入运行时间...</span>
-            <script>
-                function siteTime() {
-                    var seconds = 1000;
-                    var minutes = seconds * 60;
-                    var hours = minutes * 60;
-                    var days = hours * 24;
-                    var years = days * 365;
-                    var today = new Date();
-                    var startYear = "2017";
-                    var startMonth = "2";
-                    var startDate = "14";
-                    var startHour = "0";
-                    var startMinute = "0";
-                    var startSecond = "0";
-                    var todayYear = today.getFullYear();
-                    var todayMonth = today.getMonth() + 1;
-                    var todayDate = today.getDate();
-                    var todayHour = today.getHours();
-                    var todayMinute = today.getMinutes();
-                    var todaySecond = today.getSeconds();
-                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
-                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
-                    var diff = t2 - t1;
-                    var diffYears = Math.floor(diff / years);
-                    var diffDays = Math.floor((diff / days) - diffYears * 365);
-                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
-                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
-                        minutes);
-                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
-                        diffMinutes * minutes) / seconds);
-                    if (startYear == todayYear) {
-                        document.getElementById("year").innerHTML = todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
-                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
-                    } else {
-                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
-                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2017";
+                        var startMonth = "2";
+                        var startDate = "14";
+                        var startHour = "0";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
                     }
-                }
-                setInterval(siteTime, 1000);
-            </script>
+
+                    calcSiteTime();
+                </script>
             
             <br>
             

@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 
 
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
     <meta charset="utf-8">
     <meta name="keywords" content="LVS服务之IP负载均衡类型, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
@@ -29,6 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
+<meta name="generator" content="Hexo 5.4.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -439,7 +442,7 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Linux服务部署/" class="post-category">
+                            <a href="/categories/Linux%E6%9C%8D%E5%8A%A1%E9%83%A8%E7%BD%B2/" class="post-category">
                                 Linux服务部署
                             </a>
                         
@@ -505,10 +508,10 @@
 <h3 id="1-1-工作原理"><a href="#1-1-工作原理" class="headerlink" title="1.1 工作原理"></a>1.1 工作原理</h3><p>下图所示就是<code>LVS</code>的基本工作原理：</p>
 <p><img src="/images/linux-lvs-cluster-tech-31.png" alt="LVS服务之IP负载均衡类型"></p>
 <ul>
-<li><strong>(1)</strong>  当用户向负载均衡调度器(<code>Director Server</code>)发起请求，调度器将请求发往至内核空间。</li>
-<li><strong>(2)</strong> <code>PREROUTING</code>链首先会接收到用户请求，判断目标<code>IP</code>确定是本机<code>IP</code>，将数据包发往<code>INPUT</code>链。</li>
-<li><strong>(3)</strong> <code>IPVS</code>是工作在<code>INPUT</code>链上的，当用户请求到达<code>INPUT</code>时，<code>IPVS</code>会将用户请求和自己已定义好的集群服务进行比对，如果用户请求的就是定义的集群服务，那么此时<code>IPVS</code>会强行修改数据包里的目标<code>IP</code>地址及端口，并将新的数据包发往<code>POSTROUTING</code>链。</li>
-<li><strong>(4)</strong> <code>POSTROUTING</code>链接收数据包后发现目标<code>IP</code>地址刚好是自己的后端服务器，那么此时通过选路，将数据包最终发送给后端的服务器。</li>
+<li><strong>(1)</strong>&nbsp; 当用户向负载均衡调度器(<code>Director Server</code>)发起请求，调度器将请求发往至内核空间。</li>
+<li><strong>(2)</strong>&nbsp;<code>PREROUTING</code>链首先会接收到用户请求，判断目标<code>IP</code>确定是本机<code>IP</code>，将数据包发往<code>INPUT</code>链。</li>
+<li><strong>(3)</strong>&nbsp;<code>IPVS</code>是工作在<code>INPUT</code>链上的，当用户请求到达<code>INPUT</code>时，<code>IPVS</code>会将用户请求和自己已定义好的集群服务进行比对，如果用户请求的就是定义的集群服务，那么此时<code>IPVS</code>会强行修改数据包里的目标<code>IP</code>地址及端口，并将新的数据包发往<code>POSTROUTING</code>链。</li>
+<li><strong>(4)</strong>&nbsp;<code>POSTROUTING</code>链接收数据包后发现目标<code>IP</code>地址刚好是自己的后端服务器，那么此时通过选路，将数据包最终发送给后端的服务器。</li>
 </ul>
 <hr>
 <h3 id="1-2-工作特点"><a href="#1-2-工作特点" class="headerlink" title="1.2 工作特点"></a>1.2 工作特点</h3><p><strong>LVS</strong>是工作在<code>TCP/IP</code>的四层模型上，通过修改<code>Netfilter</code>表中的<code>INPUT</code>链来实现的(所有不是服务而是规则)，根据客户端请求报文的<strong>目标 IP 和 PORT</strong>(主要是端口)将其转发至后端主机集群中的某一台主机(根据挑选算法)。</p>
@@ -562,7 +565,8 @@ CONFIG_IP_VS_LBLCR<span class="token operator">=</span>m
 CONFIG_IP_VS_DH<span class="token operator">=</span>m
 CONFIG_IP_VS_SH<span class="token operator">=</span>m
 CONFIG_IP_VS_SED<span class="token operator">=</span>m
-<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="2-负载均衡类型"><a href="#2-负载均衡类型" class="headerlink" title="2. 负载均衡类型"></a>2. 负载均衡类型</h2><blockquote>
 <p><strong>CDN(分区域缓存) =&gt; LB(LVS/Nginx) =&gt; HA(LVS/Haproxy) =&gt; Cache(Nginx/Vanish/Mechcache) =&gt; HTTP(Nginx/Apache) =&gt; Database(master/worker)</strong></p>
@@ -582,12 +586,12 @@ CONFIG_IP_VS_SED<span class="token operator">=</span>m
 <p><img src="/images/linux-lvs-cluster-tech-32.png" alt="LVS服务之IP负载均衡类型"></p>
 <p><img src="/images/linux-lvs-cluster-tech-33.png" alt="LVS服务之IP负载均衡类型"></p>
 <ul>
-<li><strong>(1)</strong>  当用户请求到达<code>Director Server</code>的<code>VIP</code>上，此时请求的数据报文会先到内核空间的<code>PREROUTING</code>链。 此时报文的<strong>源 IP</strong>为<code>CIP</code>，<strong>目标 IP</strong>为<code>VIP</code> 。</li>
-<li><strong>(2)</strong> <code>PREROUTING</code>检查发现数据包的目标<code>IP</code>是本机，将数据包送至<code>INPUT</code>链。</li>
-<li><strong>(3)</strong> <code>IPVS</code>比对数据包请求的服务是否为集群服务，若是，修改数据包的目标<code>IP</code>地址为后端服务器<code>RIP</code>，然后将数据包发至<code>POSTROUTING</code>链。 此时报文的<strong>源 IP</strong>为<code>CIP</code>，<strong>目标 IP</strong>为<code>RIP</code> 。</li>
-<li><strong>(4)</strong> <code>POSTROUTING</code>链通过选路，将数据包发送给<code>Real Server</code>。</li>
-<li><strong>(5)</strong> <code>Real Server</code>比对发现目标为自己的<code>IP</code>，开始构建响应报文发回给<code>Director Server</code>。 此时报文的<strong>源 IP</strong>为<code>RIP</code>，<strong>目标 IP</strong>为<code>CIP</code> 。</li>
-<li><strong>(6)</strong> <code>Director Server</code>在响应客户端前，此时会将源<code>IP</code>地址修改为自己的<code>VIP</code>地址，然后响应给客户端。 此时报文的<strong>源 IP</strong>为<code>VIP</code>，<strong>目标 IP</strong>为<code>CIP</code>。</li>
+<li><strong>(1)</strong>&nbsp; 当用户请求到达<code>Director Server</code>的<code>VIP</code>上，此时请求的数据报文会先到内核空间的<code>PREROUTING</code>链。 此时报文的<strong>源 IP</strong>为<code>CIP</code>，<strong>目标 IP</strong>为<code>VIP</code>&nbsp;。</li>
+<li><strong>(2)</strong>&nbsp;<code>PREROUTING</code>检查发现数据包的目标<code>IP</code>是本机，将数据包送至<code>INPUT</code>链。</li>
+<li><strong>(3)</strong>&nbsp;<code>IPVS</code>比对数据包请求的服务是否为集群服务，若是，修改数据包的目标<code>IP</code>地址为后端服务器<code>RIP</code>，然后将数据包发至<code>POSTROUTING</code>链。 此时报文的<strong>源 IP</strong>为<code>CIP</code>，<strong>目标 IP</strong>为<code>RIP</code>&nbsp;。</li>
+<li><strong>(4)</strong>&nbsp;<code>POSTROUTING</code>链通过选路，将数据包发送给<code>Real Server</code>。</li>
+<li><strong>(5)</strong>&nbsp;<code>Real Server</code>比对发现目标为自己的<code>IP</code>，开始构建响应报文发回给<code>Director Server</code>。 此时报文的<strong>源 IP</strong>为<code>RIP</code>，<strong>目标 IP</strong>为<code>CIP</code>&nbsp;。</li>
+<li><strong>(6)</strong>&nbsp;<code>Director Server</code>在响应客户端前，此时会将源<code>IP</code>地址修改为自己的<code>VIP</code>地址，然后响应给客户端。 此时报文的<strong>源 IP</strong>为<code>VIP</code>，<strong>目标 IP</strong>为<code>CIP</code>。</li>
 </ul>
 <p><strong>NAT 模型的的特性</strong></p>
 <ul>
@@ -616,12 +620,12 @@ CONFIG_IP_VS_SED<span class="token operator">=</span>m
 <p><img src="/images/linux-lvs-cluster-tech-34.png" alt="LVS服务之IP负载均衡类型"></p>
 <p><img src="/images/linux-lvs-cluster-tech-35.png" alt="LVS服务之IP负载均衡类型"></p>
 <ul>
-<li><strong>(1)</strong>  当用户请求到达<code>Director Server</code>的<code>VIP</code>上，此时请求的数据报文会先到内核空间的<code>PREROUTING</code>链。 此时报文的<strong>源 IP</strong>为<code>CIP</code>，<strong>目标 IP</strong>为<code>VIP</code>。</li>
-<li><strong>(2)</strong> <code>PREROUTING</code>检查发现数据包的目标<code>IP</code>是本机，将数据包送至<code>INPUT</code>链。</li>
-<li><strong>(3)</strong> <code>IPVS</code>比对数据包请求的服务是否为集群服务，若是，将请求报文中的<strong>源 MAC 地址修改为 DIP 的 MAC 地址</strong>，将目标<code>MAC</code>地址修改<code>RIP</code>的<code>MAC</code>地址，然后将数据包发至<code>POSTROUTING</code>链。 此时的源<code>IP</code>和目的<code>IP</code>均未修改，仅修改了源<code>MAC</code>地址为<code>DIP</code>的<code>MAC</code>地址，目标<code>MAC</code>地址为<code>RIP</code>的<code>MAC</code>地址。</li>
-<li><strong>(4)</strong>  由于<code>DS</code>和<code>RS</code>在同一个网络中，所以是通过二层来传输。<code>POSTROUTING</code>链检查目标<code>MAC</code>地址为<code>RIP</code>的<code>MAC</code>地址，那么此时数据包将会发至<code>Real Server</code>。</li>
-<li><strong>(5)</strong> <code>RS</code>发现请求报文的<code>MAC</code>地址是自己的<code>MAC</code>地址，就接收此报文。处理完成之后，将响应报文通过<code>lo</code>接口传送给<code>eth0</code>网卡然后向外发出。 此时的<strong>源 IP</strong>地址为<code>VIP</code>，<strong>目标 IP</strong>为<code>CIP</code>。</li>
-<li><strong>(6)</strong>  响应报文最终送达至客户端。</li>
+<li><strong>(1)</strong>&nbsp; 当用户请求到达<code>Director Server</code>的<code>VIP</code>上，此时请求的数据报文会先到内核空间的<code>PREROUTING</code>链。 此时报文的<strong>源 IP</strong>为<code>CIP</code>，<strong>目标 IP</strong>为<code>VIP</code>。</li>
+<li><strong>(2)</strong>&nbsp;<code>PREROUTING</code>检查发现数据包的目标<code>IP</code>是本机，将数据包送至<code>INPUT</code>链。</li>
+<li><strong>(3)</strong>&nbsp;<code>IPVS</code>比对数据包请求的服务是否为集群服务，若是，将请求报文中的<strong>源 MAC 地址修改为 DIP 的 MAC 地址</strong>，将目标<code>MAC</code>地址修改<code>RIP</code>的<code>MAC</code>地址，然后将数据包发至<code>POSTROUTING</code>链。 此时的源<code>IP</code>和目的<code>IP</code>均未修改，仅修改了源<code>MAC</code>地址为<code>DIP</code>的<code>MAC</code>地址，目标<code>MAC</code>地址为<code>RIP</code>的<code>MAC</code>地址。</li>
+<li><strong>(4)</strong>&nbsp; 由于<code>DS</code>和<code>RS</code>在同一个网络中，所以是通过二层来传输。<code>POSTROUTING</code>链检查目标<code>MAC</code>地址为<code>RIP</code>的<code>MAC</code>地址，那么此时数据包将会发至<code>Real Server</code>。</li>
+<li><strong>(5)</strong>&nbsp;<code>RS</code>发现请求报文的<code>MAC</code>地址是自己的<code>MAC</code>地址，就接收此报文。处理完成之后，将响应报文通过<code>lo</code>接口传送给<code>eth0</code>网卡然后向外发出。 此时的<strong>源 IP</strong>地址为<code>VIP</code>，<strong>目标 IP</strong>为<code>CIP</code>。</li>
+<li><strong>(6)</strong>&nbsp; 响应报文最终送达至客户端。</li>
 </ul>
 <p><strong>DR 模型的的特性</strong></p>
 <ul>
@@ -676,12 +680,12 @@ CONFIG_IP_VS_SED<span class="token operator">=</span>m
 <p><img src="/images/linux-lvs-cluster-tech-36.png" alt="LVS服务之IP负载均衡类型"></p>
 <p><img src="/images/linux-lvs-cluster-tech-37.png" alt="LVS服务之IP负载均衡类型"></p>
 <ul>
-<li><strong>(1)</strong>  当用户请求到达<code>Director Server</code>的<code>VIP</code>上，此时请求的数据报文会先到内核空间的<code>PREROUTING</code>链。 此时报文的<strong>源 IP</strong>为<code>CIP</code>，<strong>目标 IP</strong>为<code>VIP</code>。</li>
-<li><strong>(2)</strong> <code>PREROUTING</code>检查发现数据包的目标<code>IP</code>是本机，将数据包送至<code>INPUT</code>链。</li>
-<li><strong>(3)</strong> <code>IPVS</code>比对数据包请求的服务是否为集群服务，若是，在请求报文的首部再次封装一层<code>IP</code>报文，然后发至<code>POSTROUTING</code>链。此时<strong>源 IP</strong>为<code>DIP</code>，<strong>目标 IP</strong>为<code>RIP</code>。</li>
-<li><strong>(4)</strong> <code>POSTROUTING</code>链根据最新封装的<code>IP</code>报文，将数据包发至<code>RS</code>（因为在外层封装多了一层 IP 首部，所以可以理解为此时通过隧道传输）。 此时<strong>源 IP</strong>为<code>DIP</code>，<strong>目标 IP</strong>为<code>RIP</code>。</li>
-<li><strong>(5)</strong> <code>RS</code>接收到报文后发现是自己的<code>IP</code>地址，就将报文接收下来，拆除掉最外层的<code>IP</code>后，会发现里面还有一层<code>IP</code>首部，而且目标是自己的<code>lo</code>接口<code>VIP</code>，那么此时<code>RS</code>开始处理此请求，处理完成之后，通过<code>lo</code>接口送给<code>eth0</code>网卡，然后向外传递。 此时的<strong>源 IP</strong>地址为<code>VIP</code>，<strong>目标 IP</strong>为<code>CIP</code>。</li>
-<li><strong>(6)</strong>  响应报文最终送达至客户端。</li>
+<li><strong>(1)</strong>&nbsp; 当用户请求到达<code>Director Server</code>的<code>VIP</code>上，此时请求的数据报文会先到内核空间的<code>PREROUTING</code>链。 此时报文的<strong>源 IP</strong>为<code>CIP</code>，<strong>目标 IP</strong>为<code>VIP</code>。</li>
+<li><strong>(2)</strong>&nbsp;<code>PREROUTING</code>检查发现数据包的目标<code>IP</code>是本机，将数据包送至<code>INPUT</code>链。</li>
+<li><strong>(3)</strong>&nbsp;<code>IPVS</code>比对数据包请求的服务是否为集群服务，若是，在请求报文的首部再次封装一层<code>IP</code>报文，然后发至<code>POSTROUTING</code>链。此时<strong>源 IP</strong>为<code>DIP</code>，<strong>目标 IP</strong>为<code>RIP</code>。</li>
+<li><strong>(4)</strong>&nbsp;<code>POSTROUTING</code>链根据最新封装的<code>IP</code>报文，将数据包发至<code>RS</code>（因为在外层封装多了一层 IP 首部，所以可以理解为此时通过隧道传输）。 此时<strong>源 IP</strong>为<code>DIP</code>，<strong>目标 IP</strong>为<code>RIP</code>。</li>
+<li><strong>(5)</strong>&nbsp;<code>RS</code>接收到报文后发现是自己的<code>IP</code>地址，就将报文接收下来，拆除掉最外层的<code>IP</code>后，会发现里面还有一层<code>IP</code>首部，而且目标是自己的<code>lo</code>接口<code>VIP</code>，那么此时<code>RS</code>开始处理此请求，处理完成之后，通过<code>lo</code>接口送给<code>eth0</code>网卡，然后向外传递。 此时的<strong>源 IP</strong>地址为<code>VIP</code>，<strong>目标 IP</strong>为<code>CIP</code>。</li>
+<li><strong>(6)</strong>&nbsp; 响应报文最终送达至客户端。</li>
 </ul>
 <p><strong>TUN 模型的的特性</strong></p>
 <ul>
@@ -714,7 +718,7 @@ CONFIG_IP_VS_SED<span class="token operator">=</span>m
 </blockquote>
 <p><strong>FULLNAT 模型的实现原理</strong></p>
 <ul>
-<li><a href="https://github.com/alibaba/LVS" target="_blank" rel="noopener">淘宝 FULLNAT 项目地址</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/alibaba/LVS">淘宝 FULLNAT 项目地址</a></li>
 <li>FULLNAT 是淘宝吴佳明(普空)在<code>NAT</code>基础上搞得，很大简化了<code>LVS</code>的配置和部署</li>
 <li>百度的<code>LVS</code>叫<strong>BVS</strong>(<code>Baidu Virtual Server</code>)，在<code>LVS</code>基础上增加了<code>L3 Though</code>和<code>SYN Porxy</code>，类似<code>FULLNAT</code></li>
 <li><code>CentOS</code>不支持<code>FULLNAT</code>，为了方便的实现多机房部署(<code>NAT</code>和<code>DR</code>不支持，<code>TUN</code>支持但比较复杂)，需要在淘宝中找到内核编译安装内核</li>
@@ -722,12 +726,12 @@ CONFIG_IP_VS_SED<span class="token operator">=</span>m
 <p><img src="/images/linux-lvs-cluster-tech-38.png" alt="LVS服务之IP负载均衡类型"></p>
 <p><img src="/images/linux-lvs-cluster-tech-39.png" alt="LVS服务之IP负载均衡类型"></p>
 <ul>
-<li><strong>(1)</strong>  客户端发送请求报文给<code>Director Server</code>的物理网络接口<code>VIP</code>此时请求的数据报文会先到内核空间的<code>PREROUTING</code>链。此时报文的<strong>源 IP</strong>为<code>CIP</code>，<strong>目标 IP</strong>为<code>VIP</code>。</li>
-<li><strong>(2)</strong> <code>PREROUTING</code>检查发现数据包的目标<code>IP</code>是本机，将数据包送至<code>INPUT</code>链。</li>
-<li><strong>(3)</strong> <code>IPVS</code>比对数据包请求的服务是否为集群服务，若是，修改数据包的源<code>IP</code>地址为<code>DIP</code>，目标<code>IP</code>地址为后端服务器<code>RIP</code>，然后将数据包发至<code>POSTROUTING</code>链。此时报文的<strong>源 IP</strong>为<code>DIP</code>，<strong>目标 IP</strong>为<code>RIP</code> 。</li>
-<li><strong>(4)</strong> <code>POSTROUTING</code>链通过选路，将数据包发送给<code>Real Server</code>。</li>
-<li><strong>(5)</strong> <code>Real Server</code>比对发现目标为自己的<code>IP</code>，开始构建响应报文发回给<code>Director Server</code>。 此时报文的<strong>源 IP</strong>为<code>RIP</code>，<strong>目标 IP</strong>为<code>DIP</code> 。</li>
-<li><strong>(6)</strong> <code>Director Server</code>在响应客户端前，此时会将源<code>IP</code>地址修改为自己的<code>VIP</code>地址，目标<code>IP</code>地址修改为客户端的地址<code>CIP</code>，然后响应给客户端。 此时报文的<strong>源 IP</strong>为<code>VIP</code>，<strong>目标 IP</strong>为<code>CIP</code>。</li>
+<li><strong>(1)</strong>&nbsp; 客户端发送请求报文给<code>Director Server</code>的物理网络接口<code>VIP</code>此时请求的数据报文会先到内核空间的<code>PREROUTING</code>链。此时报文的<strong>源 IP</strong>为<code>CIP</code>，<strong>目标 IP</strong>为<code>VIP</code>。</li>
+<li><strong>(2)</strong>&nbsp;<code>PREROUTING</code>检查发现数据包的目标<code>IP</code>是本机，将数据包送至<code>INPUT</code>链。</li>
+<li><strong>(3)</strong>&nbsp;<code>IPVS</code>比对数据包请求的服务是否为集群服务，若是，修改数据包的源<code>IP</code>地址为<code>DIP</code>，目标<code>IP</code>地址为后端服务器<code>RIP</code>，然后将数据包发至<code>POSTROUTING</code>链。此时报文的<strong>源 IP</strong>为<code>DIP</code>，<strong>目标 IP</strong>为<code>RIP</code>&nbsp;。</li>
+<li><strong>(4)</strong>&nbsp;<code>POSTROUTING</code>链通过选路，将数据包发送给<code>Real Server</code>。</li>
+<li><strong>(5)</strong>&nbsp;<code>Real Server</code>比对发现目标为自己的<code>IP</code>，开始构建响应报文发回给<code>Director Server</code>。 此时报文的<strong>源 IP</strong>为<code>RIP</code>，<strong>目标 IP</strong>为<code>DIP</code>&nbsp;。</li>
+<li><strong>(6)</strong>&nbsp;<code>Director Server</code>在响应客户端前，此时会将源<code>IP</code>地址修改为自己的<code>VIP</code>地址，目标<code>IP</code>地址修改为客户端的地址<code>CIP</code>，然后响应给客户端。 此时报文的<strong>源 IP</strong>为<code>VIP</code>，<strong>目标 IP</strong>为<code>CIP</code>。</li>
 </ul>
 <p><strong>FULLNAT 模型的特性</strong></p>
 <ul>
@@ -767,7 +771,7 @@ CONFIG_IP_VS_SED<span class="token operator">=</span>m
 <li><strong>session 服务器</strong><ul>
 <li>使<code>session</code>持久化，即使关机了也可以使用，存储在<code>redis</code>的键值数据库</li>
 <li>网络通信肯定有延迟</li>
-<li>单点故障，瓶颈 =&gt; LB =&gt; <code>HB</code></li>
+<li>单点故障，瓶颈 =&gt; LB =&gt;&nbsp;<code>HB</code></li>
 </ul>
 </li>
 </ul>
@@ -782,7 +786,7 @@ CONFIG_IP_VS_SED<span class="token operator">=</span>m
 <li>这种算法会考虑每台服务器的性能，并给每台服务器添加要给权值权重的取值范围<code>0 – 100</code>。权值越高的服务器，处理的请求越多。</li>
 </ul>
 </li>
-<li><strong>SH</strong>: <code>source hash</code>，源地址哈希<ul>
+<li><strong>SH</strong>:&nbsp;<code>source hash</code>，源地址哈希<ul>
 <li>实现<code>session</code>保持的机制；将来自于同一个 IP 的请求始终调度至同一<code>RS</code></li>
 <li><code>LVS</code>内部会维持一个哈希表，记录源地址、调度的<code>RealServer</code>和计时器，辞旧迎新防止打满</li>
 </ul>
@@ -797,7 +801,7 @@ CONFIG_IP_VS_SED<span class="token operator">=</span>m
 <ul>
 <li><strong>LC</strong>：<code>Least Connection</code>，最少连接数<ul>
 <li><code>Overhead=Active(活动链接数)*256+Inactive(非活动链接数)</code></li>
-<li>最少连接算法会根据后端<code>RS</code>的连接数来决定把请求的分配，比如<code>RS1</code>连接数比<code>RS2</code>连接数少，那么请求就优先发给  <code>RS1</code>这台服务器。</li>
+<li>最少连接算法会根据后端<code>RS</code>的连接数来决定把请求的分配，比如<code>RS1</code>连接数比<code>RS2</code>连接数少，那么请求就优先发给 &nbsp;<code>RS1</code>这台服务器。</li>
 </ul>
 </li>
 <li><strong>WLC</strong>：<code>Weighted LC</code>，加权最少连接数<ul>
@@ -854,25 +858,7 @@ CONFIG_IP_VS_SED<span class="token operator">=</span>m
 </ul>
 </li>
 </ul>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
+
                 
             </div>
             <hr/>
@@ -1108,6 +1094,8 @@ CONFIG_IP_VS_SED<span class="token operator">=</span>m
 
     
 
+    
+
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
@@ -1137,7 +1125,7 @@ CONFIG_IP_VS_SED<span class="token operator">=</span>m
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Python入门基础/" class="post-category">
+                            <a href="/categories/Python%E5%85%A5%E9%97%A8%E5%9F%BA%E7%A1%80/" class="post-category">
                                     Python入门基础
                                 </a>
                             
@@ -1185,7 +1173,7 @@ CONFIG_IP_VS_SED<span class="token operator">=</span>m
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Python入门基础/" class="post-category">
+                            <a href="/categories/Python%E5%85%A5%E9%97%A8%E5%9F%BA%E7%A1%80/" class="post-category">
                                     Python入门基础
                                 </a>
                             
@@ -1387,7 +1375,9 @@ CONFIG_IP_VS_SED<span class="token operator">=</span>m
 <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
 
     
-    <div class="container row center-align" style="margin-bottom: 15px !important;">
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
@@ -1399,70 +1389,82 @@ CONFIG_IP_VS_SED<span class="token operator">=</span>m
             |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1121.5k</span>&nbsp;字
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1101.7k</span>
             
             
             
+                
             
             
-            
-            <span id="busuanzi_container_site_pv">
-                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
-                    class="white-color"></span>&nbsp;次
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
             </span>
             
             
-            <span id="busuanzi_container_site_uv">
-                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
-                    class="white-color"></span>&nbsp;人
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
             </span>
             
             <br>
+
+            <!-- 运行天数提醒. -->
             
-            <span id="sitetime">载入运行时间...</span>
-            <script>
-                function siteTime() {
-                    var seconds = 1000;
-                    var minutes = seconds * 60;
-                    var hours = minutes * 60;
-                    var days = hours * 24;
-                    var years = days * 365;
-                    var today = new Date();
-                    var startYear = "2017";
-                    var startMonth = "2";
-                    var startDate = "14";
-                    var startHour = "0";
-                    var startMinute = "0";
-                    var startSecond = "0";
-                    var todayYear = today.getFullYear();
-                    var todayMonth = today.getMonth() + 1;
-                    var todayDate = today.getDate();
-                    var todayHour = today.getHours();
-                    var todayMinute = today.getMinutes();
-                    var todaySecond = today.getSeconds();
-                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
-                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
-                    var diff = t2 - t1;
-                    var diffYears = Math.floor(diff / years);
-                    var diffDays = Math.floor((diff / days) - diffYears * 365);
-                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
-                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
-                        minutes);
-                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
-                        diffMinutes * minutes) / seconds);
-                    if (startYear == todayYear) {
-                        document.getElementById("year").innerHTML = todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
-                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
-                    } else {
-                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
-                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2017";
+                        var startMonth = "2";
+                        var startDate = "14";
+                        var startHour = "0";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
                     }
-                }
-                setInterval(siteTime, 1000);
-            </script>
+
+                    calcSiteTime();
+                </script>
             
             <br>
             

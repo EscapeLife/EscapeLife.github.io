@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 
 
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
     <meta charset="utf-8">
     <meta name="keywords" content="Python中的原子无锁计数器, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
@@ -29,6 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
+<meta name="generator" content="Hexo 5.4.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -435,7 +438,7 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Python进阶指南/" class="post-category">
+                            <a href="/categories/Python%E8%BF%9B%E9%98%B6%E6%8C%87%E5%8D%97/" class="post-category">
                                 Python进阶指南
                             </a>
                         
@@ -462,7 +465,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.3k
+                    1.2k
                 </div>
                 
 
@@ -490,7 +493,7 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <blockquote>
-<p><strong>本文翻译自<a href="https://julien.danjou.info/atomic-lock-free-counters-in-python/" target="_blank" rel="noopener">Julien Danjou</a>的博客文章</strong></p>
+<p><strong>本文翻译自<a target="_blank" rel="noopener" href="https://julien.danjou.info/atomic-lock-free-counters-in-python/">Julien Danjou</a>的博客文章</strong></p>
 </blockquote>
 <p><img src="../images/python-create-counter-class.jpg" alt="Python中的原子无锁计数器"></p>
 <hr>
@@ -503,7 +506,8 @@
         self<span class="token punctuation">.</span>value <span class="token operator">=</span> <span class="token number">0</span>
 
     <span class="token keyword">def</span> <span class="token function">increment</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        self<span class="token punctuation">.</span>value <span class="token operator">+=</span> <span class="token number">1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+        self<span class="token punctuation">.</span>value <span class="token operator">+=</span> <span class="token number">1</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-python"><code class="language-python">In <span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">:</span> id <span class="token operator">=</span> SingleThreadCounter<span class="token punctuation">(</span><span class="token punctuation">)</span>
 
 In <span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">:</span> id<span class="token punctuation">.</span>value
@@ -512,14 +516,16 @@ Out<span class="token punctuation">[</span><span class="token number">3</span><s
 In <span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">:</span> id<span class="token punctuation">.</span>increment<span class="token punctuation">(</span><span class="token punctuation">)</span>
 
 In <span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">]</span><span class="token punctuation">:</span> id<span class="token punctuation">.</span>value
-Out<span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">]</span><span class="token punctuation">:</span> <span class="token number">1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+Out<span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">]</span><span class="token punctuation">:</span> <span class="token number">1</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>但是这样会存在一个问题，根据名称我们知道，上述实例是针对单线程而言的。对于单线程的应用程序，这样是可以正常使用的。但是在多线程的时候，则会出现下面这样的情况。由此可知，上述的 <code>Counter</code> 类并不是线程安全的。</p>
 <pre class="line-numbers language-python"><code class="language-python">Thread<span class="token number">-1</span> reads the value <span class="token keyword">as</span> <span class="token number">23</span>
 Thread<span class="token number">-1</span> adds <span class="token number">1</span> to <span class="token number">23</span> <span class="token operator">and</span> get <span class="token number">24</span>
 Thread<span class="token number">-2</span> reads the value <span class="token keyword">as</span> <span class="token number">23</span>
 Thread<span class="token number">-1</span> stores <span class="token number">24</span> <span class="token keyword">in</span> value
 Thread<span class="token number">-2</span> adds <span class="token number">1</span> to <span class="token number">23</span>
-Thread<span class="token number">-2</span> stores <span class="token number">24</span> <span class="token keyword">in</span> value<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+Thread<span class="token number">-2</span> stores <span class="token number">24</span> <span class="token keyword">in</span> value
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="2-多线程实现"><a href="#2-多线程实现" class="headerlink" title="2. 多线程实现"></a>2. 多线程实现</h2><blockquote>
 <p><strong>The Thread-Safe Implementation</strong></p>
@@ -534,7 +540,8 @@ Thread<span class="token number">-2</span> stores <span class="token number">24<
 
     <span class="token keyword">def</span> <span class="token function">increment</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
         <span class="token keyword">with</span> self<span class="token punctuation">.</span>_lock<span class="token punctuation">:</span>
-            self<span class="token punctuation">.</span>value <span class="token operator">+=</span> <span class="token number">1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+            self<span class="token punctuation">.</span>value <span class="token operator">+=</span> <span class="token number">1</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>此实现是线程安全的，多个线程无法同时递增数值，因此数值不会丢失。但是，该计数器的实现有一个缺点，那就是每次数值需要递增的时候，都需要锁定该计数器。如果有许多线程同时更新计数器的数值，则此时可能会存在锁竞争。虽然优缺点，但是如果用于不经常更新查询的话，那么这个类就是线程安全计数器的绝佳实现。</p>
 <hr>
 <h2 id="3-快速写实现"><a href="#3-快速写实现" class="headerlink" title="3. 快速写实现"></a>3. 快速写实现</h2><blockquote>
@@ -559,7 +566,8 @@ Thread<span class="token number">-2</span> stores <span class="token number">24<
         <span class="token keyword">with</span> self<span class="token punctuation">.</span>_read_lock<span class="token punctuation">:</span>
             value <span class="token operator">=</span> next<span class="token punctuation">(</span>self<span class="token punctuation">.</span>_counter<span class="token punctuation">)</span> <span class="token operator">-</span> self<span class="token punctuation">.</span>_number_of_read
             self<span class="token punctuation">.</span>_number_of_read <span class="token operator">+=</span> <span class="token number">1</span>
-        <span class="token keyword">return</span> value<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+        <span class="token keyword">return</span> value
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-python"><code class="language-python">In <span class="token punctuation">[</span><span class="token number">12</span><span class="token punctuation">]</span><span class="token punctuation">:</span> counter <span class="token operator">=</span> FastWriteCounter<span class="token punctuation">(</span><span class="token punctuation">)</span>
 
 In <span class="token punctuation">[</span><span class="token number">13</span><span class="token punctuation">]</span><span class="token punctuation">:</span> counter<span class="token punctuation">.</span>value<span class="token punctuation">(</span><span class="token punctuation">)</span>
@@ -568,7 +576,8 @@ Out<span class="token punctuation">[</span><span class="token number">13</span><
 In <span class="token punctuation">[</span><span class="token number">14</span><span class="token punctuation">]</span><span class="token punctuation">:</span> counter<span class="token punctuation">.</span>increment<span class="token punctuation">(</span><span class="token punctuation">)</span>
 
 In <span class="token punctuation">[</span><span class="token number">15</span><span class="token punctuation">]</span><span class="token punctuation">:</span> counter<span class="token punctuation">.</span>value<span class="token punctuation">(</span><span class="token punctuation">)</span>
-Out<span class="token punctuation">[</span><span class="token number">15</span><span class="token punctuation">]</span><span class="token punctuation">:</span> <span class="token number">1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+Out<span class="token punctuation">[</span><span class="token number">15</span><span class="token punctuation">]</span><span class="token punctuation">:</span> <span class="token number">1</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>在这种情况下，加值操作的代码非常简单，计数器只是递增而没有任何锁定。 并发读取的时候使用 <code>GIL</code> 进行访问限制，因此我们不需要锁定任何内容。</p>
 <p>另一方面，<code>Python</code> 没有提供任何方法来读取 <code>itertools.count</code> 对象的值，所以我们需要使用一个小技巧来获取当前值。值方法递增计数器，然后获取值，同时减去已读取计数器的次数。因此，此计数器对于写操作是无锁的，但对于阅读而言则是有锁的。</p>
 <hr>
@@ -602,7 +611,7 @@ Out<span class="token punctuation">[</span><span class="token number">15</span><
 <p>事实证明 <code>SingleThreadCounter</code> 和 <code>FastReadCounter</code> 类具有相同的读取性能。<code>SingleThreadCounter</code> 和 <code>FastWriteCounter</code> 也是一样，它们具有相同的递增性能。这很明显，但是如果你使用的是单线程，则并不需要关心并发访问的问题，你也应该使用简单的递增整数。</p>
 <hr>
 <h2 id="5-完整实现"><a href="#5-完整实现" class="headerlink" title="5. 完整实现"></a>5. 完整实现</h2><blockquote>
-<p><strong><a href="https://github.com/jd/fastcounter/blob/master/fastcounter/__init__.py" target="_blank" rel="noopener">https://github.com/jd/fastcounter/blob/master/fastcounter/__init__.py</a></strong></p>
+<p><strong><a target="_blank" rel="noopener" href="https://github.com/jd/fastcounter/blob/master/fastcounter/__init__.py">https://github.com/jd/fastcounter/blob/master/fastcounter/__init__.py</a></strong></p>
 </blockquote>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> itertools
 <span class="token keyword">import</span> threading
@@ -664,26 +673,9 @@ Out<span class="token punctuation">[</span><span class="token number">15</span><
         <span class="token keyword">with</span> self<span class="token punctuation">.</span>_lock<span class="token punctuation">:</span>
             value <span class="token operator">=</span> next<span class="token punctuation">(</span>self<span class="token punctuation">.</span>_counter<span class="token punctuation">)</span> <span class="token operator">-</span> self<span class="token punctuation">.</span>_number_of_read
             self<span class="token punctuation">.</span>_number_of_read <span class="token operator">+=</span> self<span class="token punctuation">.</span>_step
-        <span class="token keyword">return</span> value<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
+        <span class="token keyword">return</span> value
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
                 
             </div>
             <hr/>
@@ -915,6 +907,8 @@ Out<span class="token punctuation">[</span><span class="token number">15</span><
 
     
 
+    
+
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
@@ -944,7 +938,7 @@ Out<span class="token punctuation">[</span><span class="token number">15</span><
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/K8S即学即用/" class="post-category">
+                            <a href="/categories/K8S%E5%8D%B3%E5%AD%A6%E5%8D%B3%E7%94%A8/" class="post-category">
                                     K8S即学即用
                                 </a>
                             
@@ -992,7 +986,7 @@ Out<span class="token punctuation">[</span><span class="token number">15</span><
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Linux命令使用/" class="post-category">
+                            <a href="/categories/Linux%E5%91%BD%E4%BB%A4%E4%BD%BF%E7%94%A8/" class="post-category">
                                     Linux命令使用
                                 </a>
                             
@@ -1198,7 +1192,9 @@ Out<span class="token punctuation">[</span><span class="token number">15</span><
 <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
 
     
-    <div class="container row center-align" style="margin-bottom: 15px !important;">
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
@@ -1210,70 +1206,82 @@ Out<span class="token punctuation">[</span><span class="token number">15</span><
             |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1121.5k</span>&nbsp;字
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1101.7k</span>
             
             
             
+                
             
             
-            
-            <span id="busuanzi_container_site_pv">
-                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
-                    class="white-color"></span>&nbsp;次
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
             </span>
             
             
-            <span id="busuanzi_container_site_uv">
-                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
-                    class="white-color"></span>&nbsp;人
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
             </span>
             
             <br>
+
+            <!-- 运行天数提醒. -->
             
-            <span id="sitetime">载入运行时间...</span>
-            <script>
-                function siteTime() {
-                    var seconds = 1000;
-                    var minutes = seconds * 60;
-                    var hours = minutes * 60;
-                    var days = hours * 24;
-                    var years = days * 365;
-                    var today = new Date();
-                    var startYear = "2017";
-                    var startMonth = "2";
-                    var startDate = "14";
-                    var startHour = "0";
-                    var startMinute = "0";
-                    var startSecond = "0";
-                    var todayYear = today.getFullYear();
-                    var todayMonth = today.getMonth() + 1;
-                    var todayDate = today.getDate();
-                    var todayHour = today.getHours();
-                    var todayMinute = today.getMinutes();
-                    var todaySecond = today.getSeconds();
-                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
-                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
-                    var diff = t2 - t1;
-                    var diffYears = Math.floor(diff / years);
-                    var diffDays = Math.floor((diff / days) - diffYears * 365);
-                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
-                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
-                        minutes);
-                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
-                        diffMinutes * minutes) / seconds);
-                    if (startYear == todayYear) {
-                        document.getElementById("year").innerHTML = todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
-                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
-                    } else {
-                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
-                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2017";
+                        var startMonth = "2";
+                        var startDate = "14";
+                        var startHour = "0";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
                     }
-                }
-                setInterval(siteTime, 1000);
-            </script>
+
+                    calcSiteTime();
+                </script>
             
             <br>
             

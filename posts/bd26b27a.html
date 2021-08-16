@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 
 
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
     <meta charset="utf-8">
     <meta name="keywords" content="Supervisor不中断重启服务, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
@@ -29,6 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
+<meta name="generator" content="Hexo 5.4.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -443,7 +446,7 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Bug解决之道/" class="post-category">
+                            <a href="/categories/Bug%E8%A7%A3%E5%86%B3%E4%B9%8B%E9%81%93/" class="post-category">
                                 Bug解决之道
                             </a>
                         
@@ -470,14 +473,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.5k
+                    1.4k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    7 分
+                    6 分
                 </div>
                 
 
@@ -506,7 +509,8 @@
 <li>我们常常使用 <code>supervisor</code> 来管理服务进程，因为其能够提供很好且很健全的便捷支持，比如服务异常退出之后可以自行重启等。同样，在部署服务的时候也是可以使用该工具进行管理。为了不中断服务对产品进行更新，我们通常会使用信号量来不中断的重启服务。当然，我们的 <code>supervisor</code> 是支持接收 <code>HUP</code> 信号量的。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用方式</span>
-$ <span class="token function">sudo</span> supervisorctl signal HUP app-test:*<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> supervisorctl signal HUP app-test:*
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
 <li>但是，我们在使用的过程中发现，在使用 <code>HUP</code> 的时候，会发生进程并没有重启的异常情况。如下所示，我们使用 <code>supervisor</code> 管理了一个产品的服务，一个是 <code>web</code> 服务，另一个是对应的 <code>worker</code> 服务，其中 <code>worker</code> 服务启动的是一个 <code>celery</code> 服务。</li>
 </ul>
@@ -517,7 +521,8 @@ root    249   140  00:00:00 /usr/bin/python3 -c from multiprocessing.semaphore_t
 root  20309     1  00:00:01 /usr/bin/python3 /usr/local/bin/celery -A remarkable.worker.app worker -n norm-%n@%h -l debug -c 2 -Q celery
 root  20339 20309  00:00:00 /usr/bin/python3 -c from multiprocessing.semaphore_tracker <span class="token function">import</span> main<span class="token punctuation">;</span>main<span class="token punctuation">(</span>3<span class="token punctuation">)</span>
 root  20340 20309  00:00:00 /usr/bin/python3 /usr/local/bin/celery -A remarkable.worker.app worker -n norm-%n@%h -l debug -c 2 -Q celery
-root  20341 20309  00:00:00 /usr/bin/python3 /usr/local/bin/celery -A remarkable.worker.app worker -n norm-%n@%h -l debug -c 2 -Q celery<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+root  20341 20309  00:00:00 /usr/bin/python3 /usr/local/bin/celery -A remarkable.worker.app worker -n norm-%n@%h -l debug -c 2 -Q celery
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>但是使用 <code>HUP</code> 信号量来重启服务之后，查看对应的进程关系发现，有一个 <code>20339</code> 的子进程并没有退出，而且提示信息变成了 <code>&lt;defunct&gt;</code>。这就导致我很频繁重启服务的时候，会产生很多没有用的进程占用内存等资源。</li>
 </ul>
@@ -529,10 +534,11 @@ root  20309     1  00:00:04 /usr/bin/python3 /usr/local/bin/celery -A remarkable
 root  20339 20309  00:00:00 <span class="token punctuation">[</span>python3<span class="token punctuation">]</span> <span class="token operator">&lt;</span>defunct<span class="token operator">></span>
 root  20691 20309  00:00:00 /usr/bin/python3 -c from multiprocessing.semaphore_tracker <span class="token function">import</span> main<span class="token punctuation">;</span>main<span class="token punctuation">(</span>3<span class="token punctuation">)</span>
 root  20694 20309  00:00:00 /usr/bin/python3 /usr/local/bin/celery -A remarkable.worker.app worker -n norm-%n@%h -l debug -c 2 -Q celery
-root  20695 20309  00:00:00 /usr/bin/python3 /usr/local/bin/celery -A remarkable.worker.app worker -n norm-%n@%h -l debug -c 2 -Q celery<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+root  20695 20309  00:00:00 /usr/bin/python3 /usr/local/bin/celery -A remarkable.worker.app worker -n norm-%n@%h -l debug -c 2 -Q celery
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="2-排除经过"><a href="#2-排除经过" class="headerlink" title="2. 排除经过"></a>2. 排除经过</h2><ul>
-<li>那么，我们看下是什么原因导致上述问题的出现呢？通过阅读 <a href="https://docs.celeryproject.org/en/stable/userguide/workers.html#restarting-the-worker" target="_blank" rel="noopener"><strong><code>celery</code> 的官方文档</strong></a> 得知，其实它是支持 <code>HUP</code> 信号量，虽然是处理试用阶段并不推荐用于正式环境。</li>
+<li>那么，我们看下是什么原因导致上述问题的出现呢？通过阅读 <a target="_blank" rel="noopener" href="https://docs.celeryproject.org/en/stable/userguide/workers.html#restarting-the-worker"><strong><code>celery</code> 的官方文档</strong></a> 得知，其实它是支持 <code>HUP</code> 信号量，虽然是处理试用阶段并不推荐用于正式环境。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash">Other than stopping, <span class="token keyword">then</span> starting the worker to restart, you can also restart
 the worker using the HUP signal. Note that the worker will be responsible <span class="token keyword">for</span>
@@ -542,7 +548,8 @@ $ <span class="token function">kill</span> -HUP <span class="token variable">$pi
 Note
 Restarting by HUP only works <span class="token keyword">if</span> the worker is running <span class="token keyword">in</span> the background as a
 daemon <span class="token punctuation">(</span>it doesn’t have a controlling terminal<span class="token punctuation">)</span>.
-HUP is disabled on macOS because of a limitation on that platform.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+HUP is disabled on macOS because of a limitation on that platform.
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>我们可以看到，启动时候调用的是 <code>Python</code> 系统自带的多进程库 <code>multiprocessing</code> 中的 <code>semaphore_tracker</code> 函数，但是在其定义的源代码中并没有发现处理和接受 <code>HUP</code> 信号量的响应代码程序。</li>
 </ul>
@@ -553,7 +560,8 @@ HUP is disabled on macOS because of a limitation on that platform.<span aria-hid
     signal.signal<span class="token punctuation">(</span>signal.SIGTERM, signal.SIG_IGN<span class="token punctuation">)</span>
     <span class="token keyword">if</span> _HAVE_SIGMASK:
         signal.pthread_sigmask<span class="token punctuation">(</span>signal.SIG_UNBLOCK, _IGNORED_SIGNALS<span class="token punctuation">)</span>
-<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="3-结果总结"><a href="#3-结果总结" class="headerlink" title="3. 结果总结"></a>3. 结果总结</h2><ul>
 <li>咳咳咳，很多天后，无意间我在 <code>stackoverflow</code> 中看到有个人提了一个问题: <strong>在 docker 中使用 python 多进程库 multiprocessing 系统就奔溃了</strong>。</li>
@@ -568,7 +576,8 @@ HUP is disabled on macOS because of a limitation on that platform.<span aria-hid
     ctx <span class="token operator">=</span> mp<span class="token punctuation">.</span>get_context<span class="token punctuation">(</span><span class="token string">"spawn"</span><span class="token punctuation">)</span>
     p <span class="token operator">=</span> ctx<span class="token punctuation">.</span>Process<span class="token punctuation">(</span>target<span class="token operator">=</span>do_something<span class="token punctuation">,</span> args<span class="token operator">=</span>tuple<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
     p<span class="token punctuation">.</span>start<span class="token punctuation">(</span><span class="token punctuation">)</span>
-    p<span class="token punctuation">.</span>join<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    p<span class="token punctuation">.</span>join<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-dockerfile"><code class="language-dockerfile">version: '3.6'
 
 services:
@@ -577,7 +586,8 @@ services:
       context: .
     environment:
       - PYTHONUNBUFFERED=1
-    command: su -c "python3.6 forever.py"<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    command: su -c "python3.6 forever.py"
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> time <span class="token keyword">import</span> sleep
 
 <span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
@@ -585,12 +595,14 @@ services:
     <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
         sleep<span class="token punctuation">(</span><span class="token number">1.0</span><span class="token punctuation">)</span>
         i <span class="token operator">+=</span> <span class="token number">1</span>
-        <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">'hello {i:3}'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">'hello {i:3}'</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># To reproduce bug run in first terminal:</span>
 docker-compose build <span class="token operator">&amp;&amp;</span> docker-compose up
 
 <span class="token comment" spellcheck="true"># In the second one</span>
-docker <span class="token function">exec</span> -it downloadmovies_bug_1 python3 mp.py<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+docker <span class="token function">exec</span> -it downloadmovies_bug_1 python3 mp.py
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><p>通过阅读 <code>georgexsh</code> 同学的回答得知，如果我们在使用 <code>multiprocessing</code> 模块的时候使用了 <code>spawn</code> 模式，<code>Python</code> 默认会启动一个<strong>信号跟踪器进程</strong>(<code>semaphore_tracker</code>)来防止信号量泄露。这个进程是由 <code>mp.py</code> 启动得来的，但是在 <code>mp.py</code> 退出之后才退出，所以不会被 <code>mp.py</code> 捕获到，而是由系统的 <code>init</code> 进程接管。问题在于容器中 <code>PID</code> 为 <code>1</code> 的进程并不是传统意义上的 <code>init</code> 进程，而是我们通过 <code>entrypoint</code> 或 <code>cmd</code> 传入的命令，所以这里 <code>PID</code> 为 <code>1</code> 的进程是 <code>su -c</code> 命令。因此<strong>信号跟踪器进程</strong>(<code>semaphore_tracker</code>)传递给了 <code>su</code> 命令，但是它却并不识别。<code>su</code> 认为子进程是命令进程(<code>forever.py</code>)错误，没有检查关系直接退出了。当 <code>PID</code> 为 <code>1</code> 进程退出时，内核杀死容器中的所有其他进程，包括 <code>forever.py</code>。</p>
 </li>
@@ -608,35 +620,18 @@ root        28    27  1 07:30 pts/0    00:00:00 /usr/local/bin/python3 -c from m
 root        29    27  2 07:30 pts/0    00:00:00 <span class="token punctuation">[</span>python3<span class="token punctuation">]</span> <span class="token operator">&lt;</span>defunct<span class="token operator">></span>
 
 root        20     0  0 07:29 pts/1    00:00:00 <span class="token function">bash</span>
-root        30    20  0 07:30 pts/1    00:00:00 <span class="token function">ps</span> -ef<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+root        30    20  0 07:30 pts/1    00:00:00 <span class="token function">ps</span> -ef
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="4-参考文档"><a href="#4-参考文档" class="headerlink" title="4. 参考文档"></a>4. 参考文档</h2><blockquote>
 <p><strong>送人玫瑰，手有余香！</strong></p>
 </blockquote>
 <ul>
-<li><a href="http://docs.celeryproject.org/en/latest/userguide/workers.html#restarting-the-worker" target="_blank" rel="noopener">Restarting the worker</a></li>
-<li><a href="https://github.com/python/cpython/blob/master/Lib/multiprocessing/semaphore_tracker.py#L128" target="_blank" rel="noopener">cpython/Lib/multiprocessing/semaphore_tracker.py</a>)</li>
-<li><a href="https://stackoverflow.com/questions/54650904/python-multiprocessing-crashes-docker-container" target="_blank" rel="noopener">Python multiprocessing crashes docker container</a></li>
+<li><a target="_blank" rel="noopener" href="http://docs.celeryproject.org/en/latest/userguide/workers.html#restarting-the-worker">Restarting the worker</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/python/cpython/blob/master/Lib/multiprocessing/semaphore_tracker.py#L128">cpython/Lib/multiprocessing/semaphore_tracker.py</a>)</li>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/54650904/python-multiprocessing-crashes-docker-container">Python multiprocessing crashes docker container</a></li>
 </ul>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
+
                 
             </div>
             <hr/>
@@ -876,6 +871,8 @@ root        30    20  0 07:30 pts/1    00:00:00 <span class="token function">ps<
 
     
 
+    
+
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
@@ -905,7 +902,7 @@ root        30    20  0 07:30 pts/1    00:00:00 <span class="token function">ps<
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Nginx活学活用/" class="post-category">
+                            <a href="/categories/Nginx%E6%B4%BB%E5%AD%A6%E6%B4%BB%E7%94%A8/" class="post-category">
                                     Nginx活学活用
                                 </a>
                             
@@ -953,7 +950,7 @@ root        30    20  0 07:30 pts/1    00:00:00 <span class="token function">ps<
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Docker学习攻略/" class="post-category">
+                            <a href="/categories/Docker%E5%AD%A6%E4%B9%A0%E6%94%BB%E7%95%A5/" class="post-category">
                                     Docker学习攻略
                                 </a>
                             
@@ -1159,7 +1156,9 @@ root        30    20  0 07:30 pts/1    00:00:00 <span class="token function">ps<
 <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
 
     
-    <div class="container row center-align" style="margin-bottom: 15px !important;">
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
@@ -1171,70 +1170,82 @@ root        30    20  0 07:30 pts/1    00:00:00 <span class="token function">ps<
             |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1121.5k</span>&nbsp;字
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1101.7k</span>
             
             
             
+                
             
             
-            
-            <span id="busuanzi_container_site_pv">
-                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
-                    class="white-color"></span>&nbsp;次
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
             </span>
             
             
-            <span id="busuanzi_container_site_uv">
-                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
-                    class="white-color"></span>&nbsp;人
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
             </span>
             
             <br>
+
+            <!-- 运行天数提醒. -->
             
-            <span id="sitetime">载入运行时间...</span>
-            <script>
-                function siteTime() {
-                    var seconds = 1000;
-                    var minutes = seconds * 60;
-                    var hours = minutes * 60;
-                    var days = hours * 24;
-                    var years = days * 365;
-                    var today = new Date();
-                    var startYear = "2017";
-                    var startMonth = "2";
-                    var startDate = "14";
-                    var startHour = "0";
-                    var startMinute = "0";
-                    var startSecond = "0";
-                    var todayYear = today.getFullYear();
-                    var todayMonth = today.getMonth() + 1;
-                    var todayDate = today.getDate();
-                    var todayHour = today.getHours();
-                    var todayMinute = today.getMinutes();
-                    var todaySecond = today.getSeconds();
-                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
-                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
-                    var diff = t2 - t1;
-                    var diffYears = Math.floor(diff / years);
-                    var diffDays = Math.floor((diff / days) - diffYears * 365);
-                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
-                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
-                        minutes);
-                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
-                        diffMinutes * minutes) / seconds);
-                    if (startYear == todayYear) {
-                        document.getElementById("year").innerHTML = todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
-                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
-                    } else {
-                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
-                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2017";
+                        var startMonth = "2";
+                        var startDate = "14";
+                        var startHour = "0";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
                     }
-                }
-                setInterval(siteTime, 1000);
-            </script>
+
+                    calcSiteTime();
+                </script>
             
             <br>
             

@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 
 
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
     <meta charset="utf-8">
     <meta name="keywords" content="LVS服务之IP负载均衡技术, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
@@ -29,6 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
+<meta name="generator" content="Hexo 5.4.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -439,7 +442,7 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Linux服务部署/" class="post-category">
+                            <a href="/categories/Linux%E6%9C%8D%E5%8A%A1%E9%83%A8%E7%BD%B2/" class="post-category">
                                 Linux服务部署
                             </a>
                         
@@ -473,7 +476,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    15 分
+                    14 分
                 </div>
                 
 
@@ -515,7 +518,7 @@
 <p><img src="/images/linux-lvs-cluster-tech-20.jpg" alt="LVS服务之IP负载均衡技术"></p>
 <hr>
 <h2 id="1-实现框架"><a href="#1-实现框架" class="headerlink" title="1. 实现框架"></a>1. 实现框架</h2><blockquote>
-<p><a href="http://zh.linuxvirtualserver.org/node/58" target="_blank" rel="noopener">系统实现的若干问题</a>可以查看官方文档的说明。</p>
+<p><a target="_blank" rel="noopener" href="http://zh.linuxvirtualserver.org/node/58">系统实现的若干问题</a>可以查看官方文档的说明。</p>
 </blockquote>
 <p>在<code>Linux</code>内核<code>2.0</code>和内核<code>2.2</code>的版本中，通过修改了<code>TCP/IP</code>协议栈，在<code>IP</code>层截取和改写/转发<code>IP</code>报文，实现了三种<strong>IP 负载均衡技术</strong>，并提供了一个<strong>ipvsadm</strong>程序进行虚拟服务器的配置和管理。而在<code>Linux</code>内核<code>2.4</code>和<code>2.6</code>中，把它实现为<code>NetFilter</code>的一个模块，很多代码作了改写和进一步优化，已经较稳定。</p>
 <p><img src="/images/linux-lvs-cluster-tech-21.jpg" alt="LVS服务之IP负载均衡技术"></p>
@@ -541,7 +544,7 @@
 <h2 id="2-VS-NAT"><a href="#2-VS-NAT" class="headerlink" title="2. VS/NAT"></a>2. VS/NAT</h2><p>由于<code>IPv4</code>中<code>IP</code>地址空间的日益紧张和安全方面的原因，很多网络使用保留<code>IP</code>地址专门为内部网络使用，如<code>10.0.0.0/255.0.0.0</code>、<code>172.16.0.0/255.128.0.0</code>和<code>192.168.0.0/255.255.0.0</code>。当内部网络中的主机要访问<code>Internet</code>或被<code>Internet</code>访问时，就需要采用<strong>网络地址转换</strong>(<code>NAT</code>)，将内部地址转化为<code>Internets</code>上可用的外部地址。<code>NAT</code>的工作原理是报文头(目标地址、源地址和端口等)被正确改写后，客户相信它们连接一个<code>IP</code>地址，而不同<code>IP</code>地址的服务器组也认为它们是与客户直接相连的。由此，可以用<code>NAT</code>方法将不同<code>IP</code>地址的并行网络服务变成在一个<code>IP</code>地址上的一个虚拟服务。</p>
 <p><code>VS/NAT</code>的体系结构如下图所示。在一组服务器前有一个调度器，它们是通过<code>Switch/HUB</code>相连接的。这些服务器提供相同的网络服务、相同的内容，即不管请求被发送到哪一台服务器，执行结果是一样的。服务的内容可以复制到每台服务器的本地硬盘上，可以通过网络文件系统(如<code>NFS</code>文件系统)共享，也可以通过一个分布式文件系统来提供。</p>
 <p><img src="/images/linux-lvs-cluster-tech-22.jpg" alt="LVS服务之IP负载均衡技术"></p>
-<p>客户通过<strong>虚拟服务的 IP 地址</strong>(<code>Virtual IP Address</code>)访问网络服务时，请求报文到达调度器，调度器根据连接<strong>调度算法</strong>从一组真实服务器中选出一台服务器，将报文的目标地址<code>Virtual IP Address</code>改写成选定服务器的地址，报文的目标端口改写成选定服务器的相应端口，最后将修改后的报文发送给选出的服务器。同时，调度器在连接<strong><code>Hash</code>表</strong>中记录这个连接，当这个连接的下一个报文到达时，从连接<code>Hash</code>表中可以得到原选定服务器的地址和端口，进行同样的改写操作，并将报文传给原选定的服务器。当来自真实服务器的响应报文经过调度器时，调度器将报文的源地址和源端口改为<code>Virtual IP Address</code>和相应的端口，再把报文发给用户。我们在连接上引入一个状态机，不同的报文会使得连接处于不同的状态，不同的状态有不同的超时值。在<code>TCP</code>连接中，根据标准的<code>TCP</code>有限状态机进行状态迁移；在<code>UDP</code>中，我们只设置一个<code>UDP</code>状态。不同状态的超时值是可以设置的，在缺省情况下，<code>SYN</code>状态的超时为<code>1</code>分钟，<code>ESTABLISHED</code>状态的超时为<code>15</code>分钟，<code>FIN</code>状态的超时为<code>1</code>分钟；<code>UDP</code>状态的超时为<code>5</code>分钟。当连接终止或超时，调度器将这个连接从连接<code>Hash</code>表中删除。</p>
+<p>客户通过<strong>虚拟服务的 IP 地址</strong>(<code>Virtual IP Address</code>)访问网络服务时，请求报文到达调度器，调度器根据连接<strong>调度算法</strong>从一组真实服务器中选出一台服务器，将报文的目标地址<code>Virtual IP Address</code>改写成选定服务器的地址，报文的目标端口改写成选定服务器的相应端口，最后将修改后的报文发送给选出的服务器。同时，调度器在连接**<code>Hash</code>表**中记录这个连接，当这个连接的下一个报文到达时，从连接<code>Hash</code>表中可以得到原选定服务器的地址和端口，进行同样的改写操作，并将报文传给原选定的服务器。当来自真实服务器的响应报文经过调度器时，调度器将报文的源地址和源端口改为<code>Virtual IP Address</code>和相应的端口，再把报文发给用户。我们在连接上引入一个状态机，不同的报文会使得连接处于不同的状态，不同的状态有不同的超时值。在<code>TCP</code>连接中，根据标准的<code>TCP</code>有限状态机进行状态迁移；在<code>UDP</code>中，我们只设置一个<code>UDP</code>状态。不同状态的超时值是可以设置的，在缺省情况下，<code>SYN</code>状态的超时为<code>1</code>分钟，<code>ESTABLISHED</code>状态的超时为<code>15</code>分钟，<code>FIN</code>状态的超时为<code>1</code>分钟；<code>UDP</code>状态的超时为<code>5</code>分钟。当连接终止或超时，调度器将这个连接从连接<code>Hash</code>表中删除。</p>
 <p>这样，客户所看到的只是在<code>Virtual IP Address</code>上提供的服务，而服务器集群的结构对用户是透明的。对改写后的报文，应用增量调整<code>Checksum</code>的算法调整<code>TCP Checksum</code>的值，避免了扫描整个报文来计算<code>Checksum</code>的开销。</p>
 <p>在一些网络服务中，它们将 IP 地址或者端口号在报文的数据中传送，若我们只对报文头的 IP 地址和端口号作转换，这样就会出现不一致性，服务会中断。所以，针对这些服务，需要编写相应的应用模块来转换报文数据中的 IP 地址或者端口号。我们所知道有这个问题的网络服务有<code>FTP</code>、<code>IRC</code>、<code>RSTP</code>、<code>PPTP</code>等。</p>
 <p>下面，举个例子来进一步说明<code>VS/NAT</code>，如下图所示：</p>
@@ -581,25 +584,7 @@
 <h2 id="5-优缺点比较"><a href="#5-优缺点比较" class="headerlink" title="5. 优缺点比较"></a>5. 优缺点比较</h2><p><strong>三种 IP 负载均衡技术</strong>的优缺点归纳在下表中：</p>
 <p><img src="/images/linux-lvs-cluster-tech-08.png" alt="LVS服务之IP负载均衡技术"></p>
 <p>注：以上三种方法所能支持最大服务器数目的估计是假设调度器使用 100M 网卡，调度器的硬件配置与后端服务器的硬件配置相同，而且是对一般 Web 服务。使用更高的硬件配置（如千兆网卡和更快的处理器）作为调度器，调度器所能调度的服务器数量会相应增加。当应用不同时，服务器的数目也会相应地改变。所以，以上数据估计主要是为三种方法的伸缩性进行量化比较。</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
+
                 
             </div>
             <hr/>
@@ -835,6 +820,8 @@
 
     
 
+    
+
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
@@ -864,7 +851,7 @@
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Python第三方库/" class="post-category">
+                            <a href="/categories/Python%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/" class="post-category">
                                     Python第三方库
                                 </a>
                             
@@ -916,7 +903,7 @@
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Python第三方库/" class="post-category">
+                            <a href="/categories/Python%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/" class="post-category">
                                     Python第三方库
                                 </a>
                             
@@ -1122,7 +1109,9 @@
 <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
 
     
-    <div class="container row center-align" style="margin-bottom: 15px !important;">
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
@@ -1134,70 +1123,82 @@
             |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1121.5k</span>&nbsp;字
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1101.7k</span>
             
             
             
+                
             
             
-            
-            <span id="busuanzi_container_site_pv">
-                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
-                    class="white-color"></span>&nbsp;次
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
             </span>
             
             
-            <span id="busuanzi_container_site_uv">
-                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
-                    class="white-color"></span>&nbsp;人
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
             </span>
             
             <br>
+
+            <!-- 运行天数提醒. -->
             
-            <span id="sitetime">载入运行时间...</span>
-            <script>
-                function siteTime() {
-                    var seconds = 1000;
-                    var minutes = seconds * 60;
-                    var hours = minutes * 60;
-                    var days = hours * 24;
-                    var years = days * 365;
-                    var today = new Date();
-                    var startYear = "2017";
-                    var startMonth = "2";
-                    var startDate = "14";
-                    var startHour = "0";
-                    var startMinute = "0";
-                    var startSecond = "0";
-                    var todayYear = today.getFullYear();
-                    var todayMonth = today.getMonth() + 1;
-                    var todayDate = today.getDate();
-                    var todayHour = today.getHours();
-                    var todayMinute = today.getMinutes();
-                    var todaySecond = today.getSeconds();
-                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
-                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
-                    var diff = t2 - t1;
-                    var diffYears = Math.floor(diff / years);
-                    var diffDays = Math.floor((diff / days) - diffYears * 365);
-                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
-                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
-                        minutes);
-                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
-                        diffMinutes * minutes) / seconds);
-                    if (startYear == todayYear) {
-                        document.getElementById("year").innerHTML = todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
-                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
-                    } else {
-                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
-                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2017";
+                        var startMonth = "2";
+                        var startDate = "14";
+                        var startHour = "0";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
                     }
-                }
-                setInterval(siteTime, 1000);
-            </script>
+
+                    calcSiteTime();
+                </script>
             
             <br>
             

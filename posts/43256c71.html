@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 
 
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
     <meta charset="utf-8">
     <meta name="keywords" content="Docker防火墙管理, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
@@ -29,6 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
+<meta name="generator" content="Hexo 5.4.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -443,7 +446,7 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Docker学习攻略/" class="post-category">
+                            <a href="/categories/Docker%E5%AD%A6%E4%B9%A0%E6%94%BB%E7%95%A5/" class="post-category">
                                 Docker学习攻略
                             </a>
                         
@@ -477,7 +480,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    7 分
+                    6 分
                 </div>
                 
 
@@ -498,7 +501,7 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <blockquote>
-<p><strong>纸上得来终觉浅，绝知此事要躬行。=&gt; <a href="https://github.com/chaifeng/ufw-docker" target="_blank" rel="noopener">ufw-docker</a></strong></p>
+<p><strong>纸上得来终觉浅，绝知此事要躬行。=&gt; <a target="_blank" rel="noopener" href="https://github.com/chaifeng/ufw-docker">ufw-docker</a></strong></p>
 </blockquote>
 <p><img src="../images/docker-ufw-iptable.webp" alt="Docker防火墙管理"></p>
 <h2 id="1-问题描述"><a href="#1-问题描述" class="headerlink" title="1. 问题描述"></a>1. 问题描述</h2><blockquote>
@@ -512,7 +515,8 @@
 </ol>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 运行一个httpd服务</span>
 <span class="token comment" spellcheck="true"># 将容器的80端口发布到服务器的8080端口上</span>
-$ docker run -d --name httpd -p 0.0.0.0:8080:80 httpd:alpine<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+$ docker run -d --name httpd -p 0.0.0.0:8080:80 httpd:alpine
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <p>这个问题其实挺严重的，这意味着本来只是为了在<strong>内部提供服务的一个端口被暴露在公共网络上</strong>。在网络上搜索 <strong>“ufw docker”</strong> 可以发现很多的讨论，都是在说这个问题的。基本上可以找到的解决办法就是首先禁用 <code>docker</code> 的 <code>iptables</code> 功能，但这也意味着放弃了 <code>docker</code> 的网络管理功能，很典型的现象就是<strong>容器将无法访问外部网络</strong>。在有的文章中也提到了可以在 <code>UFW</code> 的配置文件中手工添加一条规则，比如 <code>-A POSTROUTING ! -o docker0 -s 172.17.0.0/16 -j MASQUERADE</code>。但这也只是允许了 <code>172.17.0.0/16</code> 这个网络。如果有了新增的网络，我们也必须<strong>手工再为新增的网络添加这样类似的 <code>iptables</code> 规则</strong>。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 禁用docker的iptables功能</span>
 <span class="token comment" spellcheck="true"># start docker with --iptables=false</span>
@@ -520,7 +524,8 @@ $ docker run -d --name httpd -p 0.0.0.0:8080:80 httpd:alpine<span aria-hidden="t
 
 <span class="token comment" spellcheck="true"># 添加iptable规则</span>
 <span class="token comment" spellcheck="true"># FORWARD chain policy set to ACCEPT</span>
-$ <span class="token function">sudo</span> iptables -t nat -A POSTROUTING <span class="token operator">!</span> -o docker0 -s 172.17.0.0/16 -j MASQUERADE<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> iptables -t nat -A POSTROUTING <span class="token operator">!</span> -o docker0 -s 172.17.0.0/16 -j MASQUERADE
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="2-期望目标"><a href="#2-期望目标" class="headerlink" title="2. 期望目标"></a>2. 期望目标</h2><blockquote>
 <p><strong>现在有什么解决方式呢？</strong></p>
@@ -549,7 +554,8 @@ UFW的默认FORWARD规则改回默认的DROP，而非ACCEPT
 删除UFW配置文件/etc/ufw/after.rules中与Docker网络相关的规则
 
 <span class="token comment" spellcheck="true"># 4.重启服务</span>
-如果修改了Docker相关的配置文件，重启 Docker<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+如果修改了Docker相关的配置文件，重启 Docker
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>解决方法</strong></li>
 </ul>
@@ -578,36 +584,23 @@ UFW的默认FORWARD规则改回默认的DROP，而非ACCEPT
 
 -A DOCKER-USER -j RETURN
 COMMIT
-<span class="token comment" spellcheck="true"># END UFW AND DOCKER</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token comment" spellcheck="true"># END UFW AND DOCKER</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>如果希望允许外部网络访问 <code>Docker</code> 容器提供的服务，比如有一个容器的服务端口是 <code>80</code>。这个命令会允许外部网络访问所有用 <code>Docker</code> 发布出来的并且内部服务端口为 <code>80</code> 的所有服务。请注意，这个端口 <code>80</code> 是容器的端口，而非使用 <code>-p 0.0.0.0:8080:80</code> 选项发布在服务器上的 <code>8080</code> 端口。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 那就可以用以下命令来允许外部网络访问这个服务</span>
-$ <span class="token function">sudo</span> ufw route allow proto tcp from any to any port 80<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> ufw route allow proto tcp from any to any port 80
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <p>如果有多个容器的服务端口为 <code>80</code>，但只希望外部网络访问某个特定的容器。比如该容器的私有地址为 <code>172.17.0.2</code>，就用类似下面的命令。</p>
-<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> ufw route allow proto tcp from any to 172.17.0.2 port 80<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> ufw route allow proto tcp from any to 172.17.0.2 port 80
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>如果一个容器的服务是 <code>UDP</code> 协议，假如是 <code>DNS</code> 服务，可以用下面的命令来允许外部网络访问所有发布出来的 <code>DNS</code> 服务。</p>
 <pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> ufw route allow proto udp from any to any port 53
-$ <span class="token function">sudo</span> ufw route allow log-all 53 comment <span class="token string">"open udp 53 port"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> ufw route allow log-all 53 comment <span class="token string">"open udp 53 port"</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <p>同样的，如果只针对一个特定的容器，比如 <code>IP</code> 地址为 <code>172.17.0.2</code>。</p>
-<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> ufw route allow proto udp from any to 172.17.0.2 port 53<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> ufw route allow proto udp from any to 172.17.0.2 port 53
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
                 
             </div>
             <hr/>
@@ -847,6 +840,8 @@ $ <span class="token function">sudo</span> ufw route allow log-all 53 comment <s
 
     
 
+    
+
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
@@ -876,7 +871,7 @@ $ <span class="token function">sudo</span> ufw route allow log-all 53 comment <s
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Docker学习攻略/" class="post-category">
+                            <a href="/categories/Docker%E5%AD%A6%E4%B9%A0%E6%94%BB%E7%95%A5/" class="post-category">
                                     Docker学习攻略
                                 </a>
                             
@@ -928,7 +923,7 @@ $ <span class="token function">sudo</span> ufw route allow log-all 53 comment <s
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Linux命令使用/" class="post-category">
+                            <a href="/categories/Linux%E5%91%BD%E4%BB%A4%E4%BD%BF%E7%94%A8/" class="post-category">
                                     Linux命令使用
                                 </a>
                             
@@ -1134,7 +1129,9 @@ $ <span class="token function">sudo</span> ufw route allow log-all 53 comment <s
 <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
 
     
-    <div class="container row center-align" style="margin-bottom: 15px !important;">
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
@@ -1146,70 +1143,82 @@ $ <span class="token function">sudo</span> ufw route allow log-all 53 comment <s
             |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1121.5k</span>&nbsp;字
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1101.7k</span>
             
             
             
+                
             
             
-            
-            <span id="busuanzi_container_site_pv">
-                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
-                    class="white-color"></span>&nbsp;次
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
             </span>
             
             
-            <span id="busuanzi_container_site_uv">
-                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
-                    class="white-color"></span>&nbsp;人
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
             </span>
             
             <br>
+
+            <!-- 运行天数提醒. -->
             
-            <span id="sitetime">载入运行时间...</span>
-            <script>
-                function siteTime() {
-                    var seconds = 1000;
-                    var minutes = seconds * 60;
-                    var hours = minutes * 60;
-                    var days = hours * 24;
-                    var years = days * 365;
-                    var today = new Date();
-                    var startYear = "2017";
-                    var startMonth = "2";
-                    var startDate = "14";
-                    var startHour = "0";
-                    var startMinute = "0";
-                    var startSecond = "0";
-                    var todayYear = today.getFullYear();
-                    var todayMonth = today.getMonth() + 1;
-                    var todayDate = today.getDate();
-                    var todayHour = today.getHours();
-                    var todayMinute = today.getMinutes();
-                    var todaySecond = today.getSeconds();
-                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
-                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
-                    var diff = t2 - t1;
-                    var diffYears = Math.floor(diff / years);
-                    var diffDays = Math.floor((diff / days) - diffYears * 365);
-                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
-                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
-                        minutes);
-                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
-                        diffMinutes * minutes) / seconds);
-                    if (startYear == todayYear) {
-                        document.getElementById("year").innerHTML = todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
-                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
-                    } else {
-                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
-                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2017";
+                        var startMonth = "2";
+                        var startDate = "14";
+                        var startHour = "0";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
                     }
-                }
-                setInterval(siteTime, 1000);
-            </script>
+
+                    calcSiteTime();
+                </script>
             
             <br>
             

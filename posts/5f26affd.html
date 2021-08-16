@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 
 
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
     <meta charset="utf-8">
     <meta name="keywords" content="Linux服务器Swap使用过高, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
@@ -29,6 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
+<meta name="generator" content="Hexo 5.4.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -349,7 +352,7 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Bug解决之道/" class="post-category">
+                            <a href="/categories/Bug%E8%A7%A3%E5%86%B3%E4%B9%8B%E9%81%93/" class="post-category">
                                 Bug解决之道
                             </a>
                         
@@ -376,7 +379,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    627
+                    575
                 </div>
                 
 
@@ -422,7 +425,8 @@
 $ <span class="token function">free</span> -g
          total    used    <span class="token function">free</span>    shared    buff/cache    available
 Mem:       125      75      15         2            34           46
-Swap:       63      59       4<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+Swap:       63      59       4
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[2] 通过 top/htop 查看内存使用高的进程</strong></li>
 </ul>
@@ -430,63 +434,52 @@ Swap:       63      59       4<span aria-hidden="true" class="line-numbers-rows"
 $ <span class="token function">top</span> + M
 
 <span class="token comment" spellcheck="true"># 查看内存</span>
-$ <span class="token function">htop</span> + M<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">htop</span> + M
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 命令查看占用swap过高的进程</span>
 <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token punctuation">$(</span>cd /proc<span class="token punctuation">;</span> <span class="token function">ls</span> <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">"^[0-9]"</span> <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">' <span class="token variable">$0</span> >100'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token keyword">do</span>
     <span class="token function">awk</span> <span class="token string">'/Swap:/{aa=a+<span class="token variable">$2</span>}END{print '</span><span class="token string">"<span class="token variable">$i</span>"</span><span class="token string">',a/1024"M"}'</span> /proc/<span class="token variable">$i</span>/smaps
-<span class="token keyword">done</span> <span class="token operator">|</span> <span class="token function">sort</span> -k2nr<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token keyword">done</span> <span class="token operator">|</span> <span class="token function">sort</span> -k2nr
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[3] 通过查看进程 pid 来确定是哪个服务占用了</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看进程</span>
 $ <span class="token function">ps</span> -ef <span class="token operator">|</span> <span class="token function">grep</span> 8755
-ubuntu  8755  8725  16  Feb10  ?  29-08:47:43  /opt/jdkxxx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+ubuntu  8755  8725  16  Feb10  ?  29-08:47:43  /opt/jdkxxx
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[4] 配置内核参数来减少 swap 的使用</strong></li>
 </ul>
 <p>如果部署服务的服务器内存足够大的话，其实并没有不必使用太多的 <code>swap</code> 分区，因为直接使用物理内存会更快、更迅速。这时，我们可以通过修改 <code>swappiness</code> 的数值来控制 <code>swap</code> 分区的使用条件。在 <code>Linux</code> 里面，默认设置 <code>swappiness</code> 的值为 <code>60</code>。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看默认值</span>
 $ <span class="token function">cat</span> /proc/sys/vm/swappiness
-60<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+60
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <p>设置 <code>swappiness=0</code> 的时候，则表示操作系统将最大限度上的使用服务器的物理内存，即能在物理内存上跑的话就不会再使用 <code>swap</code> 分区了，实在没办法了才会开始使用 <code>swap</code> 分区；设置 <code>swappiness=100</code> 的时候，则表示操作系统将积极的使用 <code>swap</code> 分区，并且把内存上的数据及时的搬运到 <code>swap</code> 分区里面。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 刷新swap存储</span>
 <span class="token comment" spellcheck="true"># 将swap里的数据转储回内存，并清空swap里的数据</span>
 $ <span class="token function">sudo</span> swapoff -a <span class="token operator">&amp;&amp;</span> <span class="token function">sudo</span> swapon -a
 
 <span class="token comment" spellcheck="true"># 清理缓存</span>
-$ <span class="token function">sudo</span> <span class="token function">sync</span> <span class="token operator">&amp;&amp;</span> $ <span class="token function">sudo</span> <span class="token keyword">echo</span> 3<span class="token operator">></span> /proc/sys/vm/drop_caches<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> <span class="token function">sync</span> <span class="token operator">&amp;&amp;</span> $ <span class="token function">sudo</span> <span class="token keyword">echo</span> 3<span class="token operator">></span> /proc/sys/vm/drop_caches
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 临时修改</span>
 $ <span class="token function">sudo</span> sysctl vm.swappiness<span class="token operator">=</span>10
 
 <span class="token comment" spellcheck="true"># 永久修改</span>
 $ <span class="token function">sudo</span> <span class="token keyword">echo</span> <span class="token string">"vm.swappiness=10"</span> <span class="token operator">>></span> /etc/sysctl.conf
-$ <span class="token function">sudo</span> sysctl -p<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> sysctl -p
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[5] 查看配置生效情况</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">free</span> -g
          total    used    <span class="token function">free</span>    shared    buff/cache    available
 Mem:       125      80      25         2            14           46
-Swap:       63       2      51<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
+Swap:       63       2      51
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
                 
             </div>
             <hr/>
@@ -726,6 +719,8 @@ Swap:       63       2      51<span aria-hidden="true" class="line-numbers-rows"
 
     
 
+    
+
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
@@ -755,7 +750,7 @@ Swap:       63       2      51<span aria-hidden="true" class="line-numbers-rows"
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Linux运维之路/" class="post-category">
+                            <a href="/categories/Linux%E8%BF%90%E7%BB%B4%E4%B9%8B%E8%B7%AF/" class="post-category">
                                     Linux运维之路
                                 </a>
                             
@@ -807,7 +802,7 @@ Swap:       63       2      51<span aria-hidden="true" class="line-numbers-rows"
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Tools工具分享/" class="post-category">
+                            <a href="/categories/Tools%E5%B7%A5%E5%85%B7%E5%88%86%E4%BA%AB/" class="post-category">
                                     Tools工具分享
                                 </a>
                             
@@ -919,7 +914,9 @@ Swap:       63       2      51<span aria-hidden="true" class="line-numbers-rows"
 <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
 
     
-    <div class="container row center-align" style="margin-bottom: 15px !important;">
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
@@ -931,70 +928,82 @@ Swap:       63       2      51<span aria-hidden="true" class="line-numbers-rows"
             |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1121.5k</span>&nbsp;字
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1101.7k</span>
             
             
             
+                
             
             
-            
-            <span id="busuanzi_container_site_pv">
-                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
-                    class="white-color"></span>&nbsp;次
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
             </span>
             
             
-            <span id="busuanzi_container_site_uv">
-                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
-                    class="white-color"></span>&nbsp;人
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
             </span>
             
             <br>
+
+            <!-- 运行天数提醒. -->
             
-            <span id="sitetime">载入运行时间...</span>
-            <script>
-                function siteTime() {
-                    var seconds = 1000;
-                    var minutes = seconds * 60;
-                    var hours = minutes * 60;
-                    var days = hours * 24;
-                    var years = days * 365;
-                    var today = new Date();
-                    var startYear = "2017";
-                    var startMonth = "2";
-                    var startDate = "14";
-                    var startHour = "0";
-                    var startMinute = "0";
-                    var startSecond = "0";
-                    var todayYear = today.getFullYear();
-                    var todayMonth = today.getMonth() + 1;
-                    var todayDate = today.getDate();
-                    var todayHour = today.getHours();
-                    var todayMinute = today.getMinutes();
-                    var todaySecond = today.getSeconds();
-                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
-                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
-                    var diff = t2 - t1;
-                    var diffYears = Math.floor(diff / years);
-                    var diffDays = Math.floor((diff / days) - diffYears * 365);
-                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
-                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
-                        minutes);
-                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
-                        diffMinutes * minutes) / seconds);
-                    if (startYear == todayYear) {
-                        document.getElementById("year").innerHTML = todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
-                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
-                    } else {
-                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
-                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2017";
+                        var startMonth = "2";
+                        var startDate = "14";
+                        var startHour = "0";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
                     }
-                }
-                setInterval(siteTime, 1000);
-            </script>
+
+                    calcSiteTime();
+                </script>
             
             <br>
             

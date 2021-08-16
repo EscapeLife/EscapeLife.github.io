@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 
 
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
     <meta charset="utf-8">
     <meta name="keywords" content="如何更好地连接数据库, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
@@ -29,6 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
+<meta name="generator" content="Hexo 5.4.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -345,7 +348,7 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Bug解决之道/" class="post-category">
+                            <a href="/categories/Bug%E8%A7%A3%E5%86%B3%E4%B9%8B%E9%81%93/" class="post-category">
                                 Bug解决之道
                             </a>
                         
@@ -372,14 +375,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.2k
+                    2.1k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    9 分
+                    8 分
                 </div>
                 
 
@@ -428,7 +431,8 @@ sqlalchemy.exc.OperationalError: <span class="token punctuation">(</span>psycopg
     This probably means the server terminated abnormally
     before or <span class="token keyword">while</span> processing the request.
  <span class="token punctuation">[</span>SQL: 'SELECT anon_1.user_id AS anon_1_user_id, <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
-<span class="token punctuation">(</span>Background on this error at: http://sqlalche.me/e/e3q8<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">(</span>Background on this error at: http://sqlalche.me/e/e3q8<span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>从上述报错中，可以看出是 <code>Web</code> 服务连接数据库的时候，没有正确和数据库建立连接，导致查询数据的时候发生异常。同时，通过查看服务的日志，确认证实了上述的想法。但是，手动连接或者使用工具压测数据库都是正常的，并没见异常。</p>
 <p><img src="../images/python-sqlalchemy-db-bug-2.jpeg" alt="如何更好地连接数据库"></p>
 <hr>
@@ -446,7 +450,8 @@ sqlalchemy.exc.OperationalError: <span class="token punctuation">(</span>psycopg
     <span class="token keyword">server</span> <span class="token punctuation">{</span>
         <span class="token keyword">listen</span> <span class="token number">5432</span> <span class="token keyword">so_keepalive</span><span class="token operator">=</span>on<span class="token punctuation">;</span>
         <span class="token keyword">proxy_pass</span> app_postgres<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    <span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>其实上述登录问题是概率性问题，是间隔一段时间之后才会复现一次的。后来发现是，设置的 <code>Nginx</code> 的 <code>stream</code> 超时时间导致的。超时时间已过期或者重启数据库就会出现该问题。后来，决定看看服务连接数据库的代码。如下所示，使用的熟知的 <code>SQLAlchemy</code>，顺便查了查对应的参数，发现解决问题的方法了。</p>
 <ul>
 <li><strong>PostgreSQL</strong></li>
@@ -459,7 +464,8 @@ engine <span class="token operator">=</span> create_engine<span class="token pun
 
 <span class="token comment" spellcheck="true"># pg8000</span>
 engine <span class="token operator">=</span> create_engine<span class="token punctuation">(</span><span class="token string">'postgresql+pg8000://scott:tiger@localhost/mydatabase'</span><span class="token punctuation">)</span>
-More notes on connecting to PostgreSQL at PostgreSQL<span class="token punctuation">.</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+More notes on connecting to PostgreSQL at PostgreSQL<span class="token punctuation">.</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>MySQL</strong></li>
 </ul>
@@ -470,7 +476,8 @@ engine <span class="token operator">=</span> create_engine<span class="token pun
 engine <span class="token operator">=</span> create_engine<span class="token punctuation">(</span><span class="token string">'mysql+mysqldb://scott:tiger@localhost/foo'</span><span class="token punctuation">)</span>
 
 <span class="token comment" spellcheck="true"># PyMySQL</span>
-engine <span class="token operator">=</span> create_engine<span class="token punctuation">(</span><span class="token string">'mysql+pymysql://scott:tiger@localhost/foo'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+engine <span class="token operator">=</span> create_engine<span class="token punctuation">(</span><span class="token string">'mysql+pymysql://scott:tiger@localhost/foo'</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="3-解决方法"><a href="#3-解决方法" class="headerlink" title="3. 解决方法"></a>3. 解决方法</h2><blockquote>
 <p><strong>对应连接异常问题，官方给出了以下两种解决方法。</strong></p>
@@ -486,7 +493,8 @@ engine <span class="token operator">=</span> create_engine<span class="token pun
     pool_size<span class="token operator">=</span><span class="token number">100</span><span class="token punctuation">,</span>      <span class="token comment" spellcheck="true"># 设置连接池的大小，默认为5个，而0表示无限制</span>
     pool_recycle<span class="token operator">=</span><span class="token number">3600</span><span class="token punctuation">,</span>  <span class="token comment" spellcheck="true"># 在设置的指定时间内回收连接</span>
     pool_pre_ping<span class="token operator">=</span><span class="token boolean">True</span>  <span class="token comment" spellcheck="true"># 连接前发送测试语句</span>
-<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <ul>
 <li><strong>[1] 悲观的处理方式 - pool_pre_ping</strong></li>
@@ -496,7 +504,8 @@ engine <span class="token operator">=</span> create_engine<span class="token pun
 <p>在某些罕见的情况下，连接数据库可用但无法响应 <code>ping</code> 对应的测试语句，<code>pre_ping</code> 参数将最多尝试 <code>3</code> 次，如果最后还是无法连接，将发送调用放连接数据库错误。</p>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 该参数version 1.2版本引入的</span>
 <span class="token keyword">from</span> sqlalchemy <span class="token keyword">import</span> create_engine
-engine <span class="token operator">=</span> create_engine<span class="token punctuation">(</span><span class="token string">"mysql+pymysql://user:pw@host/db"</span><span class="token punctuation">,</span> pool_pre_ping<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+engine <span class="token operator">=</span> create_engine<span class="token punctuation">(</span><span class="token string">"mysql+pymysql://user:pw@host/db"</span><span class="token punctuation">,</span> pool_pre_ping<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[2] 悲观的处理方式 - event.listens_for</strong></li>
 </ul>
@@ -540,7 +549,8 @@ some_engine <span class="token operator">=</span> create_engine<span class="toke
             <span class="token keyword">raise</span>
     <span class="token keyword">finally</span><span class="token punctuation">:</span>
         <span class="token comment" spellcheck="true"># restore "close with result"</span>
-        connection<span class="token punctuation">.</span>should_close_with_result <span class="token operator">=</span> save_should_close_with_result<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+        connection<span class="token punctuation">.</span>should_close_with_result <span class="token operator">=</span> save_should_close_with_result
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[3] 乐观的处理方式 - try… except</strong></li>
 </ul>
@@ -561,39 +571,23 @@ c <span class="token operator">=</span> e<span class="token punctuation">.</span
 <span class="token comment" spellcheck="true"># after the invalidate event, a new connection</span>
 <span class="token comment" spellcheck="true"># starts with a new Pool</span>
 c <span class="token operator">=</span> e<span class="token punctuation">.</span>connect<span class="token punctuation">(</span><span class="token punctuation">)</span>
-c<span class="token punctuation">.</span>execute<span class="token punctuation">(</span><span class="token string">"SELECT * FROM table"</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+c<span class="token punctuation">.</span>execute<span class="token punctuation">(</span><span class="token string">"SELECT * FROM table"</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[4] 乐观的处理方式 - pool_recycle</strong></li>
 </ul>
 <p>此参数可以防止连接池使用已超过一定期限的特定连接，超时之后将被立即回收，并且适用于数据库后端(例如 MySQL)，该数据库在特定时间段后会自动关闭已失效的连接。<code>pool_recycle</code> 是 <code>Pool</code> 本身的功能，与是否正在使用 <code>Engine</code> 无关。</p>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> sqlalchemy <span class="token keyword">import</span> create_engine
-e <span class="token operator">=</span> create_engine<span class="token punctuation">(</span><span class="token string">"mysql://scott:tiger@localhost/test"</span><span class="token punctuation">,</span> pool_recycle<span class="token operator">=</span><span class="token number">3600</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+e <span class="token operator">=</span> create_engine<span class="token punctuation">(</span><span class="token string">"mysql://scott:tiger@localhost/test"</span><span class="token punctuation">,</span> pool_recycle<span class="token operator">=</span><span class="token number">3600</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="4-参考链接"><a href="#4-参考链接" class="headerlink" title="4. 参考链接"></a>4. 参考链接</h2><blockquote>
 <p><strong>授人玫瑰，手有余香！</strong></p>
 </blockquote>
 <ul>
-<li><a href="https://docs.sqlalchemy.org/en/13/core/pooling.html#pool-disconnects-pessimistic" target="_blank" rel="noopener">pool-disconnects-pessimistic</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.sqlalchemy.org/en/13/core/pooling.html#pool-disconnects-pessimistic">pool-disconnects-pessimistic</a></li>
 </ul>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
+
                 
             </div>
             <hr/>
@@ -829,6 +823,8 @@ e <span class="token operator">=</span> create_engine<span class="token punctuat
 
     
 
+    
+
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
@@ -858,7 +854,7 @@ e <span class="token operator">=</span> create_engine<span class="token punctuat
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Wen文所未闻/" class="post-category">
+                            <a href="/categories/Wen%E6%96%87%E6%89%80%E6%9C%AA%E9%97%BB/" class="post-category">
                                     Wen文所未闻
                                 </a>
                             
@@ -906,7 +902,7 @@ e <span class="token operator">=</span> create_engine<span class="token punctuat
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/K8S即学即用/" class="post-category">
+                            <a href="/categories/K8S%E5%8D%B3%E5%AD%A6%E5%8D%B3%E7%94%A8/" class="post-category">
                                     K8S即学即用
                                 </a>
                             
@@ -1018,7 +1014,9 @@ e <span class="token operator">=</span> create_engine<span class="token punctuat
 <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
 
     
-    <div class="container row center-align" style="margin-bottom: 15px !important;">
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
@@ -1030,70 +1028,82 @@ e <span class="token operator">=</span> create_engine<span class="token punctuat
             |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1121.5k</span>&nbsp;字
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1101.7k</span>
             
             
             
+                
             
             
-            
-            <span id="busuanzi_container_site_pv">
-                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
-                    class="white-color"></span>&nbsp;次
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
             </span>
             
             
-            <span id="busuanzi_container_site_uv">
-                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
-                    class="white-color"></span>&nbsp;人
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
             </span>
             
             <br>
+
+            <!-- 运行天数提醒. -->
             
-            <span id="sitetime">载入运行时间...</span>
-            <script>
-                function siteTime() {
-                    var seconds = 1000;
-                    var minutes = seconds * 60;
-                    var hours = minutes * 60;
-                    var days = hours * 24;
-                    var years = days * 365;
-                    var today = new Date();
-                    var startYear = "2017";
-                    var startMonth = "2";
-                    var startDate = "14";
-                    var startHour = "0";
-                    var startMinute = "0";
-                    var startSecond = "0";
-                    var todayYear = today.getFullYear();
-                    var todayMonth = today.getMonth() + 1;
-                    var todayDate = today.getDate();
-                    var todayHour = today.getHours();
-                    var todayMinute = today.getMinutes();
-                    var todaySecond = today.getSeconds();
-                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
-                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
-                    var diff = t2 - t1;
-                    var diffYears = Math.floor(diff / years);
-                    var diffDays = Math.floor((diff / days) - diffYears * 365);
-                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
-                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
-                        minutes);
-                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
-                        diffMinutes * minutes) / seconds);
-                    if (startYear == todayYear) {
-                        document.getElementById("year").innerHTML = todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
-                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
-                    } else {
-                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
-                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2017";
+                        var startMonth = "2";
+                        var startDate = "14";
+                        var startHour = "0";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
                     }
-                }
-                setInterval(siteTime, 1000);
-            </script>
+
+                    calcSiteTime();
+                </script>
             
             <br>
             

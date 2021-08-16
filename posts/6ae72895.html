@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 
 
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
     <meta charset="utf-8">
     <meta name="keywords" content="LVS服务之内容请求分发, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
@@ -29,6 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
+<meta name="generator" content="Hexo 5.4.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -439,7 +442,7 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Linux服务部署/" class="post-category">
+                            <a href="/categories/Linux%E6%9C%8D%E5%8A%A1%E9%83%A8%E7%BD%B2/" class="post-category">
                                 Linux服务部署
                             </a>
                         
@@ -466,7 +469,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    5.8k
+                    5.7k
                 </div>
                 
 
@@ -542,9 +545,11 @@
 <hr>
 <h3 id="3-2-基于局部性的最小连接调度"><a href="#3-2-基于局部性的最小连接调度" class="headerlink" title="3.2 基于局部性的最小连接调度"></a>3.2 基于局部性的最小连接调度</h3><p>在基于局部性的<strong>最小连接负载调度</strong>中，我们假设任何后端服务器都可以处理任一请求。算法的目标是在后端服务器的负载平衡情况下，提高后端服务器的访问局部性，从而提高后端服务器的主存<code>Cache</code>命中率。</p>
 <p>在<code>WEB</code>应用中，来自不同用户的请求很有可能重叠，<code>WEB</code>访问流中存在空间的局部性，容易获得<code>WEB</code>请求的<code>URL</code>，所以，<code>LBLC</code>算法主要针对<code>WEB</code>应用。静态<code>WEB</code>页面的请求格式如下：</p>
-<pre class="line-numbers language-http"><code class="language-http">&lt;scheme>://&lt;host>:&lt;port>/&lt;path><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-http"><code class="language-http">&lt;scheme>://&lt;host>:&lt;port>/&lt;path>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>其中，区分页面不同的变量是文件的路径<code>&lt;path&gt;</code>，我们将之记为请求的目标。<code>CGI</code>动态页面的格式如下：</p>
-<pre class="line-numbers language-http"><code class="language-http">&lt;scheme>://&lt;host>:&lt;port>/&lt;path>?&lt;query><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-http"><code class="language-http">&lt;scheme>://&lt;host>:&lt;port>/&lt;path>?&lt;query>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>我们将其中的<code>CGI</code>文件路径<code>&lt;path&gt;</code>记为请求的目标。因为<code>CGI</code>程序一般要读一个或者多个文件来生成一个动态页面，若在服务器负载基本平衡情况下将相同的<code>CGI</code>请求发送到同一服务器，可以提高服务器文件系统的<code>Cache</code>命中率。<code>LBLC</code>算法的基本流程如下：</p>
 <pre class="line-numbers language-c"><code class="language-c"><span class="token keyword">while</span> <span class="token punctuation">(</span>true<span class="token punctuation">)</span> <span class="token punctuation">{</span>
   get next request r<span class="token punctuation">;</span>
@@ -569,7 +574,8 @@
     n<span class="token punctuation">.</span>conns <span class="token operator">=</span> n<span class="token punctuation">.</span>conns <span class="token operator">-</span> <span class="token number">2</span><span class="token punctuation">;</span>
   <span class="token keyword">else</span>
     n<span class="token punctuation">.</span>conns <span class="token operator">=</span> n<span class="token punctuation">.</span>conns <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>在算法中，我们用后端服务器的活跃连接数(<code>n.conns</code>)来表示它的负载，<code>server</code>是个关联变量，它将访问的目标和服务器对应起来。在这里，假设动态页面的处理是静态页面的<code>2</code>倍。开销算法的意图是将请求序列进行分割，相同的请求去同一服务器，可以提高访问的局部性；除非出现严重的负载不平衡了，我们进行调整，重新分配该请求的服务器。我们不想因为微小或者临时的负载不平衡，进行重新分配服务器，会导致<code>Cache</code>不命中和磁盘访问。所以，<strong>“严重的负载不平衡”</strong>是为了避免有些服务器空闲着而有服务器超载了。</p>
 <p>我们定义每个结点有连接数目的高低阀值，当结点的连接数(<code>node.conns</code>)小于其连接数低阀值(<code>node.low</code>)时，表明该结点有空闲资源；当结点的连接数(<code>node.conns</code>)大于其连接数高阀值(<code>node.high</code>)时，表明该结点在处理请求时可能会有一定的延时。在调度中，当一个结点的连接数大于其高阀值并且有结点的连接数小于其低阀值时，重新分配，将请求发到负载较轻的结点上。还有，为了限制结点过长的响应延时，当结点的连接数大于 2 倍的高阀值时，将请求重新分配到负载较轻的结点，不管是否有结点的连接数小于它的低阀值。</p>
 <p>我们在调度器上进行限制后端服务器的正在处理连接数必须小于<code>∑node.high</code>，这样可以避免所有结点的连接数大于它们的 2 倍的高阀值。这样，可以保证当有结点的连接数大于<code>2</code>倍的高阀值时，必有结点的连接数小于其高阀值。</p>
@@ -605,7 +611,8 @@
     n<span class="token punctuation">.</span>conns <span class="token operator">=</span> n<span class="token punctuation">.</span>conns <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span>
   <span class="token keyword">if</span> <span class="token punctuation">(</span>serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span> changed<span class="token punctuation">)</span> then
     serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token punctuation">.</span>lastMod <span class="token operator">=</span> <span class="token function">time</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>这个算法与原来算法的差别是调度器维护请求目标到一个能服务该目标的结点集合。请求会被分发到其目标的结点集中负载最轻的一个，调度器会检查是否发生结点集中存在负载不平衡，若是，则挑选所有结点中负载最轻的一个，将它加入该目标的结点集中，让它来服务该请求。另一方面，当请求目标的结点集有多个服务器，并且上次结点集的修改时间之差大于<code>K</code>秒时，将最忙的一个结点从该目标的结点集中删除。在实验中，<code>K</code>的缺省值为<code>60</code>秒。</p>
 <hr>
 <h3 id="3-3-基于内容的调度"><a href="#3-3-基于内容的调度" class="headerlink" title="3.3 基于内容的调度"></a>3.3 基于内容的调度</h3><p>在基于内容的调度（Content-based Scheduling）中，不同类型的请求会被送到不同的服务器，但是同一类型的请求有多个服务器可以选择，例如，CGI 应用往往是 CPU 密集型的，需要多台 CGI 服务器去完成，这时需要将请求负载均衡地调度到这些服务器上。其基本算法如下：</p>
@@ -617,7 +624,8 @@
   <span class="token keyword">else</span>
     n <span class="token operator">=</span> <span class="token punctuation">{</span>least connection node in definedServerSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
   send r to n and <span class="token keyword">return</span> results to the client<span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>当请求目标有定义的结点集，即该类型的请求有一些服务器能处理，从该结点集中挑选负载最轻的一个，把当前的请求发到该服务器。当请求目标没有定义好的结点集，则从缺省的结点集中选负载最轻的结点，由它来处理该请求。</p>
 <p>在上面的算法中，只考虑了结点间的负载平衡和结点上静态分割好的局部性，没有考虑动态访问时的局部性。我们对该算法改进如下：</p>
 <pre class="line-numbers language-c"><code class="language-c"><span class="token keyword">while</span> <span class="token punctuation">(</span>true<span class="token punctuation">)</span> <span class="token punctuation">{</span>
@@ -654,26 +662,9 @@
     n<span class="token punctuation">.</span>conns <span class="token operator">=</span> n<span class="token punctuation">.</span>conns <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span>
   <span class="token keyword">if</span> serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span> changed then
     serverSet<span class="token punctuation">[</span>r<span class="token punctuation">.</span>target<span class="token punctuation">]</span><span class="token punctuation">.</span>lastMod <span class="token operator">=</span> <span class="token function">time</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
                 
             </div>
             <hr/>
@@ -909,6 +900,8 @@
 
     
 
+    
+
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
@@ -938,7 +931,7 @@
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Python进阶指南/" class="post-category">
+                            <a href="/categories/Python%E8%BF%9B%E9%98%B6%E6%8C%87%E5%8D%97/" class="post-category">
                                     Python进阶指南
                                 </a>
                             
@@ -998,7 +991,7 @@
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Python入门基础/" class="post-category">
+                            <a href="/categories/Python%E5%85%A5%E9%97%A8%E5%9F%BA%E7%A1%80/" class="post-category">
                                     Python入门基础
                                 </a>
                             
@@ -1200,7 +1193,9 @@
 <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
 
     
-    <div class="container row center-align" style="margin-bottom: 15px !important;">
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
@@ -1212,70 +1207,82 @@
             |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1121.5k</span>&nbsp;字
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1101.7k</span>
             
             
             
+                
             
             
-            
-            <span id="busuanzi_container_site_pv">
-                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
-                    class="white-color"></span>&nbsp;次
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
             </span>
             
             
-            <span id="busuanzi_container_site_uv">
-                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
-                    class="white-color"></span>&nbsp;人
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
             </span>
             
             <br>
+
+            <!-- 运行天数提醒. -->
             
-            <span id="sitetime">载入运行时间...</span>
-            <script>
-                function siteTime() {
-                    var seconds = 1000;
-                    var minutes = seconds * 60;
-                    var hours = minutes * 60;
-                    var days = hours * 24;
-                    var years = days * 365;
-                    var today = new Date();
-                    var startYear = "2017";
-                    var startMonth = "2";
-                    var startDate = "14";
-                    var startHour = "0";
-                    var startMinute = "0";
-                    var startSecond = "0";
-                    var todayYear = today.getFullYear();
-                    var todayMonth = today.getMonth() + 1;
-                    var todayDate = today.getDate();
-                    var todayHour = today.getHours();
-                    var todayMinute = today.getMinutes();
-                    var todaySecond = today.getSeconds();
-                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
-                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
-                    var diff = t2 - t1;
-                    var diffYears = Math.floor(diff / years);
-                    var diffDays = Math.floor((diff / days) - diffYears * 365);
-                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
-                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
-                        minutes);
-                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
-                        diffMinutes * minutes) / seconds);
-                    if (startYear == todayYear) {
-                        document.getElementById("year").innerHTML = todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
-                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
-                    } else {
-                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
-                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2017";
+                        var startMonth = "2";
+                        var startDate = "14";
+                        var startHour = "0";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
                     }
-                }
-                setInterval(siteTime, 1000);
-            </script>
+
+                    calcSiteTime();
+                </script>
             
             <br>
             

@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 
 
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
     <meta charset="utf-8">
     <meta name="keywords" content="修改镜像默认的存储位置, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
@@ -29,6 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
+<meta name="generator" content="Hexo 5.4.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -427,12 +430,12 @@
                                 <span class="chip bg-color">Linux</span>
                             </a>
                         
-                            <a href="/tags/Bug/">
-                                <span class="chip bg-color">Bug</span>
-                            </a>
-                        
                             <a href="/tags/Docker/">
                                 <span class="chip bg-color">Docker</span>
+                            </a>
+                        
+                            <a href="/tags/Bug/">
+                                <span class="chip bg-color">Bug</span>
                             </a>
                         
                     </div>
@@ -443,7 +446,7 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Bug解决之道/" class="post-category">
+                            <a href="/categories/Bug%E8%A7%A3%E5%86%B3%E4%B9%8B%E9%81%93/" class="post-category">
                                 Bug解决之道
                             </a>
                         
@@ -470,7 +473,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    934
+                    882
                 </div>
                 
 
@@ -498,7 +501,7 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <blockquote>
-<p><strong>由于系统初始分区的原因，导致操作系统中对应 <code>/</code> 分区不会太大，通过 <code>/var</code> 目录不会单独分区。如果上面运行 <code>Docker</code> 服务，经过长时间的使用，会使原本就比较大的分区越来越不够用。如何更好地的处理这个问题呢？这就是本文的目的。=&gt; <a href="https://blog.51cto.com/forangela/1949947" target="_blank" rel="noopener">原文参考</a></strong></p>
+<p><strong>由于系统初始分区的原因，导致操作系统中对应 <code>/</code> 分区不会太大，通过 <code>/var</code> 目录不会单独分区。如果上面运行 <code>Docker</code> 服务，经过长时间的使用，会使原本就比较大的分区越来越不够用。如何更好地的处理这个问题呢？这就是本文的目的。=&gt; <a target="_blank" rel="noopener" href="https://blog.51cto.com/forangela/1949947">原文参考</a></strong></p>
 </blockquote>
 <p><img src="../images/change-docker-image-dir.jpg" alt="修改镜像默认的存储位置"></p>
 <hr>
@@ -506,7 +509,8 @@
 <li>我们知道在操作系统当中，默认情况下 <code>Docker</code> 容器的存放位置在 <code>/var/lib/docker</code> 目录下面，可以通过下面命令查看具体位置。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 默认存放位置</span>
-$ <span class="token function">sudo</span> docker info <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">"Docker Root Dir"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> docker info <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">"Docker Root Dir"</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
 <li>解决默认存储容量不足的情况，最直接且最有效的方法就是挂载新的分区到该目录。但是在原有系统空间不变的情况下爱，所以采用软链接的方式，修改镜像和容器的存放路径达到同样的目的。</li>
 </ul>
@@ -514,7 +518,8 @@ $ <span class="token function">sudo</span> docker info <span class="token operat
 $ systemctl restart docker
 
 <span class="token comment" spellcheck="true"># 停掉Docker服务</span>
-$ <span class="token function">service</span> docker stop<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">service</span> docker stop
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>然后移动整个 <code>/var/lib/docker</code> 目录到空间不较大的目的路径。这时候启动 <code>Docker</code> 时发现存储目录依旧是 <code>/var/lib/docker</code> 目录，但是实际上是存储在数据盘 <code>/data/docker</code> 上了。</li>
 </ul>
@@ -522,7 +527,8 @@ $ <span class="token function">service</span> docker stop<span aria-hidden="true
 $ <span class="token function">mv</span> /var/lib/docker /root/data/docker
 
 <span class="token comment" spellcheck="true"># 进行链接</span>
-$ <span class="token function">ln</span> -sf /data/docker /var/lib/docker<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">ln</span> -sf /data/docker /var/lib/docker
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="2-指定容器启动参数"><a href="#2-指定容器启动参数" class="headerlink" title="2. 指定容器启动参数"></a>2. 指定容器启动参数</h2><ul>
 <li>在配置文件中指定容器启动的参数 <code>--graph=/var/lib/docker</code> 来指定镜像和容器存放路径。<code>Docker</code> 的配置文件可以设置大部分的后台进程参数，在各个操作系统中的存放位置不一致。在 <code>Ubuntu</code> 中的位置是 <code>/etc/default/docker</code> 文件，在 <code>CentOS</code> 中的位置是 <code>/etc/sysconfig/docker</code> 文件。</li>
@@ -534,10 +540,12 @@ OPTIONS<span class="token operator">=</span>--graph<span class="token operator">
 <span class="token comment" spellcheck="true"># CentOS7</span>
 <span class="token comment" spellcheck="true"># 修改docker.service文件，使用-g参数指定存储位置</span>
 $ <span class="token function">vi</span> /usr/lib/systemd/system/docker.service
-ExecStart<span class="token operator">=</span>/usr/bin/dockerd --graph /new-path/docker<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+ExecStart<span class="token operator">=</span>/usr/bin/dockerd --graph /new-path/docker
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Ubuntu</span>
 <span class="token comment" spellcheck="true"># 因为Ubuntu默认没开启selinux机制</span>
-OPTIONS<span class="token operator">=</span>--graph<span class="token operator">=</span><span class="token string">"/root/data/docker"</span> -H fd://<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+OPTIONS<span class="token operator">=</span>--graph<span class="token operator">=</span><span class="token string">"/root/data/docker"</span> -H fd://
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>重新启动之后，<code>Docker</code> 的路径就改成 <code>/data/docker</code> 了。</li>
 </ul>
@@ -545,7 +553,8 @@ OPTIONS<span class="token operator">=</span>--graph<span class="token operator">
 $ <span class="token function">sudo</span> systemctl daemon-reload
 
 <span class="token comment" spellcheck="true"># 重启docker服务</span>
-$ <span class="token function">sudo</span> systemctl restart docker.service<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> systemctl restart docker.service
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>如果 <code>Docker</code> 的版本是 <code>1.12</code> 或以上的，可以修改或新建 <code>daemon.json</code> 文件。修改后会立即生效，不需重启 <code>Docker</code> 服务。</li>
 </ul>
@@ -555,7 +564,8 @@ $ vim /etc/docker/daemon.json
     <span class="token string">"registry-mirrors"</span><span class="token keyword">:</span>
         <span class="token punctuation">[</span><span class="token string">"http://7e61f7f9.m.daocloud.io"</span><span class="token punctuation">]</span>,
     <span class="token string">"graph"</span><span class="token keyword">:</span> <span class="token string">"/new-path/docker"</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="3-System-下创建配置文件"><a href="#3-System-下创建配置文件" class="headerlink" title="3. System 下创建配置文件"></a>3. System 下创建配置文件</h2><ul>
 <li>在 <code>/etc/systemd/system/docker.service.d</code> 目录下创建一个 <code>Drop-In</code> 文件 <code>docker.conf</code>，默认 <code>docker.service.d</code> 文件夹不存在，必须先创建它。创建 <code>Drop-In</code> 文件的原因，是我们希望 <code>Docker</code>服务使用 <code>docker.conf</code> 文件中提到的特定参数，将默认服务所使用的位于 <code>/lib/systemd/system/docker.service</code> 文件中的参数进行覆盖。</li>
@@ -563,7 +573,8 @@ $ vim /etc/docker/daemon.json
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 定义新的存储位置</span>
 $ <span class="token function">sudo</span> <span class="token function">vi</span> /etc/systemd/system/docker.service.d/docker.conf
 <span class="token punctuation">[</span>Service<span class="token punctuation">]</span>
-ExecStart<span class="token operator">=</span>/usr/bin/dockerd --graph<span class="token operator">=</span><span class="token string">"/data/docker"</span> --storage-driver<span class="token operator">=</span>devicemapper<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+ExecStart<span class="token operator">=</span>/usr/bin/dockerd --graph<span class="token operator">=</span><span class="token string">"/data/docker"</span> --storage-driver<span class="token operator">=</span>devicemapper
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>保存并退出 <code>vim</code> 编辑器 <code>/data/docker</code> 就是新的存储位置，而 <code>devicemapper</code> 是当前 <code>Docker</code> 所使用的存储驱动。如果你的存储驱动有所不同，请输入之前第一步查看并记下的值。现在，你可以重新加载服务守护程序，并启动 <code>Docker</code> 服务了，这将改变新的镜像和容器的存储位置。为了确认一切顺利，运行 <code>docker info</code> 命令检查 <code>Docker</code> 的根目录。</li>
 </ul>
@@ -571,26 +582,9 @@ ExecStart<span class="token operator">=</span>/usr/bin/dockerd --graph<span clas
 $ <span class="token function">sudo</span> systemctl daemon-reload
 
 <span class="token comment" spellcheck="true"># 重启docker服务</span>
-$ <span class="token function">sudo</span> systemctl start docker<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
+$ <span class="token function">sudo</span> systemctl start docker
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
                 
             </div>
             <hr/>
@@ -658,12 +652,12 @@ $ <span class="token function">sudo</span> systemctl start docker<span aria-hidd
                                     <span class="chip bg-color">Linux</span>
                                 </a>
                             
-                                <a href="/tags/Bug/">
-                                    <span class="chip bg-color">Bug</span>
-                                </a>
-                            
                                 <a href="/tags/Docker/">
                                     <span class="chip bg-color">Docker</span>
+                                </a>
+                            
+                                <a href="/tags/Bug/">
+                                    <span class="chip bg-color">Bug</span>
                                 </a>
                             
                         </div>
@@ -830,6 +824,8 @@ $ <span class="token function">sudo</span> systemctl start docker<span aria-hidd
 
     
 
+    
+
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
@@ -859,7 +855,7 @@ $ <span class="token function">sudo</span> systemctl start docker<span aria-hidd
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Nginx活学活用/" class="post-category">
+                            <a href="/categories/Nginx%E6%B4%BB%E5%AD%A6%E6%B4%BB%E7%94%A8/" class="post-category">
                                     Nginx活学活用
                                 </a>
                             
@@ -907,7 +903,7 @@ $ <span class="token function">sudo</span> systemctl start docker<span aria-hidd
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Git学习笔记/" class="post-category">
+                            <a href="/categories/Git%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="post-category">
                                     Git学习笔记
                                 </a>
                             
@@ -1109,7 +1105,9 @@ $ <span class="token function">sudo</span> systemctl start docker<span aria-hidd
 <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
 
     
-    <div class="container row center-align" style="margin-bottom: 15px !important;">
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
@@ -1121,70 +1119,82 @@ $ <span class="token function">sudo</span> systemctl start docker<span aria-hidd
             |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1121.5k</span>&nbsp;字
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1101.7k</span>
             
             
             
+                
             
             
-            
-            <span id="busuanzi_container_site_pv">
-                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
-                    class="white-color"></span>&nbsp;次
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
             </span>
             
             
-            <span id="busuanzi_container_site_uv">
-                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
-                    class="white-color"></span>&nbsp;人
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
             </span>
             
             <br>
+
+            <!-- 运行天数提醒. -->
             
-            <span id="sitetime">载入运行时间...</span>
-            <script>
-                function siteTime() {
-                    var seconds = 1000;
-                    var minutes = seconds * 60;
-                    var hours = minutes * 60;
-                    var days = hours * 24;
-                    var years = days * 365;
-                    var today = new Date();
-                    var startYear = "2017";
-                    var startMonth = "2";
-                    var startDate = "14";
-                    var startHour = "0";
-                    var startMinute = "0";
-                    var startSecond = "0";
-                    var todayYear = today.getFullYear();
-                    var todayMonth = today.getMonth() + 1;
-                    var todayDate = today.getDate();
-                    var todayHour = today.getHours();
-                    var todayMinute = today.getMinutes();
-                    var todaySecond = today.getSeconds();
-                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
-                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
-                    var diff = t2 - t1;
-                    var diffYears = Math.floor(diff / years);
-                    var diffDays = Math.floor((diff / days) - diffYears * 365);
-                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
-                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
-                        minutes);
-                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
-                        diffMinutes * minutes) / seconds);
-                    if (startYear == todayYear) {
-                        document.getElementById("year").innerHTML = todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
-                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
-                    } else {
-                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
-                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2017";
+                        var startMonth = "2";
+                        var startDate = "14";
+                        var startHour = "0";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
                     }
-                }
-                setInterval(siteTime, 1000);
-            </script>
+
+                    calcSiteTime();
+                </script>
             
             <br>
             

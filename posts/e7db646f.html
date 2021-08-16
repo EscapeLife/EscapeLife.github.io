@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 
 
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
     <meta charset="utf-8">
     <meta name="keywords" content="排查服务的TIME_WAIT问题, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
@@ -29,6 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
+<meta name="generator" content="Hexo 5.4.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -439,7 +442,7 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Bug解决之道/" class="post-category">
+                            <a href="/categories/Bug%E8%A7%A3%E5%86%B3%E4%B9%8B%E9%81%93/" class="post-category">
                                 Bug解决之道
                             </a>
                         
@@ -466,7 +469,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    3.2k
+                    3.1k
                 </div>
                 
 
@@ -503,14 +506,16 @@
 <span class="token function">netstat</span> -n <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'/^tcp/ {++S[<span class="token variable">$NF</span>]} END {for(a in S) print a, S[a]}'</span>
 
 <span class="token comment" spellcheck="true"># 查找较多time_wait连接</span>
-$ <span class="token function">netstat</span> -n <span class="token operator">|</span> <span class="token function">grep</span> TIME_WAIT <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$5</span>}'</span> <span class="token operator">|</span> <span class="token function">sort</span> <span class="token operator">|</span> <span class="token function">uniq</span> -c <span class="token operator">|</span> <span class="token function">sort</span> -rn <span class="token operator">|</span> <span class="token function">head</span> -n 20<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">netstat</span> -n <span class="token operator">|</span> <span class="token function">grep</span> TIME_WAIT <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$5</span>}'</span> <span class="token operator">|</span> <span class="token function">sort</span> <span class="token operator">|</span> <span class="token function">uniq</span> -c <span class="token operator">|</span> <span class="token function">sort</span> -rn <span class="token operator">|</span> <span class="token function">head</span> -n 20
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>登录到两台主机（一台正常、一台异常）上，首先我需要确认的是两台机器的上游负载是否有问题，主要考虑反向代理服务器的调度算法。发现上游的<code>Nginx</code>代理使用的<code>RR</code>算法且再没有其他参数，所以排除了反代导致的后端服务器分配不一致导致的问题。</p>
 <p>其实，心里还是有点不放心，随即查看了两台后端服务器的访问日志，对比发现两者访问数目相差不大，确认不是负载导致的。</p>
 <p>打开<code>Google</code>或者<code>Bing</code>搜索发现对应的解决方案中，排在最前面或者被很多人到处转载的解决方案，如下所示。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>escape@localhost ~<span class="token punctuation">]</span>$ vim sysctl.conf
 net.ipv4.tcp_tw_recycle <span class="token operator">=</span> 1
 net.ipv4.tcp_tw_reuse <span class="token operator">=</span> 1
-net.ipv4.tcp_timestamps <span class="token operator">=</span> 1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+net.ipv4.tcp_timestamps <span class="token operator">=</span> 1
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <p>你也会被告知，开启<code>tw_recylce</code>和<code>tw_reuse</code>一定需要<code>timestamps</code>的支持，而且这些配置一般不建议开启，但是对解决<code>TIME_WAIT</code>很多的问题，有很好的用处。</p>
 <p>随即，对比两个服务器的<code>sysctl.conf</code>内核配置，发现<code>TIME_WAIT</code>多的那一台没有配置该参数，而正常的那一台则在几个月之前有人给配置了。到这个时候，终于发现了问题的原因。</p>
 <hr>
@@ -592,15 +597,18 @@ net.ipv4.tcp_timestamps <span class="token operator">=</span> 1<span aria-hidden
 <ul>
 <li><strong>相关 TIME_WAIT 调优参数</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash">net.ipv4.tcp_timestamps<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash">net.ipv4.tcp_timestamps
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p><code>RFC 1323</code>在<code>TCP Reliability</code>一节里，引入了<code>timestamp的TCP option</code>，两个<code>4</code>字节的时间戳字段，其中第一个<code>4</code>字节字段用来保存发送该数据包的时间，第二个<code>4</code>字节字段用来保存最近一次接收对方发送到数据的时间。有了这两个时间字段，也就有了后续优化的余地。<code>tcp_tw_reuse</code> 和 <code>tcp_tw_recycle</code>就依赖这些时间字段。</p>
-<pre class="line-numbers language-bash"><code class="language-bash">net.ipv4.tcp_tw_reuse<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash">net.ipv4.tcp_tw_reuse
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>时刻记住一条<code>socket</code>连接，就是那个五元组，出现<code>TIME_WAIT</code>状态的连接，一定出现在主动关闭连接的一方。所以，当主动关闭连接的一方，再次向对方发起连接请求的时候，可以复用<code>TIME_WAIT</code>状态的连接。</p>
 <p>例如，客户端关闭连接，客户端再次连接服务端，此时可以复用了；负载均衡服务器，主动关闭后端的连接，当有新的<code>HTTP</code>请求，负载均衡服务器再次连接后端服务器，此时也可以复用。</p>
 <p>你看到了，<code>tcp_tw_reuse</code>应用的场景：某一方，需要不断的通过”短连接”连接其他服务器，总是自己先关闭连接(<code>TIME_WAIT</code>在自己这方)，关闭后又不断的重新连接对方。</p>
 <p>那么，当连接被复用了之后，延迟或者重发的数据包到达，新的连接怎么判断，到达的数据是属于复用后的连接，还是复用前的连接呢？那就需要依赖前面提到的两个时间字段了。复用连接后，这条连接的时间被更新为当前的时间，当延迟的数据达到，延迟数据的时间是小于新连接的时间，所以，内核可以通过时间判断出，延迟的数据可以安全的丢弃掉了。</p>
 <p>这个配置，依赖于连接双方，同时对<code>timestamps</code>的支持。同时，这个配置，仅仅影响<code>outbound</code>连接，即做为客户端的角色，连接服务端<code>[connect(dest_ip, dest_port)]</code>时复用<code>TIME_WAIT</code>的<code>socket</code>。</p>
-<pre class="line-numbers language-bash"><code class="language-bash">net.ipv4.tcp_tw_recycle<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash">net.ipv4.tcp_tw_recycle
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>当开启了这个配置后，内核会快速的回收处于<code>TIME_WAIT</code>状态的<code>socket</code>连接。多快？不再是<code>2MSL</code>，而是一个<code>RTO</code>（<code>retransmission timeout</code>，数据包重传的<code>timeout</code>时间）的时间，这个时间根据<code>RTT</code>动态计算出来，但是远小于<code>2MSL</code>。</p>
 <p>有了这个配置，还是需要保障丢失重传或者延迟的数据包，不会被新的连接(注意，这里不再是复用了，而是之前处于<code>TIME_WAIT</code>状态的连接已经被<code>destroy</code>掉了，新的连接，刚好是和某一个被<code>destroy</code>掉的连接使用了相同的五元组而已)所错误的接收。在启用该配置，当一个<code>socket</code>连接进入<code>TIME_WAIT</code>状态后，内核里会记录包括该<code>socket</code>连接对应的五元组中的对方<code>IP</code>等在内的一些统计数据，当然也包括从该对方<code>IP</code>所接收到的最近的一次数据包时间。当有新的数据包到达，只要时间晚于内核记录的这个时间，数据包都会被统统的丢掉。</p>
 <p>这个配置，依赖于连接双方对<code>timestamps</code>的支持。同时，这个配置，主要影响到了<code>inbound</code>的连接（对<code>outbound</code>的连接也有影响，但是不是复用），即做为服务端角色，客户端连进来，服务端主动关闭了连接，<code>TIME_WAIT</code>状态的<code>socket</code>处于服务端，服务端快速的回收该状态的连接。</p>
@@ -615,7 +623,8 @@ net.ipv4.tcp_timestamps <span class="token operator">=</span> 1<span aria-hidden
 net.ipv4.tcp_tw_reuse <span class="token operator">=</span> 1
 
 <span class="token comment" spellcheck="true"># 不能保证客户端不在NAT的网络</span>
-net.ipv4.tcp_tw_recycle <span class="token operator">=</span> 0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+net.ipv4.tcp_tw_recycle <span class="token operator">=</span> 0
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>在<code>Web</code>服务器上的配置为：</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 这个配置主要影响的是Web服务器到DB服务器的连接复用</span>
 net.ipv4.tcp_tw_reuse <span class="token operator">=</span> 1
@@ -623,7 +632,8 @@ net.ipv4.tcp_tw_reuse <span class="token operator">=</span> 1
 <span class="token comment" spellcheck="true"># 设置成1和0都没有任何意义。想一想，在负载均衡和它的连接中；</span>
 <span class="token comment" spellcheck="true"># 它是服务端，但是TIME_WAIT出现在负载均衡服务器上；</span>
 <span class="token comment" spellcheck="true"># 它和DB的连接，它是客户端，recycle对它并没有什么影响，关键是reuse。</span>
-net.ipv4.tcp_tw_recycle <span class="token operator">=</span> ?<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+net.ipv4.tcp_tw_recycle <span class="token operator">=</span> ?
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>场景二：Web 服务器首先关闭来自负载均衡服务器的连接</strong></li>
 </ul>
@@ -633,36 +643,20 @@ net.ipv4.tcp_tw_recycle <span class="token operator">=</span> ?<span aria-hidden
 net.ipv4.tcp_tw_reuse <span class="token operator">=</span> ?
 
 <span class="token comment" spellcheck="true"># 一定是关闭recycle</span>
-net.ipv4.tcp_tw_recycle<span class="token operator">=</span>0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+net.ipv4.tcp_tw_recycle<span class="token operator">=</span>0
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>在<code>Web</code>服务器上的配置：</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 这个配置主要影响的是Web服务器到DB服务器的连接复用</span>
 net.ipv4.tcp_tw_reuse <span class="token operator">=</span> 1
 
 <span class="token comment" spellcheck="true"># 由于在负载均衡和Web服务器之间并没有NAT的网络</span>
 <span class="token comment" spellcheck="true"># 可以考虑开启recycle，加速由于负载均衡和Web服务器之间的连接造成的大量TIME_WAIT。</span>
-net.ipv4.tcp_tw_recycle<span class="token operator">=</span>1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+net.ipv4.tcp_tw_recycle<span class="token operator">=</span>1
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="5-写在最后总结"><a href="#5-写在最后总结" class="headerlink" title="5. 写在最后总结"></a>5. 写在最后总结</h2><p>知其所以然的这个过程还是很耗费时间了，因为需要牵扯很多知识点。如果对 <code>TPC/IP</code> 完全没有理解，就很难理解对于内核参数控制的范围和用处。但是，一旦你知道了原因，也就是你一点点的成长起来了。</p>
 <p>我力求比散布在网上的文章做到准确并尽量整理的清晰一些。但是，也难免会有疏漏或者有错误的地方，高手看到可以随时指正，并和我讨论，大家一起研究！</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
+
                 
             </div>
             <hr/>
@@ -898,6 +892,8 @@ net.ipv4.tcp_tw_recycle<span class="token operator">=</span>1<span aria-hidden="
 
     
 
+    
+
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
@@ -927,7 +923,7 @@ net.ipv4.tcp_tw_recycle<span class="token operator">=</span>1<span aria-hidden="
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Python入门基础/" class="post-category">
+                            <a href="/categories/Python%E5%85%A5%E9%97%A8%E5%9F%BA%E7%A1%80/" class="post-category">
                                     Python入门基础
                                 </a>
                             
@@ -975,7 +971,7 @@ net.ipv4.tcp_tw_recycle<span class="token operator">=</span>1<span aria-hidden="
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Python入门基础/" class="post-category">
+                            <a href="/categories/Python%E5%85%A5%E9%97%A8%E5%9F%BA%E7%A1%80/" class="post-category">
                                     Python入门基础
                                 </a>
                             
@@ -1177,7 +1173,9 @@ net.ipv4.tcp_tw_recycle<span class="token operator">=</span>1<span aria-hidden="
 <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
 
     
-    <div class="container row center-align" style="margin-bottom: 15px !important;">
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
@@ -1189,70 +1187,82 @@ net.ipv4.tcp_tw_recycle<span class="token operator">=</span>1<span aria-hidden="
             |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1121.5k</span>&nbsp;字
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1101.7k</span>
             
             
             
+                
             
             
-            
-            <span id="busuanzi_container_site_pv">
-                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
-                    class="white-color"></span>&nbsp;次
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
             </span>
             
             
-            <span id="busuanzi_container_site_uv">
-                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
-                    class="white-color"></span>&nbsp;人
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
             </span>
             
             <br>
+
+            <!-- 运行天数提醒. -->
             
-            <span id="sitetime">载入运行时间...</span>
-            <script>
-                function siteTime() {
-                    var seconds = 1000;
-                    var minutes = seconds * 60;
-                    var hours = minutes * 60;
-                    var days = hours * 24;
-                    var years = days * 365;
-                    var today = new Date();
-                    var startYear = "2017";
-                    var startMonth = "2";
-                    var startDate = "14";
-                    var startHour = "0";
-                    var startMinute = "0";
-                    var startSecond = "0";
-                    var todayYear = today.getFullYear();
-                    var todayMonth = today.getMonth() + 1;
-                    var todayDate = today.getDate();
-                    var todayHour = today.getHours();
-                    var todayMinute = today.getMinutes();
-                    var todaySecond = today.getSeconds();
-                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
-                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
-                    var diff = t2 - t1;
-                    var diffYears = Math.floor(diff / years);
-                    var diffDays = Math.floor((diff / days) - diffYears * 365);
-                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
-                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
-                        minutes);
-                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
-                        diffMinutes * minutes) / seconds);
-                    if (startYear == todayYear) {
-                        document.getElementById("year").innerHTML = todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
-                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
-                    } else {
-                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
-                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2017";
+                        var startMonth = "2";
+                        var startDate = "14";
+                        var startHour = "0";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
                     }
-                }
-                setInterval(siteTime, 1000);
-            </script>
+
+                    calcSiteTime();
+                </script>
             
             <br>
             

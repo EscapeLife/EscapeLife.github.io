@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 
 
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
     <meta charset="utf-8">
     <meta name="keywords" content="Postgres数据库归档热备份, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
@@ -29,6 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
+<meta name="generator" content="Hexo 5.4.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -439,7 +442,7 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/DB浅入浅出/" class="post-category">
+                            <a href="/categories/DB%E6%B5%85%E5%85%A5%E6%B5%85%E5%87%BA/" class="post-category">
                                 DB浅入浅出
                             </a>
                         
@@ -466,7 +469,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    6.2k
+                    6.1k
                 </div>
                 
 
@@ -497,8 +500,8 @@
 <p>在使用 <code>PostgreSQL</code> 数据库在做写入操作时，对数据文件做的任何修改信息，首先会写入 <code>WAL</code> 日志(预写日志)，然后才会对数据文件做物理修改。当数据库服务器掉重启时，<code>PostgreSQL</code> 数据库在启动时会优先读取 <code>WAL</code> 日志，对数据文件进行恢复。因此，从理论上讲，如果我们有一个数据库的基础备份(也称为全备)，再配合 <code>WAL</code> 日志，是可以将数据库恢复到过去的任意时间点上。</p>
 </blockquote>
 <ul>
-<li><a href="http://mysql.taobao.org/monthly/2015/07/03/" target="_blank" rel="noopener"><strong>PgSQL·特性分析·时间线解析</strong></a></li>
-<li><a href="http://www.postgres.cn/docs/10/continuous-archiving.html" target="_blank" rel="noopener"><strong>PostgreSQL 官方备份和恢复文档</strong></a></li>
+<li><a target="_blank" rel="noopener" href="http://mysql.taobao.org/monthly/2015/07/03/"><strong>PgSQL·特性分析·时间线解析</strong></a></li>
+<li><a target="_blank" rel="noopener" href="http://www.postgres.cn/docs/10/continuous-archiving.html"><strong>PostgreSQL 官方备份和恢复文档</strong></a></li>
 </ul>
 <p><img src="/../images/postgres-backup-restore.jpg" alt="Postgres数据库归档热备份"></p>
 <hr>
@@ -509,12 +512,14 @@
 <li><strong>[1] Ubutun</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Ubutun</span>
-$ <span class="token function">sudo</span> apt <span class="token function">install</span> zstd<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> apt <span class="token function">install</span> zstd
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[2] CentOS</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># CentOS</span>
-$ <span class="token function">sudo</span> yum <span class="token function">install</span> zstd<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> yum <span class="token function">install</span> zstd
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="2-修改配置文件"><a href="#2-修改配置文件" class="headerlink" title="2. 修改配置文件"></a>2. 修改配置文件</h2><blockquote>
 <p><strong>所谓 WAL 日志归档，其实就是把在线的 WAL 日志备份出来。</strong></p>
@@ -540,7 +545,8 @@ $ <span class="token function">sudo</span> yum <span class="token function">inst
 <span class="token comment" spellcheck="true"># 用于获取正在运行的PostgreSQL数据库集群的基本备份</span>
 <span class="token comment" spellcheck="true"># 不会影响数据库的其他客户端，可用于时间点恢复或流复制备用服务器的起点</span>
 $ <span class="token function">cd</span> /data/pg_wal_backup/basebackup
-$ <span class="token function">sudo</span> /usr/lib/postgresql/10/bin/pg_basebackup -U postgres -h 127.0.0.1 -p 5432 -D ./<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> /usr/lib/postgresql/10/bin/pg_basebackup -U postgres -h 127.0.0.1 -p 5432 -D ./
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[2] 修改数据库配置文件</strong></li>
 </ul>
@@ -552,18 +558,21 @@ $ <span class="token function">sudo</span> /usr/lib/postgresql/10/bin/pg_basebac
 $ <span class="token function">sudo</span> vim /data/app/pg_data/postgresql.conf
 wal_level <span class="token operator">=</span> replica  <span class="token comment" spellcheck="true"># 需要将日志级别设置为replica或更高级别; 可使用默认值</span>
 archive_mode <span class="token operator">=</span> on    <span class="token comment" spellcheck="true"># 打开归档备份</span>
-archive_command <span class="token operator">=</span> <span class="token string">'/usr/local/bin/archive_wal.sh %f %p /data/pg_wal_backup/wal'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+archive_command <span class="token operator">=</span> <span class="token string">'/usr/local/bin/archive_wal.sh %f %p /data/pg_wal_backup/wal'</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># [本地备份] 使用cp命令</span>
 archive_command <span class="token operator">=</span> <span class="token string">'cp %p /data/pg_wal_backup/wal/%f'</span>
 archive_command <span class="token operator">=</span> <span class="token string">'test ! -f /data/pg_wal_backup/wal/%f &amp;&amp; cp %p /data/pg_wal_backup/wal/%f'</span>
 
 <span class="token comment" spellcheck="true"># [本地备份] 示例说明</span>
-archive_command <span class="token operator">=</span> <span class="token string">'cp /data/app/pg_data/pg_wal/0xxx065 /data/pg_wal_backup/wal/0xxx065'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+archive_command <span class="token operator">=</span> <span class="token string">'cp /data/app/pg_data/pg_wal/0xxx065 /data/pg_wal_backup/wal/0xxx065'</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># [远程备份] 使用scp命令</span>
 archive_command <span class="token operator">=</span><span class="token string">'scp %p postgres@192.168.1.100:/data/pg_wal_backup/wal/%f'</span>
 
 <span class="token comment" spellcheck="true"># [远程备份] 示例说明</span>
-archive_command <span class="token operator">=</span> <span class="token string">'scp /data/app/pg_data/pg_wal/0xxx065 postgres@192.168.1.100:/data/pg_wal_backup/wal/0xxx065'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+archive_command <span class="token operator">=</span> <span class="token string">'scp /data/app/pg_data/pg_wal/0xxx065 postgres@192.168.1.100:/data/pg_wal_backup/wal/0xxx065'</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[3] 添加 WAL 备份脚本</strong></li>
 </ul>
@@ -592,7 +601,8 @@ BACKUP_PATH<span class="token operator">=</span><span class="token variable">${3
     EXIT_CODE<span class="token operator">=</span><span class="token variable">$?</span>
 <span class="token keyword">fi</span>
 
-<span class="token keyword">exit</span> <span class="token variable">${EXIT_CODE}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token keyword">exit</span> <span class="token variable">${EXIT_CODE}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="3-自动归档备份"><a href="#3-自动归档备份" class="headerlink" title="3. 自动归档备份"></a>3. 自动归档备份</h2><blockquote>
 <p><strong>所有的操作都是为了一旦数据有问题时进行回退或回滚使用 =&gt; <a href="(https://www.docs4dev.com/docs/zh/postgre-sql/11.2/reference/app-pgbasebackup.html)">命令参数手册</a></strong></p>
@@ -604,17 +614,20 @@ $ <span class="token function">sudo</span> supervisorctl restarrt app-postgres
 <span class="token comment" spellcheck="true"># 修改wal_level和archive_mode参数都需要重新启动数据库才可以生效</span>
 <span class="token comment" spellcheck="true"># 而修改archive_command参数不需要重启，只需要reload数据库配置即可</span>
 postgres<span class="token operator">=</span><span class="token comment" spellcheck="true"># SELECT pg_reload_conf();</span>
-postgres<span class="token operator">=</span><span class="token comment" spellcheck="true"># show archive_command;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+postgres<span class="token operator">=</span><span class="token comment" spellcheck="true"># show archive_command;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 定时任务 => 创建用于执行还原的命名点</span>
 <span class="token comment" spellcheck="true"># 默认情况下仅限于超级用户，但可以授予其他用户EXECUTE以运行该功能</span>
 $ <span class="token function">sudo</span> <span class="token function">crontab</span> -l
 0 * * * *    <span class="token function">bash</span> -c <span class="token string">"psql -U postgres -h 127.0.0.1 -p 5432 -c
-                 \"select pg_create_restore_point('<span class="token variable"><span class="token variable">$(</span><span class="token function">date</span> +\"\%Y\%m\%d\%H\%M\"<span class="token variable">)</span></span>');\""</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+                 \"select pg_create_restore_point('<span class="token variable"><span class="token variable">$(</span><span class="token function">date</span> +\"\%Y\%m\%d\%H\%M\"<span class="token variable">)</span></span>');\""</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 正常创建恢复点之后，数据库的log文件定时会显示如下内容</span>
 <span class="token comment" spellcheck="true"># 需要注意的是，Wal的备份目录会跟随数据增长而增加Wal文件</span>
 $ <span class="token function">sudo</span> <span class="token function">grep</span> CRON /var/log/syslog
 2019-06-11 17:00:01.624 CST <span class="token punctuation">[</span>7454<span class="token punctuation">]</span> LOG:  restore point <span class="token string">"201906111700"</span> created at 85/8C84AF80
-2019-06-11 17:00:01.624 CST <span class="token punctuation">[</span>7454<span class="token punctuation">]</span> STATEMENT:  <span class="token keyword">select</span> pg_create_restore_point<span class="token punctuation">(</span><span class="token string">'201906111700'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+2019-06-11 17:00:01.624 CST <span class="token punctuation">[</span>7454<span class="token punctuation">]</span> STATEMENT:  <span class="token keyword">select</span> pg_create_restore_point<span class="token punctuation">(</span><span class="token string">'201906111700'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="4-触发归档情况"><a href="#4-触发归档情况" class="headerlink" title="4. 触发归档情况"></a>4. 触发归档情况</h2><blockquote>
 <p><strong>建立归档后，什么情况下会触发归档？</strong></p>
@@ -631,7 +644,8 @@ postgres<span class="token operator">=</span><span class="token comment" spellch
  pg_switch_xlog
 <span class="token comment" spellcheck="true">----------------</span>
  <span class="token number">0</span><span class="token operator">/</span><span class="token number">87000000</span>
-<span class="token punctuation">(</span><span class="token number">1</span> <span class="token keyword">row</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">(</span><span class="token number">1</span> <span class="token keyword">row</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[方法二] WAL 日志写满后触发归档</strong></li>
 </ul>
@@ -683,7 +697,8 @@ $ psql -U postgres -h 127.0.0.1 -p 5432 -d app
 
 <span class="token comment" spellcheck="true"># 4.备份完之后做一次WAL切换，保证最新的WAL日志归档到归档目录</span>
 $ psql -U postgres -h 127.0.0.1 -p 5432 -d app
-<span class="token operator">></span>   app<span class="token operator">=</span><span class="token comment" spellcheck="true"># select pg_switch_wal();</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token operator">></span>   app<span class="token operator">=</span><span class="token comment" spellcheck="true"># select pg_switch_wal();</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[创建] 创建还原点并删除数据</strong></li>
 </ul>
@@ -726,7 +741,8 @@ $ psql -U postgres -h 127.0.0.1 -p 5432 -d app
  pg_switch_wal
 ---------------
  0/A0005N8
-<span class="token punctuation">(</span>1 row<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">(</span>1 row<span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[恢复] 恢复到某一时间点</strong></li>
 </ul>
@@ -758,7 +774,8 @@ drwx------ 2 999 ci     4096 Jan 22 18:42 archive_status/
 <span class="token function">cp</span> /data/app/pg_data/pg_wal/000000010000000000000010 /data/pg_wal_backup/wal/000000010000000000000010
 <span class="token function">cp</span> /data/app/pg_data/pg_wal/000000010000000000000011 /data/pg_wal_backup/wal/000000010000000000000011
 <span class="token function">cp</span> /data/app/pg_data/pg_wal/000000010000000000000012 /data/pg_wal_backup/wal/000000010000000000000012
-<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 5.删除当前数据库并将备份数据导入</span>
 $ <span class="token function">rm</span> -rf /data/app/pg_data/
 $ <span class="token function">cp</span> -r /data/pg_wal_backup/basebackup/* /data/app/pg_data/
@@ -780,7 +797,8 @@ recovery_target_timeline<span class="token operator">=</span><span class="token 
 $ vim /data/app/pg_data/postgresql.conf
 wal_level<span class="token operator">=</span><span class="token string">'replica'</span>
 archive_mode<span class="token operator">=</span><span class="token string">'off'</span>
-archive_command<span class="token operator">=</span><span class="token string">''</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+archive_command<span class="token operator">=</span><span class="token string">''</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 9.启动数据，进入恢复状态，观察日志，如下所示</span>
 $ /usr/lib/postgresql/10/bin/pg_ctl -o <span class="token string">"-p 5432"</span> start -D /data/app/pg_data
 waiting <span class="token keyword">for</span> server to start<span class="token punctuation">..</span><span class="token punctuation">..</span>2019-06-12 23:44:28.034 CST <span class="token punctuation">[</span>4607<span class="token punctuation">]</span> LOG:  listening on IPv4 address <span class="token string">"127.0.0.1"</span>, port 5432
@@ -823,7 +841,8 @@ $ psql -U postgres -h 127.0.0.1 -p 5432 -d app
 2019-12-12 23:49:06.133 CST <span class="token punctuation">[</span>4608<span class="token punctuation">]</span> LOG:  last completed transaction was at log <span class="token function">time</span> 2019-12-12 23:06:57.417227+08
 2019-12-12 23:49:06.157 CST <span class="token punctuation">[</span>4608<span class="token punctuation">]</span> LOG:  selected new timeline ID: 2
 2019-12-12 23:49:06.505 CST <span class="token punctuation">[</span>4608<span class="token punctuation">]</span> LOG:  archive recovery complete
-2019-12-12 23:49:06.621 CST <span class="token punctuation">[</span>4607<span class="token punctuation">]</span> LOG:  database system is ready to accept connections<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+2019-12-12 23:49:06.621 CST <span class="token punctuation">[</span>4607<span class="token punctuation">]</span> LOG:  database system is ready to accept connections
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="6-数据库时间线"><a href="#6-数据库时间线" class="headerlink" title="6. 数据库时间线"></a>6. 数据库时间线</h2><blockquote>
 <p><strong>关于备份和恢复的时间线</strong></p>
@@ -835,18 +854,20 @@ $ psql -U postgres -h 127.0.0.1 -p 5432 -d app
 <p><img src="/../images/postgres-backup-restore-4.png" alt="Postgres数据库归档热备份"></p>
 <p>为了解决这个问题，PostgreSQL 引入了时间线的概念。每当归档文件恢复完成后，创建一个新的时间线用来区别新生成的 WAL 记录。WAL 文件名由时间线和日志序号组成，源码实现如下：</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true">#define XLogFileName(fname, tli, log, seg) \</span>
-    snprintf<span class="token punctuation">(</span>fname, XLOG_DATA_FNAME_LEN + 1, <span class="token string">"%08X%08X%08X"</span>, tli, log, seg<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+    snprintf<span class="token punctuation">(</span>fname, XLOG_DATA_FNAME_LEN + 1, <span class="token string">"%08X%08X%08X"</span>, tli, log, seg<span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">ls</span> -1
 00000002.history
 00000003.history
 00000003000000000000001A
-00000003000000000000001B<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+00000003000000000000001B
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>时间线 <code>ID</code> 号是 <code>WAL</code> 文件名组成之一，因此一个新的时间线不会覆盖由以前的时间线生成的 <code>WAL</code>。如下图所示，每个时间线类似一个分支，在当前时间线的操作不会对其他时间线 <code>WAL</code> 造成影响，有了时间线，我们就可以恢复到之前的任何时间点。</p>
 <p><img src="/../images/postgres-backup-restore-5.png" alt="Postgres数据库归档热备份"></p>
 <ul>
 <li><strong>[2] 新时间线的出现场景</strong></li>
 </ul>
-<p>第一种就是：<strong>即时恢复(PITR)配置 recovery.conf 文件 =&gt;</strong>设置好 <code>recovery.conf</code> 文件后，启动数据库，将会产生新的 <code>timeline</code>，而且会生成一个新的 <code>history</code> 文件。恢复的默认行为是沿着与当前基本备份相同的时间线恢复。如果你想恢复到某些时间线，你需要指定的 <code>recovery.conf</code> 目标时间线 <code>recovery_target_timeline</code>，不能恢复到早于基本备份分支的时间点。</p>
+<p>第一种就是：**即时恢复(PITR)配置 recovery.conf 文件 =&gt;**设置好 <code>recovery.conf</code> 文件后，启动数据库，将会产生新的 <code>timeline</code>，而且会生成一个新的 <code>history</code> 文件。恢复的默认行为是沿着与当前基本备份相同的时间线恢复。如果你想恢复到某些时间线，你需要指定的 <code>recovery.conf</code> 目标时间线 <code>recovery_target_timeline</code>，不能恢复到早于基本备份分支的时间点。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 从归档目录恢复日志</span>
 restore_command <span class="token operator">=</span> <span class="token string">'cp /mnt/server/archivedir/%f %p'</span>
 <span class="token comment" spellcheck="true"># 指定归档时间点，如没指定恢复到故障前的最后一完成的事务</span>
@@ -854,9 +875,11 @@ recovery_target_time <span class="token operator">=</span> <span class="token st
 <span class="token comment" spellcheck="true"># 指定归档时间线，latest代表最新的时间线分支，如没指定恢复到故障前的pg_control里面的时间线</span>
 recovery_target_timeline <span class="token operator">=</span> <span class="token string">'latest'</span>
 <span class="token comment" spellcheck="true"># 打开后将会以备库身份启动，而不是即时恢复</span>
-standby_mode <span class="token operator">=</span> <span class="token string">'off'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>第二种就是：<strong>standby promote 搭建一个 PG 主备，然后停止主库，在备库机器执行 =&gt;</strong>这时候备库将会升为主备，同时产生一个新的 <code>timeline</code>，同样生成一个新的 <code>history</code> 文件。</p>
-<pre class="line-numbers language-bash"><code class="language-bash">$ pg_ctl promote –D <span class="token variable">$PGDATA</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+standby_mode <span class="token operator">=</span> <span class="token string">'off'</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>第二种就是：**standby promote 搭建一个 PG 主备，然后停止主库，在备库机器执行 =&gt;**这时候备库将会升为主备，同时产生一个新的 <code>timeline</code>，同样生成一个新的 <code>history</code> 文件。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ pg_ctl promote –D <span class="token variable">$PGDATA</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <ul>
 <li><strong>[3] history 文件</strong></li>
 </ul>
@@ -869,7 +892,8 @@ standby_mode <span class="token operator">=</span> <span class="token string">'o
 $ <span class="token function">cat</span> 00000004.history
 1 0/140000C8 no recovery target specified
 2 0/19000060 no recovery target specified
-3 0/1F000090 no recovery target specified<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+3 0/1F000090 no recovery target specified
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>当数据库在从包含多个时间线的归档中恢复时，这些 <code>history</code> 文件允许系统选取正确的 <code>WAL</code> 文件。当然，它也能像 <code>WAL</code> 文件一样被归档到 <code>WAL</code> 归档目录里。历史文件只是很小的文本文件，所以保存它们的代价很小。</p>
 <p>当我们在 <code>recovery.conf</code> 指定目标时间线 <code>tli</code> 进行恢复时，程序首先寻找 <code>.history</code> 文件，根据 <code>.history</code> 文件里面记录的时间线分支关系，找到从 <code>pg_control</code> 里面的 <code>startTLI</code> 到 <code>tli</code> 之间的所有时间线对应的日志文件，再进行恢复。</p>
 <ul>
@@ -910,7 +934,7 @@ $ <span class="token function">cat</span> 00000004.history
 <li><strong>[方法一] 流复制(使用本地存储)</strong></li>
 </ul>
 <p><img src="/../images/postgres-backup-restore-1.png" alt="Postgres数据库归档热备份"></p>
-<p>第一种方法，<strong>流复制(使用本地存储)</strong>是最常见的方法。你有一个主节点，主节点具有表的数据和预写日志(<code>WAL</code>)。当您修改 <code>Postgres</code> 中的行时，更改首先会被提交到仅附加重做日志，此重做日志称为预写日志或<code>WAL</code>。然后，此 <code>Postgres</code> 的 <code>WAL</code> 日志将流式传输到辅助节点。</p>
+<p>第一种方法，**流复制(使用本地存储)**是最常见的方法。你有一个主节点，主节点具有表的数据和预写日志(<code>WAL</code>)。当您修改 <code>Postgres</code> 中的行时，更改首先会被提交到仅附加重做日志，此重做日志称为预写日志或<code>WAL</code>。然后，此 <code>Postgres</code> 的 <code>WAL</code> 日志将流式传输到辅助节点。</p>
 <p>在第一种方法中，当您构建新的辅助节点时，新的辅助节点需要从主节点重播整个状态 - 从时间开始。然后，重放操作可能在主节点上引入显着负载。如果数据库的主节点提供实时流量，则此负载变得更加重要。</p>
 <p>在此方法中，您可以使用本地磁盘或将持久 <code>volume</code> 附加到实例。在上图中，我们使用的是本地磁盘，因为这是更典型的设置。</p>
 <ul>
@@ -931,29 +955,11 @@ $ <span class="token function">cat</span> 00000004.history
 <p><strong>赠人玫瑰，手有余香</strong></p>
 </blockquote>
 <ul>
-<li><a href="https://blog.csdn.net/a964921988/article/details/84957241" target="_blank" rel="noopener">Postgresql 连续归档和时间点恢复</a></li>
-<li><a href="https://lihaoquan.me/2018/10/14/postgres-backup-wal.html" target="_blank" rel="noopener">Postgresql 备份与数据恢复</a></li>
-<li><a href="https://cloud.tencent.com/developer/article/1371871" target="_blank" rel="noopener">PostgreSQL 复制和备份的 3 种方法</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/a964921988/article/details/84957241">Postgresql 连续归档和时间点恢复</a></li>
+<li><a target="_blank" rel="noopener" href="https://lihaoquan.me/2018/10/14/postgres-backup-wal.html">Postgresql 备份与数据恢复</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1371871">PostgreSQL 复制和备份的 3 种方法</a></li>
 </ul>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
+
                 
             </div>
             <hr/>
@@ -1189,6 +1195,8 @@ $ <span class="token function">cat</span> 00000004.history
 
     
 
+    
+
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
@@ -1218,7 +1226,7 @@ $ <span class="token function">cat</span> 00000004.history
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Python第三方库/" class="post-category">
+                            <a href="/categories/Python%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/" class="post-category">
                                     Python第三方库
                                 </a>
                             
@@ -1270,7 +1278,7 @@ $ <span class="token function">cat</span> 00000004.history
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Docker学习攻略/" class="post-category">
+                            <a href="/categories/Docker%E5%AD%A6%E4%B9%A0%E6%94%BB%E7%95%A5/" class="post-category">
                                     Docker学习攻略
                                 </a>
                             
@@ -1472,7 +1480,9 @@ $ <span class="token function">cat</span> 00000004.history
 <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
 
     
-    <div class="container row center-align" style="margin-bottom: 15px !important;">
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
@@ -1484,70 +1494,82 @@ $ <span class="token function">cat</span> 00000004.history
             |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1121.5k</span>&nbsp;字
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1101.7k</span>
             
             
             
+                
             
             
-            
-            <span id="busuanzi_container_site_pv">
-                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
-                    class="white-color"></span>&nbsp;次
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
             </span>
             
             
-            <span id="busuanzi_container_site_uv">
-                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
-                    class="white-color"></span>&nbsp;人
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
             </span>
             
             <br>
+
+            <!-- 运行天数提醒. -->
             
-            <span id="sitetime">载入运行时间...</span>
-            <script>
-                function siteTime() {
-                    var seconds = 1000;
-                    var minutes = seconds * 60;
-                    var hours = minutes * 60;
-                    var days = hours * 24;
-                    var years = days * 365;
-                    var today = new Date();
-                    var startYear = "2017";
-                    var startMonth = "2";
-                    var startDate = "14";
-                    var startHour = "0";
-                    var startMinute = "0";
-                    var startSecond = "0";
-                    var todayYear = today.getFullYear();
-                    var todayMonth = today.getMonth() + 1;
-                    var todayDate = today.getDate();
-                    var todayHour = today.getHours();
-                    var todayMinute = today.getMinutes();
-                    var todaySecond = today.getSeconds();
-                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
-                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
-                    var diff = t2 - t1;
-                    var diffYears = Math.floor(diff / years);
-                    var diffDays = Math.floor((diff / days) - diffYears * 365);
-                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
-                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
-                        minutes);
-                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
-                        diffMinutes * minutes) / seconds);
-                    if (startYear == todayYear) {
-                        document.getElementById("year").innerHTML = todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
-                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
-                    } else {
-                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
-                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2017";
+                        var startMonth = "2";
+                        var startDate = "14";
+                        var startHour = "0";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
                     }
-                }
-                setInterval(siteTime, 1000);
-            </script>
+
+                    calcSiteTime();
+                </script>
             
             <br>
             

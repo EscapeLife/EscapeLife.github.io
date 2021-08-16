@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 
 
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
     <meta charset="utf-8">
     <meta name="keywords" content="Docker网络配置, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
@@ -29,6 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
+<meta name="generator" content="Hexo 5.4.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -435,7 +438,7 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Docker学习攻略/" class="post-category">
+                            <a href="/categories/Docker%E5%AD%A6%E4%B9%A0%E6%94%BB%E7%95%A5/" class="post-category">
                                 Docker学习攻略
                             </a>
                         
@@ -462,7 +465,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    3.9k
+                    3.8k
                 </div>
                 
 
@@ -505,7 +508,8 @@ NETWORK ID        NAME         DRIVER      SCOPE
 
 <span class="token comment" spellcheck="true"># 查看本机Docker网段</span>
 $ docker inspect bridge -f <span class="token string">"{{json .IPAM.Config}}"</span>
-<span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"Subnet"</span><span class="token keyword">:</span><span class="token string">"172.17.0.0/16"</span>,<span class="token string">"Gateway"</span><span class="token keyword">:</span><span class="token string">"172.17.0.1"</span><span class="token punctuation">}</span><span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"Subnet"</span><span class="token keyword">:</span><span class="token string">"172.17.0.0/16"</span>,<span class="token string">"Gateway"</span><span class="token keyword">:</span><span class="token string">"172.17.0.1"</span><span class="token punctuation">}</span><span class="token punctuation">]</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><img src="../images/docker-network-way-2.png" alt="Docker网络配置"></p>
 <ul>
 <li><strong>[1] 网桥模式(<code>bridge</code>)</strong></li>
@@ -520,20 +524,23 @@ $ brctl show
 bridge name    bridge <span class="token function">id</span>            STP enabled    interfaces
 docker0        8000.0242de1d30e9    no             veth40db10a
                                     veth5998947
-                                    veth220960a<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+                                    veth220960a
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 如果想做隔离，可以使用下面命令来创建一下bridge</span>
 $ docker network create -d bridge net_bridge
 fb0a51e7e720f0<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>1c33293c58815e31
 
 <span class="token comment" spellcheck="true"># 自定自己创建的bridge网络</span>
-$ docker run -it --rm --network<span class="token operator">=</span>net_bridge busybox<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ docker run -it --rm --network<span class="token operator">=</span>net_bridge busybox
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><img src="../images/docker-network-way-3.png" alt="Docker网络配置"></p>
 <ul>
 <li><strong>[2] 主机模式(<code>none</code>)</strong></li>
 </ul>
 <p>在这种模式下，<code>Docker</code> 容器拥有自己的 <code>Network Namespace</code>，但是，并不为 <code>Docker</code> 容器进行任何网络配置。也就是说，这个 <code>Docker</code> 容器没有网卡、<code>IP</code>、路由等信息。这种网络模式下容器只有 <code>lo</code> 回环网络，没有其他网卡，所以没有办法联网，封闭的网络能很好的保证容器的安全性。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 指定使用的网络模式</span>
-$ docker run -it --rm --network<span class="token operator">=</span>none busybox<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+$ docker run -it --rm --network<span class="token operator">=</span>none busybox
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <p><img src="../images/docker-network-way-4.png" alt="Docker网络配置"></p>
 <ul>
 <li><strong>[3] 容器模式(<code>container</code>)</strong></li>
@@ -543,7 +550,8 @@ $ docker run -it --rm --network<span class="token operator">=</span>none busybox
 $ docker run -d --name<span class="token operator">=</span>net_container_1 busybox
 
 <span class="token comment" spellcheck="true"># 指定使用的网络模式</span>
-$ docker run -it --network<span class="token operator">=</span>container:net_container_1 busybox<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ docker run -it --network<span class="token operator">=</span>container:net_container_1 busybox
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><img src="../images/docker-network-way-5.jpg" alt="Docker网络配置"></p>
 <ul>
 <li><strong>[4] 无网络模式(<code>host</code>)</strong></li>
@@ -552,7 +560,8 @@ $ docker run -it --network<span class="token operator">=</span>container:net_con
 <p>一个 <code>Docker</code> 容器一般会分配一个独立的 <code>Network Namespace</code>。但如果启动容器的时候使用 <code>host</code> 模式，那么这个容器将不会获得一个独立的 <code>Network Namespace</code>，而是和宿主机共用一个 <code>Network Namespace</code>。容器将不会虚拟出自己的网卡，配置自己的 IP 等，而是使用宿主机的 <code>IP</code> 和端口。</p>
 <p>使用 <code>host</code> 模式的容器可以直接使用 <code>host</code> 的 <code>IP</code> 地址与外界通信，容器内部的服务端口也可以使用宿主机的端口，不需要进行 <code>NAT</code>。<code>host</code> 网络模式最大的优势就是网络性能比较好，但是 <code>host</code> 上已经使用的端口就不能再用了，网络的隔离性不好。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 指定使用的网络模式</span>
-$ docker run -it --rm --network<span class="token operator">=</span>host busybox<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+$ docker run -it --rm --network<span class="token operator">=</span>host busybox
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <p><img src="../images/docker-network-way-6.png" alt="Docker网络配置"></p>
 <hr>
 <h2 id="2-外部访问"><a href="#2-外部访问" class="headerlink" title="2. 外部访问"></a>2. 外部访问</h2><blockquote>
@@ -572,9 +581,11 @@ $ docker run -d -p 127.0.0.1:5000:5000 --name<span class="token operator">=</spa
 
 <span class="token comment" spellcheck="true"># 3.映射到指定地址的任意端口</span>
 $ docker run -d -p 127.0.0.1::5000 --name<span class="token operator">=</span>myapp sonatype/nexus3
-$ docker run -d -p 127.0.0.1:5000:5000/udp --name<span class="token operator">=</span>myapp sonatype/nexus3<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ docker run -d -p 127.0.0.1:5000:5000/udp --name<span class="token operator">=</span>myapp sonatype/nexus3
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># —P参数不能多个</span>
-$ docker run -d -P training/webapp python app.py<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+$ docker run -d -P training/webapp python app.py
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看映射端口配置</span>
 $ docker port myapp
 8081/tcp -<span class="token operator">></span> 127.0.0.1:32769
@@ -582,7 +593,8 @@ $ docker port myapp 8081
 127.0.0.1:32769
 
 <span class="token comment" spellcheck="true"># 查看容器输出日志</span>
-$ docker logs -f myapp<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ docker logs -f myapp
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="3-容器互联"><a href="#3-容器互联" class="headerlink" title="3. 容器互联"></a>3. 容器互联</h2><blockquote>
 <p><strong>了解容器之前互信互通的方式和方法</strong></p>
@@ -621,7 +633,8 @@ DB_PORT_5000_TCP_ADDR<span class="token operator">=</span>172.17.0.5
 $ docker <span class="token function">exec</span> -it myapp <span class="token string">"cat /etc/hosts"</span>
 172.17.0.7  aed84ee21bde
 172.17.0.5  db
-<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 创建新子网络</span>
 $ docker network create -d bridge --subnet<span class="token operator">=</span>172.30.0.0/16 my_network
 
@@ -637,7 +650,8 @@ $  docker run -d --name<span class="token operator">=</span>mypg \
     --ip<span class="token operator">=</span>172.30.0.11 \
     -v /Users/escape/pg_data:/var/lib/postgresql/data \
     -e POSTGRES_DB<span class="token operator">=</span>draft \
-    postgres:10<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    postgres:10
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="4-设置-DNS"><a href="#4-设置-DNS" class="headerlink" title="4. 设置 DNS"></a>4. 设置 DNS</h2><blockquote>
 <p><strong>掌握 DNS 的设置方式和方法</strong></p>
@@ -647,14 +661,16 @@ $  docker run -d --name<span class="token operator">=</span>mypg \
 /dev/sda1 on /etc/resolv.conf <span class="token function">type</span> ext4 <span class="token punctuation">(</span>rw,relatime,data<span class="token operator">=</span>ordered<span class="token punctuation">)</span>
 /dev/sda1 on /etc/hostname <span class="token function">type</span> ext4 <span class="token punctuation">(</span>rw,relatime,data<span class="token operator">=</span>ordered<span class="token punctuation">)</span>
 /dev/sda1 on /etc/hosts <span class="token function">type</span> ext4 <span class="token punctuation">(</span>rw,relatime,data<span class="token operator">=</span>ordered<span class="token punctuation">)</span>
-<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>配置全部容器的 <code>DNS</code> ，也可以在 <code>/etc/docker/daemon.json</code> 文件中增加以下内容来设置。对应 <code>MacOS</code> 而已，需要在客户端内进行 <code>DNS</code> 的配置并重启，即可。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">{</span>
   <span class="token string">"dns"</span> <span class="token keyword">:</span> <span class="token punctuation">[</span>
     <span class="token string">"114.114.114.114"</span>,
     <span class="token string">"8.8.8.8"</span>
   <span class="token punctuation">]</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>如果只是针对于不同的容器使用不同的配置，则可以在启动时 <code>docker run</code> 时候通过参数的指定来达到同样的效果。</p>
 <ul>
 <li><code>--hostname=HOSTNAME</code><ul>
@@ -672,7 +688,8 @@ $  docker run -d --name<span class="token operator">=</span>mypg \
 $ docker run -d -p 5000:5000 --name<span class="token operator">=</span>myapp \
     --hostname<span class="token operator">=</span>my_app_web \
     --dns<span class="token operator">=</span>8.8.8.8 \
-    sonatype/nexus3<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    sonatype/nexus3
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="5-高级设置"><a href="#5-高级设置" class="headerlink" title="5. 高级设置"></a>5. 高级设置</h2><blockquote>
 <p><strong>了解网络配置的实现原理以及 iptable 规则的指定</strong></p>
@@ -688,7 +705,8 @@ docker0: flags<span class="token operator">=</span>4099<span class="token operat
  RX packets 0  bytes 0 <span class="token punctuation">(</span>0.0 B<span class="token punctuation">)</span>
  RX errors 0  dropped 0  overruns 0  frame 0
  TX packets 0  bytes 0 <span class="token punctuation">(</span>0.0 B<span class="token punctuation">)</span>
- TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+ TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>当创建一个 <code>Docker</code> 容器的时候，同时会创建了一对 <code>veth pair</code> 接口（当数据包发送到一个接口时，另外一个接口也可以收到相同的数据包）。这对接口一端在容器内，即 <code>eth0</code>；另一端在本地并被挂载到 <code>docker0</code> 网桥，名称以 <code>veth</code> 开头（例如 <code>vethAQI2QT</code>）。通过这种方式，主机可以跟容器通信，容器之间也可以相互通信。<code>Docker</code> 就创建了在主机和所有容器之间一个虚拟共享网络。</p>
 <p>需要注意的是，<code>MacOS</code> 操作系统下 <code>docker</code> 的网络处理方式并不一样，并没有上述所说的 <code>docker0</code> 网桥。你可以理解为其实一个假 <code>docker</code>，所以不建议再生产环境中使用。有兴趣的话，可以阅读官方文档加以理解。</p>
 <p><img src="../images/docker-network-way-1.png" alt="Docker网络配置"></p>
@@ -701,7 +719,8 @@ docker0: flags<span class="token operator">=</span>4099<span class="token operat
 $ sysctl net.ipv4.ip_forward
 
 <span class="token comment" spellcheck="true"># 开启转发机制</span>
-$ sysctl -w net.ipv4.ip_forward<span class="token operator">=</span>1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ sysctl -w net.ipv4.ip_forward<span class="token operator">=</span>1
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><strong>容器之间访问</strong>，需要两方面的支持。容器的网络拓扑是否已经互联。默认情况下所有容器都会被连接到 <code>docker0</code> 网桥上。本地系统的防火墙软件，<code>iptables</code> 是否允许通过。</p>
 <p>当启动 <code>Docker</code> 服务的时候，默认会添加一条转发策略到本地主机 <code>iptables</code> 的 <code>FORWARD</code> 链上。<code>--icc=true</code>的值决定策略是 <code>ACCEPT</code> 还是 <code>DROP</code>，默认开启。当然，如果手动指定 <code>--iptables=false</code> 则不会添加 <code>iptables</code> 规则。</p>
 <pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> iptables -t forward -nL
@@ -712,13 +731,15 @@ DOCKER-ISOLATION-STAGE-1  all  --  0.0.0.0/0            0.0.0.0/0
 ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
 DOCKER     all  --  0.0.0.0/0            0.0.0.0/0
 ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0
-<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>在启动 <code>Docker</code> 服务时，可以同时使用 <code>-icc=false --iptables=true</code> 参数来关闭允许相互的网络访问，并让 <code>Docker</code> 可以修改系统中的 <code>iptables</code> 规则。使用 <code>--link=CONTAINER_NAME:ALIAS</code> 选项，<code>iptables</code> 会在两个容器之前添加一条 <code>ACCEPT</code> 规则，允许相互访问开放的端口。取决于 <code>Dockerfile</code> 中的 <code>EXPOSE</code> 指令</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 举个栗子</span>
 $ docker run -d -p 5000:8081 --name<span class="token operator">=</span>myapp \
     icc<span class="token operator">=</span>false --iptables<span class="token operator">=</span>true \
     --link<span class="token operator">=</span>db:app_db \
-    sonatype/nexus3<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    sonatype/nexus3
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[3] 内外容器访问</strong></li>
 </ul>
@@ -729,12 +750,14 @@ $ <span class="token function">sudo</span> iptables -t nat -nL
 Chain POSTROUTING <span class="token punctuation">(</span>policy ACCEPT<span class="token punctuation">)</span>
 target     prot opt <span class="token function">source</span>               destination
 MASQUERADE  all  --  172.17.0.0/16       <span class="token operator">!</span>172.17.0.0/16
-<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><strong>外部访问容器实现</strong>，不管 <code>-p</code> 或 <code>-P</code> 用那种办法，其实也是在本地的 <code>iptable</code> 的 <code>nat</code> 表中添加相应的规则。规则映射了 <code>0.0.0.0</code>，意味着将接受主机来自所有接口的流量。可以通过 <code>-p</code> 参数，来限制指定地址访问。</p>
 <pre class="line-numbers language-bash"><code class="language-bash">$ iptables -t nat -nL
 Chain DOCKER <span class="token punctuation">(</span>2 references<span class="token punctuation">)</span>
 target     prot opt <span class="token function">source</span>               destination
-DNAT       tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:80 to:172.17.0.2:80<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+DNAT       tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:80 to:172.17.0.2:80
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[4] 设置默认网桥</strong></li>
 </ul>
@@ -742,7 +765,8 @@ DNAT       tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:80 to:172.
 <p>每次创建一个新容器的时候，<code>Docker</code> 从可用的地址段中选择一个空闲的 <code>IP</code> 地址分配给容器的 <code>eth0</code> 端口。使用本地主机上 <code>docker0</code> 接口的 <code>IP</code> 作为所有容器的默认网关。</p>
 <pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> brctl show
 bridge name    bridge <span class="token function">id</span>        STP enabled    interfaces
-docker0        8000.0242f38734a3    no<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+docker0        8000.0242f38734a3    no
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[5] 自定义网桥</strong></li>
 </ul>
@@ -758,21 +782,23 @@ $ <span class="token function">sudo</span> ip addr add 192.168.5.1/24 dev docker
 $ <span class="token function">sudo</span> ip <span class="token function">link</span> <span class="token keyword">set</span> dev docker1 up
 
 <span class="token comment" spellcheck="true"># 查看确认网桥创建并启动</span>
-$ ip addr show bridge0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ ip addr show bridge0
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>在 <code>Docker</code> 配置文件 <code>/etc/docker/daemon.json</code> 中添加如下内容，即可将 <code>Docker</code> 默认桥接到创建的网桥上。启动 <code>Docker</code> 服务。新建一个容器，可以看到它已经桥接到了 <code>bridge0</code> 上。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">{</span>
   <span class="token string">"bridge"</span><span class="token keyword">:</span> <span class="token string">"bridge0"</span>,
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="6-总结一下"><a href="#6-总结一下" class="headerlink" title="6. 总结一下"></a>6. 总结一下</h2><p>通过上面知识理解，相信我们都对应 <code>docker</code> 的网络有了一定深度的理解了。如果我们不考虑防火墙的话，使用还是比较方便，但是要设置防火墙的话就比较费劲了。</p>
 <p>幸好，我们这里提供了两个方便我们配置 <code>docker</code> 网络的 <code>github</code> 项目，通过对其的了解和使用，可以方便我们管理和配置复杂的网络设置。</p>
 <ul>
-<li><strong><a href="https://github.com/jpetazzo/pipework" target="_blank" rel="noopener">pipework</a></strong><ul>
+<li><strong><a target="_blank" rel="noopener" href="https://github.com/jpetazzo/pipework">pipework</a></strong><ul>
 <li>一个 <code>shell</code> 脚本</li>
 <li>可以帮助用户在比较复杂的场景中完成容器的连接</li>
 </ul>
 </li>
-<li><strong><a href="https://github.com/brandon-rhodes/fopnp/tree/m/playground" target="_blank" rel="noopener">playground</a></strong><ul>
+<li><strong><a target="_blank" rel="noopener" href="https://github.com/brandon-rhodes/fopnp/tree/m/playground">playground</a></strong><ul>
 <li>一个 <code>Python</code> 库</li>
 <li>提供完整的容器网络拓扑管理，路由、<code>NAT</code>防火墙等</li>
 </ul>
@@ -783,29 +809,11 @@ $ ip addr show bridge0<span aria-hidden="true" class="line-numbers-rows"><span><
 <p><strong>送人玫瑰，手有余香！</strong></p>
 </blockquote>
 <ul>
-<li><a href="https://blog.51cto.com/sky9896/2477159?source=dra" target="_blank" rel="noopener">Docker 四种网络模式的原理</a></li>
-<li><a href="https://www.wumingx.com/k8s/docker-network-mode.html" target="_blank" rel="noopener">docker 入门教程五:网络模式</a></li>
-<li><a href="https://ijayer.github.io/post/tech/devops/docker/20170509-docker-%E7%BD%91%E7%BB%9C%E5%AE%9E%E7%8E%B0%E5%92%8C%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%BC%8F/" target="_blank" rel="noopener">Docker | 网络实现和网络模式</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.51cto.com/sky9896/2477159?source=dra">Docker 四种网络模式的原理</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.wumingx.com/k8s/docker-network-mode.html">docker 入门教程五:网络模式</a></li>
+<li><a target="_blank" rel="noopener" href="https://ijayer.github.io/post/tech/devops/docker/20170509-docker-%E7%BD%91%E7%BB%9C%E5%AE%9E%E7%8E%B0%E5%92%8C%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%BC%8F/">Docker | 网络实现和网络模式</a></li>
 </ul>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
+
                 
             </div>
             <hr/>
@@ -1037,6 +1045,8 @@ $ ip addr show bridge0<span aria-hidden="true" class="line-numbers-rows"><span><
 
     
 
+    
+
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
@@ -1066,7 +1076,7 @@ $ ip addr show bridge0<span aria-hidden="true" class="line-numbers-rows"><span><
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Nginx活学活用/" class="post-category">
+                            <a href="/categories/Nginx%E6%B4%BB%E5%AD%A6%E6%B4%BB%E7%94%A8/" class="post-category">
                                     Nginx活学活用
                                 </a>
                             
@@ -1114,7 +1124,7 @@ $ ip addr show bridge0<span aria-hidden="true" class="line-numbers-rows"><span><
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Nginx活学活用/" class="post-category">
+                            <a href="/categories/Nginx%E6%B4%BB%E5%AD%A6%E6%B4%BB%E7%94%A8/" class="post-category">
                                     Nginx活学活用
                                 </a>
                             
@@ -1316,7 +1326,9 @@ $ ip addr show bridge0<span aria-hidden="true" class="line-numbers-rows"><span><
 <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
 
     
-    <div class="container row center-align" style="margin-bottom: 15px !important;">
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
@@ -1328,70 +1340,82 @@ $ ip addr show bridge0<span aria-hidden="true" class="line-numbers-rows"><span><
             |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1121.5k</span>&nbsp;字
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1101.7k</span>
             
             
             
+                
             
             
-            
-            <span id="busuanzi_container_site_pv">
-                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
-                    class="white-color"></span>&nbsp;次
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
             </span>
             
             
-            <span id="busuanzi_container_site_uv">
-                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
-                    class="white-color"></span>&nbsp;人
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
             </span>
             
             <br>
+
+            <!-- 运行天数提醒. -->
             
-            <span id="sitetime">载入运行时间...</span>
-            <script>
-                function siteTime() {
-                    var seconds = 1000;
-                    var minutes = seconds * 60;
-                    var hours = minutes * 60;
-                    var days = hours * 24;
-                    var years = days * 365;
-                    var today = new Date();
-                    var startYear = "2017";
-                    var startMonth = "2";
-                    var startDate = "14";
-                    var startHour = "0";
-                    var startMinute = "0";
-                    var startSecond = "0";
-                    var todayYear = today.getFullYear();
-                    var todayMonth = today.getMonth() + 1;
-                    var todayDate = today.getDate();
-                    var todayHour = today.getHours();
-                    var todayMinute = today.getMinutes();
-                    var todaySecond = today.getSeconds();
-                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
-                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
-                    var diff = t2 - t1;
-                    var diffYears = Math.floor(diff / years);
-                    var diffDays = Math.floor((diff / days) - diffYears * 365);
-                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
-                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
-                        minutes);
-                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
-                        diffMinutes * minutes) / seconds);
-                    if (startYear == todayYear) {
-                        document.getElementById("year").innerHTML = todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
-                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
-                    } else {
-                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
-                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2017";
+                        var startMonth = "2";
+                        var startDate = "14";
+                        var startHour = "0";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
                     }
-                }
-                setInterval(siteTime, 1000);
-            </script>
+
+                    calcSiteTime();
+                </script>
             
             <br>
             

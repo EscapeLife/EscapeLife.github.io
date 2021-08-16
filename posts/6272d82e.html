@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 
 
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
     <meta charset="utf-8">
     <meta name="keywords" content="Linux安全之iptables的target, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
@@ -29,6 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
+<meta name="generator" content="Hexo 5.4.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -439,7 +442,7 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Linux入门基础/" class="post-category">
+                            <a href="/categories/Linux%E5%85%A5%E9%97%A8%E5%9F%BA%E7%A1%80/" class="post-category">
                                 Linux入门基础
                             </a>
                         
@@ -500,7 +503,7 @@
 <p><img src="../images/linux-learn-iptables-tool-70.jpg" alt="Linux安全之iptables的target动作"></p>
 <hr>
 <blockquote>
-<p><strong>注释：更多 IPTABLES 命令的帮助，请查看<a href="https://linux.die.net/man/8/iptables" target="_blank" rel="noopener">官方文档</a> !</strong></p>
+<p><strong>注释：更多 IPTABLES 命令的帮助，请查看<a target="_blank" rel="noopener" href="https://linux.die.net/man/8/iptables">官方文档</a> !</strong></p>
 </blockquote>
 <p><img src="../images/linux-learn-iptables-tool-71.png" alt="Linux安全之iptables的target动作"></p>
 <p>我们在 <code>iptables</code> 中使用 <code>target</code> 动作，需要使用 <code>-j</code> 来指定动作，如 <code>ACCEPT</code>、 <code>DROP</code>、 <code>REJECT</code>等。</p>
@@ -596,7 +599,8 @@
 $ <span class="token function">sudo</span> iptables -t filter -A INPUT -j REJECT
 
 <span class="token comment" spellcheck="true"># 将拒绝报文的提示设置为目标主机不可达</span>
-$ <span class="token function">sudo</span> iptables -t filter -I INPUT 2 -j REJECT --reject-with icmp-host-unreachable<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> iptables -t filter -I INPUT 2 -j REJECT --reject-with icmp-host-unreachable
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="1-2-LOG-动作"><a href="#1-2-LOG-动作" class="headerlink" title="1.2 LOG 动作"></a>1.2 LOG 动作</h3><ul>
 <li><strong>LOG 动作使用</strong></li>
@@ -606,7 +610,8 @@ $ <span class="token function">sudo</span> iptables -t filter -I INPUT 2 -j REJE
 $ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp --dport 22 -j LOG
 
 <span class="token comment" spellcheck="true"># 查看日志记录</span>
-$ <span class="token function">sudo</span> <span class="token function">tail</span> -f /var/log/messages<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> <span class="token function">tail</span> -f /var/log/messages
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>但是上例中使用的匹配条件过于宽泛，所以匹配到的报文数量将会非常之多，记录到的信息也不利于分析。所以在使用 <code>LOG</code> 动作时，匹配条件应该尽量写的精确一些，这样冗余的日志信息就会变少，日后分析日志时信息可用程度更高。</p>
 <p>上述规则表示所有发往 <code>22</code> 号端口的 <code>tcp</code> 报文都符合条件，所以都会被记录到日志中，查看 <code>/var/log/messages</code> 即可看到对应报文的相关信息。当然，我们有可以将相关信息记录在指定的文件中，以防止 <code>iptables</code> 的相关信息与其他日志信息相混淆。需要修改 <code>/etc/rsyslog.conf</code> 或者 <code>/etc/syslog.conf</code> 文件，在 <code>rsyslog</code> 配置文件中添加如下配置即可。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报文的相关信息将会被记录到指定文件</span>
@@ -614,7 +619,8 @@ $ <span class="token function">sudo</span> vim /etc/rsyslog.conf
 kern.warning /var/log/iptables.log
 
 <span class="token comment" spellcheck="true"># 重启rsyslog或者syslogd服务</span>
-$ <span class="token function">sudo</span> <span class="token function">service</span> rsyslog restart<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> <span class="token function">service</span> rsyslog restart
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <ul>
 <li><strong>常用选项</strong></li>
@@ -669,7 +675,8 @@ $ <span class="token function">sudo</span> <span class="token function">service<
 </tr>
 </tbody></table>
 <pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp --dport 22 \
-    -m state --state NEW -j LOG --log-level error<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+    -m state --state NEW -j LOG --log-level error
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <table>
 <thead>
 <tr>
@@ -685,7 +692,8 @@ $ <span class="token function">sudo</span> <span class="token function">service<
 </tr>
 </tbody></table>
 <pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> iptables -t filter -I INPUT -p tcp --dport 22 \
-    -m state --state NEW -j LOG --log-prefix <span class="token string">"nginx-web-log"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+    -m state --state NEW -j LOG --log-prefix <span class="token string">"nginx-web-log"</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="1-3-MASQUERADE-动作"><a href="#1-3-MASQUERADE-动作" class="headerlink" title="1.3 MASQUERADE 动作"></a>1.3 MASQUERADE 动作</h3><p><strong><code>MASQUERADE</code> 动作</strong>是一个与 <code>SNAT</code> 类似的动作。</p>
 <ul>
@@ -696,7 +704,8 @@ $ <span class="token function">sudo</span> <span class="token function">service<
 <p>我们通过 <code>MASQUERADE</code> 即可解决这个问题，<code>MASQUERADE</code> 会动态的将源地址转换为可用的 <code>IP</code> 地址，其实与 <code>SNAT</code> 实现的功能完全一致，都是修改源地址，只不过 <code>SNAT</code> 需要指明将报文的源地址改为哪个 <code>IP</code>，而 <code>MASQUERADE</code> 则不用指定明确的 <code>IP</code>，会动态的将报文的源地址修改为指定网卡上可用的 <code>IP</code> 地址。</p>
 <p>下述中，我们指定通过外网网卡出去的报文在经过 <code>POSTROUTING</code> 链时，会自动将报文的源地址修改为外网网卡上可用的 <code>IP</code> 地址，这时，即使外网网卡中的公网 <code>IP</code> 地址发生了改变，也能够正常的、动态的将内部主机的报文的源 <code>IP</code> 映射为对应的公网 <code>IP</code>。</p>
 <p>可以把 <code>MASQUERADE</code> 理解为动态的、自动化的 <code>SNAT</code>，如果没有动态 <code>SNAT</code> 的需求，没有必要使用 <code>MASQUERADE</code>，因为 <code>SNAT</code> 更加高效。</p>
-<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> iptables -t nat -I POSTROUTING -s 10.1.0.0/16 -o eno13344625 -j MASQUERADE<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> iptables -t nat -I POSTROUTING -s 10.1.0.0/16 -o eno13344625 -j MASQUERADE
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <hr>
 <h3 id="1-4-REDIRECT-动作"><a href="#1-4-REDIRECT-动作" class="headerlink" title="1.4 REDIRECT 动作"></a>1.4 REDIRECT 动作</h3><p>使用<strong>REDIRECT 动作</strong>可以在本机上进行<strong>端口映射</strong>。</p>
 <ul>
@@ -704,10 +713,11 @@ $ <span class="token function">sudo</span> <span class="token function">service<
 </ul>
 <p>经过下述规则映射后，当别的机器访问本机的 <code>80</code> 端口时，报文会被重定向到本机的 <code>8080</code> 端口上。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将本机的80端口映射到本机的8080端口上</span>
-$ <span class="token function">sudo</span> iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="2-扩展动作"><a href="#2-扩展动作" class="headerlink" title="2. 扩展动作"></a>2. 扩展动作</h2><blockquote>
-<p><strong><code>NAT</code></strong>，即网络地址转换 (<code>Network Address Translation</code>)。<code>NAT</code>说白了就是修改报文的<code>IP</code>地址，通常会被集成到路由器、防火墙、或独立的<code>NAT</code>设备中。</p>
+<p>**<code>NAT</code>**，即网络地址转换 (<code>Network Address Translation</code>)。<code>NAT</code>说白了就是修改报文的<code>IP</code>地址，通常会被集成到路由器、防火墙、或独立的<code>NAT</code>设备中。</p>
 </blockquote>
 <ul>
 <li><strong>SNAT 技术</strong></li>
@@ -786,7 +796,8 @@ $ <span class="token function">sudo</span> <span class="token keyword">echo</spa
 
 <span class="token comment" spellcheck="true"># 将10.1.0.0/16网段的主机通过路由器转发出去，源地址改为了路由器的外网地址</span>
 $ <span class="token function">sudo</span> iptables -t nat -I POSTROUTING -s 10.1.0.0/16 -p tcp \
-    -j SNAT --to-source 192.168.1.146<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    -j SNAT --to-source 192.168.1.146
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="2-4-DNAT-动作"><a href="#2-4-DNAT-动作" class="headerlink" title="2.4 DNAT 动作"></a>2.4 DNAT 动作</h3><ul>
 <li><strong>DNAT</strong>规则只配置在<strong>PREROUTING</strong>链与<strong>OUTPUT</strong>链</li>
@@ -814,13 +825,15 @@ $ <span class="token function">sudo</span> iptables -t nat -I PREROUTING -d 192.
 
 <span class="token comment" spellcheck="true"># 还需要配置相应的SNAT规则</span>
 $ <span class="token function">sudo</span> iptables -t nat -I POSTROUTING -s 10.1.0.0/16 -p tcp \
-    -j SNAT --to-source 192.168.1.146<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    -j SNAT --to-source 192.168.1.146
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="3-实例演示"><a href="#3-实例演示" class="headerlink" title="3. 实例演示"></a>3. 实例演示</h2><h3 id="3-1-网络地址转发"><a href="#3-1-网络地址转发" class="headerlink" title="3.1 网络地址转发"></a>3.1 网络地址转发</h3><blockquote>
-<p>需要内网访问互联网：<strong>[1] NAT Server</strong>（网络层+传输层），<strong>[2] 代理服务器</strong>（应用层）。</p>
+<p>需要内网访问互联网：**[1] NAT Server<strong>（网络层+传输层），</strong>[2] 代理服务器**（应用层）。</p>
 </blockquote>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 转换过程，内网访问互联网，使用tcpdump进行抓包进行验证</span>
-Client<span class="token punctuation">(</span>192.168.20.2<span class="token punctuation">)</span> <span class="token operator">==</span><span class="token operator">></span> <span class="token punctuation">(</span>192.168.20.1<span class="token punctuation">)</span>Nat Server<span class="token punctuation">(</span>172.16.100.9<span class="token punctuation">)</span> <span class="token operator">==</span><span class="token operator">></span> Server<span class="token punctuation">(</span>172.16.100.6<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+Client<span class="token punctuation">(</span>192.168.20.2<span class="token punctuation">)</span> <span class="token operator">==</span><span class="token operator">></span> <span class="token punctuation">(</span>192.168.20.1<span class="token punctuation">)</span>Nat Server<span class="token punctuation">(</span>172.16.100.9<span class="token punctuation">)</span> <span class="token operator">==</span><span class="token operator">></span> Server<span class="token punctuation">(</span>172.16.100.6<span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>转发主机</strong>（路由器或者 NAT 设备）</li>
 </ul>
@@ -828,7 +841,8 @@ Client<span class="token punctuation">(</span>192.168.20.2<span class="token pun
 $ <span class="token function">sudo</span> <span class="token keyword">echo</span> 1 <span class="token operator">></span> /proc/sys/net/ipv4/ip_forward
 
 <span class="token comment" spellcheck="true"># CentOS7，打开核心转发功能</span>
-$ <span class="token function">sudo</span> <span class="token keyword">echo</span> <span class="token string">"net_ipv4_ip_forward = 1"</span> <span class="token operator">></span> /etc/sysctl.d/99-sysctl.conf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> <span class="token keyword">echo</span> <span class="token string">"net_ipv4_ip_forward = 1"</span> <span class="token operator">></span> /etc/sysctl.d/99-sysctl.conf
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 编辑虚拟机，再添加一块网卡，自定义为VMnet2网络适配器</span>
 
 <span class="token comment" spellcheck="true"># 两块网卡</span>
@@ -837,7 +851,8 @@ eno33554992: 192.168.20.1
 
 <span class="token comment" spellcheck="true"># 添加的网卡配置 [二选一配置]</span>
 $ <span class="token function">sudo</span> <span class="token function">ifconfig</span> eno33554992 192.168.20.1/24 up
-IP addr add 192.168.20.1/24 dev eno33554992<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+IP addr add 192.168.20.1/24 dev eno33554992
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 在forward链中进行网络防火墙规则设定</span>
 
 <span class="token comment" spellcheck="true"># 只配置web服务</span>
@@ -857,19 +872,22 @@ $ <span class="token function">sudo</span> iptables -F
 $ <span class="token function">sudo</span> modprobe nf_conntrack_ftp
 $ <span class="token function">sudo</span> iptables -R FORWARD 1 -m state --state ESTABLEISHEN,RELATED -j ACCEPT
 $ <span class="token function">sudo</span> iptables -R FORWARD 2 -m -d 192.168.20.2 -p tcp -m multiport \
-    --dports 21,22,80 -m state --state NEW -j ACCEPT<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    --dports 21,22,80 -m state --state NEW -j ACCEPT
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>外网主机</strong>（外网网关需要指定为转发主机的<code>172.16.100.9</code>地址）</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 单个主机单网卡，172.16.100.6</span>
 $ <span class="token function">sudo</span> <span class="token function">ifconfig</span> eth0 172.16.100.6/16 up
-$ <span class="token function">sudo</span> route add -net 192.168.20.0/24 gw 172.16.100.9<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> route add -net 192.168.20.0/24 gw 172.16.100.9
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>内网主机</strong>（内网网关需要指定为转发主机的<code>192.168.20.1</code>地址）</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 单个主机单网卡，网卡连接VMnet2网络适配器，192.168.20.2</span>
 $ <span class="token function">sudo</span> <span class="token function">ifconfig</span> eth0 192.168.20.2/24 up
-$ <span class="token function">sudo</span> route add default gw 192.168.20.1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> route add default gw 192.168.20.1
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="3-2-源地址转换"><a href="#3-2-源地址转换" class="headerlink" title="3.2 源地址转换"></a>3.2 源地址转换</h3><ul>
 <li><strong>模板</strong></li>
@@ -877,7 +895,8 @@ $ <span class="token function">sudo</span> route add default gw 192.168.20.1<spa
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 目的主机不是当前网络的主机进行转发  ExtIP=FIP  请求报文过程  nat表中保存链接追踪</span>
 $ <span class="token function">sudo</span> iptables -t nat -A POSTROUTING -s LocalNET <span class="token operator">!</span> \
     -d LocalNet -j SNAT --to-source ExtIP
-$ <span class="token function">sudo</span> iptables -t nat -A POSTROUTING -s LocalNET <span class="token operator">!</span> -d LocalNet -j MASQUERADE<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">sudo</span> iptables -t nat -A POSTROUTING -s LocalNET <span class="token operator">!</span> -d LocalNet -j MASQUERADE
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>实例</strong></li>
 </ul>
@@ -886,7 +905,8 @@ $ <span class="token function">sudo</span> iptables -t nat -A POSTROUTING -s Loc
 
 <span class="token comment" spellcheck="true"># 拨号上网的话ExtIP是随机的，使用MASQUERADE可以地址伪装</span>
 $ <span class="token function">sudo</span> iptables -t nat -A POSTROUTING -s 192.168.20.0/24 <span class="token operator">!</span> \
-    -d 192.168.20.0/24 -j SNAT --to-source MASQUERADE<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    -d 192.168.20.0/24 -j SNAT --to-source MASQUERADE
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="3-3-目标地址转换"><a href="#3-3-目标地址转换" class="headerlink" title="3.3 目标地址转换"></a>3.3 目标地址转换</h3><ul>
 <li><strong>模板</strong></li>
@@ -894,7 +914,8 @@ $ <span class="token function">sudo</span> iptables -t nat -A POSTROUTING -s 192
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 负载均衡iptables早起支持  IPVS基于十种方式实现负载均衡=LVS</span>
 <span class="token comment" spellcheck="true"># 内网中的主机映射到公网中，让公网可以访问内网主机  响应报文过程  nat表中保存链接追踪</span>
 $ <span class="token function">sudo</span> iptables -t nat -A PREROUTING -d ExtIP -p tcp<span class="token operator">|</span>udp \
-    --dport PORT -j DNAT --to-destination InterSeverIP<span class="token punctuation">[</span>:PORT<span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+    --dport PORT -j DNAT --to-destination InterSeverIP<span class="token punctuation">[</span>:PORT<span class="token punctuation">]</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>实例</strong></li>
 </ul>
@@ -902,26 +923,9 @@ $ <span class="token function">sudo</span> iptables -t nat -A PREROUTING -d ExtI
     --dport 80 -j DNAT --to-destination 192.168.20.2:8080
 
 $ <span class="token function">sudo</span> iptables -t nat -A PREROUTING -d 172.16.100.9 -p tcp \
-    --dport 20 -j DNAT --to-destination 192.168.20.2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
+    --dport 20 -j DNAT --to-destination 192.168.20.2
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
                 
             </div>
             <hr/>
@@ -1157,6 +1161,8 @@ $ <span class="token function">sudo</span> iptables -t nat -A PREROUTING -d 172.
 
     
 
+    
+
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
@@ -1186,7 +1192,7 @@ $ <span class="token function">sudo</span> iptables -t nat -A PREROUTING -d 172.
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Linux入门基础/" class="post-category">
+                            <a href="/categories/Linux%E5%85%A5%E9%97%A8%E5%9F%BA%E7%A1%80/" class="post-category">
                                     Linux入门基础
                                 </a>
                             
@@ -1238,7 +1244,7 @@ $ <span class="token function">sudo</span> iptables -t nat -A PREROUTING -d 172.
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Linux入门基础/" class="post-category">
+                            <a href="/categories/Linux%E5%85%A5%E9%97%A8%E5%9F%BA%E7%A1%80/" class="post-category">
                                     Linux入门基础
                                 </a>
                             
@@ -1444,7 +1450,9 @@ $ <span class="token function">sudo</span> iptables -t nat -A PREROUTING -d 172.
 <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
 
     
-    <div class="container row center-align" style="margin-bottom: 15px !important;">
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
@@ -1456,70 +1464,82 @@ $ <span class="token function">sudo</span> iptables -t nat -A PREROUTING -d 172.
             |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1121.5k</span>&nbsp;字
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1101.7k</span>
             
             
             
+                
             
             
-            
-            <span id="busuanzi_container_site_pv">
-                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
-                    class="white-color"></span>&nbsp;次
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
             </span>
             
             
-            <span id="busuanzi_container_site_uv">
-                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
-                    class="white-color"></span>&nbsp;人
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
             </span>
             
             <br>
+
+            <!-- 运行天数提醒. -->
             
-            <span id="sitetime">载入运行时间...</span>
-            <script>
-                function siteTime() {
-                    var seconds = 1000;
-                    var minutes = seconds * 60;
-                    var hours = minutes * 60;
-                    var days = hours * 24;
-                    var years = days * 365;
-                    var today = new Date();
-                    var startYear = "2017";
-                    var startMonth = "2";
-                    var startDate = "14";
-                    var startHour = "0";
-                    var startMinute = "0";
-                    var startSecond = "0";
-                    var todayYear = today.getFullYear();
-                    var todayMonth = today.getMonth() + 1;
-                    var todayDate = today.getDate();
-                    var todayHour = today.getHours();
-                    var todayMinute = today.getMinutes();
-                    var todaySecond = today.getSeconds();
-                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
-                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
-                    var diff = t2 - t1;
-                    var diffYears = Math.floor(diff / years);
-                    var diffDays = Math.floor((diff / days) - diffYears * 365);
-                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
-                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
-                        minutes);
-                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
-                        diffMinutes * minutes) / seconds);
-                    if (startYear == todayYear) {
-                        document.getElementById("year").innerHTML = todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
-                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
-                    } else {
-                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
-                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2017";
+                        var startMonth = "2";
+                        var startDate = "14";
+                        var startHour = "0";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
                     }
-                }
-                setInterval(siteTime, 1000);
-            </script>
+
+                    calcSiteTime();
+                </script>
             
             <br>
             

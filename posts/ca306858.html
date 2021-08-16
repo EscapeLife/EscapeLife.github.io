@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 
 
-<head><meta name="generator" content="Hexo 3.9.0">
+<head>
     <meta charset="utf-8">
     <meta name="keywords" content="Redis输出缓冲区限制问题, Escape Escpae&#39;s Python Linux Bug Linnux运维之路 Python成长笔记 Web进击之旅 Bug解决之道 文所未闻 音乐墙 关于我">
     <meta name="description" content="听摇滚,但不偏颇;也挺古典,但不安逸">
@@ -29,6 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
+<meta name="generator" content="Hexo 5.4.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -345,7 +348,7 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Bug解决之道/" class="post-category">
+                            <a href="/categories/Bug%E8%A7%A3%E5%86%B3%E4%B9%8B%E9%81%93/" class="post-category">
                                 Bug解决之道
                             </a>
                         
@@ -428,7 +431,8 @@ $ redis-cli -h 127.0.0.1 -a <span class="token string">"test"</span>
 <span class="token comment" spellcheck="true"># 找到客户端输出缓冲区的默认配置</span>
 client-output-buffer-limit normal 0 0 0
 client-output-buffer-limit replica 256mb 64mb 60
-client-output-buffer-limit pubsub 32mb 8mb 60<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+client-output-buffer-limit pubsub 32mb 8mb 60
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>对应 <code>Redis</code> 的客户端链接来说，不同客户端有不同策略，策略如下。并且下述三种规则都是可以修改的，可以通过 <code>CONFIG SET</code> 命令设置或者直接修改 <code>redis.conf</code> 配置文件。</p>
 <ul>
 <li><strong>普通客户端</strong><ul>
@@ -436,7 +440,7 @@ client-output-buffer-limit pubsub 32mb 8mb 60<span aria-hidden="true" class="lin
 </ul>
 </li>
 <li><strong>Pub/Sub 客户端</strong><ul>
-<li>对于<strong>Pub/Sub 客户端(也就是发布/订阅模式)</strong>，默认的<strong>大小限制</strong>条件为 <code>8M</code>，当输出缓冲区超过 <code>8M</code> 时，会直接关闭连接。 <strong>持续性限制</strong>就是，当客户端缓冲区大小持续 <code>60</code> 秒超过 <code>2M</code>，则关闭客户端连接。</li>
+<li>对于<strong>Pub/Sub 客户端(也就是发布/订阅模式)<strong>，默认的</strong>大小限制</strong>条件为 <code>8M</code>，当输出缓冲区超过 <code>8M</code> 时，会直接关闭连接。 <strong>持续性限制</strong>就是，当客户端缓冲区大小持续 <code>60</code> 秒超过 <code>2M</code>，则关闭客户端连接。</li>
 </ul>
 </li>
 <li><strong>slave 客户端</strong><ul>
@@ -451,28 +455,33 @@ task_result <span class="token operator">=</span> AsyncResult<span class="token 
 
 <span class="token keyword">with</span> allow_join_result<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     origin <span class="token operator">=</span> task_result<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token punctuation">)</span>
-task_result<span class="token punctuation">.</span>forget<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+task_result<span class="token punctuation">.</span>forget<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错提示信息</span>
 Traceback <span class="token punctuation">(</span>most recent call last<span class="token punctuation">)</span>:
   File <span class="token string">"/usr/local/lib/python3.6/dist-packages/celery/worker/consumer/consumer.py"</span>, line 318, <span class="token keyword">in</span> start
   <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
   File <span class="token string">"/usr/local/lib/python3.6/dist-packages/redis/connection.py"</span>, line 193, <span class="token keyword">in</span> _read_from_socket
     raise ConnectionError<span class="token punctuation">(</span>SERVER_CLOSED_CONNECTION_ERROR<span class="token punctuation">)</span>
-redis.exceptions.ConnectionError: Connection closed by server.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+redis.exceptions.ConnectionError: Connection closed by server.
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>那如何调整 <code>Redis</code> 的缓冲区限制呢？首先，我们可以，通过登录交互式终端来临时修改缓冲区的限制。使用 <code>config set</code> 方法进行修改，即可。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 修改方式</span>
 config <span class="token keyword">set</span> client-output-buffer-limit <span class="token string">'slave 1024mb 256mb 300'</span>
 config <span class="token keyword">set</span> client-output-buffer-limit <span class="token string">'pubsub 1024mb 256mb 300'</span>
-config <span class="token keyword">set</span> client-output-buffer-limit <span class="token string">'replica 1024mb 256mb 300'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+config <span class="token keyword">set</span> client-output-buffer-limit <span class="token string">'replica 1024mb 256mb 300'</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <p>其次，还有一个办法就是关闭复制输出缓冲区的限制，最后重启 <code>Redis</code> 服务。为了永久生效，最好还是将如下配置写入 <code>Redis</code> 服务的配置文件中。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 设置关闭缓冲区限制</span>
 config <span class="token keyword">set</span> client-output-buffer-limit <span class="token string">'slave 0 0 0'</span>
 config <span class="token keyword">set</span> client-output-buffer-limit <span class="token string">'pubsub 0 0 0'</span>
-config <span class="token keyword">set</span> client-output-buffer-limit <span class="token string">'replica 0 0 0'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+config <span class="token keyword">set</span> client-output-buffer-limit <span class="token string">'replica 0 0 0'</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将如下配置写入Redis配置文件</span>
 client-output-buffer-limit normal 0 0 0
 client-output-buffer-limit pubsub 1024mb 128mb 300
-client-output-buffer-limit replica 1024mb 256mb 300<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+client-output-buffer-limit replica 1024mb 256mb 300
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="2-相关问题处理"><a href="#2-相关问题处理" class="headerlink" title="2. 相关问题处理"></a>2. 相关问题处理</h2><blockquote>
 <p><strong>通过设置 Redis 输出缓冲区限制来解决！</strong></p>
@@ -489,11 +498,12 @@ Traceback <span class="token punctuation">(</span>most recent call last<span cla
     self._read_from_socket<span class="token punctuation">(</span><span class="token punctuation">)</span>
   File <span class="token string">"/usr/local/lib/python3.6/dist-packages/redis/connection.py"</span>, line 193, <span class="token keyword">in</span> _read_from_socket
     raise ConnectionError<span class="token punctuation">(</span>SERVER_CLOSED_CONNECTION_ERROR<span class="token punctuation">)</span>
-redis.exceptions.ConnectionError: Connection closed by server.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+redis.exceptions.ConnectionError: Connection closed by server.
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>有上述的报错得知，就是因为服务连接 <code>Redis</code> 异常，然后 <code>re-establish</code> 重连，这是 <code>server</code> 端关闭导致抛出异常信息了。继续对日志进行分析，发现上述的报错信息每隔十分钟(<code>600s</code>)就会出现一次。其初，怀疑是因为转发的 <code>Nginx</code> 配置导致了，但是对配置进行的调试还是有上述问题。经过了好几天的排除，才发现解决的方向跑偏了，最后发现是因为 <code>proxy_timeout</code> 的默认设置导致的。</p>
 <p><img src="../images/linux-redis-cache-limit-1.png" alt="Redis输出缓冲区限制问题"></p>
-<p>从 <a href="http://nginx.org/en/docs/stream/ngx_stream_proxy_module.html#proxy_timeout" target="_blank" rel="noopener">Nginx 的官方文档</a> 中知道，<code>proxy_timeout</code> 参数的作用是，设置客户端或代理服务器连接上两次连续的读取或写入操作之间的超时，如果在此时间内没有数据传输，则连接将关闭。因为我们连接 <code>Redis</code> 使用的是 <code>celery</code> 工具，所以排除下其 <code>issus</code> 有没有相关的信息。可悲的是，并没有。后来，在 <a href="https://docs.celeryproject.org/en/latest/userguide/configuration.html#redis-socket-connect-timeout" target="_blank" rel="noopener">Celery 的官方文档</a> 的工具配置参数中其找到了关于 <code>redis</code> 超时的相关配置。</p>
-<p>发现有很多参数，都是在 <code>celery4.4.1</code> 的最新版本才添加的，而我们服务使用的是 <code>celery4.4.0</code> 版本，即不支持上述配置。随即抱着试一试的态度，在环境中升级到了最新的版本，然后重启服务，解决报错消失了。困扰许久的问题，就这么解决了？热泪盈眶啊！为了弄清楚在 <code>4.4.1</code> 版本中到底加入了什么导致该问题修复了，看了下对应的 <a href="https://github.com/celery/celery/commit/6ccdc7b9f8e02d21275e923dccc7ccb9185e6153" target="_blank" rel="noopener">更新内容</a>。发现在新版本中，连接 <code>Redis</code> 服务的时候加了 <code>_reconnect_pubsub</code> 方法，即 <code>Pub/Sub</code> 客户端加了 <code>re-try</code> 函数保证链接的文档。</p>
+<p>从 <a target="_blank" rel="noopener" href="http://nginx.org/en/docs/stream/ngx_stream_proxy_module.html#proxy_timeout">Nginx 的官方文档</a> 中知道，<code>proxy_timeout</code> 参数的作用是，设置客户端或代理服务器连接上两次连续的读取或写入操作之间的超时，如果在此时间内没有数据传输，则连接将关闭。因为我们连接 <code>Redis</code> 使用的是 <code>celery</code> 工具，所以排除下其 <code>issus</code> 有没有相关的信息。可悲的是，并没有。后来，在 <a target="_blank" rel="noopener" href="https://docs.celeryproject.org/en/latest/userguide/configuration.html#redis-socket-connect-timeout">Celery 的官方文档</a> 的工具配置参数中其找到了关于 <code>redis</code> 超时的相关配置。</p>
+<p>发现有很多参数，都是在 <code>celery4.4.1</code> 的最新版本才添加的，而我们服务使用的是 <code>celery4.4.0</code> 版本，即不支持上述配置。随即抱着试一试的态度，在环境中升级到了最新的版本，然后重启服务，解决报错消失了。困扰许久的问题，就这么解决了？热泪盈眶啊！为了弄清楚在 <code>4.4.1</code> 版本中到底加入了什么导致该问题修复了，看了下对应的 <a target="_blank" rel="noopener" href="https://github.com/celery/celery/commit/6ccdc7b9f8e02d21275e923dccc7ccb9185e6153">更新内容</a>。发现在新版本中，连接 <code>Redis</code> 服务的时候加了 <code>_reconnect_pubsub</code> 方法，即 <code>Pub/Sub</code> 客户端加了 <code>re-try</code> 函数保证链接的文档。</p>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">_reconnect_pubsub</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
     self<span class="token punctuation">.</span>_pubsub <span class="token operator">=</span> None
     self<span class="token punctuation">.</span>backend<span class="token punctuation">.</span>client<span class="token punctuation">.</span>connection_pool<span class="token punctuation">.</span>reset<span class="token punctuation">(</span><span class="token punctuation">)</span>
@@ -506,34 +516,18 @@ redis.exceptions.ConnectionError: Connection closed by server.<span aria-hidden=
     self<span class="token punctuation">.</span>_pubsub <span class="token operator">=</span> self<span class="token punctuation">.</span>backend<span class="token punctuation">.</span>client<span class="token punctuation">.</span>pubsub<span class="token punctuation">(</span>
         ignore_subscribe_messages<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span>
     <span class="token punctuation">)</span>
-    self<span class="token punctuation">.</span>_pubsub<span class="token punctuation">.</span>subscribe<span class="token punctuation">(</span><span class="token operator">*</span>self<span class="token punctuation">.</span>subscribed_to<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    self<span class="token punctuation">.</span>_pubsub<span class="token punctuation">.</span>subscribe<span class="token punctuation">(</span><span class="token operator">*</span>self<span class="token punctuation">.</span>subscribed_to<span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>这里需要注意的是，修改代码库里面的 <code>requirements.txt</code> 文件的时候，因为 <code>celery</code> 工具自身也依赖其他第三方的库。所以更新的时候，其他的第三方库也需要一并更新，不然会出现意想不到的惊喜。建议使用下来这种方式来添加 <code>celery</code> 工具，保证更新版本的时候一起更新。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># requirements.txt</span>
-celery<span class="token punctuation">[</span>redis, kombu<span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+celery<span class="token punctuation">[</span>redis, kombu<span class="token punctuation">]</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="3-注意事项"><a href="#3-注意事项" class="headerlink" title="3. 注意事项"></a>3. 注意事项</h2><blockquote>
 <p><strong>需要的参数无法在启动前配置的话，自己构建 Docker 镜像才是王道！</strong></p>
 </blockquote>
 <p>我们这里设置的 <code>client-output-buffer-limit</code> 参数不能再启动的的时候直接修改，只能在服务启动之后通过 <code>config set</code> 来做修改。如果我们对外部署服务的话，还需要使用命令才做修改，很不方便，所以不如我们自行构建 <code>Docker</code> 镜像来在内部做修改的配置变更，这样更新加的好。</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>
+
                 
             </div>
             <hr/>
@@ -769,6 +763,8 @@ celery<span class="token punctuation">[</span>redis, kombu<span class="token pun
 
     
 
+    
+
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
@@ -798,7 +794,7 @@ celery<span class="token punctuation">[</span>redis, kombu<span class="token pun
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Python第三方库/" class="post-category">
+                            <a href="/categories/Python%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/" class="post-category">
                                     Python第三方库
                                 </a>
                             
@@ -850,7 +846,7 @@ celery<span class="token punctuation">[</span>redis, kombu<span class="token pun
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/K8S即学即用/" class="post-category">
+                            <a href="/categories/K8S%E5%8D%B3%E5%AD%A6%E5%8D%B3%E7%94%A8/" class="post-category">
                                     K8S即学即用
                                 </a>
                             
@@ -958,7 +954,9 @@ celery<span class="token punctuation">[</span>redis, kombu<span class="token pun
 <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
 
     
-    <div class="container row center-align" style="margin-bottom: 15px !important;">
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
@@ -970,70 +968,82 @@ celery<span class="token punctuation">[</span>redis, kombu<span class="token pun
             |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">1121.5k</span>&nbsp;字
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1101.7k</span>
             
             
             
+                
             
             
-            
-            <span id="busuanzi_container_site_pv">
-                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
-                    class="white-color"></span>&nbsp;次
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
             </span>
             
             
-            <span id="busuanzi_container_site_uv">
-                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
-                    class="white-color"></span>&nbsp;人
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
             </span>
             
             <br>
+
+            <!-- 运行天数提醒. -->
             
-            <span id="sitetime">载入运行时间...</span>
-            <script>
-                function siteTime() {
-                    var seconds = 1000;
-                    var minutes = seconds * 60;
-                    var hours = minutes * 60;
-                    var days = hours * 24;
-                    var years = days * 365;
-                    var today = new Date();
-                    var startYear = "2017";
-                    var startMonth = "2";
-                    var startDate = "14";
-                    var startHour = "0";
-                    var startMinute = "0";
-                    var startSecond = "0";
-                    var todayYear = today.getFullYear();
-                    var todayMonth = today.getMonth() + 1;
-                    var todayDate = today.getDate();
-                    var todayHour = today.getHours();
-                    var todayMinute = today.getMinutes();
-                    var todaySecond = today.getSeconds();
-                    var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
-                    var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
-                    var diff = t2 - t1;
-                    var diffYears = Math.floor(diff / years);
-                    var diffDays = Math.floor((diff / days) - diffYears * 365);
-                    var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
-                    var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) /
-                        minutes);
-                    var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours -
-                        diffMinutes * minutes) / seconds);
-                    if (startYear == todayYear) {
-                        document.getElementById("year").innerHTML = todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffDays + " 天 " + diffHours +
-                            " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
-                    } else {
-                        document.getElementById("year").innerHTML = startYear + " - " + todayYear;
-                        document.getElementById("sitetime").innerHTML = "本站已安全运行 " + diffYears + " 年 " + diffDays +
-                            " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2017";
+                        var startMonth = "2";
+                        var startDate = "14";
+                        var startHour = "0";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
                     }
-                }
-                setInterval(siteTime, 1000);
-            </script>
+
+                    calcSiteTime();
+                </script>
             
             <br>
             
