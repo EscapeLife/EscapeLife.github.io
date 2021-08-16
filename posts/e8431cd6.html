@@ -458,21 +458,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-05-31
+                    2021-08-17
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.6k
+                    2.9k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    6 分
+                    12 分
                 </div>
                 
 
@@ -663,6 +663,216 @@ $ <span class="token function">sudo</span> sh get-docker.sh
 </ul>
 <p>注册阿里云账号后，即可在<a target="_blank" rel="noopener" href="https://cr.console.aliyun.com/#/accelerator"><strong>阿里云控制台</strong></a>看到类似如下的页面。</p>
 <p><img src="../images/docker-run-easy-67.png" alt="Docker入门指南"></p>
+<hr>
+<h2 id="5-核心的要点分析"><a href="#5-核心的要点分析" class="headerlink" title="5. 核心的要点分析"></a>5. 核心的要点分析</h2><blockquote>
+<p><strong>这里主要参考 <code>卡瓦邦噶</code> 的《Docker(容器)的原理》博客而来！</strong></p>
+</blockquote>
+<p><code>Docker</code> 里面并没有什么黑魔法，只不过是将一些 <code>Linux</code> 已经有的功能集合在一起，并提供了一个简单的 <code>UI</code> 来创建 <strong>“容器”</strong>，并没有发明什么新的技术。</p>
+<ul>
+<li><strong>[1] OCI 容器标准</strong><ul>
+<li><code>image spec</code> =&gt; 容器如何打包<ul>
+<li>本质上一个 <code>image</code> 就是一个 <code>tar</code> 包</li>
+<li><code>layers</code> 就是组成 <code>rootfs</code> 的一些文件</li>
+</ul>
+</li>
+<li><code>runtime spec</code> =&gt; 容器如何运行<ul>
+<li>创建一个 <code>container</code> 然后在 <code>container</code> 中运行进程</li>
+<li>容器里面就可以不依赖系统的任何依赖，自己即可独立运行</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 容器的镜像层</span>
+$ <span class="token function">tar</span> xvf nginx_image.tar -C nginx
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+x fa03658ad40153748b0abbe573db2aaf943049a0749d192a4cfa56f107a80270/
+x fa03658ad40153748b0abbe573db2aaf943049a0749d192a4cfa56f107a80270/VERSION
+x fa03658ad40153748b0abbe573db2aaf943049a0749d192a4cfa56f107a80270/json
+x fa03658ad40153748b0abbe573db2aaf943049a0749d192a4cfa56f107a80270/layer.tar
+x manifest.json
+x repositories
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 容器的实现和生态 - Docker</span>
+oci/runc -<span class="token operator">></span> containerd -<span class="token operator">></span> moby -<span class="token operator">></span> docker
+
+<span class="token comment" spellcheck="true"># 容器的实现和生态 - Kubernetes</span>
+oci/runc -<span class="token operator">></span> cri-o -<span class="token operator">></span> kubernetes
+oci/runc -<span class="token operator">></span> containerd -<span class="token operator">></span> cri-containerd -<span class="token operator">></span> kubernetes
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 进程之间的隔离</strong><ul>
+<li>在容器里面，一个进程只能看到同一个容器下面的其他进程(<code>pid/mount</code>)</li>
+<li><code>Namespaces</code> 可以控制进程在 <code>container</code> 中可以看到什么(隔离)</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 手动运行runc来创建我们自己的容器(用busybox演示)</span>
+$ <span class="token function">mkdir</span> /mycontainer <span class="token operator">&amp;&amp;</span> <span class="token function">cd</span> /mycontainer <span class="token operator">&amp;&amp;</span> <span class="token function">mkdir</span> rootfs
+$ docker <span class="token function">export</span> <span class="token variable"><span class="token variable">$(</span>docker create busybox<span class="token variable">)</span></span> <span class="token operator">|</span> <span class="token function">tar</span> -C rootfs -xvf -
+
+<span class="token comment" spellcheck="true"># 创建一个默认的config.json作为配置文件</span>
+$ <span class="token function">cd</span> /mycontainer
+$ runc run mycontainerid
+
+<span class="token comment" spellcheck="true"># 查看namespace命名空间(两个终端|一个运行一个观察)</span>
+ 92518  90576 runc run xyxy
+ 92524  92521 runc init
+ 92528  92527 sh
+
+<span class="token comment" spellcheck="true"># 查看宿主机这个进程的pidns是什么</span>
+$ <span class="token function">ps</span> -p 92528 -o pid,pidns
+   PID      PIDNS
+ 92528 4026534092
+
+<span class="token comment" spellcheck="true"># 查看对应的ns里面到底有什么</span>
+$ <span class="token function">ls</span> -l /proc/92528/ns
+total 0
+lrwxrwxrwx 1 root root 0 Apr  4 23:41 <span class="token punctuation">[</span><span class="token punctuation">[</span>cgroup<span class="token punctuation">]</span><span class="token punctuation">]</span> -<span class="token operator">></span> <span class="token punctuation">[</span><span class="token punctuation">[</span>cgroup<span class="token punctuation">]</span><span class="token punctuation">]</span>:<span class="token punctuation">[</span>4026531835<span class="token punctuation">]</span>
+lrwxrwxrwx 1 root root 0 Apr  4 23:28 ipc -<span class="token operator">></span> ipc:<span class="token punctuation">[</span>4026534091<span class="token punctuation">]</span>
+lrwxrwxrwx 1 root root 0 Apr  4 23:28 mnt -<span class="token operator">></span> mnt:<span class="token punctuation">[</span>4026534089<span class="token punctuation">]</span>
+lrwxrwxrwx 1 root root 0 Apr  4 23:27 net -<span class="token operator">></span> net:<span class="token punctuation">[</span>4026534094<span class="token punctuation">]</span>
+lrwxrwxrwx 1 root root 0 Apr  4 23:28 pid -<span class="token operator">></span> pid:<span class="token punctuation">[</span>4026534092<span class="token punctuation">]</span>
+
+<span class="token comment" spellcheck="true"># 更为详细的信息</span>
+$ cinf -namespace 4026534092
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] cgroups 资源分组</strong><ul>
+<li><code>cgroups</code> 可以控制进程可以使用的资源(资源)</li>
+<li>当一个新的 <code>container</code> 创建的时候，容器会为每种资源创建一个 <code>cgroup</code> 来限制容器可以使用的资源</li>
+<li>默认情况下的容器是不限制资源的，比如说内存，需要限制的话，可以将限制写入到这个文件里面</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将系统上的cgroup保存到一个文档当中</span>
+$ lscgroup <span class="token operator">|</span> <span class="token function">tee</span> cgroup.b
+
+<span class="token comment" spellcheck="true"># 启动一个容器并观察cgroup的变化</span>
+$ lscgroup <span class="token operator">|</span> <span class="token function">tee</span> cgroup.a
+$ <span class="token function">diff</span> cgroup.b cgroup.a
+4a5
+<span class="token operator">></span> net_cls,net_prio:/xyxy
+12a14
+<span class="token operator">></span> pids:/user.slice/user-0.slice/session-c9.scope/xyxy
+121a124
+<span class="token operator">></span> cpuset:/xyxy
+129a133
+<span class="token operator">></span> blkio:/user.slice/user-0.slice/session-c9.scope/xyxy
+242a247
+<span class="token operator">></span> cpu,cpuacct:/user.slice/user-0.slice/session-c9.scope/xyxy
+352a358
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] Linux Capabilities</strong><ul>
+<li>可以在用户有 <code>root</code> 权限的同时，限制 <code>root</code> 使用某些权限</li>
+<li>这就是我们在使用容器的时候常见的 <code>CAP_SYS_ADMIN</code> 权限限制了</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 准备好一个带有Libcap的容器</span>
+$ docker run -it alpine sh -c <span class="token string">'apk add -U libcap; capsh --print'</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true"># 将这个docker容器导出到runc的rootfs里面</span>
+$ docker <span class="token function">export</span> 5aad51652320 <span class="token operator">|</span> <span class="token function">tar</span> -C rootfs -xvf -
+
+<span class="token comment" spellcheck="true"># 生成一个spec来</span>
+$ <span class="token function">mkdir</span> test_cap <span class="token operator">&amp;&amp;</span> <span class="token function">mv</span> rootfs/ test_cap/ <span class="token operator">&amp;&amp;</span> <span class="token function">cd</span> test_cap/
+$ runc spec
+$ <span class="token function">ls</span>
+config.json  rootfs
+
+<span class="token comment" spellcheck="true"># 进入容器发现，即使是root也无法修改hostname</span>
+$ runc run mycap
+$ <span class="token function">sudo</span> <span class="token function">id</span>
+uid<span class="token operator">=</span>0<span class="token punctuation">(</span>root<span class="token punctuation">)</span> gid<span class="token operator">=</span>0<span class="token punctuation">(</span>root<span class="token punctuation">)</span>
+$ <span class="token function">sudo</span> <span class="token function">hostname</span> xintao.local
+hostname: sethostname: Operation not permitted
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-json"><code class="language-json"><span class="token property">"capabilities"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+  <span class="token property">"bounding"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token string">"CAP_AUDIT_WRITE"</span><span class="token punctuation">,</span>
+    <span class="token string">"CAP_KILL"</span><span class="token punctuation">,</span>
+    <span class="token string">"CAP_SYS_ADMIN"</span><span class="token punctuation">,</span>
+    <span class="token string">"CAP_NET_BIND_SERVICE"</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"effective"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token string">"CAP_AUDIT_WRITE"</span><span class="token punctuation">,</span>
+    <span class="token string">"CAP_SYS_ADMIN"</span><span class="token punctuation">,</span>
+    <span class="token string">"CAP_KILL"</span><span class="token punctuation">,</span>
+    <span class="token string">"CAP_NET_BIND_SERVICE"</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"inheritable"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token string">"CAP_AUDIT_WRITE"</span><span class="token punctuation">,</span>
+    <span class="token string">"CAP_KILL"</span><span class="token punctuation">,</span>
+    <span class="token string">"CAP_NET_BIND_SERVICE"</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"permitted"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token string">"CAP_AUDIT_WRITE"</span><span class="token punctuation">,</span>
+    <span class="token string">"CAP_SYS_ADMIN"</span><span class="token punctuation">,</span>
+    <span class="token string">"CAP_KILL"</span><span class="token punctuation">,</span>
+    <span class="token string">"CAP_NET_BIND_SERVICE"</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"ambient"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token string">"CAP_AUDIT_WRITE"</span><span class="token punctuation">,</span>
+    <span class="token string">"CAP_KILL"</span><span class="token punctuation">,</span>
+    <span class="token string">"CAP_NET_BIND_SERVICE"</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] 文件系统的隔离(mount namespace)</strong><ul>
+<li>在容器中只能看到容器里面的文件，而不能看到 <code>host</code> 上面的文件</li>
+<li>如果 <code>mount namespace</code> 下面有任何进程修改了 <code>mount table</code> 其他的进程也会受到影响</li>
+<li><code>chroot</code> 并没有改变任何 <code>mount table</code>，它只是让进程的 <code>/</code> 看起来就是一个指定的目录</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 启动一个容器可以看到有新的mount的ns</span>
+$ <span class="token function">sudo</span> cinf <span class="token operator">|</span> <span class="token function">grep</span> mnt
+ 4026531840  mnt   102     0,1,103,104,112,1000          /sbin/initx
+ 4026532185  mnt   1       0                             sh
+$ sduo cinf -namespace 4026532185
+ PID    PPID   NAME  CMD  NTHREADS  CGROUPS STATE
+ 14013  14003  sh    sh   1         12:blkio:/user.slice/yoyo
+
+<span class="token comment" spellcheck="true"># 在host进程上查看mount的info信息</span>
+<span class="token function">cat</span> /proc/14013/mounts <span class="token operator">|</span> <span class="token function">sort</span> <span class="token operator">|</span> <span class="token function">uniq</span>
+cgroup /sys/fs/cgroup/blkio cgroup ro,nosuid,nodev 0 0
+cgroup /sys/fs/cgroup/cpu,cpuacct cgroup ro,nosuid,nodev 0 0
+cgroup /sys/fs/cgroup/cpuset cgroup ro,nosuid,nodev 0 0
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[6] User and root</strong><ul>
+<li>不推荐使用 <code>root</code> 来跑容器</li>
+<li><code>config.json</code> 文件中的 <code>User</code> 字段可以指定容器的进程以什么 <code>uid</code> 来运行，默认是 <code>0</code>，即 <code>root</code></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 字段不是必须的，如果删去，依然是以uisd=0运行</span>
+$ <span class="token function">id</span>
+uid<span class="token operator">=</span>0<span class="token punctuation">(</span>root<span class="token punctuation">)</span> gid<span class="token operator">=</span>0<span class="token punctuation">(</span>root<span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[7] 网络</strong><ul>
+<li>在网络方面，<code>OCI Runtime Spec</code> 只做了创建和假如 <code>network ns</code>, 其他的工作需要通过 <code>hooks</code> 完成</li>
+<li>使用默认的 <code>config.json</code>，就只有一个 <code>loop device</code>，没有 <code>eth0</code> ，所以也就不能连接到容器外面的网络</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Export the sha256sum for verification.</span>
+$ <span class="token function">export</span> NETNS_SHA256<span class="token operator">=</span><span class="token string">"8a3a48183ed5182a0619b18f05ef42ba5c4c3e3e499a2e2cb33787bd7fbdaa5c"</span>
+
+<span class="token comment" spellcheck="true"># Download and check the sha256sum.</span>
+$ curl -fSL <span class="token string">"https://github.com/genuinetools/netns/releases/download/v0.5.3/netns-linux-amd64"</span> -o <span class="token string">"/usr/local/bin/netns"</span> \
+    <span class="token operator">&amp;&amp;</span> <span class="token keyword">echo</span> <span class="token string">"<span class="token variable">${NETNS_SHA256}</span>  /usr/local/bin/netns"</span> <span class="token operator">|</span> sha256sum -c - \
+    <span class="token operator">&amp;&amp;</span> <span class="token function">chmod</span> a+x <span class="token string">"/usr/local/bin/netns"</span>
+
+$ <span class="token keyword">echo</span> <span class="token string">"netns installed!"</span>
+
+<span class="token comment" spellcheck="true"># Run it!</span>
+$ netns -h
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1195,7 +1405,7 @@ $ <span class="token function">sudo</span> sh get-docker.sh
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1101.7k</span>
+                        class="white-color">1102.9k</span>
             
             
             
