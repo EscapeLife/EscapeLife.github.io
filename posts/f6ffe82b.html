@@ -458,7 +458,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-12-05
+                    2021-09-04
                 </div>
                 
 
@@ -783,7 +783,9 @@ $ <span class="token function">git</span> cherry-pick -x z562e23d
 <h2 id="7-使用引用日志记录"><a href="#7-使用引用日志记录" class="headerlink" title="7. 使用引用日志记录"></a>7. 使用引用日志记录</h2><blockquote>
 <p><strong>如何找回我们丢失的内容和记录？</strong></p>
 </blockquote>
-<p>我们之前说过，使用下面命令回退内容、强制推送代码、删除本地分支，都是非常危险的操作，因为重置之后我们就没有办法在找到之前的修改内容了。</p>
+<ul>
+<li>我们之前说过，使用下面命令回退内容、强制推送代码、删除本地分支，都是非常危险的操作，因为重置之后我们就没有办法在找到之前的修改内容了。</li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 回退</span>
 $ <span class="token function">git</span> reset --hard <span class="token operator">&lt;</span>commit<span class="token operator">></span>
 
@@ -793,7 +795,9 @@ $ <span class="token function">git</span> push origin master -f
 <span class="token comment" spellcheck="true"># 分支</span>
 $ <span class="token function">git</span> branch -D <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>其实 <code>Git</code> 给我们留了一个后门，就是使用 <code>relflog</code> 命令来找回之前的内容，只不过是相对来说麻烦一些。而原理也很简答，就是在我们使用 <code>Git</code> 命令操作仓库的时候，<code>Git</code> 偷偷地帮助我们把所有的操作记录了下来。</p>
+<ul>
+<li>其实 <code>Git</code> 给我们留了一个后门，就是使用 <code>relflog</code> 命令来找回之前的内容，只不过是相对来说麻烦一些。而原理也很简答，就是在我们使用 <code>Git</code> 命令操作仓库的时候，<code>Git</code> 偷偷地帮助我们把所有的操作记录了下来。</li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看日志记录</span>
 $ <span class="token function">git</span> --no-pager log --oneline -1
 4bc8703 <span class="token punctuation">(</span>HEAD -<span class="token operator">></span> master<span class="token punctuation">)</span> hhhh
@@ -837,8 +841,12 @@ $ <span class="token function">git</span> filter-branch --commit-filter <span cl
 <h2 id="9-灵活使用钩子函数"><a href="#9-灵活使用钩子函数" class="headerlink" title="9. 灵活使用钩子函数"></a>9. 灵活使用钩子函数</h2><blockquote>
 <p><strong>主要介绍.git/hooks 目录下面的示例钩子函数！</strong></p>
 </blockquote>
-<p>在 <code>Git</code> 里面有两类，分别对应客户端和服务端钩子函数。客户端的钩子函数，是在执行提交和合并之类的操作时调用的。而服务端钩子函数，就是当服务端收到代码提交之后，可以出发代码检查和持续集成的步骤。作为开发者我们并不会搭建 <code>Git</code> 服务器，所以基本不会涉及。</p>
-<p>下面就是 <code>Git</code> 自带的钩子脚本，但是自带的都以 <code>.sample</code> 作为后缀，表示并没有启用，表示为一个示例。如果需要启用的话，将 <code>.sample</code> 作为后缀删除掉，即可。而其钩子脚本的对应内容，都是使用 <code>Shell</code> 语法进行编写的。</p>
+<ul>
+<li><p>在 <code>Git</code> 里面有两类，分别对应客户端和服务端钩子函数。客户端的钩子函数，是在执行提交和合并之类的操作时调用的。而服务端钩子函数，就是当服务端收到代码提交之后，可以出发代码检查和持续集成的步骤。作为开发者我们并不会搭建 <code>Git</code> 服务器，所以基本不会涉及。</p>
+</li>
+<li><p>下面就是 <code>Git</code> 自带的钩子脚本，但是自带的都以 <code>.sample</code> 作为后缀，表示并没有启用，表示为一个示例。如果需要启用的话，将 <code>.sample</code> 作为后缀删除掉，即可。而其钩子脚本的对应内容，都是使用 <code>Shell</code> 语法进行编写的。</p>
+</li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash">➜ ll .git/hooks
 total 112
 -rwxr-xr-x  applypatch-msg.sample
@@ -854,10 +862,16 @@ total 112
 -rwxr-xr-x  prepare-commit-msg.sample
 -rwxr-xr-x  update.sample
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>其实，钩子脚本使用任何语言编写都是可以的，只要你让程序返回对应的退出码就可以了。</p>
-<p>正常的代码合入流程就是，我们本地修改之后，提一个 <code>PR</code> 请求并通过 <code>Github</code> 的 <code>CI</code> 检查，接下来进行代码评审，最后被合并入主干。但是，好的一个习惯就是，在代码提交之前就应该保证代码不会出现语法错误等基础问题，比如通过 <code>flake8</code> 和 <code>PEP8</code> 标准等。</p>
-<p>这个时候我们就可以使用 <a target="_blank" rel="noopener" href="https://github.com/pre-commit/pre-commit"><code>pre-commit</code></a> 这个 <code>Github</code> 的开源项目了，其本质就是给项目添加钩子函数的一个脚本，可以保证我们在提交代码或者推送代码之前，先检查代码的质量。</p>
-<p>而 <a target="_blank" rel="noopener" href="https://github.com/pre-commit/pre-commit-hooks"><code>pre-commit-hooks</code></a> 这个项目里面包含的就是，现在所支持的钩子脚本，即开箱即用的钩子脚本集合。而其钩子脚本的对应内容，都是使用 <code>Python</code> 语法进行编写的。</p>
+<ul>
+<li><p>其实，钩子脚本使用任何语言编写都是可以的，只要你让程序返回对应的退出码就可以了。</p>
+</li>
+<li><p>正常的代码合入流程就是，我们本地修改之后，提一个 <code>PR</code> 请求并通过 <code>Github</code> 的 <code>CI</code> 检查，接下来进行代码评审，最后被合并入主干。但是，好的一个习惯就是，在代码提交之前就应该保证代码不会出现语法错误等基础问题，比如通过 <code>flake8</code> 和 <code>PEP8</code> 标准等。</p>
+</li>
+<li><p>这个时候我们就可以使用 <a target="_blank" rel="noopener" href="https://github.com/pre-commit/pre-commit"><code>pre-commit</code></a> 这个 <code>Github</code> 的开源项目了，其本质就是给项目添加钩子函数的一个脚本，可以保证我们在提交代码或者推送代码之前，先检查代码的质量。</p>
+</li>
+<li><p>而 <a target="_blank" rel="noopener" href="https://github.com/pre-commit/pre-commit-hooks"><code>pre-commit-hooks</code></a> 这个项目里面包含的就是，现在所支持的钩子脚本，即开箱即用的钩子脚本集合。而其钩子脚本的对应内容，都是使用 <code>Python</code> 语法进行编写的。</p>
+</li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 安装方式</span>
 $ pip <span class="token function">install</span> pre-commit
 
@@ -880,19 +894,27 @@ $ <span class="token function">git</span> push origin master
 <h2 id="10-快速克隆大型项目"><a href="#10-快速克隆大型项目" class="headerlink" title="10. 快速克隆大型项目"></a>10. 快速克隆大型项目</h2><blockquote>
 <p><strong>在大项目中工作中，拉取代码非常占时间！</strong></p>
 </blockquote>
-<p>我们如果想为 <code>Linux</code> 或 <code>Python</code> 这样的大型项目贡献提交的时候，首先遇到的问题就是，如果快速的 <code>clone</code> 该项目到本地。因为改项目提交历史超多且仓库巨大，加了国内网络的问题，可能等项目完全拉下来的时候，我们的热情都消减下去了。</p>
-<p>好在 <code>Git</code> 也帮我们想到了这样的问题，我们可以使用 <code>--depth</code> 参数值拉取远程仓库上面最新一次的提交历史，并不包含项目历史记录，即 <code>.git/objects/</code> 目录下的对象只是本地的，并不包含之前的多次修改产生的对象。</p>
+<ul>
+<li><p>我们如果想为 <code>Linux</code> 或 <code>Python</code> 这样的大型项目贡献提交的时候，首先遇到的问题就是，如果快速的 <code>clone</code> 该项目到本地。因为改项目提交历史超多且仓库巨大，加了国内网络的问题，可能等项目完全拉下来的时候，我们的热情都消减下去了。</p>
+</li>
+<li><p>好在 <code>Git</code> 也帮我们想到了这样的问题，我们可以使用 <code>--depth</code> 参数值拉取远程仓库上面最新一次的提交历史，并不包含项目历史记录，即 <code>.git/objects/</code> 目录下的对象只是本地的，并不包含之前的多次修改产生的对象。</p>
+</li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 克隆不包含之前历史</span>
 $ <span class="token function">git</span> clone http://xxx.xx.xxx/xxx --depth<span class="token operator">=</span>1
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<p>但是，有时间我们可能会需要 <code>clone</code> 仓库中的某个 <code>tag</code> 版本对应下的内容。如果我们直接使用 <code>clone</code> 命令是无法做到的，需要执行如下操作，即可完美解决。</p>
+<ul>
+<li>但是，有时间我们可能会需要 <code>clone</code> 仓库中的某个 <code>tag</code> 版本对应下的内容。如果我们直接使用 <code>clone</code> 命令是无法做到的，需要执行如下操作，即可完美解决。</li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 克隆特定版本代码</span>
 $ <span class="token function">git</span> init xxx-15-0-1
 $ <span class="token function">git</span> remote add origin http://xxx.xx.xxx/xxx
 $ <span class="token function">git</span> -c protocol.version<span class="token operator">=</span>2 fetch origin 15.0.1 --depth<span class="token operator">=</span>1
 $ <span class="token function">git</span> checkout FETCH_HEAD
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>上面的效果已经基本可以满足我们日常使用需求了，但是不幸的是，你现在接受了一个机器学习的项目，里面包含了大量的 <code>lfs</code> 文件，现在 <code>clone</code> 又会变得非常慢。可以使用如下操作来避免，<code>Git</code> 工具主动拉去 <code>lfs</code> 文件，来达到目录。</p>
+<ul>
+<li>上面的效果已经基本可以满足我们日常使用需求了，但是不幸的是，你现在接受了一个机器学习的项目，里面包含了大量的 <code>lfs</code> 文件，现在 <code>clone</code> 又会变得非常慢。可以使用如下操作来避免，<code>Git</code> 工具主动拉去 <code>lfs</code> 文件，来达到目录。</li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 克隆不包含LFS数据</span>
 $ GIT_LFS_SKIP_SMUDGE<span class="token operator">=</span>1 <span class="token function">git</span> clone http://xxx.xx.xxx/xxx
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
@@ -900,9 +922,14 @@ $ GIT_LFS_SKIP_SMUDGE<span class="token operator">=</span>1 <span class="token f
 <h2 id="11-如何处理工作中断"><a href="#11-如何处理工作中断" class="headerlink" title="11. 如何处理工作中断"></a>11. 如何处理工作中断</h2><blockquote>
 <p><strong>如果在多路运转的时候，还能够高效的进行开发！</strong></p>
 </blockquote>
-<p>比如，我们现在正在一个分支为项目添加一个小的功能，此时，产品经理找到你说是线上环境现在有一个 <code>bug</code> 需要让你来修复下。但是，此时我们添加的小功能并没有完成。</p>
-<p>如果此时，我们直接切换到主干分支的话，会将之前分支没有来得及提交的内容全部都带到了主干分支上来，这是我们不想看到的情况。此时，我们需要保存上个分支的工作状态，在我们修改完成线上 <code>bug</code> 之后，再继续工作。</p>
-<p>好在 <code>Git</code> 也帮我们想到了这样的问题，我们可以使用 <code>stash</code> 子命令帮助我们将当前工作区、暂存区当中的修改都保存到堆栈之中。等到需要处理的时候，再弹出堆栈中的内容，我们再次进行开发。</p>
+<ul>
+<li><p>比如，我们现在正在一个分支为项目添加一个小的功能，此时，产品经理找到你说是线上环境现在有一个 <code>bug</code> 需要让你来修复下。但是，此时我们添加的小功能并没有完成。</p>
+</li>
+<li><p>如果此时，我们直接切换到主干分支的话，会将之前分支没有来得及提交的内容全部都带到了主干分支上来，这是我们不想看到的情况。此时，我们需要保存上个分支的工作状态，在我们修改完成线上 <code>bug</code> 之后，再继续工作。</p>
+</li>
+<li><p>好在 <code>Git</code> 也帮我们想到了这样的问题，我们可以使用 <code>stash</code> 子命令帮助我们将当前工作区、暂存区当中的修改都保存到堆栈之中。等到需要处理的时候，再弹出堆栈中的内容，我们再次进行开发。</p>
+</li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash">➜ <span class="token function">git</span> stash -h
 usage: <span class="token function">git</span> stash list <span class="token punctuation">[</span><span class="token operator">&lt;</span>options<span class="token operator">></span><span class="token punctuation">]</span>
    or: <span class="token function">git</span> stash show <span class="token punctuation">[</span><span class="token operator">&lt;</span>options<span class="token operator">></span><span class="token punctuation">]</span> <span class="token punctuation">[</span><span class="token operator">&lt;</span>stash<span class="token operator">></span><span class="token punctuation">]</span>
@@ -941,7 +968,9 @@ $ <span class="token function">git</span> stash <span class="token function">cle
 <span class="token comment" spellcheck="true"># 从stash中拿出某个文件的修改</span>
 $ <span class="token function">git</span> checkout <span class="token operator">&lt;</span>stash@<span class="token punctuation">{</span>n<span class="token punctuation">}</span><span class="token operator">></span> -- <span class="token operator">&lt;</span>file-path<span class="token operator">></span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>其实比较保险的做法就是，将当前的所有修改进行 <code>push</code> 并保存到远程仓库里面。这样的好处在于，可以远端备份我们的修改，不会害怕本地文件丢失等问题。等到我们需要继续开发的时候，拉下对应内容，再想办法进行补救，比如使用 <code>--amend</code> 或者 <code>reset</code> 命令。</p>
+<ul>
+<li>其实比较保险的做法就是，将当前的所有修改进行 <code>push</code> 并保存到远程仓库里面。这样的好处在于，可以远端备份我们的修改，不会害怕本地文件丢失等问题。等到我们需要继续开发的时候，拉下对应内容，再想办法进行补救，比如使用 <code>--amend</code> 或者 <code>reset</code> 命令。</li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将工作区和暂存区覆盖最近一次提交</span>
 $ <span class="token function">git</span> commit --amend
 $ <span class="token function">git</span> commit --amend -m <span class="token string">"some_info"</span>
@@ -1491,7 +1520,7 @@ $ <span class="token function">git</span> reset --hard <span class="token operat
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1106k</span>
+                        class="white-color">1106.1k</span>
             
             
             
