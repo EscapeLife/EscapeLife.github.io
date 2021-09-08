@@ -414,8 +414,7 @@
 <hr>
 <p>今天早上发现，管理的某台服务器 <code>CPU</code> 负载挺高的，并且上面部署的服务响应速度有些慢。随即登录上去，使用 <code>htop</code> 查看内存使用情况挺正常的，但是看 <code>CPU</code> 状态，可以看到有多个 <code>arc_prune</code> 进程一直疯狂的在跑，如下图所示：</p>
 <p><img src="../images/zfs-bug-arc-prune-01.png" alt="ZFS进程占用大量CPU资源 - 占用大量CPU资源"></p>
-<p>然后，发现 <code>arc_prune</code> 程序会大量占用系统的 <code>CPU</code>，而且持续时间很长，导致服务器读写数据有些吃紧，出现服务卡顿的情况。网上搜了下 <code>arc_prune</code>，才发现是 <code>ZFS</code> 产生的，其目的是为了回收内存。</p>
-<p>又在网上和对应 <code>Github</code> 上面逛了一圈，发现了这个 <code>issue</code> 和我遇到的情况是一致，但是到现在也并没有 <code>close</code> 掉。</p>
+<p>然后，发现 <code>arc_prune</code> 程序会大量占用系统的 <code>CPU</code>，而且持续时间很长，导致服务器读写数据有些吃紧，出现服务卡顿的情况。网上搜了下 <code>arc_prune</code>，才发现是 <code>ZFS</code> 产生的，其目的是为了回收内存。又在网上和对应 <code>Github</code> 上面逛了一圈，发现了这个 <code>issue</code> 和我遇到的情况是一致，但是到现在也并没有 <code>close</code> 掉。</p>
 <p><img src="../images/zfs-bug-arc-prune-02.png" alt="ZFS进程占用大量CPU资源 - 占用大量CPU资源"></p>
 <hr>
 <p>但是，怎么解决这个问题呢？如果放着不管的话，等待自愈的话，也不清除什么时候对应的程序可以执行完毕，少则几分钟，多则一两个小时。显然，这样的情况是不能够被接受的，所以需要看看有没有什么好点的方法可以规避或者减少出现该问题的情况。</p>
