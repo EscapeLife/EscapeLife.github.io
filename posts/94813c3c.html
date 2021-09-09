@@ -462,7 +462,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-12-09
+                    2021-09-09
                 </div>
                 
 
@@ -688,7 +688,7 @@ $ <span class="token function">sudo</span> iptables -t filter -I INPUT -p icmp -
 <ul>
 <li><strong>TCP 三次握手中的第一次握手</strong><ul>
 <li>下图为<code>TCP</code>三次握手中的第一次握手，客户端(IP 为<code>98</code>)使用本地的随机端口<code>54808</code>向服务端(IP 为<code>137</code>)发起连接请求，<code>TCP</code>头的标志位中，只有<code>SYN</code>位被标识为<code>1</code>，其他标志位均为<code>0</code>。</li>
-<li>在下图的下方可以看到<code>[TCP Flags: ··········S·]</code>，其中的**”<code>S</code>“**就表示<code>SYN</code>位，整体表示只有<code>SYN</code>位为<code>1</code>。</li>
+<li>在下图的下方可以看到<code>[TCP Flags: ··········S·]</code>，其中的**<code>S</code>**就表示<code>SYN</code>位，整体表示只有<code>SYN</code>位为<code>1</code>。</li>
 </ul>
 </li>
 </ul>
@@ -875,11 +875,11 @@ $ <span class="token function">sudo</span> iptables -A OUTPUT -s 172.16.100.100 
 <p>当我们作为客户端通过<code>http</code>访问网站网页的时候，会向服务端的<code>80</code>端口发起请求，服务端再通过<code>80</code>端口响应我们的请求。作为客户端，我们似乎需要放行<code>80</code>端口，以便服务端回应我们的报文可以进入客户端主机。同理，当我们通过<code>ssh</code>工具远程连接到某台服务器时，也应当的放行了<code>22</code>号端口，以便远程主机的响应请求能够通过防火墙。</p>
 <p>那么，如果我们需要管理的主机越来越多呢？如果管理成百上千主机，这样防火墙规则也就越来越多，且越来越难为维护。<code>80</code>端口就更别提了，难道你每次访问一个新的网址，都要对这个网址添加信任吗？这显然不太合理。</p>
 <p>如果我们针对对应的端口，使用<code>--tcp-flags</code>去匹配<code>TCP</code>报文的标志位，把外来的<code>第一次握手</code>的请求拒绝，是不是也可以呢？那么如果对方使用的是<code>UDP</code>协议或者<code>ICMP</code>协议呢？似乎总是有一些不完美的地方。究其原因，问题就是：<strong>怎样判断这些报文是为了回应我们之前发出的报文，还是主动向我们发送的报文呢？</strong></p>
-<p>我们可以通过<code>iptables</code>的<code>state</code>扩展模块解决上述问题，<code>state</code>模块可以让<code>iptables</code>实现**”连接追踪”**机制。</p>
+<p>我们可以通过<code>iptables</code>的<code>state</code>扩展模块解决上述问题，<code>state</code>模块可以让<code>iptables</code>实现<strong>连接追踪</strong>机制。</p>
 <ul>
 <li><strong>连接追踪的过程</strong></li>
 </ul>
-<p>在<code>TCP/IP</code>协议簇中，只有<code>TCP</code>才有连接概念(三次握手/四次挥手)，而对于<code>UDP</code>和<code>ICMP</code>是没有所谓连接的概念。但是对于<code>iptables</code>的<code>state</code>模块来说，<code>TCP</code>报文、<code>UDP</code>报文、<code>ICMP</code>报文都是有连接状态的。我们可以这样认为，对于<code>state</code>模块而言，只要两台机器在**”你来我往”**的通信，就算建立起了连接。</p>
+<p>在<code>TCP/IP</code>协议簇中，只有<code>TCP</code>才有连接概念(三次握手/四次挥手)，而对于<code>UDP</code>和<code>ICMP</code>是没有所谓连接的概念。但是对于<code>iptables</code>的<code>state</code>模块来说，<code>TCP</code>报文、<code>UDP</code>报文、<code>ICMP</code>报文都是有连接状态的。我们可以这样认为，对于<code>state</code>模块而言，只要两台机器在<strong>你来我往</strong>的通信，就算建立起了连接。</p>
 <p><img src="../images/linux-learn-iptables-tool-38.png" alt="Linux安全之iptables匹配条件"></p>
 <hr>
 <blockquote>

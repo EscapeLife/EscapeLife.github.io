@@ -466,7 +466,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-12-09
+                    2021-09-09
                 </div>
                 
 
@@ -517,7 +517,7 @@
 <span class="token comment" spellcheck="true"># 将容器的80端口发布到服务器的8080端口上</span>
 $ docker run -d --name httpd -p 0.0.0.0:8080:80 httpd:alpine
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<p>这个问题其实挺严重的，这意味着本来只是为了在<strong>内部提供服务的一个端口被暴露在公共网络上</strong>。在网络上搜索 <strong>“ufw docker”</strong> 可以发现很多的讨论，都是在说这个问题的。基本上可以找到的解决办法就是首先禁用 <code>docker</code> 的 <code>iptables</code> 功能，但这也意味着放弃了 <code>docker</code> 的网络管理功能，很典型的现象就是<strong>容器将无法访问外部网络</strong>。在有的文章中也提到了可以在 <code>UFW</code> 的配置文件中手工添加一条规则，比如 <code>-A POSTROUTING ! -o docker0 -s 172.17.0.0/16 -j MASQUERADE</code>。但这也只是允许了 <code>172.17.0.0/16</code> 这个网络。如果有了新增的网络，我们也必须<strong>手工再为新增的网络添加这样类似的 <code>iptables</code> 规则</strong>。</p>
+<p>这个问题其实挺严重的，这意味着本来只是为了在<strong>内部提供服务的一个端口被暴露在公共网络上</strong>。在网络上搜索 <strong>ufw docker</strong> 可以发现很多的讨论，都是在说这个问题的。基本上可以找到的解决办法就是首先禁用 <code>docker</code> 的 <code>iptables</code> 功能，但这也意味着放弃了 <code>docker</code> 的网络管理功能，很典型的现象就是<strong>容器将无法访问外部网络</strong>。在有的文章中也提到了可以在 <code>UFW</code> 的配置文件中手工添加一条规则，比如 <code>-A POSTROUTING ! -o docker0 -s 172.17.0.0/16 -j MASQUERADE</code>。但这也只是允许了 <code>172.17.0.0/16</code> 这个网络。如果有了新增的网络，我们也必须<strong>手工再为新增的网络添加这样类似的 <code>iptables</code> 规则</strong>。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 禁用docker的iptables功能</span>
 <span class="token comment" spellcheck="true"># start docker with --iptables=false</span>
 在启动docker容器的时候，在DOCKER_OPTS添加--iptables<span class="token operator">=</span>false来禁止
