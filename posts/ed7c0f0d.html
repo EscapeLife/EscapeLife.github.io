@@ -320,10 +320,104 @@
 
 
 
-<main class="container content">
+<main class="post-container content">
 
     
-    <!-- 文章内容详情 -->
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
 <div id="artDetail">
     <div class="card">
         <div class="card-content article-info">
@@ -376,14 +470,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-07-21
+                    2021-09-17
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    190
+                    318
                 </div>
                 
 
@@ -415,7 +509,10 @@
 </blockquote>
 <p><img src="../images/shell-uses-command-summary.jpg" alt="Shell使用命令汇总"></p>
 <hr>
-<h2 id="1-查看系统信息"><a href="#1-查看系统信息" class="headerlink" title="1. 查看系统信息"></a>1. 查看系统信息</h2><ul>
+<h2 id="1-查看系统信息"><a href="#1-查看系统信息" class="headerlink" title="1. 查看系统信息"></a>1. 查看系统信息</h2><blockquote>
+<p><strong>获取 Linux 操作系统本机的相关常用信息</strong></p>
+</blockquote>
+<ul>
 <li><strong>获取本机 IP 地址</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">ifconfig</span> eth0 <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">"inet addr"</span> <span class="token operator">|</span> <span class="token function">awk</span> -F: <span class="token string">'{print <span class="token variable">$2</span>}'</span> <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$1</span>}'</span>
@@ -431,7 +528,10 @@
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">ps</span> -aux <span class="token operator">|</span> <span class="token function">sort</span> -k3nr <span class="token operator">|</span> <span class="token function">head</span> -5
 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <hr>
-<h2 id="2-查看服务状况"><a href="#2-查看服务状况" class="headerlink" title="2. 查看服务状况"></a>2. 查看服务状况</h2><ul>
+<h2 id="2-查看服务状况"><a href="#2-查看服务状况" class="headerlink" title="2. 查看服务状况"></a>2. 查看服务状况</h2><blockquote>
+<p><strong>获取网络相关的状态请求信息</strong></p>
+</blockquote>
+<ul>
 <li><strong>查看 TCP 连接状态</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">netstat</span> -n <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'/^tcp/ {++S[<span class="token variable">$NF</span>]} END {for(a in S) print a, S[a]}'</span>
@@ -447,7 +547,39 @@
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">netstat</span> -n <span class="token operator">|</span> <span class="token function">grep</span> TIME_WAIT <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$5</span>}'</span> <span class="token operator">|</span> <span class="token function">sort</span> <span class="token operator">|</span> <span class="token function">uniq</span> -c <span class="token operator">|</span> <span class="token function">sort</span> -rn <span class="token operator">|</span> <span class="token function">head</span> -n 20
 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <hr>
-<h2 id="3-命令使用注意"><a href="#3-命令使用注意" class="headerlink" title="3. 命令使用注意"></a>3. 命令使用注意</h2><ul>
+<h2 id="3-设备驱动信息"><a href="#3-设备驱动信息" class="headerlink" title="3. 设备驱动信息"></a>3. 设备驱动信息</h2><blockquote>
+<p><strong><a target="_blank" rel="noopener" href="https://opensource.com/article/21/9/lspci-linux-hardware">显示 Linux 系统上的设备和驱动程序</a></strong></p>
+</blockquote>
+<ul>
+<li><strong>列出 PCI 总线及其连接的设备</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">lspci
+lspci -v
+lspci -vv
+lspci -vvv
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>定位显卡信息</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">lspci <span class="token operator">|</span> <span class="token function">grep</span> -e VGA
+lspci <span class="token operator">|</span> <span class="token function">grep</span> -e 3D
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>按供应商 ID 搜索</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">lspci -nn <span class="token operator">|</span> <span class="token function">grep</span> -e VGA
+lspci -nn -d 10de:
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>查看内核模块</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">lspci -nn -k -d 10de:
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<hr>
+<h2 id="4-命令使用注意"><a href="#4-命令使用注意" class="headerlink" title="4. 命令使用注意"></a>4. 命令使用注意</h2><blockquote>
+<p><strong>列出平时使用 Linux 命令时需要注意的小细节</strong></p>
+</blockquote>
+<ul>
 <li><strong><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/29360925/whats-the-difference-between-and-at-the-end-of-a-find-command">使用 find 命令</a></strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># ./abc</span>
@@ -825,6 +957,100 @@ $ <span class="token function">find</span> <span class="token keyword">.</span> 
 <script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
 
 
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('4'),
+            headingSelector: 'h2, h3, h4, h5'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4, h5').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
     
 
 </main>
@@ -903,7 +1129,7 @@ $ <span class="token function">find</span> <span class="token keyword">.</span> 
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1116.4k</span>
+                        class="white-color">1116.5k</span>
             
             
             
