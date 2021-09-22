@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-09-15
+                    2021-09-22
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    8.1k
+                    8.3k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    32 分
+                    34 分
                 </div>
                 
 
@@ -1288,6 +1288,34 @@ $ <span class="token function">sudo</span> systemctl stop firewalld.service
 <span class="token comment" spellcheck="true"># 禁用自启动</span>
 $ <span class="token function">sudo</span> systemctl disable firewalld.service
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="21-Docker-无法获取镜像"><a href="#21-Docker-无法获取镜像" class="headerlink" title="21. Docker 无法获取镜像"></a>21. Docker 无法获取镜像</h2><blockquote>
+<p><strong>新初始化的机器，无法获取私有仓库的镜像文件！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 机器初始化之后，使用如下命令登录私有 <code>docker</code> 仓库，发现提示无法获取对应镜像，但是在其他机器上面获取该镜像就可以执行成功，这就非常奇怪了！</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 登录私有仓库</span>
+$ <span class="token keyword">echo</span> <span class="token string">'123456'</span> <span class="token operator">|</span> docker login -u escape --password-stdin docker.escapelife.site
+
+<span class="token comment" spellcheck="true"># 异常信息提示</span>
+$ <span class="token function">sudo</span> docker pull docker.escapelife.site/app:0.10
+Error response from daemon: manifest <span class="token keyword">for</span> docker.escapelife.site/app:0.10 not found: manifest unknown: manifest unknown
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 太坑了，我还以为我发现某个隐藏的 <code>bug</code> 了，可劲的排查，最后发现，原来是自己镜像包名字写错了，应该写成 <code>0.0.10</code> 的，自己却写成了 <code>0.10</code>。这里，纪念一下，以后碰到上述报错，那肯定是镜像不存在的。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 登录私有仓库之后会在用户家目录下生成一个docker配置</span>
+<span class="token comment" spellcheck="true"># 其用来记录docker私有仓库的登录认证信息(是加密过的信息但不安全) => base64</span>
+$ <span class="token function">cat</span> .docker/config.json
+<span class="token punctuation">{</span>
+    <span class="token string">"auths"</span><span class="token keyword">:</span> <span class="token punctuation">{</span>
+        <span class="token string">"docker.escapelife.site"</span><span class="token keyword">:</span> <span class="token punctuation">{</span>
+            <span class="token string">"auth"</span><span class="token keyword">:</span> <span class="token string">"d00u11Fu22B3355VG2xasE12w=="</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1824,7 +1852,7 @@ $ <span class="token function">sudo</span> systemctl disable firewalld.service
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1118.7k</span>
+                        class="white-color">1119k</span>
             
             
             
