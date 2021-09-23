@@ -462,14 +462,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-09-22
+                    2021-09-23
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    8.3k
+                    8.6k
                 </div>
                 
 
@@ -1316,6 +1316,30 @@ $ <span class="token function">cat</span> .docker/config.json
     <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="22-Docker-使容器不退出"><a href="#22-Docker-使容器不退出" class="headerlink" title="22. Docker 使容器不退出"></a>22. Docker 使容器不退出</h2><blockquote>
+<p><strong>如何使使用 docker-compose 启动的容器服务 hang 住而不退出</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 有时候我们启动的服务，因为某些问题(<code>bug</code>)导致服务无法正常启动，就会出现容器无限重启(<code>restart: on-failure</code>)的情况，这时就很不利于排除问题。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">➜ docker <span class="token function">ps</span> -a
+4e6xxx9a4   app:latest   <span class="token string">"/xxx/…"</span>   26 seconds ago   Restarting <span class="token punctuation">(</span>1<span class="token punctuation">)</span> 2 seconds ago
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 这时我们就需要根据，服务构建使用命令来决定是用什么命令来 <code>hang</code> 住服务。卡住的原理，就类似于使用 <code>/bin/bash</code> 进入容器是一样的，这里我就不过多解释了。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 类似原理</span>
+docker run -it --rm --entrypoint<span class="token operator">=</span>/bin/bash xxx/app:latest
+
+<span class="token comment" spellcheck="true"># 使用Command命令</span>
+tty: <span class="token boolean">true</span>
+command: <span class="token function">tail</span> -f /dev/null
+
+<span class="token comment" spellcheck="true"># 使用Entrypoint命令</span>
+tty: <span class="token boolean">true</span>
+entrypoint: <span class="token function">tail</span> -f /dev/null
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1852,7 +1876,7 @@ $ <span class="token function">cat</span> .docker/config.json
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1119k</span>
+                        class="white-color">1119.2k</span>
             
             
             
