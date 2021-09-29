@@ -336,6 +336,10 @@
                                 <span class="chip bg-color">Bug</span>
                             </a>
                         
+                            <a href="/tags/Fdisk/">
+                                <span class="chip bg-color">Fdisk</span>
+                            </a>
+                        
                     </div>
                     
                 </div>
@@ -364,7 +368,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-03-06
+                    2021-09-29
                 </div>
                 
 
@@ -399,11 +403,13 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <blockquote>
-<p>服务器磁盘不足是一个运维系统中很常见的问题，我们应该很了解。</p>
+<p><strong>服务器磁盘不足是一个运维系统中很常见的问题，我们应该很了解。</strong></p>
 </blockquote>
 <p><img src="/images/linux_disk.png" alt="服务器根路径磁盘爆满"></p>
 <hr>
-<p>早上需要安装 PG 的数据库，安装之后发现使用客户端命令无法启用，提示信息显示磁盘空间已经满了且无法启动服务。这才通过 df 命令查看，原来真的是根目录 100%了，怪不得无法启动服务了。磁盘信息，大致如下所示：</p>
+<ul>
+<li>早上需要安装 <code>PG</code> 的数据库，安装之后发现使用客户端命令无法启用，提示信息显示磁盘空间已经满了且无法启动服务。这才通过 <code>df</code> 命令查看，原来真的是根目录 <code>100%</code> 了，怪不得无法启动服务了。磁盘信息，大致如下所示：</li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@iZ2ze6s4n0kaabcdmehkiZ opt<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># df</span>
 Filesystem     1K-blocks     Used Available Use% Mounted on
 /dev/vda1       41151808  6430640  6430600  100% /
@@ -413,7 +419,9 @@ tmpfs            8133712      508   8133204   1% /run
 tmpfs            8133712        0   8133712   0% /sys/fs/cgroup
 tmpfs            1626744        0   1626744   0% /run/user/0
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>因为毕竟是物理机器，所有没办法像虚拟机那样子进行磁盘的扩充。查了一下，服务器是否还有多余的磁盘没有被使用，结果还真的发现真的有，而且还不小，足足 268G。磁盘信息，大致如下所示：</p>
+<ul>
+<li>因为毕竟是物理机器，所有没办法像虚拟机那样子进行磁盘的扩充。查了一下，服务器是否还有多余的磁盘没有被使用，结果还真的发现真的有，而且还不小，足足 <code>268G</code>。磁盘信息，大致如下所示：</li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@iZ2ze6s4n0kaabcdmehkiZ opt<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># fdisk -l</span>
 
 Disk /dev/vda: 42.9 GB, 42949672960 bytes, 83886080 sectors
@@ -429,14 +437,18 @@ Disk identifier: 0x000d2717
 Disk /dev/vdb: 268.4 GB, 268435456000 bytes, 524288000 sectors
 Units <span class="token operator">=</span> sectors of 1 * 512 <span class="token operator">=</span> 512 bytes
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>但是还有一个问题，一直让我很是疑问，那就是这个服务器没有做类似于虚拟磁盘系统，如 LVM 等。所有要对根目录进行扩充，还真不知道怎么办好？后来，问一个一个同事，用笨办法：把根目录下大的/opt 目录移到被的服务器上，然后挂载 vdb 到/opt 下面，重新移动到该磁盘上。</p>
+<ul>
+<li>但是还有一个问题，一直让我很是疑问，那就是这个服务器没有做类似于虚拟磁盘系统，如 <code>LVM</code> 等。所有要对根目录进行扩充，还真不知道怎么办好？后来，问一个一个同事，用笨办法：把根目录下大的 <code>/opt</code> 目录移到被的服务器上，然后挂载 <code>vdb</code> 到 <code>/opt</code> 下面，重新移动到该磁盘上。</li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 格式化磁盘</span>
 <span class="token punctuation">[</span>root@iZ2ze6s4n0kaabcdmehkiZ opt<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># fdisk /dev/vdb</span>
 
 <span class="token comment" spellcheck="true"># 挂载磁盘</span>
 <span class="token punctuation">[</span>root@iZ2ze6s4n0kaabcdmehkiZ opt<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># mount /dev/vdb1 /opt</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>这样，根的空间一下子就释放了，但是还是感觉这种方法太过于笨了，不知道有没有什么个好的方法。如果各位大佬知道的话，可以在评论区里给我留言哈，哈哈。</p>
+<ul>
+<li>这样，根的空间一下子就释放了，但是还是感觉这种方法太过于笨了，不知道有没有什么个好的方法。如果各位大佬知道的话，可以在评论区里给我留言哈，哈哈。</li>
+</ul>
 
                 
             </div>
@@ -503,6 +515,10 @@ Units <span class="token operator">=</span> sectors of 1 * 512 <span class="toke
                             
                                 <a href="/tags/Bug/">
                                     <span class="chip bg-color">Bug</span>
+                                </a>
+                            
+                                <a href="/tags/Fdisk/">
+                                    <span class="chip bg-color">Fdisk</span>
                                 </a>
                             
                         </div>
@@ -769,6 +785,10 @@ Units <span class="token operator">=</span> sectors of 1 * 512 <span class="toke
                     
                     <a href="/tags/Bug/">
                         <span class="chip bg-color">Bug</span>
+                    </a>
+                    
+                    <a href="/tags/DNS/">
+                        <span class="chip bg-color">DNS</span>
                     </a>
                     
                 </div>
