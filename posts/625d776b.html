@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-08-19
+                    2021-10-19
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.8k
+                    2.5k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    7 分
+                    10 分
                 </div>
                 
 
@@ -505,7 +505,7 @@
 </blockquote>
 <p><img src="../images/git_common_problems.jpg" alt="Git常见零碎问题汇总"></p>
 <hr>
-<h2 id="1-GIT-分支已经删除"><a href="#1-GIT-分支已经删除" class="headerlink" title="1. GIT 分支已经删除"></a>1. GIT 分支已经删除</h2><blockquote>
+<h2 id="1-Git-分支已经删除"><a href="#1-Git-分支已经删除" class="headerlink" title="1. Git 分支已经删除"></a>1. Git 分支已经删除</h2><blockquote>
 <p><strong>远程获取分支最新代码，提示远程分支已经不存在了</strong></p>
 </blockquote>
 <ul>
@@ -669,7 +669,7 @@ $ <span class="token function">cat</span> .git/config
 $ <span class="token function">git</span> fetch origin master:refs/remotes/origin/master
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="7-GIT-显示中文乱码"><a href="#7-GIT-显示中文乱码" class="headerlink" title="7. GIT 显示中文乱码"></a>7. GIT 显示中文乱码</h2><blockquote>
+<h2 id="7-Git-显示中文乱码"><a href="#7-Git-显示中文乱码" class="headerlink" title="7. Git 显示中文乱码"></a>7. Git 显示中文乱码</h2><blockquote>
 <p><strong>Git 命令显示中文和解决中文乱码</strong></p>
 </blockquote>
 <ul>
@@ -696,6 +696,52 @@ Changes not staged <span class="token keyword">for</span> commit:
 <span class="token punctuation">[</span>core<span class="token punctuation">]</span>
 quotepath <span class="token operator">=</span> <span class="token boolean">false</span>        <span class="token comment" spellcheck="true"># 引用路径不再是八进制</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="8-Git-恢复丢失数据"><a href="#8-Git-恢复丢失数据" class="headerlink" title="8. Git 恢复丢失数据"></a>8. Git 恢复丢失数据</h2><blockquote>
+<p><strong>使用 Git 工具管理仓库的时候，意外删除文档，重置仓库，如何快速恢复丢失的数据呢？</strong></p>
+</blockquote>
+<ul>
+<li><strong>问题描述：</strong>重置数据，一般都是使用了 <code>reset</code> 命令导致的，因为其命令用于改变当前的仓库状态。下面是常见的 <code>Git</code> 重置操作，一旦执行之后，我们又后悔了，那该怎么办呢？</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 暂存区 &lt;- 本地仓库</span>
+$ <span class="token function">git</span> reset HEAD <span class="token operator">&lt;</span>file<span class="token operator">></span>   <span class="token comment" spellcheck="true"># 本地仓库文件内容覆盖暂存区文件内容</span>
+
+<span class="token comment" spellcheck="true"># 工作区 &lt;- 本地仓库</span>
+$ <span class="token function">git</span> reset <span class="token punctuation">[</span>commit<span class="token punctuation">]</span>         <span class="token comment" spellcheck="true"># 本地仓库覆盖到工作区(保存回退文件内容修改)；默认就是--mixed参数</span>
+$ <span class="token function">git</span> reset <span class="token punctuation">[</span>commit<span class="token punctuation">]</span>         <span class="token comment" spellcheck="true"># 重置当前分支的指针为指定commit；同时重置暂存区但工作区不变</span>
+$ <span class="token function">git</span> reset --soft <span class="token punctuation">[</span>commit<span class="token punctuation">]</span>  <span class="token comment" spellcheck="true"># 本地仓库覆盖到工作区(保留修改并加到暂存区)</span>
+$ <span class="token function">git</span> reset --soft <span class="token punctuation">[</span>commit<span class="token punctuation">]</span>  <span class="token comment" spellcheck="true"># 回退为指定版本(不删除回退文件的修改)</span>
+$ <span class="token function">git</span> reset --hard <span class="token punctuation">[</span>commit<span class="token punctuation">]</span>  <span class="token comment" spellcheck="true"># 本地仓库覆盖到工作区(不保留修改直接删除掉)</span>
+$ <span class="token function">git</span> reset --hard <span class="token punctuation">[</span>commit<span class="token punctuation">]</span>  <span class="token comment" spellcheck="true"># 重置当前分支的HEAD为指定commit；同时重置暂存区和工作区；谨慎使用</span>
+
+<span class="token comment" spellcheck="true"># 工作区 &lt;- 本地仓库</span>
+$ <span class="token function">git</span> reset --keep <span class="token punctuation">[</span>commit<span class="token punctuation">]</span>   <span class="token comment" spellcheck="true"># 重置当前HEAD为指定commit，但保持暂存区和工作区不变</span>
+$ <span class="token function">git</span> reset --mixed <span class="token punctuation">[</span>commit<span class="token punctuation">]</span>  <span class="token comment" spellcheck="true"># 本地仓库覆盖到工作区(保存回退文件内容修改)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>解决方法：</strong>当我们操作进行了版本回退，现在又需要回退之前的文件信息，此时分为三种情况：<ul>
+<li><strong>[情况一]</strong> -&gt; 之前的修改进行了 <code>commit</code> 提交，即执行了 <code>git commit</code>；</li>
+<li><strong>[情况二]</strong> -&gt; 之前的修改未进行 <code>commit</code> 提交，即执行了 <code>git add</code>；</li>
+<li><strong>[情况三]</strong> -&gt; 之前的修改未进行 <code>commit</code> 提交，即也没有执行 <code>git add</code>；</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 针对第一种情况</span>
+$ <span class="token function">git</span> reflog               <span class="token comment" spellcheck="true"># 获取hash值</span>
+$ <span class="token function">git</span> reset --hard <span class="token punctuation">[</span>hash<span class="token punctuation">]</span>  <span class="token comment" spellcheck="true"># 回退到之前修改的状态</span>
+
+<span class="token comment" spellcheck="true"># 针对第二种情况可以执行如下恢复步骤</span>
+<span class="token comment" spellcheck="true"># 因为会重置暂存区和工作区且没有提交记录，所以不好恢复</span>
+<span class="token comment" spellcheck="true"># 可以利用fsck命令查找到之前丢失文件(在.git/lost-found目录)</span>
+<span class="token comment" spellcheck="true"># other  -> .git/lost-found/other  -> 添加信息</span>
+<span class="token comment" spellcheck="true"># commit -> .git/lost-found/commit -> 提交信息</span>
+$ <span class="token function">git</span> <span class="token function">fsck</span> --lost-found
+
+<span class="token comment" spellcheck="true"># 针对第三种情况可以执行如下恢复步骤</span>
+因为根本就没有被Git接管，所以恢复就无从谈起了！
+但是如果你使用的是JB<span class="token punctuation">(</span>jetbrains<span class="token punctuation">)</span>家的IDE工具，可以通过自带的文件历史功能成功恢复！<span class="token operator">=</span><span class="token operator">></span> 右键菜单本地历史功能
+想了想，JB<span class="token punctuation">(</span>jetbrains<span class="token punctuation">)</span>家的东西真香呀！
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1244,7 +1290,7 @@ quotepath <span class="token operator">=</span> <span class="token boolean">fals
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1133.3k</span>
+                        class="white-color">1134k</span>
             
             
             
