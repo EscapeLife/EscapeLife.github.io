@@ -372,7 +372,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-10-24
+                    2021-10-25
                 </div>
                 
 
@@ -412,7 +412,7 @@
 <p><img src="../images/python-subprocess-pipe-stdout.jpg" alt="Python调用系统命令卡住"></p>
 <hr>
 <ul>
-<li>今天在 <code>Twitter</code> 上面看到 <code>laixintao</code> 发了一个动态，说的是发现在 <code>Python</code> 程序下直接调用系统命令时，如果返回信息量过大的话，子进程输出的 <code>stdout</code> 会把管道(<code>PIPE</code>)的缓冲器打满，导致主进程卡住。</li>
+<li>今天在 <code>Twitter</code> 上面看到 <code>laixintao</code> 发了一个小心，说的是发现在 <code>Python</code> 程序下直接调用系统命令时，如果返回信息量过大的话，子进程输出信息量 <code>stdout</code> 会把管道(<code>PIPE</code>)的缓冲器打满，导致主进程卡住。</li>
 </ul>
 <p><img src="../images/python-subprocess-pipe-stdout-1.png" alt="Python调用系统命令卡住"></p>
 <ul>
@@ -455,7 +455,7 @@ p <span class="token operator">=</span> Popen<span class="token punctuation">(</
 <ul>
 <li>但是，这里就有一个问题，其实在 <code>Popen</code> 的文档里面已经有说明了：<strong>“注意数据读取是在内存中缓冲的，所以如果数据大小很大或者没有限制，不要使用这种方法”</strong>。显然，这个警告实际上意味着：<strong>“如果读取的数据有可能超过几页，那么这将使你的代码陷入死锁”</strong>。注意，这里是 <code>subprocess.wait</code> 才会卡住。</li>
 </ul>
-<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># Linux默认的pipe-size是64kb大小</span>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># Linux默认的pipe-size是64kb</span>
 <span class="token keyword">from</span> subprocess <span class="token keyword">import</span> Popen<span class="token punctuation">,</span> PIPE
 
 <span class="token keyword">def</span> <span class="token function">dd_test</span><span class="token punctuation">(</span>index<span class="token punctuation">,</span> dd_size<span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -486,17 +486,11 @@ p <span class="token operator">=</span> Popen<span class="token punctuation">(</
 </li>
 </ul>
 <p><img src="../images/python-subprocess-pipe-stdout-2.png" alt="Python调用系统命令卡住"></p>
-<ul>
-<li><strong>[方法一] 使用 <code>communicate()</code> 方法</strong></li>
-</ul>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> subprocess <span class="token keyword">import</span> Popen<span class="token punctuation">,</span> PIPE
 
 p <span class="token operator">=</span> Popen<span class="token punctuation">(</span>cmd<span class="token punctuation">,</span> stdout<span class="token operator">=</span>PIPE<span class="token punctuation">,</span> stderr<span class="token operator">=</span>PIPE<span class="token punctuation">)</span>
 <span class="token punctuation">(</span>out<span class="token punctuation">,</span>err<span class="token punctuation">)</span> <span class="token operator">=</span> p<span class="token punctuation">.</span>communicate<span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<ul>
-<li><strong>[方法二] 使用 <code>StringIO</code> 库</strong></li>
-</ul>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> subprocess <span class="token keyword">import</span> Popen<span class="token punctuation">,</span> PIPE
 
 <span class="token keyword">def</span> <span class="token function">run</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> cmd<span class="token punctuation">)</span><span class="token punctuation">:</span>
