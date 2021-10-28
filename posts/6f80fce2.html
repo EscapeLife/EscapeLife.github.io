@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-12-09
+                    2021-10-28
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.2k
+                    2.4k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    11 分
+                    12 分
                 </div>
                 
 
@@ -1023,6 +1023,26 @@ INFO  <span class="token punctuation">[</span>alembic.context<span class="token 
 INFO  <span class="token punctuation">[</span>alembic.context<span class="token punctuation">]</span> Running upgrade None -<span class="token operator">></span> 1975ea83b712
 INFO  <span class="token punctuation">[</span>alembic.context<span class="token punctuation">]</span> Running upgrade 1975ea83b712 -<span class="token operator">></span> ae1027a6acf
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="8-Solve-the-Problem"><a href="#8-Solve-the-Problem" class="headerlink" title="8. Solve the Problem"></a>8. Solve the Problem</h2><blockquote>
+<p><strong>记录日常使用 alembic 命令时遇到的问题以及对应的解决方法！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] 数据库升级找不到对应代码</strong></li>
+</ul>
+<p>镜像包启动的时候，升级数据库，发现如下报错信息，提示找不到需要使用的 <code>revision id</code>，很明显是因为找不到对应升级文件。但是确认之后，发现对应文件是好的，且开发本地测试也是没有任何问题的。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ alembic -c misc/alembic.ini -n db -x dburl<span class="token operator">=</span>postgresql+psycopg2://postgres:app@postgres:5432/app upgrade
+FAILED: Can<span class="token string">'t locate revision identified by '</span>1111324a57ff'
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>后来发现，原来是因为容器打包的时候，将 <code>python</code> 代码打包成了 <code>pyc</code>，导致其找不到了。这时，需要我们在 <code>alembic.ini</code> 文件里面，开启对应配置，即可。</p>
+<pre class="line-numbers language-ini"><code class="language-ini"># set to 'true' to allow .pyc and .pyo files without
+# a source .py file to be detected as revisions in the
+# versions/ directory
+# sourceless <span class="token attr-value"><span class="token punctuation">=</span> false</span>
+
+<span class="token selector">[db]</span>
+<span class="token constant">sourceless</span> <span class="token attr-value"><span class="token punctuation">=</span> true</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1571,7 +1591,7 @@ INFO  <span class="token punctuation">[</span>alembic.context<span class="token 
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1135.9k</span>
+                        class="white-color">1136.1k</span>
             
             
             
