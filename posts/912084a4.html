@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-07-13
+                    2021-11-11
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    7.9k
+                    8.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    37 分
+                    39 分
                 </div>
                 
 
@@ -521,9 +521,10 @@ $ restic --repo /data/backup init
 <span class="token comment" spellcheck="true"># 将备份/home/data文件夹到存储库/data/backup中</span>
 $ restic -r /data/backup backup /home/data
 
-<span class="token comment" spellcheck="true"># 备份单文件到存储库(需输入密码)</span>
+<span class="token comment" spellcheck="true"># 备份单文件到存储库(需输入密码) - exclude是从同步目录的根算起</span>
 $ restic -r /data/backup backup /home/data/file.txt
 $ restic -r /data/backup backup --exclude<span class="token operator">=</span>*.doc /home/data
+$ restic -r /data/backup backup --exclude<span class="token operator">=</span>/files/ /home/data
 $ restic -r /data/backup backup --exclude-file<span class="token operator">=</span>exclude.conf /home/data
 
 <span class="token comment" spellcheck="true"># 检查两个快照之间的差异(需输入密码)</span>
@@ -531,7 +532,7 @@ $ restic -r /data/backup <span class="token function">diff</span> 6eda7c7d b52d4
 
 <span class="token comment" spellcheck="true"># 列出存储库中的可用快照</span>
 $ restic -r /data/backup snapshots
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[2] 使用 Restic 工具的示例演示 - 恢复</strong></li>
 </ul>
@@ -1629,6 +1630,39 @@ Fatal: unable to create lock <span class="token keyword">in</span> backend: repo
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 解锁</span>
 $ restic unlock
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<ul>
+<li><strong>[问题二]</strong> 如果多个相同的目录文件内容，需要备份到我们的服务器，这时在 <code>A</code> 服务器使用 <code>restic</code> 备份，会携带 <code>A</code> 服务器的某些信息(如下所示)。之后，如果需要在 <code>B</code> 服务器上面同步增量的数据，其实不能够增量的同步。因为 <code>restic</code> 会根据下面的表示来判断是否是来自同一来源。<ul>
+<li><code>ID</code>: 快照的版本号</li>
+<li><code>Time</code>: 备份的时间</li>
+<li><code>Host</code>: 备份服务器的主机名</li>
+<li><code>Tags</code>: 备份指定的标签</li>
+<li><code>Paths</code>: 备份的服务器路径</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">ID        Time                 Host        Tags        Paths
+---------------------------------------------------------------------------
+22591124  2021-08-11 12:46:49  shanghai    app_data    /data1/app_data/data
+fed3dd34  2021-08-11 14:44:51  hangzhou    app_data    /data2/app_data/data
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决二]</strong> 判断的主要依据是，<code>Host</code>、<code>Tags</code> 和 <code>Paths</code> 来判断的，所以只要我们能够骗过 <code>restic</code> 就能够达到我们的目的。<ul>
+<li>其中 <code>Host</code> 可以使用 <code>-H</code> 参数来指定</li>
+<li>其中 <code>Tags</code> 可以使用 <code>tag --set</code> 参数来指定</li>
+<li>而 <code>Paths</code> 路径就需要我们创建相同的目录了，这里不能使用链接文件</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># host</span>
+$ restic -r /data/restic_backup -H shanghai /data1/app_data/data
+
+<span class="token comment" spellcheck="true"># tag</span>
+$ restic -r /data/restic_backup tag --set NL --set CH de586d1f
+
+<span class="token comment" spellcheck="true"># path</span>
+$ <span class="token function">mkdir</span> /data1/app_data/data
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -2165,7 +2199,7 @@ $ restic unlock
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1136.1k</span>
+                        class="white-color">1137.1k</span>
             
             
             
