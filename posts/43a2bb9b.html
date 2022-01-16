@@ -29,9 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.0">
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
+
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-10-26
+                    2022-01-16
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    8.6k
+                    9.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    35 分
+                    37 分
                 </div>
                 
 
@@ -537,11 +537,11 @@ $ <span class="token function">sudo</span> systemctl start docker
 <ul>
 <li><strong>[解决方法 2] 改动 docker 配置文件</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 3.改动docker启动配置文件</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># [方式一] 改动docker启动配置文件</span>
 $ <span class="token function">sudo</span> vim /lib/systemd/system/docker.service
 ExecStart<span class="token operator">=</span>/usr/bin/dockerd --graph<span class="token operator">=</span>/data/docker/
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 3.改动docker启动配置文件</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># [方式二] 改动docker启动配置文件</span>
 $ <span class="token function">sudo</span> vim /etc/docker/daemon.json
 <span class="token punctuation">{</span>
     <span class="token string">"live-restore"</span><span class="token keyword">:</span> true,
@@ -597,7 +597,7 @@ Storage Driver: devicemapper
  Metadata Space Total: 2.147 GB
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li>**[解决方法]**通过查看信息，我们知道正是因为 <code>docker</code> 可用的磁盘空间不足，所以导致启动的时候没有足够的空间进行加载启动镜像。解决的方法也很简单，第一就是清理无效数据文件释放磁盘空间(<strong>清除日志</strong>)，第二就是修改 <code>docker</code> 数据的存放路径(<strong>大分区</strong>)。</li>
+<li><strong>[解决方法]</strong> 通过查看信息，我们知道正是因为 <code>docker</code> 可用的磁盘空间不足，所以导致启动的时候没有足够的空间进行加载启动镜像。解决的方法也很简单，第一就是清理无效数据文件释放磁盘空间(<strong>清除日志</strong>)，第二就是修改 <code>docker</code> 数据的存放路径(<strong>大分区</strong>)。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 显示哪些容器目录具有最大的日志文件</span>
 $ <span class="token function">du</span> -d1 -h /var/lib/docker/containers <span class="token operator">|</span> <span class="token function">sort</span> -h
@@ -798,7 +798,7 @@ $ <span class="token function">sudo</span> systemctl restart docker
 <p><strong>找不到对应容器进程是最吓人的</strong></p>
 </blockquote>
 <ul>
-<li><strong>[问题起因]</strong> 今天遇到 <code>docker</code> 容器无法停止/终止/删除，以为这个容器可能又出现了 <code>dockerd</code> 守护进程托管的情况，但是通过 <code>ps -ef &lt;container id&gt;</code> 无法查到对应的运行进程。哎，后来开始开始查 <code>supervisor</code> 以及 <code>Dockerfile</code> 中的进程，都没有。这种情况的可能原因是容器启动之后，之后，主机因任何原因重新启动并且没有优雅地终止容器。剩下的文件现在阻止你重新生成旧名称的新容器，因为系统认为旧容器仍然存在。</li>
+<li><strong>[问题起因]</strong> 今天遇到 <code>docker</code> 容器无法停止/终止/删除，以为这个容器可能又出现了 <code>dockerd</code> 守护进程托管的情况，但是通过 <code>ps -ef &lt;container id&gt;</code> 无法查到对应的运行进程。哎，后来开始开始查 <code>supervisor</code> 以及 <code>Dockerfile</code> 中的进程，都没有。这种情况的可能原因是容器启动之后，主机因任何原因重新启动并且没有优雅地终止容器。剩下的文件现在阻止你重新生成旧名称的新容器，因为系统认为旧容器仍然存在。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 删除容器</span>
 $ <span class="token function">sudo</span> docker <span class="token function">rm</span> -f f8e8c3<span class="token punctuation">..</span>
@@ -924,10 +924,10 @@ shm            tmpfs     64M   24K   64M   1% /dev/shm
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="10-Docker-NFS-挂载报错"><a href="#10-Docker-NFS-挂载报错" class="headerlink" title="10. Docker NFS 挂载报错"></a>10. Docker NFS 挂载报错</h2><blockquote>
-<p><strong>总线错误看到的时候还是挺吓人了</strong></p>
+<p><strong>NFS 挂载之后容器程序使用异常为内核版本太低导致的</strong></p>
 </blockquote>
 <ul>
-<li><strong>[问题起因]</strong> 我们将服务部署到 <code>openshift</code> 集群中，启动服务调用资源文件的时候，报错信息如下所示。从报错信息中，得知是在 <code>Python3</code> 程序执行 <code>read_file()</code> 读取文件的内容，给文件加锁的时候报错了。但是奇怪的是，本地调试的时候发现服务都是可以正常运行的，文件加锁也是没问题的。后来发现，在 <code>openshift</code> 集群中使用的是 <code>NFS</code> 挂  载的共享磁盘。</li>
+<li><strong>[问题起因]</strong> 我们将服务部署到 <code>openshift</code> 集群中，启动服务调用资源文件的时候，报错信息如下所示。从报错信息中，得知是在 <code>Python3</code> 程序执行 <code>read_file()</code> 读取文件的内容，给文件加锁的时候报错了。但是奇怪的是，本地调试的时候发现服务都是可以正常运行的，文件加锁也是没问题的。后来发现，在 <code>openshift</code> 集群中使用的是 <code>NFS</code> 挂载的共享磁盘。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息</span>
 Traceback <span class="token punctuation">(</span>most recent call last<span class="token punctuation">)</span>:
@@ -952,21 +952,21 @@ the scope of locks was limited to the local system<span class="token punctuation
 NFS clients support flock<span class="token punctuation">(</span><span class="token punctuation">)</span> locks by emulating them as byte-range locks on the entire file.
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="11-Docker-默认使用网段"><a href="#11-Docker-默认使用网段" class="headerlink" title="11. Docker 默认使用网段"></a>11. Docker 默认使用网段</h2><blockquote>
+<h2 id="11-Docker-使用默认网段"><a href="#11-Docker-使用默认网段" class="headerlink" title="11. Docker 使用默认网段"></a>11. Docker 使用默认网段</h2><blockquote>
 <p><strong>启动的容器网络无法相互通信，很是奇怪！</strong></p>
 </blockquote>
 <ul>
-<li><strong>[问题起因]</strong> 我们在使用 <code>Docker</code> 启动服务的时候，发现有时候服务之前可以相互连通，而有时间启动的多个服务之前却出现了无法访问的情况。究其原因，发现原来是因为使用的内部私有地址网段不一致导致的。有点服务启动到了 <code>172.17 - 172.31</code> 的网段，有的服务跑到了 <code>192.169.0 - 192.168.224</code> 的网段，这样导致服务启动之后出现无法访问的情况。</li>
+<li><strong>[问题起因]</strong> 我们在使用 <code>Docker</code> 启动服务的时候，发现有时候服务之前可以相互连通，而有时启动的多个服务之前却出现了无法访问的情况。究其原因，发现原来是因为使用的内部私有地址网段不一致导致的。有的服务启动到了 <code>172.17 - 172.31</code> 的网段，有的服务跑到了 <code>192.169.0 - 192.168.224</code> 的网段，这样导致服务启动之后出现无法访问的情况(默认情况下，有下面这个两个网段可供其使用)。</li>
 </ul>
 <p><img src="../images/docker-have-some-trouble-2.png" alt="Docker默认使用网段"></p>
 <ul>
-<li><strong>[解决方法]</strong> 上述问题的处理方式，就是手动指定 <code>Docker</code> 服务的启动网段，就可以了。</li>
+<li><strong>[解决方法]</strong> 上述问题的处理方式，就是手动指定 <code>Docker</code> 服务的启动网段，二选一就可以了。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看docker容器配置</span>
 $ <span class="token function">cat</span> /etc/docker/daemon.json
 <span class="token punctuation">{</span>
     <span class="token string">"registry-mirrors"</span><span class="token keyword">:</span> <span class="token punctuation">[</span><span class="token string">"https://vec0xydj.mirror.aliyuncs.com"</span><span class="token punctuation">]</span>,
-    <span class="token string">"default-address-pools"</span>:<span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"base"</span><span class="token keyword">:</span><span class="token string">"172.17.0.0/12"</span>,<span class="token string">"size"</span>:24<span class="token punctuation">}</span><span class="token punctuation">]</span>,
+    <span class="token string">"default-address-pools"</span>:<span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"base"</span><span class="token keyword">:</span><span class="token string">"172.17.0.0/12"</span>, <span class="token string">"size"</span>:24<span class="token punctuation">}</span><span class="token punctuation">]</span>,
     <span class="token string">"experimental"</span><span class="token keyword">:</span> true,
     <span class="token string">"default-runtime"</span><span class="token keyword">:</span> <span class="token string">"nvidia"</span>,
     <span class="token string">"live-restore"</span><span class="token keyword">:</span> true,
@@ -983,7 +983,7 @@ $ <span class="token function">cat</span> /etc/docker/daemon.json
 <p><strong>使用 docker-compose 命令各自启动两组服务，发现服务会串台！</strong></p>
 </blockquote>
 <ul>
-<li><strong>[问题起因]</strong> 在两个不同名称的目录目录下面，使用 <code>docker-compose</code> 来启动服务，发现当 <code>A</code> 组服务启动完毕之后，再启动 <code>B</code> 组服务的时候，发现 <code>A</code> 组当中对应的一部分服务又重新启动了一次，这就非常奇怪了！因为这个问题的存在会导致，<code>A</code> 组服务和 <code>B</code> 组服务无法同时启动。之前还以为是工具的 <code>Bug</code>，后来请教了“上峰”，才知道了原因，恍然大悟。</li>
+<li><strong>[问题起因]</strong> 在两个不同名称的目录目录下面，使用 <code>docker-compose</code> 来启动服务，发现当 <code>A</code> 组服务启动完毕之后，再启动 <code>B</code> 组服务的时候，发现 <code>A</code> 组当中对应的一部分服务又重新启动了一次，这就非常奇怪了！因为这个问题的存在会导致，<code>A</code> 组服务和 <code>B</code> 组服务无法同时启动。之前还以为是工具的 <code>Bug</code>，后来请教了 <strong>“上峰”</strong>，才知道了原因，恍然大悟。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 服务目录结构如下所示</span>
 A: /data1/app/docker-compose.yml
@@ -1001,7 +1001,7 @@ A: /data1/app-old/docker-compose.yml
 B: /data2/app-new/docker-compose.yml
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li>或者使用 <code>docker-compose</code> 命令提供的参数 <code>-p</code> 来规避该问题的发生。</li>
+<li>或者使用 <code>docker-compose</code> 命令提供的参数 <code>-p</code> 手动指定标签，来规避该问题的发生。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 指定项目项目名称</span>
 $ docker-compose -f ./docker-compose.yml -p app1 up -d
@@ -1015,7 +1015,7 @@ $ docker-compose -f ./docker-compose.yml -p app1 up -d
 </ul>
 <p><img src="../images/docker-have-some-trouble-5.png" alt="Docker命令调用报错"></p>
 <ul>
-<li>随即，查看了脚本发现报错地方是执行了一个 <code>exec</code> 的 <code>docker</code> 命令，大致如下所示。很奇怪的是，手动执行或直接调脚本的时候，怎么都是没有问题的，但是等到 <code>CI</code> 调用的时候怎么都是有问题。后来好好看下下面这个命令，注意到 <code>-it</code> 这个参数了。</li>
+<li>随即，查看了脚本发现报错地方是执行了一个 <code>exec</code> 的 <code>docker</code> 命令，大致如下所示。很奇怪的是，手动执行或直接调脚本的时候，怎么都是没有问题的，但是等到 <code>CI</code> 调用的时候怎么都是有问题。后来好好看下，下面这个命令，注意到 <code>-it</code> 这个参数了。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 脚本调用docker命令</span>
 docker <span class="token function">exec</span> -it <span class="token operator">&lt;</span>container_name<span class="token operator">></span> psql -Upostgres <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
@@ -1134,7 +1134,7 @@ $ docker rmi <span class="token punctuation">$(</span>docker images --filter <sp
 <p><strong>切换 Docker 启动用户的话，还是需要注意下权限问题的！</strong></p>
 </blockquote>
 <ul>
-<li><strong>[问题起因]</strong> 我们都知道在 <code>Docker</code> 容器里面使用 <code>root</code> 用户的话，是不安全的，很容易出现越权的安全问题，所以一般情况下，我们都会使用普通用户来代替 <code>root</code> 进行服务的启动和管理的。今天给一个服务切换用户的时候，发现 <code>Nginx</code> 服务一直无法启动，提示如下权限问题。因为对应的配置文件也没有配置 <code>var</code> 相关的目录，无奈 🤷‍♀ ！️</li>
+<li><strong>[问题起因]</strong> 我们知道在 <code>Docker</code> 容器里面使用 <code>root</code> 用户的话，是不安全的，很容易出现越权的安全问题，所以一般情况下，我们都会使用普通用户来代替 <code>root</code> 进行服务的启动和管理的。今天给一个服务切换用户的时候，发现 <code>Nginx</code> 服务一直无法启动，提示如下权限问题。因为对应的配置文件也没有配置 <code>var</code> 相关的目录，无奈 🤷‍♀ ！️</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Nginx报错信息</span>
 nginx: <span class="token punctuation">[</span>alert<span class="token punctuation">]</span> could not <span class="token function">open</span> error log file: open<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token string">"/var/log/nginx/error.log"</span> failed <span class="token punctuation">(</span>13: Permission denied<span class="token punctuation">)</span>
@@ -1350,6 +1350,71 @@ command: <span class="token function">tail</span> -f /dev/null
 tty: <span class="token boolean">true</span>
 entrypoint: <span class="token function">tail</span> -f /dev/null
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>同理，我们在使用 <code>docker-compose</code> 或者 <code>k8s</code> 平台部署服务的时候，也有时会因为启动问题需要，使启动的服务不直接退出，来手动调试和排查问题原因。所以，我这里记录下其不同部署方式的，暂停方式。</li>
+</ul>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token comment" spellcheck="true"># Compose</span>
+
+<span class="token key atrule">version</span><span class="token punctuation">:</span> <span class="token string">"3"</span>
+<span class="token key atrule">services</span><span class="token punctuation">:</span>
+  <span class="token key atrule">app</span><span class="token punctuation">:</span>
+    <span class="token key atrule">image</span><span class="token punctuation">:</span> ubuntu<span class="token punctuation">:</span>latest
+    <span class="token key atrule">tty</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+    <span class="token key atrule">command</span><span class="token punctuation">:</span> <span class="token string">"/usr/bin/tail -f /dev/null"</span>
+    <span class="token comment" spellcheck="true"># command: bash -c "sleep 99999999"</span>
+    <span class="token comment" spellcheck="true"># command: bash -c "sleep infinity"</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token comment" spellcheck="true"># K8S</span>
+
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> Pod
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> ubuntu
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">containers</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> ubuntu
+      <span class="token key atrule">image</span><span class="token punctuation">:</span> ubuntu<span class="token punctuation">:</span>latest
+      <span class="token key atrule">command</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"/bin/bash"</span><span class="token punctuation">,</span> <span class="token string">"-c"</span><span class="token punctuation">,</span> <span class="token string">"--"</span><span class="token punctuation">]</span>
+      <span class="token key atrule">args</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"while true; do sleep 30; done;"</span><span class="token punctuation">]</span>
+      <span class="token comment" spellcheck="true"># command: ["sleep"]</span>
+      <span class="token comment" spellcheck="true"># args: ["infinity"]</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="23-Docker-不使用默认网段"><a href="#23-Docker-不使用默认网段" class="headerlink" title="23. Docker 不使用默认网段"></a>23. Docker 不使用默认网段</h2><blockquote>
+<p><strong>有些情况，内部规划的网段和可能和 Dockerd 默认的网段有冲突，导致异常出现！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 今天在新机器上面，部署了一整套服务(多台机器)，服务部署完毕之后，通过前置 <code>Nginx</code> 服务发现并不能访问，后置机器开放的端口，发现发到对应端口的请求都没有转发出去。这就比较奇怪了，因为端口控制是已经开通了的，不应该出现不通的情况。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">➜ nc -v 172.16.100.12 8000
+nc: connect to 172.16.100.12 port 8000 <span class="token punctuation">(</span>tcp<span class="token punctuation">)</span> failed: Connection refused
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 发现服务器端口不通，我这里怀疑可能是 <code>dockerd</code> 服务启动导致的，所以我先将服务都停掉，直接在机器上面启动了 <code>Python</code> 的服务端程序(<code>Linux</code> 机器自带 <code>Python2.7.x</code> 的版本)，然后在前置 <code>Nginx</code> 服务发现，端口确实是通的。后来，排除发现是内部服务默认网段和 <code>dockerd</code> 服务启动的默认网段是冲突的，导致重写了机器的防火墙规则，导致出现上述异常的。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ python -m SimpleHTTPServer 8000
+Serving HTTP on 0.0.0.0 port 8000 <span class="token punctuation">..</span>.
+
+➜ nc -v 172.16.100.12 8000
+Connection to 172.16.100.12 8000 port <span class="token punctuation">[</span>tcp/*<span class="token punctuation">]</span> succeeded<span class="token operator">!</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>既然问题已经知道了，现在需要做的就是非常简单了：不适用默认网段！通过 <a target="_blank" rel="noopener" href="https://docs.mirantis.com/mke/3.4/install/plan-deployment/mcr-considerations/default-address-pools.html">『mirantis』</a> 里面，我们可以选择进行设置，然后重启服务 <code>dockerd</code> 服务，即可。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 修改配置</span>
+$ <span class="token function">sudo</span> <span class="token function">cat</span> /etc/docker/daemon.json
+<span class="token punctuation">{</span>
+  <span class="token string">"default-address-pools"</span>:<span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"base"</span><span class="token keyword">:</span><span class="token string">"192.168.100.0/20"</span>,<span class="token string">"size"</span>:24<span class="token punctuation">}</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true"># 重启服务</span>
+$ <span class="token function">sudo</span> systemctl restart docker
+
+<span class="token comment" spellcheck="true"># 启动服务验证是否生效</span>
+$ ip a
+$ docker network inspect app <span class="token operator">|</span> <span class="token function">grep</span> Subnet
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="../images/docker-have-some-trouble-7.png" alt="Docker 不使用默认网段"></p>
 
                 
             </div>
@@ -1894,7 +1959,7 @@ entrypoint: <span class="token function">tail</span> -f /dev/null
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1150.7k</span>
+                        class="white-color">1151.3k</span>
             
             
             
