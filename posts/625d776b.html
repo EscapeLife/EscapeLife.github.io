@@ -29,9 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
-
+<meta name="generator" content="Hexo 5.4.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-10-19
+                    2022-01-16
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.5k
+                    2.8k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    10 分
+                    11 分
                 </div>
                 
 
@@ -742,6 +742,43 @@ $ <span class="token function">git</span> <span class="token function">fsck</spa
 但是如果你使用的是JB<span class="token punctuation">(</span>jetbrains<span class="token punctuation">)</span>家的IDE工具，可以通过自带的文件历史功能成功恢复！<span class="token operator">=</span><span class="token operator">></span> 右键菜单本地历史功能
 想了想，JB<span class="token punctuation">(</span>jetbrains<span class="token punctuation">)</span>家的东西真香呀！
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="9-Git-忽略冗余文件"><a href="#9-Git-忽略冗余文件" class="headerlink" title="9. Git 忽略冗余文件"></a>9. Git 忽略冗余文件</h2><blockquote>
+<p><strong>使用过苹果电脑的话，肯定只有默认会给目录生成的 <code> .DS_Store</code> 文件。</strong></p>
+</blockquote>
+<ul>
+<li><strong>问题描述：</strong> 在 <code>macOS</code> 系统上面，我们会看到每个目录都会存在一个名为 <code>.DS_Store</code> 的隐藏文件。其作用就是以告诉 <code>Finder</code> 应该如何显示它，但是 <code>99%</code> 的时间我们都不关心它，尤其是在代码库中，我们更不愿意或者关注它。虽然，可以在代码库里面使用 <code>.gitignore</code> 文件进行忽略，但是每个项目都要来一遍，也挺麻烦的。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">➜ <span class="token function">ls</span> -lh
+-rw-r--r--@   1 escape  staff    22K Jan 16 15:39 .DS_Store
+drwx------   48 escape  staff   1.5K Jan 16 16:05 .Trash
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>解决方法：</strong> 如果做到一次配置，全局忽略 <code>.DS_Store</code> 呢，就是我们继续要解决的问题。<code>Git</code> 中可以通过设置 <code>core.exclusudesfile</code> 变量来指定全局的 <code>gignore</code> 文件。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 忽略你需要忽略的文件</span>
+
+<span class="token comment" spellcheck="true"># Logs</span>
+*.log
+
+<span class="token comment" spellcheck="true"># OS generated files</span>
+.DS_Store
+$ <span class="token function">cat</span> .gitignore_global
+.DS_Store
+.Spotlight-V100
+.Trashes
+Thumbs.db
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 创建全局配置文件 => gitignore</span>
+$ <span class="token function">ln</span> -s /Users/escape/fuckcode/dotfiles/.gitignore_global /Users/escape/.gitignore
+
+<span class="token comment" spellcheck="true"># 设置Git配置对应文件</span>
+$ <span class="token function">git</span> config --global core.excludesfile ~/.gitignore
+
+<span class="token comment" spellcheck="true"># 或者在配置文件里面添加对应内容</span>
+$ <span class="token function">cat</span> .gitconfig
+excludesfile <span class="token operator">=</span> ~/.gitignore
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1290,7 +1327,7 @@ $ <span class="token function">git</span> <span class="token function">fsck</spa
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1151.3k</span>
+                        class="white-color">1151.6k</span>
             
             
             
