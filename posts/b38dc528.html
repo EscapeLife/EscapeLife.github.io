@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-12-28
+                    2022-01-18
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    893
+                    1.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    3 分
+                    4 分
                 </div>
                 
 
@@ -566,6 +566,60 @@ location / <span class="token punctuation">{</span>
     <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="3-配置多个-HTTPS-主机"><a href="#3-配置多个-HTTPS-主机" class="headerlink" title="3. 配置多个 HTTPS 主机"></a>3. 配置多个 HTTPS 主机</h2><blockquote>
+<p><strong>在 Nginx 服务上如何在同一个 IP 上配置多个 HTTPS 主机呢？</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 最近有个需求，就是需要保证新旧域名同时运行。那么，这就需要对于 <code>https</code> 的域名，在同一个 <code>IP</code> 上如何同时存在多个虚拟主机了。</li>
+</ul>
+<p><img src="../images/nginx-diseases-all-list-04.jpg" alt="Nginx疑难杂症汇总 - 配置多个HTTPS主机"></p>
+<ul>
+<li><strong>[解决方法]</strong> <code>Nginx</code> 支持 <code>SSL</code> 需要使用 <code>--http_ssl_module</code> 这个模块，如果使用的版本没有安装的话，则需要手动安装或者使用新版本。我们这里使用的 <code>Docker</code> 容器镜像，该版本默认是支持的。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 手动编译安装SSL支持</span>
+$ ./configure --prefix<span class="token operator">=</span>/usr/local/nginx \
+    --with-http_ssl_module \
+    --with-openssl-opt<span class="token operator">=</span><span class="token string">"enable-tlsext"</span> <span class="token punctuation">..</span>.
+
+<span class="token comment" spellcheck="true"># 编译并安装</span>
+$ <span class="token function">make</span> <span class="token operator">&amp;&amp;</span> <span class="token function">make</span> <span class="token function">install</span>
+
+<span class="token comment" spellcheck="true"># 查看版本是否支持SSL功能</span>
+root@7e201233b8e1:/<span class="token comment" spellcheck="true"># nginx -V | grep ssl</span>
+nginx version: nginx/1.19.10
+built by gcc 8.3.0 <span class="token punctuation">(</span>Debian 8.3.0-6<span class="token punctuation">)</span>
+built with OpenSSL 1.1.1d  10 Sep 2019
+TLS SNI support enabled
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">listen</span>       <span class="token number">443</span> <span class="token keyword">ssl</span> default_server<span class="token punctuation">;</span>
+    <span class="token keyword">server_name</span>  www<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>site<span class="token punctuation">;</span>
+
+    <span class="token keyword">ssl_certificate</span>            <span class="token string">"/xxx/escapelife_site.crt"</span><span class="token punctuation">;</span>
+    <span class="token keyword">ssl_certificate_key</span>        <span class="token string">"/xxx/escapelife_site.key"</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+        <span class="token keyword">proxy_http_version</span> <span class="token number">1.1</span><span class="token punctuation">;</span>
+        <span class="token keyword">proxy_set_header</span> Host <span class="token variable">$http_host</span><span class="token punctuation">;</span>
+        <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">123.100</span><span class="token punctuation">:</span><span class="token number">8000</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">listen</span>       <span class="token number">443</span> <span class="token keyword">ssl</span><span class="token punctuation">;</span>
+    <span class="token keyword">server_name</span>  www<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
+
+    <span class="token keyword">ssl_certificate</span>            <span class="token string">"/xxx/escapelife_com.crt"</span><span class="token punctuation">;</span>
+    <span class="token keyword">ssl_certificate_key</span>        <span class="token string">"/xxx/escapelife_com.key"</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+        <span class="token keyword">proxy_http_version</span> <span class="token number">1.1</span><span class="token punctuation">;</span>
+        <span class="token keyword">proxy_set_header</span> Host <span class="token variable">$http_host</span><span class="token punctuation">;</span>
+        <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">123.101</span><span class="token punctuation">:</span><span class="token number">8000</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1110,7 +1164,7 @@ location / <span class="token punctuation">{</span>
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1151.6k</span>
+                        class="white-color">1151.9k</span>
             
             
             
