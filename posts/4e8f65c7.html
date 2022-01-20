@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-12-18
+                    2022-01-20
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.2k
+                    1.7k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    4 分
+                    6 分
                 </div>
                 
 
@@ -562,6 +562,25 @@ scheduler.conf             Jun 17, 2021 <span class="token punctuation">..</span
 <li>然后重启 <code>kubelet systemctl restart kubelet</code> 服务</li>
 <li>查看 <code>k8s</code> 容器的状态，如果 <code>pod</code> 不全就删了其他的 <code>pod</code>，再重启一下 <code>kubelet</code> 服务</li>
 <li>如果不行就进到 <code>kube-system namespace</code> 界面，在守护进程集把对应的容器组删了，让 <code>k8s</code> 从新拉起一组</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-Kubernetes-跳板机实例配置"><a href="#3-Kubernetes-跳板机实例配置" class="headerlink" title="3. Kubernetes 跳板机实例配置"></a>3. Kubernetes 跳板机实例配置</h2><blockquote>
+<p><strong>这里只是记录一下，顺便后续自己需要的时候看看。</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 之前 <code>AWS</code> 上跳板机的 <code>NAT</code> 实例 <code>gateway</code> 上面忘记配置下面这个防火墙规则，导致内网无法 <code>ping</code> 通外网的 <code>IP</code>。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> sysctl -w net.ipv4.ip_forward<span class="token operator">=</span>1
+$ <span class="token function">sudo</span> iptables -A FORWARD -i eth0 -j ACCEPT
+$ <span class="token function">sudo</span> iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 这里记一下，上面三条命令到底做了什么呢？<ul>
+<li><strong>第一条：</strong>配置 <code>Linux</code> 内核参数，主要是用来把 <code>Linux</code> 当成路由器来用。一般来说，一个路由器至少要有两个网络接口，一个是 <code>WAN</code>，另一个是 <code>LAN</code>，为了让 <code>LAN</code> 和 <code>WAN</code> 的流量相通，需要进行内核上路由转发。</li>
+<li><strong>第二条：</strong>通行所有需要转发的包，只有机器成为一个路由器时，需要在两个网卡间进行网络包转发时，才需要配置这条规则。</li>
+<li><strong>第三条：</strong>关键字 <code>MASQUERADE</code> 意思是“伪装“，<code>NAT</code> 的工作原理是就像是个宿舍收发室对学生宿舍一样，学生宿舍的地址外部不可见邮递员只看得见整栋宿舍收发室的地址，邮递员把快递交给收发室，收发室再把快递转给学习宿舍（反之，如果学生要对外寄邮件，也是先到收发室，收发室传给邮局）。现在的问题是，所有的学生宿舍如何才能参与到任何快递的通信中，如果把学生宿舍地址发到外部，则没人能把信送回来。如果这个收发室是个自动化的机器人，他要干的事就是，把学生宿舍的地址换成收发室地址。这就是 <code>MASQUERADE</code> 的意思 —— 来自具有接收方 <code>1</code> 地址的本地网络到达 <code>Internet</code> 某处的数据包必须进行修改，也就是让发送方的地址等于路由器的地址</li>
 </ul>
 </li>
 </ul>
@@ -1097,7 +1116,7 @@ scheduler.conf             Jun 17, 2021 <span class="token punctuation">..</span
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1152.2k</span>
+                        class="white-color">1152.7k</span>
             
             
             
