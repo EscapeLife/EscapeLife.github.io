@@ -466,14 +466,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-09-29
+                    2022-02-11
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.3k
+                    2.4k
                 </div>
                 
 
@@ -629,6 +629,25 @@ $ docker run -d \
     nginx:latest
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><img src="../images/docker-data-save-way-2.svg" alt="Docker数据管理"></p>
+<ul>
+<li><strong>[4] 容器数据卷迁移</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 备份数据卷容器(备份dbdata数据卷到backup目录下面)</span>
+$ <span class="token function">sudo</span> docker run --volumes-from dbdata -v <span class="token variable"><span class="token variable">$(</span><span class="token function">pwd</span><span class="token variable">)</span></span>:/backup ubuntu \
+    <span class="token function">tar</span> cvf /backup/backup.tar /dbdata
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 恢复数据卷容器</span>
+
+<span class="token comment" spellcheck="true"># 创建一个带有空数据卷的容器(其中dbdata2为容器名称)</span>
+$ <span class="token function">sudo</span> docker run -v /dbdata --name dbdata2 ubuntu /bin/bash
+
+<span class="token comment" spellcheck="true"># 创建另一个容器并挂载dbdata2容器卷中的数据</span>
+$ <span class="token function">sudo</span> docker run --volumes-from dbdata2 -v <span class="token variable"><span class="token variable">$(</span><span class="token function">pwd</span><span class="token variable">)</span></span>:/backup busybox \
+    <span class="token function">tar</span> xvf /backup/backup.tar
+
+<span class="token comment" spellcheck="true"># 查看/验证恢复的数据(再启动一个容器挂载同样的容器卷)</span>
+$ <span class="token function">sudo</span> docker run --volumes-from dbdata2 busybox /bin/ls /dbdata
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="3-挂载主机目录-bind-mounts"><a href="#3-挂载主机目录-bind-mounts" class="headerlink" title="3. 挂载主机目录 - bind mounts"></a>3. 挂载主机目录 - bind mounts</h2><blockquote>
 <p><strong>挂载主机目录是将主机中的特定目录直接挂在到容器内部使用</strong></p>
@@ -1376,7 +1395,7 @@ $ <span class="token function">tail</span> -f `docker inspect --format<span clas
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1171.1k</span>
+                        class="white-color">1171.3k</span>
             
             
             
