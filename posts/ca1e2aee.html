@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-02-11
+                    2022-02-15
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    140
+                    690
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    2 分
                 </div>
                 
 
@@ -505,15 +505,99 @@
 <p><strong>因为 grpc 依赖 protobuf 包，但是指定了版本后并不会强制更新 protobuf 版本！</strong></p>
 </blockquote>
 <ul>
-<li><strong>问题描述：</strong>项目自动化执行 <code>Unit</code> 测试的时候，提示如下所示的错误。</li>
+<li><strong>问题描述：</strong> 项目自动化执行 <code>Unit</code> 测试的时候，提示如下所示的错误。</li>
 </ul>
 <p><img src="../images/python-use-problems-01.png" alt="Python常见零碎问题汇总 - 单元测试依赖问题"></p>
 <ul>
-<li><strong>解决方法：</strong>搜了下，看到 <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/61922334/how-to-solve-attributeerror-module-google-protobuf-descriptor-has-no-attribu">StackOverFlow</a> 上面有人之前提问题，也有对应解决方法。</li>
+<li><strong>解决方法：</strong> 搜了下，看到 <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/61922334/how-to-solve-attributeerror-module-google-protobuf-descriptor-has-no-attribu">StackOverFlow</a> 上面有人之前提问题，也有对应解决方法。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 是因为protobuf版本太低导致</span>
 ➜ pip3 <span class="token function">install</span> --upgrade protobuf
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="2-Python-dump-文件无法生成"><a href="#2-Python-dump-文件无法生成" class="headerlink" title="2. Python dump 文件无法生成"></a>2. Python dump 文件无法生成</h2><blockquote>
+<p><strong>Python doesn’t dump core files！</strong></p>
+</blockquote>
+<ul>
+<li><strong>问题描述：</strong>收到反馈，说是程序异常之后，提示生成了 <code>core dump</code> 文件，但是整个系统都没有找到对应文件。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查了下确实没有</span>
+<span class="token function">find</span> ./ -name <span class="token string">"code.*"</span> -type f
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><p><strong>解决方法：</strong> 搜了下，看到下面这个两个有用的链接，提及了可能出现的四个原因。首先，我们需要了解 <code>core</code> 文件是什么。某些信号的操作是导致进程终止并生成核心转储文件(<code>core</code>)，包含终止时进程内存的映像，主要用于程序崩溃时调试找原因用的。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://superuser.com/questions/621877/python-doesnt-dump-core-files">StackExchange - Python doesn’t dump core files</a></li>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/7732983/core-dump-file-is-not-generated">StackOverflow - Core dump file is not generated</a></li>
+</ul>
+</li>
+<li><p><strong>unlimited</strong></p>
+<ul>
+<li>使用 <code>ulimit -c</code> 确认系统是否能够生成 <code>core</code> 文件</li>
+<li>若为 <code>0</code>，说明禁用了 <code>core</code> 文件生成(根据需要配置大小；以 <code>KB</code> 为单位)</li>
+<li>若为 <code>unlimited</code>，说明对生成 <code>core</code> 文件的大小没有限制</li>
+</ul>
+</li>
+<li><p><strong>suid_dumpable</strong></p>
+<ul>
+<li>在默认情况下系统不会为 <code>seteuid()/setegid()</code> 进程生成 <code>core dump</code> 文件的</li>
+<li>为了能够让这些进程生成 <code>core dump</code> 文件，需要将 <code>suid_dumpable</code> 文件的内容改为 <code>1</code></li>
+</ul>
+</li>
+<li><p><strong>core_uses_pid</strong></p>
+<ul>
+<li>设置 pid 作为扩展名</li>
+<li>0: 不添加 pid 作为扩展名；生成的文件名称为 core；新的 core 会覆盖已存在的 core</li>
+<li>1: 可以将进程的 pid 作为作为扩展名；生成的 core 文件格式为 core.xxx；其中 xxx 即为 pid</li>
+</ul>
+</li>
+<li><p><strong>core_pattern</strong></p>
+<ul>
+<li>设置 core 文件保存位置和格式</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># unlimited</span>
+$ <span class="token function">ulimit</span> -c
+unlimited
+
+<span class="token comment" spellcheck="true"># suid_dumpable</span>
+$ <span class="token function">cat</span> /proc/sys/fs/suid_dumpable
+2
+
+<span class="token comment" spellcheck="true"># core_uses_pid</span>
+$ <span class="token function">cat</span> /proc/sys/kernel/core_uses_pid
+0
+
+<span class="token comment" spellcheck="true"># core_pattern</span>
+$ <span class="token function">cat</span> /proc/sys/kernel/core_pattern
+<span class="token operator">|</span>/usr/share/apport/apport %p %s %c %d %P %E
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>所以，知道上述知识之后，可以通过如下配置临时修改环境，使其能够生成 <code>core dump</code> 文件。<ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/li-hao/archive/2011/09/25/2190278.html">linux 下 core 文件调试方法</a></li>
+<li><a target="_blank" rel="noopener" href="https://b.sundayle.com/coredump/">Linux 开启 core dump</a></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 临时修改</span>
+$ <span class="token function">sudo</span> <span class="token function">ulimit</span> -c unlimited
+$ <span class="token keyword">echo</span> <span class="token string">"1"</span> <span class="token operator">|</span> <span class="token function">sudo</span> <span class="token function">tee</span> /proc/sys/fs/suid_dumpable
+$ <span class="token keyword">echo</span> <span class="token string">"1"</span> <span class="token operator">|</span> <span class="token function">sudo</span> <span class="token function">tee</span> /proc/sys/kernel/core_uses_pid
+$ <span class="token keyword">echo</span> <span class="token string">"/home/vagrant/core-%e-%p-%t"</span> <span class="token operator">|</span> <span class="token function">sudo</span> <span class="token function">tee</span> /proc/sys/kernel/core_pattern
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 永久修改</span>
+$ <span class="token keyword">echo</span> <span class="token string">"ulimit -c unlimited"</span> <span class="token operator">|</span> <span class="token function">sudo</span> /etc/profile
+$ <span class="token keyword">echo</span> <span class="token string">"kernel.suid_dumpable = 1"</span> <span class="token operator">|</span> <span class="token function">sudo</span> /etc/sysctl.conf
+$ <span class="token keyword">echo</span> <span class="token string">"kernel.core_uses_pid = 1"</span> <span class="token operator">|</span> <span class="token function">sudo</span> /etc/sysctl.conf
+$ <span class="token keyword">echo</span> <span class="token string">"kernel.core_pattern = /home/vagrant/core-%e-%p-%t"</span> <span class="token operator">|</span> <span class="token function">sudo</span> /etc/sysctl.conf
+$ <span class="token function">sudo</span> sysctl -p
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 测试方式</span>
+$ <span class="token keyword">set</span> -x
+$ <span class="token function">sleep</span> 120 <span class="token operator">&amp;</span>
+$ <span class="token function">kill</span> -abrt <span class="token variable">$!</span><span class="token punctuation">;</span> <span class="token function">ls</span> core*
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1058,7 +1142,7 @@
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1171.8k</span>
+                        class="white-color">1172.4k</span>
             
             
             
