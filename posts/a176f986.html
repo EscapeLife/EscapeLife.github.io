@@ -466,14 +466,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-09-29
+                    2022-02-28
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.7k
+                    2.6k
                 </div>
                 
 
@@ -503,12 +503,13 @@
                 <blockquote>
 <p><strong>纸上得来终觉浅，绝知此事要躬行。</strong></p>
 </blockquote>
+<p><code>Linux</code> 的文件权限，远不止 <code>rwx</code> 那么简单，还有一些特殊权限是用来打破限制和默认的安全上下文规则的，除了之前介绍过的隐藏属性，还有几个显式的特殊权限。下面就来说说 <code>Linux</code> 文件系统上的 <code>SUID</code>，<code>SGID</code> 和 <code>Sticky</code> 权限。</p>
 <p><img src="/images/suid.jpg" alt="Linux文件系统上的特殊权限"></p>
 <hr>
-<blockquote>
-<p>Linux 的文件权限，远不止 rwx 那么简单，还有一些特殊权限是用来打破限制和默认的安全上下文规则的，除了之前介绍过的隐藏属性，还有几个显式的特殊权限。下面就来说说 Linux 文件系统上的 SUID，SGID 和 Sticky 权限。</p>
+<h2 id="1-权限分类"><a href="#1-权限分类" class="headerlink" title="1. 权限分类"></a>1. 权限分类</h2><blockquote>
+<p><strong>Linux 系统上面关于用户、组、其他的人的权限的基本分类</strong></p>
 </blockquote>
-<h2 id="1-权限"><a href="#1-权限" class="headerlink" title="1. 权限"></a>1. 权限</h2><ul>
+<ul>
 <li><code>user</code><ul>
 <li><code>r</code></li>
 <li><code>w</code></li>
@@ -548,10 +549,10 @@
 </li>
 </ul>
 </li>
-<li><strong>目录 - rwx - 说明</strong><ul>
+<li><strong>文件 - rwx - 说明</strong><ul>
 <li><code>r</code><ul>
 <li>可读取此文件的内容</li>
-<li>即可以打开文件</li>
+<li>即可以读取文件</li>
 </ul>
 </li>
 <li><code>w</code><ul>
@@ -567,185 +568,161 @@
 </li>
 </ul>
 <hr>
-<h2 id="2-安全上下文"><a href="#2-安全上下文" class="headerlink" title="2. 安全上下文"></a>2. 安全上下文</h2><p><strong>前提：进程有属主和属组；文件有属主和属组</strong></p>
+<h2 id="2-安全上下文"><a href="#2-安全上下文" class="headerlink" title="2. 安全上下文"></a>2. 安全上下文</h2><blockquote>
+<p><strong>前提：进程有属主和属组；文件有属主和属组</strong></p>
+</blockquote>
 <ul>
 <li>(1) 任何一个可执行程序文件能不能启动为进程，取决发起者对程序文件是否拥有执行权限</li>
 <li>(2) 启动为进程之后，其进程的属主为发起者，进程的属组为发起者所属的组</li>
-<li>(3) 进程访问文件时的权限，取决于进程的发起者</li>
+<li>(3) 进程访问文件时的权限，取决于进程的发起者<ul>
 <li>(a) 进程的发起者，同文件的属主，则应用文件属主权限</li>
 <li>(b) 进程的发起者，属于文件的属组，则应用文件属组权限</li>
 <li>(c) 应用文件“其它”权限</li>
 </ul>
+</li>
+</ul>
 <hr>
 <h2 id="3-特殊权限"><a href="#3-特殊权限" class="headerlink" title="3. 特殊权限"></a>3. 特殊权限</h2><h3 id="3-1-SUID"><a href="#3-1-SUID" class="headerlink" title="3.1 SUID"></a>3.1 SUID</h3><ul>
-<li>(1) 任何一个可执行程序文件能不能启动为进程，取决发起者对程序文件是否拥有执行权限</li>
-<li>(2) 启动为进程之后，其进程的属主为原程序文件的属主</li>
+<li><strong>含义解释</strong><ul>
+<li>任何一个可执行程序文件能不能启动为进程，取决发起者对程序文件是否拥有执行权限</li>
+<li>启动为进程之后，其进程的属主为原程序文件的属主</li>
 </ul>
-<p><strong>权限设定：</strong><br><code>chmod u+s FILE...</code><br><code>chmod u-s FILE...</code></p>
+</li>
+<li><strong>权限设定</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">chmod</span> u+s FILE<span class="token punctuation">..</span>.
+$ <span class="token function">chmod</span> u-s FILE<span class="token punctuation">..</span>.
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="3-2-SGID"><a href="#3-2-SGID" class="headerlink" title="3.2 SGID"></a>3.2 SGID</h3><ul>
+<li><strong>含义解释</strong><ul>
 <li>默认情况下，用户创建文件时，其属组为此用户所属的基本组</li>
-<li>一旦某目录被设定了 SGID，则对此目录有写权限的用户在此目录中创建的文件所属的组为此目录的属组</li>
+<li>一旦某目录被设定了 <code>SGID</code>，则对此目录有写权限的用户在此目录中创建的文件所属的组为此目录的属组</li>
 </ul>
-<p><strong>权限设定：</strong><br><code>chmod g+s DIR...</code><br><code>chmod g-s DIR...</code></p>
+</li>
+<li><strong>权限设定</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">chmod</span> g+s DIR<span class="token punctuation">..</span>.
+$ <span class="token function">chmod</span> g-s DIR<span class="token punctuation">..</span>.
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="3-3-Sticky"><a href="#3-3-Sticky" class="headerlink" title="3.3 Sticky"></a>3.3 Sticky</h3><ul>
-<li>对于一个多人可写的目录，如果设置了 sticky，则每个用户仅能删除自己的文件</li>
+<li><strong>含义解释</strong><ul>
+<li>对于一个多人可写的目录，如果设置了 <code>sticky</code>，则每个用户仅能删除自己的文件</li>
 </ul>
-<p><strong>权限设定：</strong></p>
-<p><code>chmod o+t DIR...</code><br><code>chmod o-t DIR...</code></p>
-<p><code>chmod 4777 /tmp/a.txt</code></p>
-<table>
-<thead>
-<tr>
-<th>NUM</th>
-<th>SUID</th>
-<th>SGID</th>
-<th>STICKY</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-</tr>
-<tr>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>1</td>
-</tr>
-<tr>
-<td>2</td>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-</tr>
-<tr>
-<td>3</td>
-<td>0</td>
-<td>1</td>
-<td>1</td>
-</tr>
-<tr>
-<td>4</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-</tr>
-<tr>
-<td>5</td>
-<td>1</td>
-<td>0</td>
-<td>1</td>
-</tr>
-<tr>
-<td>6</td>
-<td>1</td>
-<td>1</td>
-<td>0</td>
-</tr>
-<tr>
-<td>7</td>
-<td>1</td>
-<td>1</td>
-<td>1</td>
-</tr>
-</tbody></table>
+</li>
+<li><strong>权限设定</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">chmod</span> o+t DIR<span class="token punctuation">..</span>.
+$ <span class="token function">chmod</span> o-t DIR<span class="token punctuation">..</span>.
+
+$ <span class="token function">chmod</span> 4777 /tmp/a.txt
+<span class="token operator">|</span> NUM <span class="token operator">|</span> SUID <span class="token operator">|</span> SGID <span class="token operator">|</span> STICKY <span class="token operator">|</span>
+<span class="token operator">|</span> --- <span class="token operator">|</span> ---- <span class="token operator">|</span> ---- <span class="token operator">|</span> ------ <span class="token operator">|</span>
+<span class="token operator">|</span> 0   <span class="token operator">|</span> 0    <span class="token operator">|</span> 0    <span class="token operator">|</span> 0      <span class="token operator">|</span>
+<span class="token operator">|</span> 1   <span class="token operator">|</span> 0    <span class="token operator">|</span> 0    <span class="token operator">|</span> 1      <span class="token operator">|</span>
+<span class="token operator">|</span> 2   <span class="token operator">|</span> 0    <span class="token operator">|</span> 1    <span class="token operator">|</span> 0      <span class="token operator">|</span>
+<span class="token operator">|</span> 3   <span class="token operator">|</span> 0    <span class="token operator">|</span> 1    <span class="token operator">|</span> 1      <span class="token operator">|</span>
+<span class="token operator">|</span> 4   <span class="token operator">|</span> 1    <span class="token operator">|</span> 0    <span class="token operator">|</span> 0      <span class="token operator">|</span>
+<span class="token operator">|</span> 5   <span class="token operator">|</span> 1    <span class="token operator">|</span> 0    <span class="token operator">|</span> 1      <span class="token operator">|</span>
+<span class="token operator">|</span> 6   <span class="token operator">|</span> 1    <span class="token operator">|</span> 1    <span class="token operator">|</span> 0      <span class="token operator">|</span>
+<span class="token operator">|</span> 7   <span class="token operator">|</span> 1    <span class="token operator">|</span> 1    <span class="token operator">|</span> 1      <span class="token operator">|</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="3-4-三个权限位映射"><a href="#3-4-三个权限位映射" class="headerlink" title="3.4 三个权限位映射"></a>3.4 三个权限位映射</h3><blockquote>
-<p>请注意，在权限位上可能会出现<code>s</code>和<code>S</code>，其意义实际上不一样。</p>
+<p>请注意，在权限位上可能会出现 <code>s</code> 和 <code>S</code>，其意义实际上不一样。</p>
 </blockquote>
 <ul>
-<li><p><code>SUID</code>: user, 占据属主的执行权限位</p>
+<li><p><code>SUID</code>: <code>user</code> - 占据属主的执行权限位</p>
 <ul>
-<li><code>s</code>: 属主拥有 x 权限</li>
-<li><code>S</code>：属主没有 x 权限</li>
+<li><code>s</code>: 属主拥有 <code>x</code> 权限</li>
+<li><code>S</code>：属主没有 <code>x</code> 权限</li>
 </ul>
 </li>
-<li><p><code>SGID</code>: group, 占据 group 的执行权限位</p>
+<li><p><code>SGID</code>: <code>group</code> - 占据 <code>group</code> 的执行权限位</p>
 <ul>
-<li><code>s</code>: group 拥有 x 权限</li>
-<li><code>S</code>：group 没有 x 权限</li>
+<li><code>s</code>: <code>group</code> 拥有 <code>x</code> 权限</li>
+<li><code>S</code>：<code>group</code> 没有 <code>x</code> 权限</li>
 </ul>
 </li>
-<li><p><code>Sticky</code>: other, 占据 ohter 的执行权限位</p>
+<li><p><code>Sticky</code>: <code>other</code> - 占据 <code>ohter</code> 的执行权限位</p>
 <ul>
-<li><code>t</code>: other 拥有 x 权限</li>
-<li><code>T</code>：other 没有 x 权限</li>
+<li><code>t</code>: <code>other</code> 拥有 <code>x</code> 权限</li>
+<li><code>T</code>：<code>other</code> 没有 <code>x</code> 权限</li>
 </ul>
 </li>
 </ul>
 <hr>
-<h3 id="3-5-chattr-命"><a href="#3-5-chattr-命" class="headerlink" title="3.5 chattr 命"></a>3.5 chattr 命</h3><ul>
-<li><strong>注释:</strong> ls 是看不到<code>attr</code>属性的，可以用<code>lsattr</code>显示特定属性。</li>
-<li><code>chattr +i xxx</code> 锁定该文件 ，不允许修改，删除，重命名，重定向方式清空也不可以。</li>
-<li><code>chattr -i xxx</code> 去掉锁定。</li>
-<li><code>chattr +a xxx</code>只能&gt;&gt;追加内容，不能删除和减少。</li>
-<li><code>chattr -a xxx</code>去掉只能追加这种锁定</li>
+<h3 id="3-5-chattr-命令"><a href="#3-5-chattr-命令" class="headerlink" title="3.5 chattr 命令"></a>3.5 chattr 命令</h3><blockquote>
+<p><strong>注释:</strong> <code>ls</code> 是看不到 <code>attr</code> 属性的，可以用 <code>lsattr</code> 显示特定属性。</p>
+</blockquote>
+<ul>
+<li><code>chattr +i xxx</code> 锁定该文件 ，不允许修改/删除/重命名/重定向方式清空也不可以</li>
+<li><code>chattr -i xxx</code> 去掉锁定</li>
+<li><code>chattr +a xxx</code> 只能 <code>&gt;&gt;</code> 追加内容，不能删除和减少</li>
+<li><code>chattr -a xxx</code> 去掉只能追加这种锁定</li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ <span class="token function">touch</span> file1
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ chattr +i file1
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ lsattr file1
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">touch</span> file1
+$ chattr +i file1
+$ lsattr file1
 ----i----------- file1
 
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ <span class="token keyword">echo</span> <span class="token string">"escape"</span> <span class="token operator">></span> file1
+$ <span class="token keyword">echo</span> <span class="token string">"escape"</span> <span class="token operator">></span> file1
 -bash: file1: Permission denied
 
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ <span class="token keyword">echo</span> <span class="token string">"escape"</span> <span class="token operator">>></span> file1
+$ <span class="token keyword">echo</span> <span class="token string">"escape"</span> <span class="token operator">>></span> file1
 -bash: file1: Permission denied
 
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ <span class="token function">mv</span> file1 /tmp
+$ <span class="token function">mv</span> file1 /tmp
 mv: cannot remove ‘file1’: Operation not permitted
 
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ <span class="token function">rm</span> file1
+$ <span class="token function">rm</span> file1
 rm: remove regular empty <span class="token function">file</span> ‘file1’? y
 rm: cannot remove ‘file1’: Operation not permitted
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ <span class="token function">touch</span> file2
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ chattr +a file2
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ lsattr file2
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">touch</span> file2
+$ chattr +a file2
+$ lsattr file2
 -----a---------- file2
 
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ <span class="token keyword">echo</span> <span class="token string">"escape"</span> <span class="token operator">></span> file2
+$ <span class="token keyword">echo</span> <span class="token string">"escape"</span> <span class="token operator">></span> file2
 -bash: file2: Operation not permitted
 
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ <span class="token keyword">echo</span> <span class="token string">"escape"</span> <span class="token operator">>></span> file2
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ <span class="token function">cat</span> file2
+$ <span class="token keyword">echo</span> <span class="token string">"escape"</span> <span class="token operator">>></span> file2
+$ <span class="token function">cat</span> file2
 escape
 
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ <span class="token function">rm</span> file2
+$ <span class="token function">rm</span> file2
 rm: remove regular <span class="token function">file</span> ‘file2’? y
 rm: cannot remove ‘file2’: Operation not permitted
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="4-ACL-访问控制列表"><a href="#4-ACL-访问控制列表" class="headerlink" title="4. ACL 访问控制列表"></a>4. ACL 访问控制列表</h2><blockquote>
 <p><strong>ACL：Access Control List</strong> 访问控制列表。除了文件原本的权限位设置，可以自定义用户访问控制。</p>
-<ul>
-<li><code>CentOS 7</code> 默认创建的<code>xfs</code>和<code>ext4</code>文件系统具有<code>ACL</code>功能</li>
-<li><code>CentOS 7</code> 之前版本，系统安装时候创建的文件系统有<code>ACL</code>功能，默认手工创建的<code>ext4</code>文件系统无<code>ACL</code>功 能，需手动增加。</li>
-</ul>
 </blockquote>
+<ul>
+<li><code>CentOS 7</code> 默认创建的 <code>xfs</code> 和 <code>ext4</code> 文件系统具有 <code>ACL</code> 功能</li>
+<li><code>CentOS 7</code> 之前版本，系统安装时候创建的文件系统有 <code>ACL</code> 功能，默认手工创建的 <code>ext4</code> 文件系统无 <code>ACL</code> 功 能，需手动增加。</li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 比如在CentOS6上新加一块磁盘，创建了sdb1分区，可以用下面命令使其支持ACL</span>
-tune2fs –o acl /dev/sdb1
-<span class="token function">mount</span> –o acl /dev/sdb1 /mnt/test
+$ tune2fs –o acl /dev/sdb1
+$ <span class="token function">mount</span> –o acl /dev/sdb1 /mnt/test
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="4-1-getfacl-XXX"><a href="#4-1-getfacl-XXX" class="headerlink" title="4.1 getfacl XXX"></a>4.1 getfacl XXX</h3><ul>
 <li>获取文件或文件夹的权限</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 默认的从上到下的权限依次是：</span>
-<span class="token operator">></span> <span class="token comment" spellcheck="true">#owner:文件的拥有者</span>
-<span class="token operator">></span> <span class="token comment" spellcheck="true">#group：文件的拥有组</span>
+<span class="token comment" spellcheck="true"># owner:文件的拥有者</span>
+<span class="token comment" spellcheck="true"># group：文件的拥有组</span>
 <span class="token operator">></span> user：自定义的用户（可多个）
 <span class="token operator">></span> group：自定义的组（可多个）
 <span class="token operator">></span> other：自定义的其它用户（可多个）
 
 <span class="token comment" spellcheck="true"># 如果一个用户属于多个自定义的组，权限是这几个组的权限的累加。</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ <span class="token function">touch</span> a
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ getfacl a
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">touch</span> a
+$ getfacl a
 <span class="token comment" spellcheck="true"># file: a</span>
 <span class="token comment" spellcheck="true"># owner: root</span>
 <span class="token comment" spellcheck="true"># group: root</span>
@@ -753,8 +730,8 @@ user::rw-
 group::r--
 other::r--
 
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ <span class="token function">mkdir</span> dir1
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ getfacl dir1
+$ <span class="token function">mkdir</span> dir1
+$ getfacl dir1
 <span class="token comment" spellcheck="true"># file: dir1</span>
 <span class="token comment" spellcheck="true"># owner: root</span>
 <span class="token comment" spellcheck="true"># group: root</span>
@@ -768,9 +745,9 @@ other::r-x
 <li><code>-m</code> 参数，表示<code>modify</code>修改的意思</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 禁止escape用户访问file1</span>
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ setfacl -m u:escape:000 file1
+$ setfacl -m u:escape:000 file1
 
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ getfacl file1
+$ getfacl file1
 <span class="token comment" spellcheck="true"># file: file1</span>
 <span class="token comment" spellcheck="true"># owner: root</span>
 <span class="token comment" spellcheck="true"># group: root</span>
@@ -781,9 +758,9 @@ mask::r--
 other::r--
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 禁止escape组访问file2</span>
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ setfacl -m g:escape:rw- file2
+$ setfacl -m g:escape:rw- file2
 
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ getfacl file2
+$ getfacl file2
 <span class="token comment" spellcheck="true"># file: file2</span>
 <span class="token comment" spellcheck="true"># owner: root</span>
 <span class="token comment" spellcheck="true"># group: root</span>
@@ -794,9 +771,9 @@ mask::r--
 other::r--
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 禁止其它用户访问file1</span>
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ setfacl -m o:0 file3
+$ setfacl -m o:0 file3
 
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ getfacl file3
+$ getfacl file3
 <span class="token comment" spellcheck="true"># file: file3</span>
 <span class="token comment" spellcheck="true"># owner: root</span>
 <span class="token comment" spellcheck="true"># group: root</span>
@@ -809,13 +786,13 @@ other::---
 <li><code>setfacl -Rb *</code>：清除所有<code>acl</code></li>
 <li><code>setfacl -M TEXT</code>：利用列表来批量设置权限</li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root❄centos7 ~<span class="token punctuation">]</span>☭ <span class="token function">cat</span> file.acl
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">cat</span> file.acl
 u:escape:-
 g:escape:rwx
 
-<span class="token punctuation">[</span>root❄centos7 ~<span class="token punctuation">]</span>☭ setfacl -M file.acl xxx
+$ setfacl -M file.acl xxx
 
-<span class="token punctuation">[</span>root❄centos7 ~<span class="token punctuation">]</span>☭ getfacl xxx
+$ getfacl xxx
 <span class="token comment" spellcheck="true"># file: xxx</span>
 <span class="token comment" spellcheck="true"># owner: root</span>
 <span class="token comment" spellcheck="true"># group: root</span>
@@ -849,10 +826,10 @@ setfacl -md d:u:yu:rwx /app/dir2
 <li>如果设置了，就相当于设定了高压线，高于这个高压线的权限，会降低到高压线之下。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 设置了高压线后，自定义用户和自定义组的有效值是不超过mask的r--</span>
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ <span class="token function">touch</span> file4
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ setfacl -m u:yu:rwx file4
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ setfacl -m g:yu:rw- file4
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ getfacl file4
+$ <span class="token function">touch</span> file4
+$ setfacl -m u:yu:rwx file4
+$ setfacl -m g:yu:rw- file4
+$ getfacl file4
 <span class="token comment" spellcheck="true"># file: file4</span>
 <span class="token comment" spellcheck="true"># owner: root</span>
 <span class="token comment" spellcheck="true"># group: root</span>
@@ -863,9 +840,9 @@ group:yu:rw-
 mask::rwx
 other::r--
 
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ setfacl -m m:r-- file4
+$ setfacl -m m:r-- file4
 
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ getfacl file4
+$ getfacl file4
 <span class="token comment" spellcheck="true"># file: file4</span>
 <span class="token comment" spellcheck="true"># owner: root</span>
 <span class="token comment" spellcheck="true"># group: root</span>
@@ -883,18 +860,18 @@ other::r--
 <li>主要的文件操作命令<code>cp</code>和<code>mv</code>都支持<code>ACL</code>，只是<code>cp</code>命令需要加上<code>-p</code> 参数。但是<code>tar</code>等常见的备份工具是不会保留目录和文件的<code>ACL</code>信息。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 得到app目录及其目录里所有文件的acl权限（-R参数），写入到/root/app.acl文件里</span>
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ getfacl -R /app <span class="token operator">></span>/root/app.acl
+$ getfacl -R /app <span class="token operator">></span>/root/app.acl
 
 <span class="token comment" spellcheck="true"># 去掉/app目录及其目录里所有文件的acl权限（-b去除）</span>
-<span class="token punctuation">[</span>root❄centos7 app<span class="token punctuation">]</span>☭ setfacl -R -b /app
+$ setfacl -R -b /app
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 恢复权限</span>
 
 <span class="token comment" spellcheck="true"># 绝对路径法</span>
-setfacl --set-file<span class="token operator">=</span>/root/app.acl /app
+$ setfacl --set-file<span class="token operator">=</span>/root/app.acl /app
 
 <span class="token comment" spellcheck="true"># 相对路径法（需要在要恢复的文件夹或文件的上一级目录运行）</span>
-setfacl --restore /root/app.acl
+$ setfacl --restore /root/app.acl
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="5-实例演示"><a href="#5-实例演示" class="headerlink" title="5. 实例演示"></a>5. 实例演示</h2><p><strong>SUID</strong></p>
@@ -904,16 +881,16 @@ setfacl --restore /root/app.acl
 <p><img src="/images/setfacl.jpg" alt="setfacl"></p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 修改的密码最终会存储在/etc/shadow文件中，虽然用户有passwd命令的执行权限，但是shadow文件的权限为000</span>
 <span class="token comment" spellcheck="true"># 参考上文所说的进程的安全上下文，是没有权限修改密码的，那么为何我们能修改密码成功呢？</span>
-<span class="token punctuation">[</span>root@MiWiFi-R3-srv /<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ll /etc/shadow</span>
+$ <span class="token function">sudo</span> ll /etc/shadow
 ----------. 1 root root 823 Nov  2 15:36 /etc/shadow
 
 <span class="token comment" spellcheck="true"># 查看一下passwd这个可执行程序文件的权限，竟然是rws，出现了s权限，这就是SUID权限</span>
 <span class="token comment" spellcheck="true"># 这里A用户执行passwd实际上进程属主不再是A而是root所以能修改密码了</span>
-ll /usr/bin/passwd
+$ ll /usr/bin/passwd
 -rwsr-xr-x. 1 root root 30768 Feb 22  2012 /usr/bin/passwd
 
 <span class="token comment" spellcheck="true"># 使用chmod命令就可以实现</span>
-<span class="token punctuation">[</span>root@MiWiFi-R3-srv /<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># chmod u+s /usr/bin/passwd</span>
+$ <span class="token function">sudo</span> <span class="token function">chmod</span> u+s /usr/bin/passwd
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><strong>SGID</strong></p>
 <ul>
@@ -922,48 +899,51 @@ ll /usr/bin/passwd
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 默认情况下，用户A创建一个文件其属主是A，属组是A的基本组这没有问题。</span>
 <span class="token comment" spellcheck="true"># 如果在一个公共目录中，大家创建各自的文件想实现协同工作，但是由于系统的这种默认机制显然A用户访问B用户的文件会被禁止，因为不在一个组呀！</span>
 <span class="token comment" spellcheck="true"># 当某个目录设定为SGID权限后，则对此目录拥有写权限的用户在此目录中创建的文件属组为目录的属组，而非用户的基本组</span>
-<span class="token punctuation">[</span>root@MiWiFi-R3-srv /<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># chmod g+s /tmp/public</span>
+$ <span class="token function">sudo</span> <span class="token function">chmod</span> g+s /tmp/public
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <p><strong>Sticky</strong></p>
 <ul>
 <li>在一个协同工作目录中，用户可以互相编辑文件但是不允许删除别人的文件</li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@MiWiFi-R3-srv /<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># chmod o+t /tmp/public</span>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> <span class="token function">chmod</span> o+t /tmp/public
 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p><strong>ACL</strong></p>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 1、在`/testdir/dir`里创建的新文件自动属于`g1`组，组 `g2`的成员如：`alice`能对这些新文件有读写权限，组`g3` 的成员如：`tom`只能对新文件有读权限，其它用户（不 属于`g1`,`g2`,`g3`）不能访问这个文件夹。</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 在/testdir/dir里创建的新文件自动属于g1组</span>
+<span class="token comment" spellcheck="true"># 组g2的成员如alice能对这些新文件有读写权限</span>
+<span class="token comment" spellcheck="true"># 组g3的成员如tom只能对新文件有读权限</span>
+<span class="token comment" spellcheck="true"># 其它用户（不属于g1,g2,g3）不能访问这个文件夹。</span>
 
 <span class="token comment" spellcheck="true"># 前期准备</span>
-<span class="token punctuation">[</span>root❄centos7 ~<span class="token punctuation">]</span>☭ <span class="token keyword">echo</span> g<span class="token punctuation">{</span>1,2,3<span class="token punctuation">}</span> <span class="token operator">|</span><span class="token function">xargs</span> -n 1 <span class="token function">groupadd</span>
-<span class="token punctuation">[</span>root❄centos7 ~<span class="token punctuation">]</span>☭ <span class="token function">tail</span> -n 3 /etc/group
+$ <span class="token keyword">echo</span> g<span class="token punctuation">{</span>1,2,3<span class="token punctuation">}</span> <span class="token operator">|</span> <span class="token function">xargs</span> -n 1 <span class="token function">groupadd</span>
+$ <span class="token function">tail</span> -n 3 /etc/group
 g1:x:1002:
 g2:x:1003:
 g3:x:1004:
-<span class="token punctuation">[</span>root❄centos7 ~<span class="token punctuation">]</span>☭ <span class="token function">useradd</span> alice -g g2
-<span class="token punctuation">[</span>root❄centos7 ~<span class="token punctuation">]</span>☭ <span class="token function">useradd</span> tom -g g3
+$ <span class="token function">useradd</span> alice -g g2
+$ <span class="token function">useradd</span> tom -g g3
 
 <span class="token comment" spellcheck="true"># 题目解答</span>
-<span class="token function">chgrp</span> g1 /testdir/dir
-<span class="token function">chmod</span> g+s /testdir/dir
-setfacl -Rm d:g:g2:rw /testdir/dir
-setfacl -Rm d:g:g3:r /testdir/dir
-<span class="token function">chmod</span> o<span class="token operator">=</span> /testdir/dir
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ <span class="token function">chgrp</span> g1 /testdir/dir
+$ <span class="token function">chmod</span> g+s /testdir/dir
+$ setfacl -Rm d:g:g2:rw /testdir/dir
+$ setfacl -Rm d:g:g3:r /testdir/dir
+$ <span class="token function">chmod</span> o<span class="token operator">=</span> /testdir/dir
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 2、备份`/testdir/dir`里所有文件的ACL权限到`/root/acl.txt`中，清除`/testdir/dir`中所有ACL权限 ，最后还原ACL权限。</span>
 
 <span class="token comment" spellcheck="true"># 备份权限</span>
-<span class="token punctuation">[</span>root❄centos7 /<span class="token punctuation">]</span>☭ getfacl -R /testdir/dir <span class="token operator">></span> /root/acl.txt
+$ getfacl -R /testdir/dir <span class="token operator">></span> /root/acl.txt
 
 <span class="token comment" spellcheck="true"># 清除/testdir/dir权限</span>
-<span class="token punctuation">[</span>root❄centos7 /<span class="token punctuation">]</span>☭ setfacl -Rb /testdir/dir
+$ testdir/dir
 
 <span class="token comment" spellcheck="true"># 还原ACL权限，两种方法。</span>
 <span class="token comment" spellcheck="true"># 第一种绝对路径法：</span>
-setfacl --set-file<span class="token operator">=</span>/root/acl.txt /testdir/dir
+$ setfacl --set-file<span class="token operator">=</span>/root/acl.txt /testdir/dir
 
 <span class="token comment" spellcheck="true"># 第二种相对路径法（查看acl.txt看是相对路径testdir/dir,是相对于/的，所以先cd到/,这步不能省）</span>
-<span class="token punctuation">[</span>root❄centos7 /<span class="token punctuation">]</span>☭ <span class="token function">cd</span> /
-<span class="token punctuation">[</span>root❄centos7 /<span class="token punctuation">]</span>☭ setfacl --restore /root/acl.txt
+$ <span class="token function">cd</span> /
+$ setfacl --restore /root/acl.txt
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
@@ -1513,7 +1493,7 @@ setfacl --set-file<span class="token operator">=</span>/root/acl.txt /testdir/di
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1174.6k</span>
+                        class="white-color">1174.5k</span>
             
             
             
