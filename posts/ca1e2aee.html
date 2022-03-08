@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-02-18
+                    2022-03-08
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.1k
+                    1.5k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    4 分
+                    6 分
                 </div>
                 
 
@@ -646,6 +646,92 @@ error: subprocess-exited-with-error
 <span class="token comment" spellcheck="true"># 如何使用 - 即可共享构建CPython</span>
 $ <span class="token function">env</span> PYTHON_CONFIGURE_OPTS<span class="token operator">=</span><span class="token string">"--enable-shared"</span> pyenv <span class="token function">install</span> 3.5.0
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="4-Python-较安全的文件传输"><a href="#4-Python-较安全的文件传输" class="headerlink" title="4. Python 较安全的文件传输"></a>4. Python 较安全的文件传输</h2><blockquote>
+<p><strong>虽然已经基本不怎么提交代码了，但是简单好用！</strong></p>
+</blockquote>
+<ul>
+<li><strong>问题描述：</strong> 我们因为某些原因，需要共享一些文件或者目录给其他人员临时使用，虽然 <code>Linux</code> 自带了 <code>Python2/3</code> 可以临时启动一个简单的服务，完成上述需求。但是，其并不太安全，没有任何限制。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Python2</span>
+$ python -m SimpleHTTPServer 80
+
+<span class="token comment" spellcheck="true"># Python3</span>
+$ python -m http.server 9000 --bind 127.0.0.1 --directory /tmp/
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>解决方法：</strong> <a target="_blank" rel="noopener" href="https://github.com/sc0tfree/updog"><code>Updog</code></a> 是一个 <code>Python</code> 自带的 <code>HTTPServer</code> 的一个替代选择，其允许通过 <code>HTTP/S</code> 上传和下载，还可以支持简单的用户认证。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-d DIRECTORY, –directory DIRECTORY</td>
+<td>Root directory [Default=.]</td>
+</tr>
+<tr>
+<td>-p PORT, –port PORT</td>
+<td>Port to serve [Default=9090]</td>
+</tr>
+<tr>
+<td>–password PASSWORD</td>
+<td>Use a password to access the page. (No username)</td>
+</tr>
+<tr>
+<td>–ssl</td>
+<td>Enable transport encryption via SSL</td>
+</tr>
+<tr>
+<td>–version</td>
+<td>Show version</td>
+</tr>
+<tr>
+<td>-h, –help</td>
+<td>Show help</td>
+</tr>
+</tbody></table>
+<pre class="line-numbers language-bash"><code class="language-bash">$ pip3 <span class="token function">install</span> updog
+$ updog -d /data/app/core -p 9001 —password 12345678
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><img src="../images/python-use-problems-02.png" alt="Python常见零碎问题汇总 - 较安全的文件传输"></p>
+<hr>
+<h2 id="5-Python-服务上传文件异常"><a href="#5-Python-服务上传文件异常" class="headerlink" title="5. Python 服务上传文件异常"></a>5. Python 服务上传文件异常</h2><blockquote>
+<p><strong>需要修改服务框架的默认文件上传大小已适配不同的需求</strong></p>
+</blockquote>
+<ul>
+<li><strong>问题描述：</strong> 发现服务上传文档的时候发生了异常，排除了下确实是文档大小超过了 <code>Nginx</code> 的限制了。但是当调整完毕之后，发现还是有同样的问题。</li>
+</ul>
+<p><img src="../images/python-use-problems-03.png" alt="Python常见零碎问题汇总 - 服务上传文件异常"></p>
+<ul>
+<li><strong>解决方法：</strong> 后来发现是 <code>Nginx</code> 之后的后续服务 <code>block</code> 掉了，需要排除全链路所有涉及的服务，进行统一的调整来解决这个问题。</li>
+</ul>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 调整Nginx上传配置(要都一致才可以)</span>
+<span class="token keyword">http</span> <span class="token punctuation">{</span>
+    <span class="token keyword">client_max_body_size</span>    100M<span class="token punctuation">;</span>
+
+    <span class="token keyword">server</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 调整Gunicorn配置(如果有的话)</span>
+app_params <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">"max_buffer_size"</span><span class="token punctuation">:</span> <span class="token number">200</span> <span class="token operator">*</span> <span class="token number">1024</span> <span class="token operator">*</span> <span class="token number">1024</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true"># 100MB</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true"># 调整Tronado配置(要都一致才可以)</span>
+<span class="token keyword">class</span> <span class="token class-name">Application</span><span class="token punctuation">(</span>tornado<span class="token punctuation">.</span>web<span class="token punctuation">.</span>Application<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+ws_app <span class="token operator">=</span> Application<span class="token punctuation">(</span><span class="token punctuation">)</span>
+server <span class="token operator">=</span> tornado<span class="token punctuation">.</span>httpserver<span class="token punctuation">.</span>HTTPServer<span class="token punctuation">(</span>ws_app<span class="token punctuation">,</span> max_buffer_size<span class="token operator">=</span><span class="token number">100</span><span class="token operator">*</span><span class="token number">1024</span><span class="token operator">*</span><span class="token number">1024</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 100M</span>
+server<span class="token punctuation">.</span>bind<span class="token punctuation">(</span>options<span class="token punctuation">.</span>port<span class="token punctuation">,</span> reuse_port<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+server<span class="token punctuation">.</span>start<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1194,7 +1280,7 @@ $ <span class="token function">env</span> PYTHON_CONFIGURE_OPTS<span class="toke
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1176.7k</span>
+                        class="white-color">1177.6k</span>
             
             
             
