@@ -368,21 +368,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-07-26
+                    2022-03-10
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    953
+                    1.1k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    3 分
+                    4 分
                 </div>
                 
 
@@ -467,10 +467,21 @@ ii    supervisor    3.x.x-x.x    all    System <span class="token keyword">for</
 <ul>
 <li>这时抱着试一试的态度，通过 <code>lsof</code> 命令查看对应的十个日志文件，到底是那些进程打开的呢？使用如下命令，查看之后才发现，对应的这几个文件，都被 <code>supervisor</code> 进程给打开了。</li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> <span class="token function">lsof</span> draft-csc-test-stderr.log
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 同样的PID接管了日志文件</span>
+$ <span class="token function">sudo</span> <span class="token function">lsof</span> app-web-stderr.log
 COMMAND     PID   USER  FD   TYPE  DEVICE  SIZE/OFF      NODE  NAME
-supervisor  2xx8  root  xxw   REG    x,xx  2431xx20  1416xx18  app-web-stderr.log
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+supervisor  2228  root  xxw   REG    x,xx  2431xx20  1416xx18  /var/log/supervisor/app-web-stderr.log
+
+<span class="token comment" spellcheck="true"># 同样的PID接管了日志文件</span>
+$ <span class="token function">sudo</span> <span class="token function">lsof</span> app-web-stderr.log.1
+COMMAND     PID   USER  FD   TYPE  DEVICE  SIZE/OFF      NODE  NAME
+supervisor  2228  root  xxw   REG    x,xx  2431xx20  1416xx18  /var/log/supervisor/app-web-stderr.log.1
+
+<span class="token comment" spellcheck="true"># 同样的PID接管了日志文件</span>
+$ <span class="token function">sudo</span> <span class="token function">lsof</span> app-web-stderr.log.2
+COMMAND     PID   USER  FD   TYPE  DEVICE  SIZE/OFF      NODE  NAME
+supervisor  2228  root  xxw   REG    x,xx  2431xx20  1416xx18  /var/log/supervisor/app-web-stderr.log.2
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>走到这里，现在基本就可以大致判断出问题的原因了，就是因为某些因素或者工具 <code>Bug</code> 导致 <code>Supervisor</code> 异常接管对应日志文件，使日志内容输出到多个文件。后来通过重启 <code>Supervisord</code> 服务，使日志输出正常了，到现在为止也没有再出现同样的问题了。</li>
 </ul>
@@ -927,7 +938,7 @@ $ systemctl restart supervisor.service
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1178.1k</span>
+                        class="white-color">1178.2k</span>
             
             
             
