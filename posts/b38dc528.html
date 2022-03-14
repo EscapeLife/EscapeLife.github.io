@@ -29,9 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.0">
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
+
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-03-08
+                    2022-03-14
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.7k
+                    1.9k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    6 分
+                    7 分
                 </div>
                 
 
@@ -525,20 +525,18 @@
 </ul>
 <p><img src="../images/nginx-diseases-all-list-03.png" alt="Nginx疑难杂症汇总 - large_client_header_buffers"></p>
 <ul>
-<li>后来网上找到了，对 <code>nginx</code> 处理 <code>header</code> 时的方法，大致如下所示：</li>
+<li>后来网上找到了，对 <code>nginx</code> 处理 <code>header</code> 时的方法，大致如下所示：<ul>
+<li>1.先处理请求的 request_line，之后才是 <code>request_header</code>。</li>
+<li>2.这两者的 <code>buffer</code> 分配策略相同。</li>
+<li>3.先根据 <code>client_header_buffer_size</code> 配置的值分配一个 <code>buffer</code>，如果分配的 <code>buffer</code> 无法容纳 <code>request_line</code>/<code>request_header</code>，那么就会再次根据 <code>large_client_header_buffers</code> 配置的参数分配 <code>large_buffer</code>，如果 <code>large_buffer</code> 还是无法容纳，那么就会返回 <code>414</code>/<code>400</code> 错误。</li>
 </ul>
-<ol>
-<li>先处理请求的 request_line，之后才是 <code>request_header</code>。</li>
-<li>这两者的 <code>buffer</code> 分配策略相同。</li>
-<li>先根据 <code>client_header_buffer_size</code> 配置的值分配一个 <code>buffer</code>，如果分配的 <code>buffer</code> 无法容纳 <code>request_line</code>/<code>request_header</code>，那么就会再次根据 <code>large_client_header_buffers</code> 配置的参数分配 <code>large_buffer</code>，如果 <code>large_buffer</code> 还是无法容纳，那么就会返回 <code>414</code>/<code>400</code> 错误。</li>
-</ol>
-<ul>
-<li>根据对手册的理解，这两个指令在配置 <code>header_buffer</code> 时的使用场景是不同的，个人理解如下：</li>
+</li>
+<li>根据对手册的理解，这两个指令在配置 <code>header_buffer</code> 时的使用场景是不同的，个人理解如下：<ul>
+<li>1.如果你的请求中的 <code>header</code> 都很大，那么应该使用 <code>client_header_buffer_size</code>，这样能减少一次内存分配。</li>
+<li>2.如果你的请求中只有少量请求 <code>header</code> 很大，那么应该使用 <code>large_client_header_buffers</code>，因为这样就仅需在处理大 <code>header</code> 时才会分配更多的空间，从而减少无谓的内存空间浪费。</li>
 </ul>
-<ol>
-<li>如果你的请求中的 <code>header</code> 都很大，那么应该使用 <code>client_header_buffer_size</code>，这样能减少一次内存分配。</li>
-<li>如果你的请求中只有少量请求 <code>header</code> 很大，那么应该使用 <code>large_client_header_buffers</code>，因为这样就仅需在处理大 <code>header</code> 时才会分配更多的空间，从而减少无谓的内存空间浪费。</li>
-</ol>
+</li>
+</ul>
 <hr>
 <h2 id="2-开启转发-Delete-方法"><a href="#2-开启转发-Delete-方法" class="headerlink" title="2. 开启转发 Delete 方法"></a>2. 开启转发 Delete 方法</h2><blockquote>
 <p><strong>老版本 Nginx 默认不转发 put/delete 等方法</strong></p>
@@ -621,7 +619,7 @@ TLS SNI support enabled
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="4-Nginx-实现协议跳转"><a href="#4-Nginx-实现协议跳转" class="headerlink" title="4. Nginx 实现协议跳转"></a>4. Nginx 实现协议跳转</h2><blockquote>
+<h2 id="4-Nginx-实现协议自跳转"><a href="#4-Nginx-实现协议自跳转" class="headerlink" title="4. Nginx 实现协议自跳转"></a>4. Nginx 实现协议自跳转</h2><blockquote>
 <p><strong>利用 Nginx 的 497 状态码实现 http 跳转 https</strong></p>
 </blockquote>
 <ul>
@@ -673,6 +671,50 @@ sever<span class="token punctuation">{</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="5-用-Nginx-伪装-SSH-端口"><a href="#5-用-Nginx-伪装-SSH-端口" class="headerlink" title="5. 用 Nginx 伪装 SSH 端口"></a>5. 用 Nginx 伪装 SSH 端口</h2><blockquote>
+<p><strong>利用 Nginx Stream 模块把 SSH 藏在 443 端口</strong></p>
+</blockquote>
+<ul>
+<li><p><strong>[问题起因]</strong> 虽然可以使用 <code>fail2ban</code> 防火墙工具护体(每天 <code>auth.log</code> 里一堆垃圾试探)，但是使用 <code>Stream</code> 模块加固 <code>SSH</code> 服务器的连接更上一层楼。</p>
+</li>
+<li><p><strong>[解决方法]</strong> 这样做的好处在于，当我们连接服务(<code>:ssh</code>)的时候，需要经过 <code>443</code> 端口进入(可以屏蔽默认的 <code>22</code> 端口或自定义端口)，使服务更加安全一些且不要再头痛烦人的嗅探工具了。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://notes.zhangjie.work/index.php/archives/138">Nginx-443 端口复用记录</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/XTLS/Xray-core/discussions/697#discussioncomment-1295912">使用 stream 模块 443 流量转发搭建梯子</a></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-nginx"><code class="language-nginx">stream <span class="token punctuation">{</span>
+    <span class="token keyword">map</span> <span class="token variable">$ssl_preread_server_name</span> <span class="token variable">$name</span> <span class="token punctuation">{</span>
+        escapelife        xtls<span class="token punctuation">;</span>
+        www<span class="token punctuation">.</span>escapelife    <span class="token keyword">http</span><span class="token punctuation">;</span>
+        default           ssh<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">upstream</span> xtls <span class="token punctuation">{</span>
+        <span class="token keyword">server</span> localhost<span class="token punctuation">:</span><span class="token number">8081</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">upstream</span> <span class="token keyword">http</span> <span class="token punctuation">{</span>
+        <span class="token keyword">server</span> localhost<span class="token punctuation">:</span><span class="token number">8080</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">upstream</span> ssh <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true"># 默认ssh连接会回落到default然后到本机22端口</span>
+        <span class="token keyword">server</span> localhost<span class="token punctuation">:</span><span class="token number">22</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true"># 你甚至可以在这里挂个openvpn实现自用梯子</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">server</span> <span class="token punctuation">{</span>
+        <span class="token keyword">listen</span> <span class="token number">443</span> reuseport<span class="token punctuation">;</span>
+        <span class="token keyword">listen</span> <span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token number">443</span> reuseport<span class="token punctuation">;</span>
+        <span class="token keyword">proxy_pass</span> <span class="token variable">$name</span><span class="token punctuation">;</span>
+        proxy_protocol on<span class="token punctuation">;</span>
+        ssl_preread on<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1217,7 +1259,7 @@ sever<span class="token punctuation">{</span>
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1180k</span>
+                        class="white-color">1180.3k</span>
             
             
             
