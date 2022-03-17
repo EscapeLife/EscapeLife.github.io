@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-03-10
+                    2022-03-17
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    929
+                    1.4k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    3 分
+                    5 分
                 </div>
                 
 
@@ -501,7 +501,65 @@
 </blockquote>
 <p><img src="../images/linux_use_problems.png" alt="Linux常见零碎问题汇总"></p>
 <hr>
-<h2 id="1-RPO-和-RTO-的区别"><a href="#1-RPO-和-RTO-的区别" class="headerlink" title="1. RPO 和 RTO 的区别"></a>1. RPO 和 RTO 的区别</h2><blockquote>
+<h2 id="1-机器宕机问题排除思路"><a href="#1-机器宕机问题排除思路" class="headerlink" title="1. 机器宕机问题排除思路"></a>1. 机器宕机问题排除思路</h2><blockquote>
+<p><strong>简单记录一下系统宕机之后，主要排除思路和纪要！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] 服务器资源不足导致</strong><ul>
+<li>是否内存(<code>OOM</code>)/<code>CPU</code>/磁盘爆满导致服务器重启</li>
+<li>排除系统日志 <code>/var/log/messages</code>、<code>/var/log/dmesg</code></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 系统信息</span>
+服务器类型: <span class="token function">cat</span> /etc/redhat-release
+操作系统版本: <span class="token function">cat</span> /etc/issue
+内核版本: <span class="token function">uname</span> -a
+Docker版本: docker --version
+
+<span class="token comment" spellcheck="true"># 主要排除日志</span>
+/var/log/messages <span class="token punctuation">(</span>系统启动后的信息和错误日志<span class="token punctuation">)</span>
+/var/log/dmesg    <span class="token punctuation">(</span>系统日志守护进程的日志文件<span class="token punctuation">)</span>
+/var/log/boot.log <span class="token punctuation">(</span>守护进程启动和停止相关的日志消息<span class="token punctuation">)</span>
+/var/log/kern.log <span class="token punctuation">(</span>发行版中的日志文件<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 次要排除日志</span>
+/var/log/secure  <span class="token punctuation">(</span>与安全相关的日志信息<span class="token punctuation">)</span>
+/var/log/cron    <span class="token punctuation">(</span>与定时任务相关的日志信息<span class="token punctuation">)</span>
+/var/log/maillog <span class="token punctuation">(</span>与邮件任务相关的日志信息<span class="token punctuation">)</span>
+/var/log/spooler <span class="token punctuation">(</span>与UUCP和news设备相关的日志信息<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 用户登录日志</span>
+/var/log/wtmp <span class="token punctuation">(</span>永久记录每个用户登录/注销及系统的启动/停机的事件<span class="token punctuation">)</span>
+/var/run/utmp <span class="token punctuation">(</span>记录当前正在登录系统的用户信息<span class="token punctuation">)</span>
+/var/log/btmp <span class="token punctuation">(</span>记录失败的登录尝试信息<span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 服务器硬件问题导致</strong><ul>
+<li>是否因为系统硬件原因导致服务器重启</li>
+<li>查看是否有硬件告警并收集硬件信息，报告厂商协助排查</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 基本信息收集</span>
+<span class="token function">uptime</span>  <span class="token punctuation">(</span>查看系统运行时间/用户数/负载<span class="token punctuation">)</span>
+last    <span class="token punctuation">(</span>查看最近系统重启的信息<span class="token punctuation">)</span>
+<span class="token function">df</span> -h   <span class="token punctuation">(</span>查看各分区使用情况<span class="token punctuation">)</span>
+<span class="token function">free</span> -m <span class="token punctuation">(</span>查看内存使用量和交换区使用量<span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 触发服务器系统 Bug 导致</strong><ul>
+<li>是否触发系统 <code>Bug</code> 并生成 <code>dump</code> 文件</li>
+<li>检查是否是系统内核 <code>Bug</code> 导致，所以得看 <code>kdump</code> 在系统崩溃保留的信息</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看kdump日志(发生故障)</span>
+/var/crash/生产一个主机+故障时间目录
+产生两个vmcore和vmcore-dmesg.txt文件
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="2-RPO-和-RTO-的区别"><a href="#2-RPO-和-RTO-的区别" class="headerlink" title="2. RPO 和 RTO 的区别"></a>2. RPO 和 RTO 的区别</h2><blockquote>
 <p><strong>故障发生时，需要了解两个指标！</strong></p>
 </blockquote>
 <ul>
@@ -519,7 +577,7 @@
 </li>
 </ul>
 <hr>
-<h2 id="2-普通用户执行特权指令"><a href="#2-普通用户执行特权指令" class="headerlink" title="2. 普通用户执行特权指令"></a>2. 普通用户执行特权指令</h2><blockquote>
+<h2 id="3-普通用户执行特权指令"><a href="#3-普通用户执行特权指令" class="headerlink" title="3. 普通用户执行特权指令"></a>3. 普通用户执行特权指令</h2><blockquote>
 <p><strong>还是应该回顾下，之前掌握的基础知识！</strong></p>
 </blockquote>
 <ul>
@@ -553,7 +611,7 @@ $ <span class="token function">sudo</span> grpck -q <span class="token punctuati
 $ <span class="token function">sudo</span> grpconv
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="3-邮件被识别为垃圾邮件"><a href="#3-邮件被识别为垃圾邮件" class="headerlink" title="3. 邮件被识别为垃圾邮件"></a>3. 邮件被识别为垃圾邮件</h2><blockquote>
+<h2 id="4-邮件被识别为垃圾邮件"><a href="#4-邮件被识别为垃圾邮件" class="headerlink" title="4. 邮件被识别为垃圾邮件"></a>4. 邮件被识别为垃圾邮件</h2><blockquote>
 <p><strong>此邮件类似于我们的垃圾邮件过滤器检测到的邮件</strong></p>
 </blockquote>
 <ul>
@@ -1133,7 +1191,7 @@ $ <span class="token function">dig</span> @8.8.8.8 -t TXT escapelife.site
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1182.3k</span>
+                        class="white-color">1182.8k</span>
             
             
             
