@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-03-17
+                    2022-03-22
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.4k
+                    2.4k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    5 分
+                    10 分
                 </div>
                 
 
@@ -648,6 +648,191 @@ $ <span class="token function">dig</span> @8.8.8.8 -t TXT escapelife.site
 <span class="token punctuation">;</span><span class="token punctuation">;</span> WHEN: Thu Mar 10 11:31:03 CST 2022
 <span class="token punctuation">;</span><span class="token punctuation">;</span> MSG SIZE  rcvd: 109
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="5-私有-CA-的创建流程"><a href="#5-私有-CA-的创建流程" class="headerlink" title="5. 私有 CA 的创建流程"></a>5. 私有 CA 的创建流程</h3><blockquote>
+<p><strong>简单介绍私有 CA 证书以及签名的整体流程</strong></p>
+</blockquote>
+<p>为了 <a target="_blank" rel="noopener" href="https://www.kawabangga.com/posts/4649">用 <code>Nginx</code> 在公网上搭建加密数据通道</a>，首先可以使用 <code>mTLS</code> 技术进行双向的 <code>TLS</code> 验证，然后自己做 <code>CA</code> 给自己签发证书，然后搭建 <code>Nginx</code> 服务完成。</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>名称</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>CA</strong></td>
+<td><code>ca.key</code></td>
+<td>CA 的私钥</td>
+</tr>
+<tr>
+<td><strong>Server</strong></td>
+<td><code>ca.crt</code></td>
+<td>CA 的公钥(证书)</td>
+</tr>
+<tr>
+<td><strong>Server</strong></td>
+<td><code>server.key</code></td>
+<td>服务器端私钥</td>
+</tr>
+<tr>
+<td><strong>Server</strong></td>
+<td><code>server.crt</code></td>
+<td>服务器端公钥</td>
+</tr>
+<tr>
+<td><strong>Server</strong></td>
+<td><code>server.csr</code></td>
+<td>服务器端请求(部署不需要用到)</td>
+</tr>
+<tr>
+<td><strong>Client</strong></td>
+<td><code>client.key</code></td>
+<td>客户端的私钥</td>
+</tr>
+<tr>
+<td><strong>Client</strong></td>
+<td><code>client.crt</code></td>
+<td>客户端的公钥</td>
+</tr>
+<tr>
+<td><strong>Client</strong></td>
+<td><code>client.csr</code></td>
+<td>客户端的请求(部署不需要用到)</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>[1] 生成 CA 的私钥 Key - 妥善保管 - ca.key</strong><ul>
+<li>对于 CA 的私钥 Key 最好给一个密码保护</li>
+<li>每次使用这个 CA 签发证书的时候都需要输入密码</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># genrsa: 生成RSA私钥</span>
+<span class="token comment" spellcheck="true"># -des3: 生成的Key使用des3进行加密；如果不加这个参数就不会提示让你输入密码</span>
+<span class="token comment" spellcheck="true"># 4096: 生成Key的长度；</span>
+$ <span class="token function">sudo</span> openssl genrsa -des3 -out ca.key 4096
+Generating RSA private key, 4096 bit long modulus <span class="token punctuation">(</span>2 primes<span class="token punctuation">)</span>
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.++++<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>.++++
+e is 65537 <span class="token punctuation">(</span>0x010001<span class="token punctuation">)</span>
+Enter pass phrase <span class="token keyword">for</span> ca.key:<span class="token operator">&lt;</span>passphrase<span class="token operator">></span>
+Verifying - Enter pass phrase <span class="token keyword">for</span> ca.key:<span class="token operator">&lt;</span>passphrase<span class="token operator">></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 生成 CA 的公钥 Key - 证书 - ca.crt</strong><ul>
+<li>会询问你一些信息，比如地区，组织名字之类的</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># req: 创建证书请求</span>
+<span class="token comment" spellcheck="true"># -new: 产生新的证书</span>
+<span class="token comment" spellcheck="true"># -x509: 直接使用x509产生新的自签名证书</span>
+<span class="token comment" spellcheck="true"># -days 365: 证书1年之后过期，省略表示永不过期</span>
+<span class="token comment" spellcheck="true"># key: 创建公共证书的私钥，会被提示输入私钥的密码</span>
+<span class="token comment" spellcheck="true"># -out: 生成的证书</span>
+$ <span class="token function">sudo</span> openssl req -new -x509 -days 365 -key ca.key -out ca.crt
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter <span class="token string">'.'</span>, the field will be left blank.
+-----
+Country Name <span class="token punctuation">(</span>2 letter code<span class="token punctuation">)</span> <span class="token punctuation">[</span>AU<span class="token punctuation">]</span>:
+State or Province Name <span class="token punctuation">(</span>full name<span class="token punctuation">)</span> <span class="token punctuation">[</span>Some-State<span class="token punctuation">]</span>:
+Locality Name <span class="token punctuation">(</span>eg, city<span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>:
+Organization Name <span class="token punctuation">(</span>eg, company<span class="token punctuation">)</span> <span class="token punctuation">[</span>Internet Widgits Pty Ltd<span class="token punctuation">]</span>:CertAuth
+Organizational Unit Name <span class="token punctuation">(</span>eg, section<span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>:
+Common Name <span class="token punctuation">(</span>e.g. server FQDN or YOUR name<span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>:
+Email Address <span class="token punctuation">[</span><span class="token punctuation">]</span>:
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 申请服务器端证书 - server.csr</strong><ul>
+<li>我们有了一对 <code>CA</code> 证书，<code>ca.key</code> 和 <code>ca.crt</code> 两个文件</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 服务器端依旧创建一个私钥Key(不用保护了)</span>
+$ <span class="token function">sudo</span> openssl genrsa -out server.key 4096
+
+<span class="token comment" spellcheck="true"># 不是直接生成证书，而是生成一个证书请求(这个.csr的文件就是请求签名)</span>
+<span class="token comment" spellcheck="true"># Organization Name: 不能和CA的一样</span>
+<span class="token comment" spellcheck="true"># Common Name: 必须要写一个，可以写一个不存在的域名，否则证书无法使用</span>
+$ <span class="token function">sudo</span> openssl req -new -key server.key -out server.csr
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] 服务器端证书签名 - server.crt</strong><ul>
+<li>用我们的 <code>CA</code> 给这个服务器端证书签名</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># x509: 公有证书的标准格式</span>
+<span class="token comment" spellcheck="true"># -CA: 使用CA对其签名</span>
+<span class="token comment" spellcheck="true"># -CAkey: CA的私钥key</span>
+<span class="token comment" spellcheck="true"># -set_serial 01: 签发的序列号，如果证书过期的话，可以直接用.csr修改序列号重新签一个，不需要重新生成.csr文件</span>
+$ <span class="token function">sudo</span> openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] 验证生成的证书</strong><ul>
+<li>可以使用这条命令验证生成的证书是正常</li>
+<li>重复此流程再签发一个 <code>client</code> 端的证书</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 如下输入即可</span>
+$ <span class="token function">sudo</span> openssl verify -verbose -CAfile ca.crt server.crt
+server.crt: OK
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] 配置 Nginx 服务</strong><ul>
+<li><code>ssl_certificate</code>: 告诉 <code>Nginx</code> 使用哪一个公有证书</li>
+<li><code>ssl_certificate_key</code>: 此证书对用的私钥是什么，服务器需要有私钥才能工作</li>
+<li><code>ssl_verify_client</code>: 需要验证客户端的证书</li>
+<li><code>ssl_client_certificate</code>: 我们信任这个 <code>CA</code> 所签发的所有证书</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 使用自签证书 - Server端</span>
+<span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">listen</span> <span class="token number">443</span> default_server <span class="token keyword">ssl</span><span class="token punctuation">;</span>
+    <span class="token keyword">listen</span> <span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token number">443</span> default_server <span class="token keyword">ssl</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">server_name</span> _<span class="token punctuation">;</span>
+    <span class="token keyword">ssl_certificate</span> <span class="token operator">/</span>data<span class="token operator">/</span>cert<span class="token operator">/</span><span class="token keyword">server</span><span class="token punctuation">.</span>crt<span class="token punctuation">;</span>
+    <span class="token keyword">ssl_certificate_key</span> <span class="token operator">/</span>data<span class="token operator">/</span>cert<span class="token operator">/</span><span class="token keyword">server</span><span class="token punctuation">.</span>key<span class="token punctuation">;</span>
+
+    <span class="token keyword">ssl_verify_client</span> on<span class="token punctuation">;</span>
+    <span class="token keyword">ssl_client_certificate</span> <span class="token operator">/</span>data<span class="token operator">/</span>cert<span class="token operator">/</span>ca<span class="token punctuation">.</span>crt<span class="token punctuation">;</span>
+
+    <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+        <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">127.0</span><span class="token punctuation">.</span><span class="token number">0.1</span><span class="token punctuation">:</span><span class="token number">8000</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 使用自签证书 - Client端</span>
+<span class="token keyword">upstream</span> remote<span class="token punctuation">{</span>
+    <span class="token keyword">server</span> <span class="token number">127.0</span><span class="token punctuation">.</span><span class="token number">0.1</span><span class="token punctuation">:</span><span class="token number">443</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">listen</span> <span class="token number">80</span> default_server<span class="token punctuation">;</span>
+    <span class="token keyword">listen</span> <span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token number">80</span> default_server<span class="token punctuation">;</span>
+
+    <span class="token keyword">server_name</span> _<span class="token punctuation">;</span>
+
+    <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+        <span class="token keyword">proxy_pass</span> <span class="token keyword">https</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>remote<span class="token punctuation">;</span>
+        proxy_ssl_trusted_certificate <span class="token operator">/</span>home<span class="token operator">/</span>vagrant<span class="token operator">/</span>cert<span class="token operator">/</span>ca<span class="token punctuation">.</span>crt<span class="token punctuation">;</span>
+        proxy_ssl_verify on<span class="token punctuation">;</span>
+        proxy_ssl_server_name on<span class="token punctuation">;</span>
+        proxy_ssl_name <span class="token keyword">proxy</span><span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
+
+        proxy_ssl_certificate <span class="token operator">/</span>home<span class="token operator">/</span>vagrant<span class="token operator">/</span>crt<span class="token operator">/</span>client<span class="token punctuation">.</span>crt<span class="token punctuation">;</span>
+        proxy_ssl_certificate_key <span class="token operator">/</span>home<span class="token operator">/</span>vagrant<span class="token operator">/</span>cert<span class="token operator">/</span>client<span class="token punctuation">.</span>key<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1192,7 +1377,7 @@ $ <span class="token function">dig</span> @8.8.8.8 -t TXT escapelife.site
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1187.2k</span>
+                        class="white-color">1188.2k</span>
             
             
             
