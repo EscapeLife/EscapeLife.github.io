@@ -462,14 +462,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-03-03
+                    2022-03-25
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    9.6k
+                    9.7k
                 </div>
                 
 
@@ -1081,26 +1081,29 @@ docker <span class="token function">exec</span> -it <span class="token operator"
 </tr>
 </tbody></table>
 <hr>
-<h2 id="15-Docker-变量使用引号"><a href="#15-Docker-变量使用引号" class="headerlink" title="15 Docker 变量使用引号"></a>15 Docker 变量使用引号</h2><blockquote>
+<h2 id="15-Docker-变量使用引号"><a href="#15-Docker-变量使用引号" class="headerlink" title="15. Docker 变量使用引号"></a>15. Docker 变量使用引号</h2><blockquote>
 <p><strong>compose 里边环境变量带不带引号的问题！</strong></p>
 </blockquote>
 <ul>
-<li><p><strong>[问题起因]</strong> 使用过 <code>compose</code> 的同学可能都遇到过，我们在编写启动配置文件的时候，添加环境变量的时候到底是使用单引号、双引号还是不使用引号。时间长了，可能我们总是三者是一样的，可以相互使用。但是，直到最后我们发现坑越来越多，越来越隐晦。</p>
+<li><p><strong>[问题起因]</strong> 使用过 <code>compose</code> 的朋友可能都遇到过，在编写启服务启动配置文件的时候，添加环境变量时到底是使用单引号、双引号还是不使用引号的问题？时间长了，我们可能会将三者混用，认为其效果是一样的。但是后来，发现的坑越来越多，才发现其越来越隐晦。</p>
 </li>
-<li><p>反正我是遇到过很多是因为添加引号导致的服务启动问题，后来得出的结论就是一律不适用引号。裸奔，体验前所未有的爽快！直到现在看到了 <code>Github</code> 中对应的 <a target="_blank" rel="noopener" href="https://github.com/docker/compose/issues/2854">issus</a> 之后，才终于破案了。</p>
+<li><p>反正我是遇到过很多问题，都是因为添加引号导致的服务启动异常的，后来得出的结论就是一律不使引号。裸奔，体验前所未有的爽快！直到现在看到了 <code>Github</code> 中对应的 <a target="_blank" rel="noopener" href="https://github.com/docker/compose/issues/2854">issus</a> 之后，才终于破案了。</p>
 </li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># TESTVAR="test"</span>
-在Compose中进行引用TESTVAR变量，无法找到
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 在Compose中进行引用TEST_VAR变量，无法找到</span>
+TEST_VAR<span class="token operator">=</span><span class="token string">"test"</span>
 
-<span class="token comment" spellcheck="true"># TESTVAR=test</span>
-在Compose中进行引用TESTVAR变量，可以找到
+<span class="token comment" spellcheck="true"># 在Compose中进行引用TEST_VAR变量，可以找到</span>
+TEST_VAR<span class="token operator">=</span>test
 
-<span class="token comment" spellcheck="true"># docker run -it --rm -e TESTVAR="test" test:latest</span>
-后来发现docker本身其实已经正确地处理了引号的使用
+<span class="token comment" spellcheck="true"># 后来发现docker本身其实已经正确地处理了引号的使用</span>
+docker run -it --rm -e TEST_VAR<span class="token operator">=</span><span class="token string">"test"</span> test:latest
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[解决方法]</strong> 得到的结论就是，因为 <code>Compose</code> 解析 <code>yaml</code> 配置文件，发现引号也进行了解释包装。这就导致原本的 <code>TESTVAR="test"</code> 被解析成了 <code>'TESTVAR="test"'</code>，所以我们在引用的时候就无法获取到对应的值。现在解决方法就是，不管是我们直接在配置文件添加环境变量或者使用 <code>env_file</code> 配置文件，能不使用引号就不适用引号。</li>
+<li><p><strong>[解决方法]</strong> 得到的结论就是，因为 <code>Compose</code> 解析 <code>yaml</code> 配置文件，发现引号也进行了解释包装。这就导致原本的 <code>TEST_VAR="test"</code> 被解析成了 <code>'TEST_VAR="test"'</code>，所以我们在引用的时候就无法获取到对应的值。现在解决方法就是，不管是我们直接在配置文件添加环境变量或者使用 <code>env_file</code> 配置文件，能不使用引号就不适用引号。</p>
+</li>
+<li><p>需要注意的是环境变量配置的是日志格式的话(<code>2022-01-01</code>)，如果使用的是 <code>Python</code> 的 <code>yaml.load</code> 模块的话，会被当做是 <code>date</code> 类型的，这是如果希望保持原样信息的话，可以使用 <code>'</code>/<code>"</code> 引起来将其变成字符串格式的。</p>
+</li>
 </ul>
 <hr>
 <h2 id="16-Docker-删除镜像报错"><a href="#16-Docker-删除镜像报错" class="headerlink" title="16. Docker 删除镜像报错"></a>16. Docker 删除镜像报错</h2><blockquote>
