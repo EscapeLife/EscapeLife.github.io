@@ -766,7 +766,7 @@ $ <span class="token function">sudo</span> yum <span class="token function">inst
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 构建方式</span>
 $ curl -L <span class="token string">"https://github.com/allinurl/goaccess/archive/refs/heads/master.tar.gz"</span> <span class="token operator">|</span> <span class="token function">tar</span> -xz <span class="token operator">&amp;&amp;</span> <span class="token function">cd</span> goaccess-master
 $ docker build -t goaccess/build.debian-10 -f Dockerfile.debian-10 <span class="token keyword">.</span>
-$ docker run -i --rm -v <span class="token variable">$PWD</span>:/goaccess goaccess/build.debian-10 <span class="token operator">></span> goaccess
+$ docker run -i --rm -v <span class="token variable">$PWD</span>:/goaccess goaccess/build.debian-10 <span class="token operator">&gt;</span> goaccess
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[2] 部署启动运行</strong></li>
@@ -774,12 +774,12 @@ $ docker run -i --rm -v <span class="token variable">$PWD</span>:/goaccess goacc
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 非实时查看</span>
 <span class="token function">cat</span> access.log <span class="token operator">|</span> docker run --rm -i \
     -e LANG<span class="token operator">=</span><span class="token variable">$LANG</span> allinurl/goaccess \
-    -a -o html --log-format COMBINED - <span class="token operator">></span> report.html
+    -a -o html --log-format COMBINED - <span class="token operator">&gt;</span> report.html
 
 <span class="token comment" spellcheck="true"># 实时查看</span>
 $ <span class="token function">cat</span> access.log <span class="token operator">|</span> docker run --rm -i -p 7890:7890 \
     -e LANG<span class="token operator">=</span><span class="token variable">$LANG</span> allinurl/goaccess -a -o html \
-    --log-format COMBINED --real-time-html - <span class="token operator">></span> report.html
+    --log-format COMBINED --real-time-html - <span class="token operator">&gt;</span> report.html
 
 <span class="token comment" spellcheck="true"># 修改了配置文件只需重启容器即可</span>
 $ docker restart goaccess
@@ -802,14 +802,14 @@ date-format  %d/%b/%Y
 log-format   %h - %^ <span class="token punctuation">[</span>%d:%t %^<span class="token punctuation">]</span> <span class="token string">"%r"</span> %s %b <span class="token string">"%R"</span> - %^<span class="token string">"%u"</span> - %^ %T
 
 <span class="token comment" spellcheck="true"># 解析生成报告</span>
-goaccess -a -c -d -f /xxx/access.log -p /xxx/goaccess.conf <span class="token operator">></span> report.html
+goaccess -a -c -d -f /xxx/access.log -p /xxx/goaccess.conf <span class="token operator">&gt;</span> report.html
 
 <span class="token comment" spellcheck="true"># 解析生成报告</span>
 <span class="token function">cat</span> access.log <span class="token operator">|</span> docker run --rm -i \
     -e LANG<span class="token operator">=</span><span class="token variable">$LANG</span> allinurl/goaccess -a -o html \
     --date-format<span class="token operator">=</span>%d/%b/%Y --time-format<span class="token operator">=</span>%H:%M:%S \
     --log-format<span class="token operator">=</span><span class="token string">'%h - %^ [%d:%t %^] "%r" %s %b %^ %T %^ "%R" "%u"'</span> \
-    - <span class="token operator">></span> report.html
+    - <span class="token operator">&gt;</span> report.html
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[4] 日志格式定义</strong><ul>
@@ -1122,7 +1122,7 @@ $ goaccess access.log -o report.html --real-time-html --ws-url<span class="token
 $ goaccess access.log -o report.html --real-time-html --port<span class="token operator">=</span>9870
 
 <span class="token comment" spellcheck="true"># 绑定WebSocket服务器到不同于0.0.0.0的另外一个地址</span>
-<span class="token comment" spellcheck="true"># 如果需要在加密连接上输出实时数据，则需要使用--ssl-cert=&lt;cert.crt>和--ssl-key=&lt;priv.key></span>
+<span class="token comment" spellcheck="true"># 如果需要在加密连接上输出实时数据，则需要使用--ssl-cert=&lt;cert.crt&gt;和--ssl-key=&lt;priv.key&gt;</span>
 $ goaccess access.log -o report.html --real-time-html --addr<span class="token operator">=</span>127.0.0.1
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
@@ -1156,7 +1156,7 @@ $ <span class="token function">awk</span> <span class="token string">'<span clas
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 解析特定页面，比如：页面访问数，html，htm，php，等等</span>
 $ <span class="token function">awk</span> <span class="token string">'<span class="token variable">$7</span>~/\.html|\.htm|\.php/'</span> access.log <span class="token operator">|</span> goaccess -
-$ <span class="token function">tail</span> -10 access.log <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$8</span>}'</span>
+$ <span class="token function">tail</span> -10 access.log <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'&amp;#123;print <span class="token variable">$8</span>&amp;#125;'</span>
 
 <span class="token comment" spellcheck="true"># 或者解析一个特定的状态码，比如：500(服务器内部错误)</span>
 $ <span class="token function">awk</span> <span class="token string">'<span class="token variable">$9</span>~/500/'</span> access.log <span class="token operator">|</span> goaccess -
@@ -1531,12 +1531,12 @@ $ goaccess --load-from-disk --keep-db-files
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Python/">
-                        <span class="chip bg-color">Python</span>
-                    </a>
-                    
                     <a href="/tags/Celery/">
                         <span class="chip bg-color">Celery</span>
+                    </a>
+                    
+                    <a href="/tags/Python/">
+                        <span class="chip bg-color">Python</span>
                     </a>
                     
                 </div>
@@ -1741,7 +1741,7 @@ $ goaccess --load-from-disk --keep-db-files
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1188.5k</span>
+                        class="white-color">1209.5k</span>
             
             
             

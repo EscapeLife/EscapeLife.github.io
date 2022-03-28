@@ -755,8 +755,8 @@ DEBUG
 <li><code>ConfigMap</code> 更新后滚动更新 <code>Pod</code>，更新 <code>ConfigMap</code> 目前并不会触发相关 <code>Pod</code> 的滚动更新，可以通过修改 <code>pod annotations</code> 的方式强制触发滚动更新。这个例子里我们在 <code>.spec.template.metadata.annotations</code> 中添加 <code>version/config</code>，每次通过修改 <code>version/config</code> 来触发滚动更新。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash">$ kubectl patch deployment my-nginx \
-    --patch <span class="token string">'{"spec": {"template": {"metadata": {"annotations": \
-    {"version/config": "20190411" }}}}}'</span>
+    --patch <span class="token string">'&amp;#123;"spec": &amp;#123;"template": &amp;#123;"metadata": &amp;#123;"annotations": \
+    &amp;#123;"version/config": "20190411" &amp;#125;&amp;#125;&amp;#125;&amp;#125;&amp;#125;'</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>更新 <code>ConfigMap</code> 后：<ul>
@@ -961,10 +961,10 @@ $ kubectl create secret docker-registry myregistrykey \
           <span class="token key atrule">mountPath</span><span class="token punctuation">:</span> /data/
       <span class="token key atrule">command</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"/bin/sh"</span><span class="token punctuation">,</span> <span class="token string">"-c"</span><span class="token punctuation">]</span>
       <span class="token key atrule">args</span><span class="token punctuation">:</span>
-        <span class="token punctuation">-</span> <span class="token string">"while true; do echo $(date) >> /data/index.html; sleep 3; done"</span>
+        <span class="token punctuation">-</span> <span class="token string">"while true; do echo $(date) &gt;&gt; /data/index.html; sleep 3; done"</span>
   <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
     <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> html
-      <span class="token key atrule">emptyDir</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+      <span class="token key atrule">emptyDir</span><span class="token punctuation">:</span> &amp;<span class="token comment" spellcheck="true">#123;&amp;#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash">$ kubectl apply -f pod_volume.demo1.yaml
 curl  10.244.3.34 -s
@@ -1647,7 +1647,7 @@ spec:
 pod/pv-nfs-nginx-6b4759b5b8-95vhk   1/1     Running   0          74s
 pod/pv-nfs-nginx-6b4759b5b8-mjwhn   1/1     Running   0          58s
 pod/pv-nfs-nginx-6b4759b5b8-p4jhn   1/1     Running   0          11s
-service/nfs-pvc      NodePort    10.0.0.57    <span class="token operator">&lt;</span>none<span class="token operator">></span>        80:31850/TCP   4m23s
+service/nfs-pvc      NodePort    10.0.0.57    <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>        80:31850/TCP   4m23s
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><strong>[3] 资源使用：</strong><code>Pod</code> 使用 <code>volume</code> 的定义，将 <code>PVC</code> 挂载到容器内的某个路径进行使用。<code>volume</code> 的类型为 <code>persistentVoulumeClaim</code>，在容器应用挂载了一个 <code>PVC</code> 后，就能被持续独占使用。不过，多个 <code>Pod</code> 可以挂载同一个 <code>PVC</code>，应用程序需要考虑多个实例共同访问一块存储空间的问题。</p>
 <p><strong>[4] 资源释放：</strong>当用户对存储资源使用哪个完毕后，用户可以删除 <code>PVC</code>，与该 <code>PVC</code> 绑定的 <code>PV</code> 将会被标记为已释放，但还不能立刻与其他 <code>PVC</code> 进行绑定。通过之前 <code>PVC</code> 写入的数据可能还留在存储设备上，只有在清除之后该 <code>PV</code> 才能继续使用。</p>
@@ -2270,7 +2270,7 @@ service/nfs-pvc      NodePort    10.0.0.57    <span class="token operator">&lt;<
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1188.5k</span>
+                        class="white-color">1209.5k</span>
             
             
             

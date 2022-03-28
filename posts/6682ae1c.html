@@ -379,7 +379,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    570
+                    598
                 </div>
                 
 
@@ -414,21 +414,21 @@
 <ul>
 <li>早上吃了早餐就到了公司，刚刚坐下并顺便泡了一杯枸杞水，还没喝就匆匆打开电脑，于是乎就收到微信群里的一个小需求，大致要求就是将 <code>/api/v1/game/data?id=&lt;game_id&gt;</code> 新网站路径地址映射到 <code>http://gameid.escape.com/api/v1/new_game/&lt;game_id&gt;</code> 老网站的 <code>API</code> 上面，给开发提供获取游戏用户信息的接口。因为我们使用的 <code>nginx</code> 进行路由配置的，所以最先想到的就是使用 <code>proxy_pass</code> 直接代理到对应的路径位置上。</li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash">server <span class="token punctuation">{</span>
+<pre class="line-numbers language-bash"><code class="language-bash">server <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     listen       80<span class="token punctuation">;</span>
     server_name  gameid.escape.com<span class="token punctuation">;</span>
 
     access_log /var/log/nginx/gameid.nginx.access.log  main<span class="token punctuation">;</span>
     error_log  /var/log/nginx/gameid.nginx.error.log   error<span class="token punctuation">;</span>
 
-    location / <span class="token punctuation">{</span>
+    location / <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
         <span class="token keyword">return</span> 404<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
+    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
-    location ~ /api/v1/game/data\?id<span class="token operator">=</span><span class="token punctuation">(</span>.*<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    location ~ /api/v1/game/data\?id<span class="token operator">=</span><span class="token punctuation">(</span>.*<span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
         proxy_pass http://gameid.escape.com/api/v1/new_game/<span class="token variable">$1</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>本以为就这么简单就完事儿了，但是通过 <code>nginx -t</code> 监测了下配置文件，发现居然报错了。查了下，发现通过 <code>proxy_pass</code> 配置的路径不能包含 <code>URI</code> 部分。分别是：<strong>location 字段中使用正则表达式</strong>、<strong>内部命名的 location 字段</strong>、<strong>包含 if 声明</strong>、<strong>包含 limit_except 块</strong>，我们这里就是使用了正则表达式。</li>
@@ -447,30 +447,30 @@ or inside named location, or inside “if” statement, or inside “limit_excep
 <li><p>这样就好办了，换个方式匹配一下就好了，仅为此做个笔记。</p>
 </li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash">server <span class="token punctuation">{</span>
+<pre class="line-numbers language-bash"><code class="language-bash">server <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     listen       80<span class="token punctuation">;</span>
     server_name  gameid.escape.com<span class="token punctuation">;</span>
 
     access_log /var/log/nginx/gameid.nginx.access.log  main<span class="token punctuation">;</span>
     error_log  /var/log/nginx/gameid.nginx.error.log   error<span class="token punctuation">;</span>
 
-    location / <span class="token punctuation">{</span>
+    location / <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
         <span class="token keyword">return</span> 404<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
+    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
-    location /api/v1/ <span class="token punctuation">{</span>
+    location /api/v1/ <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
         proxy_pass_header Server<span class="token punctuation">;</span>
         proxy_set_header Host <span class="token variable">$http_host</span><span class="token punctuation">;</span>
         proxy_set_header X-Real-IP <span class="token variable">$remote_addr</span><span class="token punctuation">;</span>
         proxy_set_header X-Scheme <span class="token variable">$scheme</span><span class="token punctuation">;</span>
         proxy_http_version 1.1<span class="token punctuation">;</span>
-        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$request_uri</span> ~* <span class="token string">"/api/v1/game/data\?id=(.*)"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$request_uri</span> ~* <span class="token string">"/api/v1/game/data\?id=(.*)"</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
             <span class="token keyword">set</span> <span class="token variable">$id</span> <span class="token variable">$1</span><span class="token punctuation">;</span>
             rewrite     .*  /api/v1/new_game/<span class="token variable">$id</span>  <span class="token keyword">break</span><span class="token punctuation">;</span>
             proxy_pass  http://gameid.escape.com<span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+        <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
@@ -922,7 +922,7 @@ or inside named location, or inside “if” statement, or inside “limit_excep
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1188.5k</span>
+                        class="white-color">1209.5k</span>
             
             
             
