@@ -533,7 +533,7 @@
 <p>路由器<code>(router)</code>就是为此而产生的 <strong>“中间人”</strong>。一个路由器有多个网卡(<code>NIC</code>)。每个网卡可以接入到一个网络，并理解相应的连接层协议。在帧经过路由到达另一个网络的时候，路由会读取帧的信息，并改写以发送到另一个网络。所以路由器就像是在两个社区都有分支的邮局。一个社区的邮差将信送到本社区的邮局分支，而邮局会通过自己在另一个地区的分支将信转交给另一个社区的邮差手中，并由另一个社区的邮差最终送到目的地。</p>
 <p><img src="/images/learn-tcp-ip-protocol-3.jpg" alt="通过路由连接的WiFi和以太网"></p>
 <p>整个通信过程如下:</p>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">&gt;</span> WiFi上的计算机1 -<span class="token operator">&gt;</span> 路由WiFi接口 -<span class="token operator">&gt;</span> 路由以太网接口 -<span class="token operator">&gt;</span> 以太网上的计算机2
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">></span> WiFi上的计算机1 -<span class="token operator">></span> 路由WiFi接口 -<span class="token operator">></span> 路由以太网接口 -<span class="token operator">></span> 以太网上的计算机2
 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>在连接层，一个帧中只能记录起点 <code>SRC</code> 和终点 <code>DST</code> 两个地址。而上面的过程需要经过四个地址(计算机 1，WiFi 接口，以太网接口，计算机 2)。显然，仅仅靠连接层协议无法满足我们的需要。由于连接层协议开发在先，我们无法改动连接层协议，只能在连接层的数据<code>(payload)</code>，也就是信纸内部下功夫了。由此，<code>IP</code> 协议应运而生。</p>
 <p>计算机 1，路由器和计算机 2 都要懂得 <code>IP</code> 协议。当计算机 1 写信的时候，会在信纸的开头写上这封信的出发地址和最终到达地址(注意，这里是信纸，而不是在信封上)，信封上写要送往的邮局。<code>WiFi</code> 网的邮差将信送往邮局。在邮局，信被打开，邮局工作人员看到最终地址，于是将信包装在一个新的信封中，写上出发地为邮局，到达地为计算机 2，并交给以太网的邮差，由以太网的邮差送往计算机 2。</p>
@@ -558,7 +558,7 @@
 <li><strong>[6] 总结陈述</strong></li>
 </ul>
 <p>总过网络分层，我们从原始的 <code>0/1</code> 序列抽象出</p>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">&gt;</span> 本地地址<span class="token punctuation">(</span>邮差<span class="token punctuation">)</span>、邮编<span class="token punctuation">(</span>邮局<span class="token punctuation">)</span>、收信人<span class="token punctuation">(</span>管理员<span class="token punctuation">)</span>、收信人行业<span class="token punctuation">(</span>用语规范<span class="token punctuation">)</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">></span> 本地地址<span class="token punctuation">(</span>邮差<span class="token punctuation">)</span>、邮编<span class="token punctuation">(</span>邮局<span class="token punctuation">)</span>、收信人<span class="token punctuation">(</span>管理员<span class="token punctuation">)</span>、收信人行业<span class="token punctuation">(</span>用语规范<span class="token punctuation">)</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>这些概念。这些概念最终允许互联网上的分布于两台计算机的两个进程相互通信。写信人必须按照各层的协议，封装(<code>encapsulation</code>)好整个信封；而收信人则按照相反的顺序，来拆开这个信封。整个过程是 <strong>可读信息 -&gt; 二进制 -&gt; 可读信息</strong>。</p>
 <p>计算机只能理解和传输 <code>0/1</code> 序列，而计算机的用户则总是输入和输出可读信息。网络协议保证了可读信息在整个转换和传输过程中的完整性。计算机协议本身还有更多的细节需要深入。这篇文章只是从分层的角度描述各个层次所实现的功能。</p>
@@ -766,7 +766,7 @@
 <p>从前两行我们看到，由于路由器横跨 <code>eth0</code> 和 <code>eth1</code> 两个网络，它可以直接通过 <code>eth0</code> 和 <code>eth1</code> 上的网卡直接传送 <code>IP</code> 包。第三行表示，如果是前面两行之外的 <code>IP</code> 地址，则需要通过 <code>eth1</code>，送往 <code>199.165.146.8</code>(右边的路由器)。我们的目的地符合第二行，所以将 <code>IP</code> 放入一个新的帧中，在帧的头部写上 <code>199.165.146.21</code> 的 <code>MAC</code> 地址，直接发往主机 <code>146.21</code>。</p>
 <p>在 <code>Linux</code> 下，可以使用 <code>route -n</code> 或 <code>ip route</code> 来查看路由表。<code>route</code> 命令基本上是所有 <code>Linux</code> 系统自带的命令，不过现在有更强悍的网络命令集 <a target="_blank" rel="noopener" href="http://www.linuxfoundation.org/collaborate/workgroups/networking/iproute2">iproute2</a>。它完全可以替代 <code>ifconfig</code>, <code>route</code> 等命令，比如查看 <code>ip address</code> 和 <code>route table</code>。</p>
 <pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token variable"><span class="token variable">`</span>IP<span class="token variable">`</span></span> addr show enp0s5
-2: enp0s5: <span class="token operator">&lt;</span>BROADCAST,MULTICAST,UP,LOWER_UP<span class="token operator">&gt;</span> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+2: enp0s5: <span class="token operator">&lt;</span>BROADCAST,MULTICAST,UP,LOWER_UP<span class="token operator">></span> mtu 1500 qdisc pfifo_fast state UP qlen 1000
     link/ether 00:1c:42:bd:ea:3d brd ff:ff:ff:ff:ff:ff
         inet 10.211.55.6/24 brd 10.211.55.255 scope global enp0s5
     inet6 fdb2:2c26:f4e4:0:12c:42ff:fedb:ae3d/64 scope global dynamic
@@ -796,7 +796,7 @@ default via 10.211.55.1 dev enp0s5  metric 2
 <p>路由表的生成同样基于网络。一种用来生成路由表的协议是 <code>RIP</code>。它通过“距离”来决定路由表，所以属于 <code>distance-vector protocol</code>。对于 <code>RIP</code> 来说，所谓的“距离”是从出发地到目的地途径的路由器数目(<code>hop number</code>)。</p>
 <p><code>RIP</code> 的基本逻辑是：如果 <code>A</code> 距离 <code>B</code> 为 <code>6</code>，而我距离 <code>A</code> 为 <code>1</code>，那么我途径 <code>A</code> 到 <code>B</code> 的距离为 <code>7</code>。</p>
 <p>比如上面从机场到朝阳门，按照</p>
-<pre class="line-numbers language-bash"><code class="language-bash">    2号航站楼 -<span class="token operator">&gt;&gt;</span> 三元桥 -<span class="token operator">&gt;&gt;</span> 东直门 -<span class="token operator">&gt;&gt;</span> 朝阳门路线
+<pre class="line-numbers language-bash"><code class="language-bash">    2号航站楼 -<span class="token operator">>></span> 三元桥 -<span class="token operator">>></span> 东直门 -<span class="token operator">>></span> 朝阳门路线
 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>途径上有两个路由器，因此从起点到终点的距离为 <code>2</code>。我们最初可以手动生成三元桥的路由表。随后，根据 <code>RIP</code> 协议，三元桥向周围的路由器和主机广播自己前往各个 <code>IP</code> 的距离(比如到机场=0，团结湖=0，国贸=1，望京西=1，建国门=2)。收到 <code>RIP</code> 包的路由器和主机根据 <code>RIP</code> 包和自己到发送 <code>RIP</code> 包的主机的距离，算出自己前往各个 <code>IP</code> 的距离。东直门与三元桥的距离为 1。东直门收到三元桥的 <code>RIP</code> 包(到机场的距离为 0)，那么东直门途径三元桥前往机场的距离为 1+0=1。如果东直门自己的 <code>RIP</code> 记录都比这个远(比如东直门-&gt;&gt;芍药居-&gt;&gt;三元桥-&gt;&gt;机场= 2)。那么东直门更改自己的路由表：前往机场的交通都发往三元桥而不是芍药居。如果东直门自身的 <code>RIP</code> 记录并不差，那么东直门保持路由表不变。在各个点不断重复<strong>RIP 广播/计算距离/更新路由表</strong>的过程，最终所有的主机和路由器都能生成最合理的路由表。</p>
 <p><code>RIP</code> 出于技术上的原因，认为距离超过 <code>15</code> 的 <code>IP</code> 不可到达。所以 <code>RIP</code> 更多用于互联网的一部分(比如整个中国电信的网络)。这样一个互联网的部分往往属于同一个 <code>ISP</code> 或者有同一个管理机构，所以叫做自治系统。自治系统内部的主机和路由根据通向外部的边界路由器来和其它的自治系统通信。各个边界路由器之间通过 <code>BGP</code> 来生成自己前往其它 <code>AS</code> 的路由表。自治系统内部则参照边界路由器，使用 <code>RIP</code> 来决定路由表。<code>BGP</code> 的基本工作过程与 <code>RIP</code> 类似，但在考虑距离的同时，也权衡比如政策、连接性能等其他因素，再决定交通的走向(路由表)。</p>
@@ -1873,7 +1873,7 @@ RTO <span class="token operator">=</span> mean + 4 std
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1209.5k</span>
+                        class="white-color">1189.3k</span>
             
             
             

@@ -575,7 +575,7 @@ In <span class="token punctuation">[</span><span class="token number">8</span><s
 Out<span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">:</span> <span class="token boolean">False</span>
 
 In <span class="token punctuation">[</span><span class="token number">9</span><span class="token punctuation">]</span><span class="token punctuation">:</span> output<span class="token punctuation">.</span>process
-Out<span class="token punctuation">[</span><span class="token number">9</span><span class="token punctuation">]</span><span class="token punctuation">:</span> <span class="token operator">&lt;</span>Process <span class="token number">60644</span> <span class="token punctuation">[</span>b<span class="token string">'/usr/bin/command'</span><span class="token punctuation">,</span> b<span class="token string">'who'</span><span class="token punctuation">]</span><span class="token operator">&gt;</span>
+Out<span class="token punctuation">[</span><span class="token number">9</span><span class="token punctuation">]</span><span class="token punctuation">:</span> <span class="token operator">&lt;</span>Process <span class="token number">60644</span> <span class="token punctuation">[</span>b<span class="token string">'/usr/bin/command'</span><span class="token punctuation">,</span> b<span class="token string">'who'</span><span class="token punctuation">]</span><span class="token operator">></span>
 
 In <span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span><span class="token punctuation">:</span> output<span class="token punctuation">.</span>next<span class="token punctuation">(</span><span class="token punctuation">)</span>
 Out<span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span><span class="token punctuation">:</span> <span class="token string">'escape   console  Sep 29 09:10'</span>
@@ -585,9 +585,9 @@ Out<span class="token punctuation">[</span><span class="token number">10</span><
 <p><strong>具体的实现可以参考源码</strong></p>
 </blockquote>
 <p>在 sh 库中，其并没有重新实现了类似 <code>ls</code>、<code>sudo</code> 这样的 <code>Linux</code> 命令，而是使用了一种我们在 <code>Python</code> 编写中不常用的 <code>ModuleType</code> 类型来实现的。</p>
-<pre class="line-numbers language-python"><code class="language-python"><span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> <span class="token keyword">import</span> types
-<span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> types<span class="token punctuation">.</span>ModuleType
-<span class="token operator">&lt;</span>type <span class="token string">'module'</span><span class="token operator">&gt;</span>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token operator">>></span><span class="token operator">></span> <span class="token keyword">import</span> types
+<span class="token operator">>></span><span class="token operator">></span> types<span class="token punctuation">.</span>ModuleType
+<span class="token operator">&lt;</span>type <span class="token string">'module'</span><span class="token operator">></span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <p>在编程中，我们所导入的每个模块都是这种类型。这里，我们将导入的模块替换为我们自己定义的模块，即可。当我们去访问模块不存在的属性时，会自动调用定义的 <code>__getattr__</code> 魔术方法，是不是很巧妙？从这我们知道怎么从一个 <code>module</code> 中 <code>import</code> 出不存在的函数或者类了，那么它是怎么把 import 的函数绑定到系统中呢？这个可以看下 <a href="https://link.zhihu.com/?target=https://github.com/amoffat/sh/blob/master/sh.py">源码</a>，然后思考思考。</p>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> sys
@@ -597,7 +597,7 @@ Out<span class="token punctuation">[</span><span class="token number">10</span><
     <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> self_module<span class="token punctuation">)</span><span class="token punctuation">:</span>
         self<span class="token punctuation">.</span>self_module <span class="token operator">=</span> self_module
     <span class="token keyword">def</span> <span class="token function">__getattr__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> name<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">return</span> f<span class="token string">'&amp;#123;name&amp;#125; to -&gt; test'</span>
+        <span class="token keyword">return</span> f<span class="token string">'{name} to -> test'</span>
 
 <span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">"__main__"</span><span class="token punctuation">:</span>
     <span class="token keyword">pass</span>
@@ -605,9 +605,9 @@ Out<span class="token punctuation">[</span><span class="token number">10</span><
     self <span class="token operator">=</span> sys<span class="token punctuation">.</span>modules<span class="token punctuation">[</span>__name__<span class="token punctuation">]</span>
     sys<span class="token punctuation">.</span>modules<span class="token punctuation">[</span>__name__<span class="token punctuation">]</span> <span class="token operator">=</span> Tenv<span class="token punctuation">(</span>self<span class="token punctuation">)</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> <span class="token function">import</span> <span class="token function">test</span>
-<span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> print test.ls
-<span class="token punctuation">(</span><span class="token string">'ls'</span> to -<span class="token operator">&gt;</span> test<span class="token punctuation">)</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">>></span><span class="token operator">></span> <span class="token function">import</span> <span class="token function">test</span>
+<span class="token operator">>></span><span class="token operator">></span> print test.ls
+<span class="token punctuation">(</span><span class="token string">'ls'</span> to -<span class="token operator">></span> test<span class="token punctuation">)</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="3-sh-库使用技巧"><a href="#3-sh-库使用技巧" class="headerlink" title="3. sh 库使用技巧"></a>3. sh 库使用技巧</h2><blockquote>
@@ -792,7 +792,7 @@ procs <span class="token operator">=</span> <span class="token punctuation">[</s
 <p>使用 <code>_env</code> 变量允许我们传递环境变量及其对应值的字典。</p>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> sh
 
-sh<span class="token punctuation">.</span>google_chrome<span class="token punctuation">(</span>_env<span class="token operator">=</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;"SOCKS_SERVER": "localhost:1234"&amp;#125;)</span>
+sh<span class="token punctuation">.</span>google_chrome<span class="token punctuation">(</span>_env<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"SOCKS_SERVER"</span><span class="token punctuation">:</span> <span class="token string">"localhost:1234"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> os
 <span class="token keyword">import</span> sh
@@ -1591,7 +1591,7 @@ out <span class="token operator">=</span> tr<span class="token punctuation">(</s
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1209.5k</span>
+                        class="white-color">1189.3k</span>
             
             
             

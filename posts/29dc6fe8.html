@@ -465,14 +465,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    4.1k
+                    3.9k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    17 分
+                    16 分
                 </div>
                 
 
@@ -862,8 +862,8 @@ $ docker <span class="token function">ps</span> --filter status<span class="toke
 $ docker <span class="token function">ps</span> --filter <span class="token string">"name=nostalgic_stallman"</span>
 
 <span class="token comment" spellcheck="true"># 格式化</span>
-$ docker network inspect --format <span class="token string">"&amp;#123;&amp;#123;.ID&amp;#125;&amp;#125;"</span> net1
-$ docker <span class="token function">ps</span> --filter volume<span class="token operator">=</span>/data --format <span class="token string">"table &amp;#123;&amp;#123;.ID&amp;#125;&amp;#125;\t&amp;#123;&amp;#123;.Mounts&amp;#125;&amp;#125;"</span>
+$ docker network inspect --format <span class="token string">"{{.ID}}"</span> net1
+$ docker <span class="token function">ps</span> --filter volume<span class="token operator">=</span>/data --format <span class="token string">"table {{.ID}}\t{{.Mounts}}"</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="2-2-inspect-命令"><a href="#2-2-inspect-命令" class="headerlink" title="2.2 inspect 命令"></a>2.2 inspect 命令</h3><ul>
@@ -895,16 +895,16 @@ $ docker <span class="token function">ps</span> --filter volume<span class="toke
 </tr>
 </tbody></table>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 获取容器IP地址</span>
-$ docker inspect --format<span class="token operator">=</span><span class="token string">'&amp;#123;&amp;#123;range .NetworkSettings.Networks&amp;#125;&amp;#125;&amp;#123;&amp;#123;.IPAddress&amp;#125;&amp;#125;&amp;#123;&amp;#123;end&amp;#125;&amp;#125;'</span> <span class="token variable">$INSTANCE_ID</span>
+$ docker inspect --format<span class="token operator">=</span><span class="token string">'{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'</span> <span class="token variable">$INSTANCE_ID</span>
 
 <span class="token comment" spellcheck="true"># 获取容器MAC地址</span>
-$ $ docker inspect --format<span class="token operator">=</span><span class="token string">'&amp;#123;&amp;#123;range .NetworkSettings.Networks&amp;#125;&amp;#125;&amp;#123;&amp;#123;.MacAddress&amp;#125;&amp;#125;&amp;#123;&amp;#123;end&amp;#125;&amp;#125;'</span> <span class="token variable">$INSTANCE_ID</span>
+$ $ docker inspect --format<span class="token operator">=</span><span class="token string">'{{range .NetworkSettings.Networks}}{{.MacAddress}}{{end}}'</span> <span class="token variable">$INSTANCE_ID</span>
 
 <span class="token comment" spellcheck="true"># 获取容器日志路径</span>
-$ docker inspect --format<span class="token operator">=</span><span class="token string">'&amp;#123;&amp;#123;.LogPath&amp;#125;&amp;#125;'</span> <span class="token variable">$INSTANCE_ID</span>
+$ docker inspect --format<span class="token operator">=</span><span class="token string">'{{.LogPath}}'</span> <span class="token variable">$INSTANCE_ID</span>
 
 <span class="token comment" spellcheck="true"># 获取容器名称</span>
-$ docker inspect --format<span class="token operator">=</span><span class="token string">'&amp;#123;&amp;#123;.Config.Image&amp;#125;&amp;#125;'</span> <span class="token variable">$INSTANCE_ID</span>
+$ docker inspect --format<span class="token operator">=</span><span class="token string">'{{.Config.Image}}'</span> <span class="token variable">$INSTANCE_ID</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="2-3-exec-命令"><a href="#2-3-exec-命令" class="headerlink" title="2.3 exec 命令"></a>2.3 exec 命令</h3><ul>
@@ -1038,7 +1038,7 @@ $ docker logs --since<span class="token operator">=</span><span class="token str
 </tr>
 </tbody></table>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 导出镜像</span>
-$ docker <span class="token function">export</span> a404c6c174a2 <span class="token operator">&gt;</span> latest.tar
+$ docker <span class="token function">export</span> a404c6c174a2 <span class="token operator">></span> latest.tar
 $ docker <span class="token function">export</span> -o mysql-<span class="token variable"><span class="token variable">`</span><span class="token function">date</span> +%Y%m%d<span class="token variable">`</span></span>.tar a404c6c174a2
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
@@ -1102,23 +1102,23 @@ $ docker stats --no-stream
 $ docker stats --no-stream registry
 
 <span class="token comment" spellcheck="true"># 基于此，我们可以通过简单的方式使用容器的名称替代默认输出中的容器ID</span>
-$ docker stats <span class="token punctuation">$(</span>docker <span class="token function">ps</span> --format<span class="token operator">=</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;&amp;#123;.Names&amp;#125;&amp;#125;)</span>
+$ docker stats <span class="token variable"><span class="token variable">$(</span>docker <span class="token function">ps</span> --format<span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">{</span>.Names<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token variable">)</span></span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 格式化输出的结果</span>
-<span class="token comment" spellcheck="true"># .Container =&gt; 根据用户指定的名称显示容器的名称或ID</span>
-<span class="token comment" spellcheck="true"># .Name =&gt; 容器名称</span>
-<span class="token comment" spellcheck="true"># .ID =&gt; 容器ID</span>
-<span class="token comment" spellcheck="true"># .CPUPerc =&gt; CPU使用率</span>
-<span class="token comment" spellcheck="true"># .MemUsage =&gt; 内存使用量</span>
-<span class="token comment" spellcheck="true"># .NetIO =&gt; 网络I/O</span>
-<span class="token comment" spellcheck="true"># .BlockIO =&gt; 磁盘I/O</span>
-<span class="token comment" spellcheck="true"># .MemPerc =&gt; 内存使用率</span>
-<span class="token comment" spellcheck="true"># .PIDs =&gt; PID号</span>
-$ docker stats --format <span class="token string">"table &amp;#123;&amp;#123;.Name&amp;#125;&amp;#125;\t&amp;#123;&amp;#123;.CPUPerc&amp;#125;&amp;#125;\t&amp;#123;&amp;#123;.MemUsage&amp;#125;&amp;#125;"</span>
+<span class="token comment" spellcheck="true"># .Container => 根据用户指定的名称显示容器的名称或ID</span>
+<span class="token comment" spellcheck="true"># .Name => 容器名称</span>
+<span class="token comment" spellcheck="true"># .ID => 容器ID</span>
+<span class="token comment" spellcheck="true"># .CPUPerc => CPU使用率</span>
+<span class="token comment" spellcheck="true"># .MemUsage => 内存使用量</span>
+<span class="token comment" spellcheck="true"># .NetIO => 网络I/O</span>
+<span class="token comment" spellcheck="true"># .BlockIO => 磁盘I/O</span>
+<span class="token comment" spellcheck="true"># .MemPerc => 内存使用率</span>
+<span class="token comment" spellcheck="true"># .PIDs => PID号</span>
+$ docker stats --format <span class="token string">"table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}"</span>
 
 <span class="token comment" spellcheck="true"># 还可以通过format选项输出json格式的结果</span>
 $ docker stats --no-stream --format \
-    <span class="token string">"&amp;#123;\"container\":\"&amp;#123;&amp;#123; .Container &amp;#125;&amp;#125;\",\"memory\":&amp;#123;\"raw\":\"&amp;#123;&amp;#123; .MemUsage &amp;#125;&amp;#125;\",\"percent\":\"&amp;#123;&amp;#123; .MemPerc &amp;#125;&amp;#125;\"&amp;#125;,\"cpu\":\"&amp;#123;&amp;#123; .CPUPerc &amp;#125;&amp;#125;\"&amp;#125;"</span>
+    <span class="token string">"{\"container\":\"{{ .Container }}\",\"memory\":{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"},\"cpu\":\"{{ .CPUPerc }}\"}"</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="2-9-port-命令"><a href="#2-9-port-命令" class="headerlink" title="2.9 port 命令"></a>2.9 port 命令</h3><ul>
@@ -2252,7 +2252,7 @@ $ docker <span class="token function">import</span> my_ubuntu_v3.tar ubuntu:v4
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1209.5k</span>
+                        class="white-color">1189.3k</span>
             
             
             

@@ -520,12 +520,12 @@
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 我们可以看到命令都是需要动态链接的</span>
 $ ldd /usr/bin/lsof
     linux-vdso.so.1 <span class="token punctuation">(</span>0x00007ffead5d4000<span class="token punctuation">)</span>
-    libselinux.so.1 <span class="token operator">=</span><span class="token operator">&gt;</span> /lib/x86_64-linux-gnu/libselinux.so.1 <span class="token punctuation">(</span>0x00007f64feb94000<span class="token punctuation">)</span>
-    libc.so.6 <span class="token operator">=</span><span class="token operator">&gt;</span> /lib/x86_64-linux-gnu/libc.so.6 <span class="token punctuation">(</span>0x00007f64fe7f5000<span class="token punctuation">)</span>
-    libpcre.so.3 <span class="token operator">=</span><span class="token operator">&gt;</span> /lib/x86_64-linux-gnu/libpcre.so.3 <span class="token punctuation">(</span>0x00007f64fe582000<span class="token punctuation">)</span>
-    libdl.so.2 <span class="token operator">=</span><span class="token operator">&gt;</span> /lib/x86_64-linux-gnu/libdl.so.2 <span class="token punctuation">(</span>0x00007f64fe37e000<span class="token punctuation">)</span>
+    libselinux.so.1 <span class="token operator">=</span><span class="token operator">></span> /lib/x86_64-linux-gnu/libselinux.so.1 <span class="token punctuation">(</span>0x00007f64feb94000<span class="token punctuation">)</span>
+    libc.so.6 <span class="token operator">=</span><span class="token operator">></span> /lib/x86_64-linux-gnu/libc.so.6 <span class="token punctuation">(</span>0x00007f64fe7f5000<span class="token punctuation">)</span>
+    libpcre.so.3 <span class="token operator">=</span><span class="token operator">></span> /lib/x86_64-linux-gnu/libpcre.so.3 <span class="token punctuation">(</span>0x00007f64fe582000<span class="token punctuation">)</span>
+    libdl.so.2 <span class="token operator">=</span><span class="token operator">></span> /lib/x86_64-linux-gnu/libdl.so.2 <span class="token punctuation">(</span>0x00007f64fe37e000<span class="token punctuation">)</span>
     /lib64/ld-linux-x86-64.so.2 <span class="token punctuation">(</span>0x00007f64fefe4000<span class="token punctuation">)</span>
-    libpthread.so.0 <span class="token operator">=</span><span class="token operator">&gt;</span> /lib/x86_64-linux-gnu/libpthread.so.0 <span class="token punctuation">(</span>0x00007f64fe161000<span class="token punctuation">)</span>
+    libpthread.so.0 <span class="token operator">=</span><span class="token operator">></span> /lib/x86_64-linux-gnu/libpthread.so.0 <span class="token punctuation">(</span>0x00007f64fe161000<span class="token punctuation">)</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>该服务器上面还是很多开发和测试环境使用的环境和配置的程序，如果正式的导致系统无法使用，那就玩大的。所有开始在网上找相关的内容，可是一直都没有知道处理上述问题的方法，让人感觉到绝望。</li>
@@ -571,16 +571,16 @@ $ ldd /usr/bin/lsof
 <span class="token comment" spellcheck="true"># random_num.c</span>
 <span class="token comment" spellcheck="true">##############</span>
 
-<span class="token comment" spellcheck="true">#include &lt;stdio.h&gt;</span>
-<span class="token comment" spellcheck="true">#include &lt;stdlib.h&gt;</span>
-<span class="token comment" spellcheck="true">#include &lt;time.h&gt;</span>
+<span class="token comment" spellcheck="true">#include &lt;stdio.h></span>
+<span class="token comment" spellcheck="true">#include &lt;stdlib.h></span>
+<span class="token comment" spellcheck="true">#include &lt;time.h></span>
 
-int main<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+int main<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
   srand<span class="token punctuation">(</span>time<span class="token punctuation">(</span>NULL<span class="token punctuation">))</span><span class="token punctuation">;</span>
   int i <span class="token operator">=</span> 10<span class="token punctuation">;</span>
   while<span class="token punctuation">(</span>i--<span class="token punctuation">)</span> printf<span class="token punctuation">(</span><span class="token string">"%d\n"</span>,rand<span class="token punctuation">(</span><span class="token punctuation">)</span>%100<span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token keyword">return</span> 0<span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>我们使用这条命令 <code>gcc -shared -fPIC unrandom.c -o unrandom.so</code> 将另一个 <code>C</code> 程序编译进入一个共享库中，它使用一个常数值 <code>42</code> 实现了一个 <code>rand()</code> 函数。因此，现在我们已经有了一个可以输出一些随机数的<strong>应用程序</strong>和一个<strong>定制的库</strong>。</li>
@@ -589,9 +589,9 @@ int main<span class="token punctuation">(</span><span class="token punctuation">
 <span class="token comment" spellcheck="true"># unrandom.c</span>
 <span class="token comment" spellcheck="true">##############</span>
 
-int rand<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+int rand<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
     <span class="token keyword">return</span> 42<span class="token punctuation">;</span> //the <span class="token function">most</span> random number <span class="token keyword">in</span> the universe
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>现在，我们再试用如下命令执行程序的时候，发现已经的不要我们原有的十个随机数了，而是返回十次常数 <code>42</code> 了。这是为什么呢？一个未被改变过的应用程序在一个正常的运行方式中，看上去受到了我们做的一个极小的库的影响。</li>
@@ -609,8 +609,8 @@ $ <span class="token function">export</span> LD_PRELOAD<span class="token operat
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 程序random_nums所需要的库的列表</span>
 <span class="token comment" spellcheck="true"># 这个列表是构建进可执行程序中的并且它是在编译时决定的</span>
 $ ldd random_nums
-linux-vdso.so.1 <span class="token operator">=</span><span class="token operator">&gt;</span> <span class="token punctuation">(</span>0x00007fff4bdfe000<span class="token punctuation">)</span>
-libc.so.6 <span class="token operator">=</span><span class="token operator">&gt;</span> /lib/x86_64-linux-gnu/libc.so.6 <span class="token punctuation">(</span>0x00007f48c03ec000<span class="token punctuation">)</span>
+linux-vdso.so.1 <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">(</span>0x00007fff4bdfe000<span class="token punctuation">)</span>
+libc.so.6 <span class="token operator">=</span><span class="token operator">></span> /lib/x86_64-linux-gnu/libc.so.6 <span class="token punctuation">(</span>0x00007f48c03ec000<span class="token punctuation">)</span>
 /lib64/ld-linux-x86-64.so.2 <span class="token punctuation">(</span>0x00007f48c07e3000<span class="token punctuation">)</span>
 
 <span class="token comment" spellcheck="true"># 可以使用如下命令查看so文件的全部函数列表</span>
@@ -618,9 +618,9 @@ $ nm -D /lib/libc.so.6 <span class="token operator">|</span> <span class="token 
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 列出我们强加指定库之后的链接库列表</span>
 $ LD_PRELOAD<span class="token operator">=</span><span class="token variable">$PWD</span>/unrandom.so ldd random_nums
-linux-vdso.so.1 <span class="token operator">=</span><span class="token operator">&gt;</span>  <span class="token punctuation">(</span>0x00007fff369dc000<span class="token punctuation">)</span>
+linux-vdso.so.1 <span class="token operator">=</span><span class="token operator">></span>  <span class="token punctuation">(</span>0x00007fff369dc000<span class="token punctuation">)</span>
 /some/path/to/unrandom.so <span class="token punctuation">(</span>0x00007f262b439000<span class="token punctuation">)</span>
-libc.so.6 <span class="token operator">=</span><span class="token operator">&gt;</span> /lib/x86_64-linux-gnu/libc.so.6 <span class="token punctuation">(</span>0x00007f262b044000<span class="token punctuation">)</span>
+libc.so.6 <span class="token operator">=</span><span class="token operator">></span> /lib/x86_64-linux-gnu/libc.so.6 <span class="token punctuation">(</span>0x00007f262b044000<span class="token punctuation">)</span>
 /lib64/ld-linux-x86-64.so.2 <span class="token punctuation">(</span>0x00007f262b63d000<span class="token punctuation">)</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
@@ -1210,7 +1210,7 @@ libc.so.6 <span class="token operator">=</span><span class="token operator">&gt;
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1209.5k</span>
+                        class="white-color">1189.3k</span>
             
             
             

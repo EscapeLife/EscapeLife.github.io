@@ -375,7 +375,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    743
+                    731
                 </div>
                 
 
@@ -462,10 +462,10 @@
 <p>最近发现某个测试系统登录跳转异常，但是使用相同的镜像重新启动一组服务却能够正常运行起来，实在是百思不得其解。排除中抛开了系统和代码之外，能够想到的区别就是请求传参的问题，所以使用了 <code>Har</code> 文件保留了异常环境的登录跳转异常时所产生的所有请求信息(可能会报错密码等敏感信息，尽量使用测试账户)。</p>
 <p>然后导入类似于 <code>Proxyman</code> 这种可以识别 <code>Har</code> 文件的工具，通过查看对应内容发现，异常环境和正常环境的问题就在于 <code>token</code> 的生成结果不一致导致的，导致跳转校验失败。对应 <code>token</code> 的实现涉及到使用 <code>URL</code> 地址来作为参数的，所以看到了如下代码。这两种写法生成的 <code>string</code> 存在细微差异，即前者如果 <code>URL</code> 地址中存在 <code>/</code> 符号的话会原样保持，但后者会 <code>urlencode</code> 编码为 <code>%2F</code>，所以如果从 <strong>A 系统</strong> 跳转到 <strong>B 系统</strong> 就会出现问题。</p>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># A系统parama生成</span>
-<span class="token punctuation">(</span><span class="token string">"&amp;#123;&amp;#125;=&amp;#123;&amp;#125;"</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>key<span class="token punctuation">,</span> urllib<span class="token punctuation">.</span>parse<span class="token punctuation">.</span>quote<span class="token punctuation">(</span>str<span class="token punctuation">(</span>values<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token string">"{}={}"</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>key<span class="token punctuation">,</span> urllib<span class="token punctuation">.</span>parse<span class="token punctuation">.</span>quote<span class="token punctuation">(</span>str<span class="token punctuation">(</span>values<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 
 <span class="token comment" spellcheck="true"># B系统parama生成</span>
-urllib<span class="token punctuation">.</span>parse<span class="token punctuation">.</span>urlencode<span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;key: values&amp;#125;)</span>
+urllib<span class="token punctuation">.</span>parse<span class="token punctuation">.</span>urlencode<span class="token punctuation">(</span><span class="token punctuation">{</span>key<span class="token punctuation">:</span> values<span class="token punctuation">}</span><span class="token punctuation">)</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>所以通过上面的问题排除，我们发现 <code>Har</code> 文件还是非常有用的！而且还有一个问题就是，需要保持思维的清晰，不会形成思维定式，才能有助于排除问题。</p>
 
@@ -914,7 +914,7 @@ urllib<span class="token punctuation">.</span>parse<span class="token punctuatio
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1209.5k</span>
+                        class="white-color">1189.3k</span>
             
             
             

@@ -477,7 +477,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    354
+                    318
                 </div>
                 
 
@@ -515,7 +515,7 @@
 <ul>
 <li><strong>获取本机 IP 地址</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">ifconfig</span> eth0 <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">"inet addr"</span> <span class="token operator">|</span> <span class="token function">awk</span> -F: <span class="token string">'&amp;#123;print <span class="token variable">$2</span>&amp;#125;'</span> <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'&amp;#123;print <span class="token variable">$1</span>&amp;#125;'</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">ifconfig</span> eth0 <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">"inet addr"</span> <span class="token operator">|</span> <span class="token function">awk</span> -F: <span class="token string">'{print <span class="token variable">$2</span>}'</span> <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$1</span>}'</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <ul>
 <li><strong>查看内存占用最多</strong></li>
@@ -534,17 +534,17 @@
 <ul>
 <li><strong>查看 TCP 连接状态</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">netstat</span> -n <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'/^tcp/ &amp;#123;++S[<span class="token variable">$NF</span>]&amp;#125; END &amp;#123;for(a in S) print a, S[a]&amp;#125;'</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">netstat</span> -n <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'/^tcp/ {++S[<span class="token variable">$NF</span>]} END {for(a in S) print a, S[a]}'</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <ul>
 <li><strong>找查较多的 SYN 连接</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">netstat</span> -an <span class="token operator">|</span> <span class="token function">grep</span> SYN <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'&amp;#123;print <span class="token variable">$5</span>&amp;#125;'</span> <span class="token operator">|</span> <span class="token function">awk</span> -F: <span class="token string">'&amp;#123;print <span class="token variable">$1</span>&amp;#125;'</span> <span class="token operator">|</span> <span class="token function">sort</span> <span class="token operator">|</span> <span class="token function">uniq</span> -c <span class="token operator">|</span><span class="token function">sort</span> -nr <span class="token operator">|</span> <span class="token function">more</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">netstat</span> -an <span class="token operator">|</span> <span class="token function">grep</span> SYN <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$5</span>}'</span> <span class="token operator">|</span> <span class="token function">awk</span> -F: <span class="token string">'{print <span class="token variable">$1</span>}'</span> <span class="token operator">|</span> <span class="token function">sort</span> <span class="token operator">|</span> <span class="token function">uniq</span> -c <span class="token operator">|</span><span class="token function">sort</span> -nr <span class="token operator">|</span> <span class="token function">more</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <ul>
 <li><strong>查找较多 time_wait 连接</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">netstat</span> -n <span class="token operator">|</span> <span class="token function">grep</span> TIME_WAIT <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'&amp;#123;print <span class="token variable">$5</span>&amp;#125;'</span> <span class="token operator">|</span> <span class="token function">sort</span> <span class="token operator">|</span> <span class="token function">uniq</span> -c <span class="token operator">|</span> <span class="token function">sort</span> -rn <span class="token operator">|</span> <span class="token function">head</span> -n 20
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">netstat</span> -n <span class="token operator">|</span> <span class="token function">grep</span> TIME_WAIT <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$5</span>}'</span> <span class="token operator">|</span> <span class="token function">sort</span> <span class="token operator">|</span> <span class="token function">uniq</span> -c <span class="token operator">|</span> <span class="token function">sort</span> -rn <span class="token operator">|</span> <span class="token function">head</span> -n 20
 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <hr>
 <h2 id="3-设备驱动信息"><a href="#3-设备驱动信息" class="headerlink" title="3. 设备驱动信息"></a>3. 设备驱动信息</h2><blockquote>
@@ -584,10 +584,10 @@ lspci -nn -d 10de:
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># ./abc</span>
 <span class="token comment" spellcheck="true"># ./xyz</span>
-$ <span class="token function">find</span> <span class="token keyword">.</span> -type f -exec <span class="token keyword">echo</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;&amp;#125; \;</span>
+$ <span class="token function">find</span> <span class="token keyword">.</span> -type f -exec <span class="token keyword">echo</span> <span class="token punctuation">{</span><span class="token punctuation">}</span> \<span class="token punctuation">;</span>
 
 <span class="token comment" spellcheck="true"># ./xyz ./abc</span>
-$ <span class="token function">find</span> <span class="token keyword">.</span> -type f -exec <span class="token keyword">echo</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;&amp;#125; +</span>
+$ <span class="token function">find</span> <span class="token keyword">.</span> -type f -exec <span class="token keyword">echo</span> <span class="token punctuation">{</span><span class="token punctuation">}</span> +
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
@@ -1133,7 +1133,7 @@ $ <span class="token function">find</span> <span class="token keyword">.</span> 
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1209.5k</span>
+                        class="white-color">1189.3k</span>
             
             
             

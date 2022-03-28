@@ -472,7 +472,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    18 分
+                    17 分
                 </div>
                 
 
@@ -526,13 +526,13 @@
 <span class="token comment" spellcheck="true"># limit_req指令指定location为/login.html的页面使用这块共享内存区域</span>
 <span class="token keyword">limit_req_zone</span> <span class="token variable">$binary_remote_addr</span> zone<span class="token operator">=</span>one<span class="token punctuation">:</span>10m rate<span class="token operator">=</span>30r<span class="token operator">/</span>m<span class="token punctuation">;</span>
 
-<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<span class="token keyword">server</span> <span class="token punctuation">{</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-    <span class="token keyword">location</span> <span class="token operator">/</span>login<span class="token punctuation">.</span>html <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token keyword">location</span> <span class="token operator">/</span>login<span class="token punctuation">.</span>html <span class="token punctuation">{</span>
         <span class="token keyword">limit_req</span> zone<span class="token operator">=</span>one<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[2] 限制请求的连接数</strong></li>
@@ -543,50 +543,50 @@
 <span class="token comment" spellcheck="true"># limit_conn指令指定location为/store的页面使用这块共享内存区域，并且限制每个客户端IP的最大连接数为10个</span>
 <span class="token keyword">limit_conn_zone</span> <span class="token variable">$binary_remote_addr</span> zone<span class="token operator">=</span>addr<span class="token punctuation">:</span>10m<span class="token punctuation">;</span>
 
-<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<span class="token keyword">server</span> <span class="token punctuation">{</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-    <span class="token keyword">location</span> <span class="token operator">/</span>store<span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token keyword">location</span> <span class="token operator">/</span>store<span class="token operator">/</span> <span class="token punctuation">{</span>
         <span class="token keyword">limit_conn</span> addr <span class="token number">10</span><span class="token punctuation">;</span>
         <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[3] 关闭慢速连接</strong></li>
 </ul>
 <p>可以关闭那些请求数据非常稀少的连接，这些连接通常试图保持尽可能长的时间以消耗服务器资源。<code>Slowloris</code>攻击就是这种类型。<code>client_body_timeout</code>指令控制<code>NGINX</code>在两次用户体写之间等待多长时间，<code>client_header_timeout</code>指令控制<code>NGINX</code>在两次用户头部写之间等待多长时间。这两个指令默认值均为<code>60</code>秒。下面为示例配置<code>NGINX</code>在两次用户体或头部写之间最多等待 5 秒。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
     <span class="token keyword">client_body_timeout</span> 5s<span class="token punctuation">;</span>
     <span class="token keyword">client_header_timeout</span> 5s<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[4] 设置 IP 地址黑名单</strong></li>
 </ul>
 <p>如果你可以识别出用于攻击的<code>IP</code>地址，就可以使用<code>deny</code>指令将其加入黑名单中，这样<code>NGINX</code>和<code>NGINX Plus</code>会拒绝来着这个<code>IP</code>的任何连接或请求。例如，如果你确定攻击来自地址<code>123.123.123.1~123.123.123.16</code>。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
     <span class="token keyword">deny</span> <span class="token number">123.123</span><span class="token punctuation">.</span><span class="token number">123.0</span><span class="token operator">/</span><span class="token number">28</span><span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <p>又或者你确定攻击来自地址<code>123.123.123.3</code>、<code>123.123.123.5</code>和<code>123.123.123.7</code>。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
     <span class="token keyword">deny</span> <span class="token number">123.123</span><span class="token punctuation">.</span><span class="token number">123.3</span><span class="token punctuation">;</span>
     <span class="token keyword">deny</span> <span class="token number">123.123</span><span class="token punctuation">.</span><span class="token number">123.5</span><span class="token punctuation">;</span>
     <span class="token keyword">deny</span> <span class="token number">123.123</span><span class="token punctuation">.</span><span class="token number">123.7</span><span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[5] IP 地址白名单</strong></li>
 </ul>
 <p>如果网站或应用只允许来自指定<code>IP</code>地址的连接，则可以同时使用<code>allow</code>和<code>deny</code>指令来设置只允许指定<code>IP</code>访问网站或应用。例如，限制只允许来自本地网络的连接。这里的 &nbsp;<code>deny all</code>指令禁止所有来自<code>allow</code>指定范围之外<code>IP</code>的连接。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
     <span class="token keyword">allow</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">1.0</span><span class="token operator">/</span><span class="token number">24</span><span class="token punctuation">;</span>
     <span class="token keyword">deny</span> all<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[6] 使用缓存来平滑流量峰值</strong></li>
@@ -612,12 +612,12 @@ proxy_cache_key
 <span class="token number">4</span><span class="token punctuation">.</span> 请求头部中其他字段含有与攻击相关的值
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>例如，如果确定<code>DDoS</code>攻击的目标<code>URL</code>为<code>/foo.php</code>，则可以设置阻塞所有对于该页面的请求。或者发现来自<code>DDoS</code>攻击的请求头部<code>User-Agent</code>字段值为<code>foo</code>或<code>bar</code>，则可以设置阻塞这些请求。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$http_user_agent</span> <span class="token operator">~</span><span class="token operator">*</span> foo<span class="token operator">|</span>bar<span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$http_user_agent</span> <span class="token operator">~</span><span class="token operator">*</span> foo<span class="token operator">|</span>bar<span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token keyword">return</span> <span class="token number">403</span><span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+    <span class="token punctuation">}</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[8] 限制后端服务器的连接</strong></li>
@@ -626,11 +626,11 @@ proxy_cache_key
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># max_conns参数为每个服务器指定最大连接数</span>
 <span class="token comment" spellcheck="true"># queue指令设置当upstream组内后端服务器达到了最大连接数时请求队列的长度</span>
 <span class="token comment" spellcheck="true"># timeout参数设置请求队列中每项的保留时间</span>
-<span class="token keyword">upstream</span> website <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<span class="token keyword">upstream</span> website <span class="token punctuation">{</span>
     <span class="token keyword">server</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">100.1</span><span class="token punctuation">:</span><span class="token number">80</span> max_conns<span class="token operator">=</span><span class="token number">200</span><span class="token punctuation">;</span>
     <span class="token keyword">server</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">100.2</span><span class="token punctuation">:</span><span class="token number">80</span> max_conns<span class="token operator">=</span><span class="token number">200</span><span class="token punctuation">;</span>
     queue <span class="token number">10</span> <span class="token keyword">timeout</span><span class="token operator">=</span>30s<span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[9] 处理基于 Range 字段的攻击</strong></li>
@@ -820,7 +820,7 @@ $ yum <span class="token function">install</span> logrotate
 <span class="token comment" spellcheck="true"># nginx进程PID路径在/usr/local/nginx/logs/nginx.pid</span>
 <span class="token comment" spellcheck="true"># 自动在/etc/cron.daily/下生成个logrotate脚本文件</span>
 $ vim nginx
-/home/wwwlogs/*log <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+/home/wwwlogs/*log <span class="token punctuation">{</span>
     <span class="token function">su</span> root www
     create 600 www www
     daily
@@ -835,7 +835,7 @@ $ vim nginx
     postrotate
         <span class="token function">kill</span> -USR1 <span class="token variable"><span class="token variable">`</span><span class="token function">cat</span> /usr/local/nginx/logs/nginx.pid<span class="token variable">`</span></span>
     endscript
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 
 <span class="token comment" spellcheck="true"># 设置计划任务(/etc/crontab)</span>
 $ <span class="token function">crontab</span> -e
@@ -861,7 +861,7 @@ logrotate在对status未记录的文件进行转储时，会在status添加一�
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 4.分割日志时报错：error: skipping "/var/log/nginx/test.access.log" because parent directory has insecure permissions (It's world writable or writable by group which is not "root") Set "su" directive in config file to tell logrotate which user/group should be used for rotation.</span>
 
 <span class="token comment" spellcheck="true"># 添加“su root list”到/etc/logrotate.d/nginx文件中即可，如下所示</span>
-/var/log/nginx/*.log <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+/var/log/nginx/*.log <span class="token punctuation">{</span>
     <span class="token function">su</span> root list
     daily
     missingok
@@ -874,7 +874,7 @@ logrotate在对status未记录的文件进行转储时，会在status添加一�
     postrotate
         <span class="token punctuation">[</span> <span class="token operator">!</span> -f /var/run/nginx.pid <span class="token punctuation">]</span> <span class="token operator">||</span> <span class="token function">kill</span> -USR1 <span class="token variable"><span class="token variable">`</span><span class="token function">cat</span> /var/run/nginx.pid<span class="token variable">`</span></span>
     endscript
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="3-获取用户真实-IP-地址"><a href="#3-获取用户真实-IP-地址" class="headerlink" title="3. 获取用户真实 IP 地址"></a>3. 获取用户真实 IP 地址</h2><p>如果你的 <code>Web</code> 服务器前端有代理服务器或 <code>CDN</code> 时，在日志中的 <code>$remote_addr</code> 可能就不是客户端的真实 <code>IP</code> 了。比较常用的解决方法有以下三几种，这里我们将主要介绍如何使用 <code>Nginx</code> 自带 <code>realip</code> 模块来解决这一问题。</p>
@@ -950,7 +950,7 @@ real_ip_recursive on<span class="token punctuation">;</span>
 <ul>
 <li><strong>配置实例</strong></li>
 </ul>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
 
     <span class="token keyword">listen</span>       <span class="token number">80</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span>  www<span class="token punctuation">.</span>wseacape<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
@@ -960,15 +960,15 @@ real_ip_recursive on<span class="token punctuation">;</span>
     <span class="token keyword">root</span> <span class="token operator">/</span>var<span class="token operator">/</span>www<span class="token operator">/</span>www<span class="token punctuation">.</span>wseacape<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
 
     <span class="token keyword">location</span> <span class="token operator">/</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token punctuation">{</span>
             <span class="token keyword">root</span> <span class="token operator">/</span>var<span class="token operator">/</span>www<span class="token operator">/</span>www<span class="token punctuation">.</span>wseacape<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
             <span class="token keyword">set_real_ip_from</span>  <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">2.0</span><span class="token operator">/</span><span class="token number">24</span><span class="token punctuation">;</span>
             <span class="token keyword">set_real_ip_from</span>  <span class="token number">128.22</span><span class="token punctuation">.</span><span class="token number">189.11</span><span class="token punctuation">;</span>
             <span class="token keyword">real_ip_header</span>    X<span class="token operator">-</span>Forwarded<span class="token operator">-</span>For<span class="token punctuation">;</span>
             real_ip_recursive on<span class="token punctuation">;</span>
 
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>这里详细讲下<code>real_ip_recursive</code>的用途：递归的去除所配置中的可信<code>IP</code>，排除<code>set_real_ip_from</code>里面出现的<code>IP</code>。如果出现了未出现这些<code>IP</code>段的<code>IP</code>，那么这个<code>IP</code>将被认为是用户的<code>IP</code>地址。</p>
 <p>以上配置为例，服务器获取到以下的<code>IP</code>地址：</p>
@@ -1304,12 +1304,12 @@ real_ip_recursive on<span class="token punctuation">;</span>
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Bug/">
-                        <span class="chip bg-color">Bug</span>
-                    </a>
-                    
                     <a href="/tags/Celery/">
                         <span class="chip bg-color">Celery</span>
+                    </a>
+                    
+                    <a href="/tags/Bug/">
+                        <span class="chip bg-color">Bug</span>
                     </a>
                     
                     <a href="/tags/Supervisor/">
@@ -1518,7 +1518,7 @@ real_ip_recursive on<span class="token punctuation">;</span>
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1209.5k</span>
+                        class="white-color">1189.3k</span>
             
             
             

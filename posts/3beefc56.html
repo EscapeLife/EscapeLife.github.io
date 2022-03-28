@@ -465,14 +465,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    7.5k
+                    7.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    32 分
+                    30 分
                 </div>
                 
 
@@ -617,10 +617,10 @@ NGINX_CONF_FILE<span class="token operator">=</span><span class="token string">"
 <span class="token punctuation">[</span> -f /etc/sysconfig/nginx <span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token keyword">.</span> /etc/sysconfig/nginx
 lockfile<span class="token operator">=</span>/var/lock/subsys/nginx
 
-make_dirs<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+make_dirs<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
    <span class="token comment" spellcheck="true"># make required directories</span>
-   user<span class="token operator">=</span>`nginx -V 2<span class="token operator">&gt;</span><span class="token operator">&amp;</span>1 <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">"configure arguments:"</span> <span class="token operator">|</span> <span class="token function">sed</span> <span class="token string">'s/[^*]*--user=\([^ ]*\).*/\1/g'</span> -<span class="token variable"><span class="token variable">`</span>
-   options<span class="token operator">=</span><span class="token variable">`</span></span><span class="token variable">$nginx</span> -V 2<span class="token operator">&gt;</span><span class="token operator">&amp;</span>1 <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">'configure arguments:'</span><span class="token variable"><span class="token variable">`</span>
+   user<span class="token operator">=</span>`nginx -V 2<span class="token operator">></span><span class="token operator">&amp;</span>1 <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">"configure arguments:"</span> <span class="token operator">|</span> <span class="token function">sed</span> <span class="token string">'s/[^*]*--user=\([^ ]*\).*/\1/g'</span> -<span class="token variable"><span class="token variable">`</span>
+   options<span class="token operator">=</span><span class="token variable">`</span></span><span class="token variable">$nginx</span> -V 2<span class="token operator">></span><span class="token operator">&amp;</span>1 <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">'configure arguments:'</span><span class="token variable"><span class="token variable">`</span>
    <span class="token keyword">for</span> opt <span class="token keyword">in</span> $options<span class="token punctuation">;</span> <span class="token keyword">do</span>
        <span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token variable">`</span></span><span class="token keyword">echo</span> <span class="token variable">$opt</span> <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">'.*-temp-path'</span><span class="token variable"><span class="token variable">`</span> <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
            value<span class="token operator">=</span><span class="token variable">`</span></span><span class="token keyword">echo</span> <span class="token variable">$opt</span> <span class="token operator">|</span> <span class="token function">cut</span> -d <span class="token string">"="</span> -f 2`
@@ -630,9 +630,9 @@ make_dirs<span class="token punctuation">(</span><span class="token punctuation"
            <span class="token keyword">fi</span>
        <span class="token keyword">fi</span>
    <span class="token keyword">done</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 
-start<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+start<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token punctuation">[</span> -x <span class="token variable">$nginx</span> <span class="token punctuation">]</span> <span class="token operator">||</span> <span class="token keyword">exit</span> 5
     <span class="token punctuation">[</span> -f <span class="token variable">$NGINX_CONF_FILE</span> <span class="token punctuation">]</span> <span class="token operator">||</span> <span class="token keyword">exit</span> 6
     make_dirs
@@ -642,47 +642,47 @@ start<span class="token punctuation">(</span><span class="token punctuation">)</
     <span class="token keyword">echo</span>
     <span class="token punctuation">[</span> <span class="token variable">$retval</span> -eq 0 <span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token function">touch</span> <span class="token variable">$lockfile</span>
     <span class="token keyword">return</span> <span class="token variable">$retval</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 
-stop<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+stop<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token keyword">echo</span> -n $<span class="token string">"Stopping <span class="token variable">$prog</span>: "</span>
     killproc <span class="token variable">$prog</span> -QUIT
     retval<span class="token operator">=</span><span class="token variable">$?</span>
     <span class="token keyword">echo</span>
     <span class="token punctuation">[</span> <span class="token variable">$retval</span> -eq 0 <span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token function">rm</span> -f <span class="token variable">$lockfile</span>
     <span class="token keyword">return</span> <span class="token variable">$retval</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 
-restart<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+restart<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
     configtest <span class="token operator">||</span> <span class="token keyword">return</span> <span class="token variable">$?</span>
     stop
     <span class="token function">sleep</span> 1
     start
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 
-reload<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+reload<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
     configtest <span class="token operator">||</span> <span class="token keyword">return</span> <span class="token variable">$?</span>
     <span class="token keyword">echo</span> -n $<span class="token string">"Reloading <span class="token variable">$prog</span>: "</span>
     killproc <span class="token variable">$nginx</span> -HUP
     RETVAL<span class="token operator">=</span><span class="token variable">$?</span>
     <span class="token keyword">echo</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 
-force_reload<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+force_reload<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
     restart
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 
-configtest<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+configtest<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
   <span class="token variable">$nginx</span> -t -c <span class="token variable">$NGINX_CONF_FILE</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 
-rh_status<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+rh_status<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
     status <span class="token variable">$prog</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 
-rh_status_q<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
-    rh_status <span class="token operator">&gt;</span>/dev/null 2<span class="token operator">&gt;</span><span class="token operator">&amp;</span>1
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+rh_status_q<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    rh_status <span class="token operator">></span>/dev/null 2<span class="token operator">></span><span class="token operator">&amp;</span>1
+<span class="token punctuation">}</span>
 
 <span class="token keyword">case</span> <span class="token string">"<span class="token variable">$1</span>"</span> <span class="token keyword">in</span>
     start<span class="token punctuation">)</span>
@@ -710,7 +710,7 @@ rh_status_q<span class="token punctuation">(</span><span class="token punctuatio
         rh_status_q <span class="token operator">||</span> <span class="token keyword">exit</span> 0
             <span class="token punctuation">;</span><span class="token punctuation">;</span>
     *<span class="token punctuation">)</span>
-        <span class="token keyword">echo</span> $<span class="token string">"Usage: <span class="token variable">$0</span> &amp;#123;start|stop|status|restart|condrestart|try-restart|reload|force-reload|configtest&amp;#125;"</span>
+        <span class="token keyword">echo</span> $<span class="token string">"Usage: <span class="token variable">$0</span> {start|stop|status|restart|condrestart|try-restart|reload|force-reload|configtest}"</span>
         <span class="token keyword">exit</span> 2
 esac
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
@@ -736,23 +736,23 @@ esac
 <span class="token keyword">error_log</span>
 <span class="token keyword">pid</span>
 
-<span class="token keyword">events</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<span class="token keyword">events</span> <span class="token punctuation">{</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 
-<span class="token keyword">http</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<span class="token keyword">http</span> <span class="token punctuation">{</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-    <span class="token keyword">upstream</span> escapelife <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token keyword">upstream</span> escapelife <span class="token punctuation">{</span>
         <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 
-<span class="token keyword">server</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<span class="token keyword">server</span><span class="token punctuation">{</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-    <span class="token keyword">location</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token keyword">location</span> <span class="token punctuation">{</span>
         <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-        <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="3-2-配置-main-模块"><a href="#3-2-配置-main-模块" class="headerlink" title="3.2 配置 main 模块"></a>3.2 配置 main 模块</h3><blockquote>
@@ -849,10 +849,10 @@ max_clients <span class="token operator">=</span> <span class="token keyword">wo
 <span class="token keyword">error_log</span> <span class="token operator">/</span>var<span class="token operator">/</span>log<span class="token operator">/</span>nginx<span class="token operator">/</span>error<span class="token punctuation">.</span>log<span class="token punctuation">;</span>
 <span class="token keyword">pid</span> <span class="token operator">/</span>var<span class="token operator">/</span>run<span class="token operator">/</span>nginx<span class="token punctuation">.</span><span class="token keyword">pid</span><span class="token punctuation">;</span>
 
-<span class="token keyword">events</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<span class="token keyword">events</span> <span class="token punctuation">{</span>
     <span class="token keyword">use</span> epoll<span class="token punctuation">;</span>
     <span class="token keyword">worker_connections</span> <span class="token number">2048</span><span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="3-5-HTTP-服务器相关配置"><a href="#3-5-HTTP-服务器相关配置" class="headerlink" title="3.5 HTTP 服务器相关配置"></a>3.5 HTTP 服务器相关配置</h3><blockquote>
@@ -898,52 +898,52 @@ max_clients <span class="token operator">=</span> <span class="token keyword">wo
 <h3 id="3-6-虚拟服务器相关配置"><a href="#3-6-虚拟服务器相关配置" class="headerlink" title="3.6 虚拟服务器相关配置"></a>3.6 虚拟服务器相关配置</h3><ul>
 <li>用于定义虚拟服务器相关的属性，常见的指令有<code>backlog</code>、<code>rcvbuf</code>、<code>bind</code>及<code>sndbuf</code>等。</li>
 </ul>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
-    <span class="token operator">&lt;</span>directive<span class="token operator">&gt;</span> <span class="token operator">&lt;</span>parameters<span class="token operator">&gt;</span><span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token operator">&lt;</span>directive<span class="token operator">></span> <span class="token operator">&lt;</span>parameters<span class="token operator">></span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="3-7-location-的相关配置"><a href="#3-7-location-的相关配置" class="headerlink" title="3.7 location 的相关配置"></a>3.7 location 的相关配置</h3><ul>
 <li>通常用于<code>server</code>上下文中，用于设定某<code>URI</code>的访问属性，<code>location</code>可以嵌套。</li>
 </ul>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token punctuation">[</span>modifier<span class="token punctuation">]</span> uri <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;...&amp;#125; 或 location @name &amp;#123;…&amp;#125;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token punctuation">[</span>modifier<span class="token punctuation">]</span> uri <span class="token punctuation">{</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">}</span> 或 <span class="token keyword">location</span> @name <span class="token punctuation">{</span>…<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <ul>
 <li>如下面关于<code>memcached</code>的相关配置</li>
 </ul>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
-  <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+  <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
     <span class="token keyword">set</span> <span class="token variable">$memcached_key</span> <span class="token variable">$uri</span><span class="token punctuation">;</span>
     <span class="token keyword">memcached_pass</span>     name<span class="token punctuation">:</span><span class="token number">11211</span><span class="token punctuation">;</span>
     <span class="token keyword">default_type</span>       text<span class="token operator">/</span>html<span class="token punctuation">;</span>
     <span class="token keyword">error_page</span>         <span class="token number">404</span> @fallback<span class="token punctuation">;</span>
-  <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+  <span class="token punctuation">}</span>
 
-  <span class="token keyword">location</span> @fallback <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+  <span class="token keyword">location</span> @fallback <span class="token punctuation">{</span>
     <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>backend<span class="token punctuation">;</span>
-  <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="4-Nginx-的反向代理"><a href="#4-Nginx-的反向代理" class="headerlink" title="4. Nginx 的反向代理"></a>4. Nginx 的反向代理</h2><h3 id="4-1-使用方式"><a href="#4-1-使用方式" class="headerlink" title="4.1 使用方式"></a>4.1 使用方式</h3><p><code>Nginx</code>通过<code>proxy</code>模块实现反向代理功能。在作为<code>web</code>反向代理服务器时，<code>nginx</code>负责接收客户请求，并能够根据<code>URI</code>、客户端参数或其它的处理逻辑将用户请求调度至上游服务器上(<code>upstream server</code>)。<code>nginx</code>在实现反向代理功能时的最重要指令为<code>proxy_pass</code>，它能够将<code>location</code>定义的某<code>URI</code>代理至指定的上游服务器(组)上。如下面的示例中，<code>location</code>的<code>/uri</code>将被替换为上游服务器上的<code>/newuri</code>。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span>uri <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span>uri <span class="token punctuation">{</span>
     <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>www<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token punctuation">:</span><span class="token number">8080</span><span class="token operator">/</span>newuri<span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>不过，这种处理机制中有两个例外。一个是如果<code>location</code>的<code>URI</code>是通过模式匹配定义的，其<code>URI</code>将直接被传递至上游服务器，而不能为其指定转换的另一个<code>URI</code>。</li>
 </ul>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">~</span> <span class="token operator">^</span><span class="token operator">/</span>bbs <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">~</span> <span class="token operator">^</span><span class="token operator">/</span>bbs <span class="token punctuation">{</span>
     <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>www<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>第二个例外是，如果在<code>loation</code>中使用的<code>URL</code>重定向，那么<code>nginx</code>将使用重定向后的<code>URI</code>处理请求，而不再考虑上游服务器上定义的<code>URI</code>。如下面所示的例子中，传送给上游服务器的<code>URI</code>为<code>/index.php?page=&lt;match&gt;</code>，而不是<code>/index</code>。</li>
 </ul>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
     <span class="token keyword">rewrite</span> <span class="token operator">/</span><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token operator">*</span><span class="token punctuation">)</span>$ <span class="token operator">/</span><span class="token keyword">index</span><span class="token punctuation">.</span>php<span class="token operator">?</span>page<span class="token operator">=</span>$<span class="token number">1</span> <span class="token keyword">break</span><span class="token punctuation">;</span>
     <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>localhost<span class="token punctuation">:</span><span class="token number">8080</span><span class="token operator">/</span><span class="token keyword">index</span><span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="4-2-proxy-模块的指令"><a href="#4-2-proxy-模块的指令" class="headerlink" title="4.2 proxy 模块的指令"></a>4.2 proxy 模块的指令</h3><p><code>proxy</code>模块的可用配置指令非常多，它们分别用于定义<code>proxy</code>模块工作时的诸多属性，如连接超时时长、代理时使用<code>http</code>协议版本等。下面对常用的指令做一个简单说明。</p>
@@ -1014,49 +1014,49 @@ max_clients <span class="token operator">=</span> <span class="token keyword">wo
 </li>
 </ul>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 例如</span>
-<span class="token keyword">upstream</span> backend <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<span class="token keyword">upstream</span> backend <span class="token punctuation">{</span>
   <span class="token keyword">server</span> www<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com weight<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">;</span>
   <span class="token keyword">server</span> www2<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token punctuation">:</span><span class="token number">8080</span>       max_fails<span class="token operator">=</span><span class="token number">3</span>  fail_timeout<span class="token operator">=</span>30s<span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><code>upstream</code>模块的负载均衡算法主要有三种，<strong>轮调</strong>(<code>round-robin</code>)、<strong>ip 哈希</strong>(<code>ip_hash</code>)和<strong>最少连接</strong>(<code>least_conn</code>)三种。此外，<code>upstream</code>模块也能为非<code>http</code>类的应用实现负载均衡，如下面的示例定义了<code>nginx</code>为<code>memcached</code>服务实现负载均衡之目的。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">upstream</span> memcachesrvs <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">upstream</span> memcachesrvs <span class="token punctuation">{</span>
     <span class="token keyword">server</span> <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.6</span><span class="token punctuation">:</span><span class="token number">11211</span><span class="token punctuation">;</span>
     <span class="token keyword">server</span> <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.7</span><span class="token punctuation">:</span><span class="token number">11211</span><span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 
-<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
-    <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
     <span class="token keyword">set</span> <span class="token variable">$memcached_key</span> <span class="token string">"$uri?$args"</span><span class="token punctuation">;</span>
     <span class="token keyword">memcached_pass</span> memcachesrvs<span class="token punctuation">;</span>
     <span class="token keyword">error_page</span> <span class="token number">404</span> <span class="token operator">=</span> @fallback<span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+    <span class="token punctuation">}</span>
 
-    <span class="token keyword">location</span> @fallback <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token keyword">location</span> @fallback <span class="token punctuation">{</span>
             <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">127.0</span><span class="token punctuation">.</span><span class="token number">0.1</span><span class="token punctuation">:</span><span class="token number">8080</span><span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="4-4-if-判断语句"><a href="#4-4-if-判断语句" class="headerlink" title="4.4 if 判断语句"></a>4.4 if 判断语句</h3><ul>
 <li><strong>基本使用方法</strong></li>
 </ul>
 <p>在<code>location</code>中使用<code>if</code>语句可以实现条件判断，其通常有一个<code>return</code>语句，且一般与有着<code>last</code>或<code>break</code>标记的<code>rewrite</code>规则一同使用。但其也可以按需要使用在多种场景下，需要注意的是，不当的使用可能会导致不可预料的后果。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$request_method</span> <span class="token operator">==</span> <span class="token string">"PUT"</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$request_method</span> <span class="token operator">==</span> <span class="token string">"PUT"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>upload<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token punctuation">:</span><span class="token number">8080</span><span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+    <span class="token punctuation">}</span>
 
-    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$request_uri</span> <span class="token operator">~</span> <span class="token string">"\.(jpg|gif|jpeg|png)$"</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$request_uri</span> <span class="token operator">~</span> <span class="token string">"\.(jpg|gif|jpeg|png)$"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>imageservers<span class="token punctuation">;</span>
         <span class="token keyword">break</span><span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-<span class="token keyword">upstream</span> imageservers <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<span class="token keyword">upstream</span> imageservers <span class="token punctuation">{</span>
     <span class="token keyword">server</span> <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.8</span><span class="token punctuation">:</span><span class="token number">80</span> weight <span class="token number">2</span><span class="token punctuation">;</span>
     <span class="token keyword">server</span> <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.9</span><span class="token punctuation">:</span><span class="token number">80</span> weight <span class="token number">3</span><span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>if 语句中的判断条件</strong></li>
@@ -1206,11 +1206,11 @@ X<span class="token operator">-</span>Accel<span class="token operator">-</span>
 <span class="token keyword">proxy_cache_bypass</span> <span class="token variable">$cookie_nocache</span> <span class="token variable">$arg_nocache</span> <span class="token variable">$arg_comment</span><span class="token punctuation">;</span>
 <span class="token keyword">proxy_cache_bypass</span> <span class="token variable">$http_pragma</span> <span class="token variable">$http_authorization</span><span class="token punctuation">;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">http</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">http</span> <span class="token punctuation">{</span>
     <span class="token keyword">proxy_cache_path</span>  <span class="token operator">/</span>data<span class="token operator">/</span>nginx<span class="token operator">/</span>cache  levels<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token number">2</span>    keys_zone<span class="token operator">=</span>STATIC<span class="token punctuation">:</span>10m
                                          inactive<span class="token operator">=</span>24h  max_size<span class="token operator">=</span>1g<span class="token punctuation">;</span>
-    <span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
-        <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token keyword">server</span> <span class="token punctuation">{</span>
+        <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
             <span class="token keyword">proxy_pass</span>             <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>www<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
             <span class="token keyword">proxy_set_header</span>       Host <span class="token variable">$host</span><span class="token punctuation">;</span>
             <span class="token keyword">proxy_cache</span>            STATIC<span class="token punctuation">;</span>
@@ -1219,13 +1219,13 @@ X<span class="token operator">-</span>Accel<span class="token operator">-</span>
             proxy_cache_vaild        any 1m<span class="token punctuation">;</span>
             <span class="token keyword">proxy_cache_use_stale</span>  error <span class="token keyword">timeout</span> invalid_header updating
                                    http_500 http_502 http_503 http_504<span class="token punctuation">;</span>
-        <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="5-3-压缩设定"><a href="#5-3-压缩设定" class="headerlink" title="5.3 压缩设定"></a>5.3 压缩设定</h3><p><code>nginx</code>将响应报文发送至客户端之前可以启用压缩功能，这能够有效地节约带宽，并提高响应至客户端的速度。通常编译<code>nginx</code>默认会附带<code>gzip</code>压缩的功能，因此，可以直接启用之。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">http</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">http</span> <span class="token punctuation">{</span>
     <span class="token keyword">gzip</span> on<span class="token punctuation">;</span>
     <span class="token keyword">gzip_http_version</span> <span class="token number">1.0</span><span class="token punctuation">;</span>
     <span class="token keyword">gzip_comp_level</span> <span class="token number">2</span><span class="token punctuation">;</span>
@@ -1239,34 +1239,34 @@ X<span class="token operator">-</span>Accel<span class="token operator">-</span>
         application<span class="token operator">/</span>javascript
         application<span class="token operator">/</span>json<span class="token punctuation">;</span>
     <span class="token keyword">gzip_disable</span> msie6<span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><code>gzip_proxied</code>指令可以定义对客户端请求哪类对象启用压缩功能，如<code>“expired”</code>表示对由于使用了<code>expire</code>首部定义而无法缓存的对象启用压缩功能，其它可接受的值还有<code>“no-cache”</code>、<code>“no-store”</code>、<code>“private”</code>、<code>“no_last_modified”</code>、<code>“no_etag”</code>和<code>“auth”</code>等，而<code>“off”</code>则表示关闭压缩功能。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token operator">^</span><span class="token operator">~</span> <span class="token operator">/</span>test
 <span class="token keyword">rewrite</span> a<span class="token punctuation">.</span>jpg   a<span class="token punctuation">.</span>css  last<span class="token punctuation">;</span>
-<span class="token keyword">rewrite</span>  a<span class="token punctuation">.</span>css  <span class="token operator">--</span><span class="token operator">&gt;</span> <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">1.1</span> <span class="token keyword">break</span><span class="token punctuation">;</span>
+<span class="token keyword">rewrite</span>  a<span class="token punctuation">.</span>css  <span class="token operator">--</span><span class="token operator">></span> <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">1.1</span> <span class="token keyword">break</span><span class="token punctuation">;</span>
 <span class="token keyword">rewrite</span>  <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">1.1</span> <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">1.2</span>
 <span class="token operator">~</span><span class="token operator">*</span>  css$
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="6-Nginx-配置文件示例"><a href="#6-Nginx-配置文件示例" class="headerlink" title="6. Nginx 配置文件示例"></a>6. Nginx 配置文件示例</h2><h3 id="6-1-反向代理"><a href="#6-1-反向代理" class="headerlink" title="6.1 反向代理"></a>6.1 反向代理</h3><pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<h2 id="6-Nginx-配置文件示例"><a href="#6-Nginx-配置文件示例" class="headerlink" title="6. Nginx 配置文件示例"></a>6. Nginx 配置文件示例</h2><h3 id="6-1-反向代理"><a href="#6-1-反向代理" class="headerlink" title="6.1 反向代理"></a>6.1 反向代理</h3><pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
         <span class="token keyword">listen</span>       <span class="token number">80</span><span class="token punctuation">;</span>
         <span class="token keyword">server_name</span>  www<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
         <span class="token keyword">add_header</span> X<span class="token operator">-</span>Via <span class="token variable">$server_addr</span><span class="token punctuation">;</span>
 
-        <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+        <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
             <span class="token keyword">root</span>   html<span class="token punctuation">;</span>
             <span class="token keyword">index</span>  <span class="token keyword">index</span><span class="token punctuation">.</span>html <span class="token keyword">index</span><span class="token punctuation">.</span>htm<span class="token punctuation">;</span>
-            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$request_method</span> <span class="token operator">~</span><span class="token operator">*</span> <span class="token string">"PUT"</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$request_method</span> <span class="token operator">~</span><span class="token operator">*</span> <span class="token string">"PUT"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
                 <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.12</span><span class="token punctuation">;</span>
                 <span class="token keyword">break</span><span class="token punctuation">;</span>
-            <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-        <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
 
-        <span class="token keyword">location</span> <span class="token operator">/</span>bbs <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+        <span class="token keyword">location</span> <span class="token operator">/</span>bbs <span class="token punctuation">{</span>
             <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.11</span><span class="token operator">/</span><span class="token punctuation">;</span>
-        <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+        <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>此例中，对<code>http://www.escapelife.com/bbs/</code>的请求将被转发至<code>http://172.16.100.11/</code>这个<code>URL</code>，切记最后的<code>/</code>不应该省去；而<code>/</code>匹配的<code>URL</code>中请求方法为<code>“PUT”时</code>，将被转发至<code>http://172.16.100.12/</code>这个<code>URL</code>。</p>
 <p>另外，<code>add_header</code>用于让<code>nginx</code>在响应给用户的报文中构造自定义首部，其使用格式为<code>“add_header NAME VALUE”</code>。可以使用<code>curl</code>命令对配置好的服务进行请求，以验正其效果。如：</p>
@@ -1288,12 +1288,12 @@ LoadModule dav_module modules<span class="token operator">/</span>mod_dav<span c
 LoadModule dav_fs_module modules<span class="token operator">/</span>mod_dav_fs<span class="token punctuation">.</span>so
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 而后配置相应主机的目录如下所示，关键是其中的dav一行</span>
-<span class="token operator">&lt;</span>Directory <span class="token string">"/var/www/html"</span><span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span>Directory <span class="token string">"/var/www/html"</span><span class="token operator">></span>
     dav on
     Options Indexes FollowSymLinks
     Order <span class="token keyword">allow</span><span class="token punctuation">,</span><span class="token keyword">deny</span>
     <span class="token keyword">Allow</span> from all
-<span class="token operator">&lt;</span><span class="token operator">/</span>Directory<span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>Directory<span class="token operator">></span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 接着尝试访问代理服务器</span>
 <span class="token comment" spellcheck="true"># curl -I -T /etc/inittab http://www.escapelife.com/</span>
@@ -1308,18 +1308,18 @@ Content<span class="token operator">-</span>Length<span class="token punctuation
 Connection<span class="token punctuation">:</span> keep<span class="token operator">-</span>alive
 X<span class="token operator">-</span>Via<span class="token punctuation">:</span> <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.107</span>
 
-<span class="token operator">&lt;</span><span class="token operator">!</span>DOCTYPE HTML PUBLIC <span class="token string">"-//IETF//DTD HTML 2.0//EN"</span><span class="token operator">&gt;</span>
-<span class="token operator">&lt;</span>html<span class="token operator">&gt;</span><span class="token operator">&lt;</span>head<span class="token operator">&gt;</span>
-<span class="token operator">&lt;</span>title<span class="token operator">&gt;</span><span class="token number">201</span> Created<span class="token operator">&lt;</span><span class="token operator">/</span>title<span class="token operator">&gt;</span>
-<span class="token operator">&lt;</span><span class="token operator">/</span>head<span class="token operator">&gt;</span><span class="token operator">&lt;</span>body<span class="token operator">&gt;</span>
-<span class="token operator">&lt;</span>h1<span class="token operator">&gt;</span>Created<span class="token operator">&lt;</span><span class="token operator">/</span>h1<span class="token operator">&gt;</span>
-<span class="token operator">&lt;</span>p<span class="token operator">&gt;</span>Resource <span class="token operator">/</span>inittab has been created<span class="token punctuation">.</span><span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">&gt;</span>
-<span class="token operator">&lt;</span>hr <span class="token operator">/</span><span class="token operator">&gt;</span>
-<span class="token operator">&lt;</span>address<span class="token operator">&gt;</span>Apache<span class="token operator">/</span><span class="token number">2.2</span><span class="token punctuation">.</span><span class="token function">3</span> <span class="token punctuation">(</span>Red Hat<span class="token punctuation">)</span> <span class="token keyword">Server</span> at <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.12</span> Port <span class="token number">80</span><span class="token operator">&lt;</span><span class="token operator">/</span>address<span class="token operator">&gt;</span>
-<span class="token operator">&lt;</span><span class="token operator">/</span>body<span class="token operator">&gt;</span><span class="token operator">&lt;</span><span class="token operator">/</span>html<span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span><span class="token operator">!</span>DOCTYPE HTML PUBLIC <span class="token string">"-//IETF//DTD HTML 2.0//EN"</span><span class="token operator">></span>
+<span class="token operator">&lt;</span>html<span class="token operator">></span><span class="token operator">&lt;</span>head<span class="token operator">></span>
+<span class="token operator">&lt;</span>title<span class="token operator">></span><span class="token number">201</span> Created<span class="token operator">&lt;</span><span class="token operator">/</span>title<span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>head<span class="token operator">></span><span class="token operator">&lt;</span>body<span class="token operator">></span>
+<span class="token operator">&lt;</span>h1<span class="token operator">></span>Created<span class="token operator">&lt;</span><span class="token operator">/</span>h1<span class="token operator">></span>
+<span class="token operator">&lt;</span>p<span class="token operator">></span>Resource <span class="token operator">/</span>inittab has been created<span class="token punctuation">.</span><span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">></span>
+<span class="token operator">&lt;</span>hr <span class="token operator">/</span><span class="token operator">></span>
+<span class="token operator">&lt;</span>address<span class="token operator">></span>Apache<span class="token operator">/</span><span class="token number">2.2</span><span class="token punctuation">.</span><span class="token function">3</span> <span class="token punctuation">(</span>Red Hat<span class="token punctuation">)</span> <span class="token keyword">Server</span> at <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.12</span> Port <span class="token number">80</span><span class="token operator">&lt;</span><span class="token operator">/</span>address<span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>body<span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>html<span class="token operator">></span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h3 id="6-2-启用缓存"><a href="#6-2-启用缓存" class="headerlink" title="6.2 启用缓存"></a>6.2 启用缓存</h3><pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">http</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<h3 id="6-2-启用缓存"><a href="#6-2-启用缓存" class="headerlink" title="6.2 启用缓存"></a>6.2 启用缓存</h3><pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">http</span> <span class="token punctuation">{</span>
     <span class="token keyword">include</span>            mime<span class="token punctuation">.</span><span class="token keyword">types</span><span class="token punctuation">;</span>
     <span class="token keyword">default_type</span>       application<span class="token operator">/</span>octet<span class="token operator">-</span>stream<span class="token punctuation">;</span>
     <span class="token keyword">sendfile</span>           on<span class="token punctuation">;</span>
@@ -1332,72 +1332,72 @@ X<span class="token operator">-</span>Via<span class="token punctuation">:</span
                       inactive<span class="token operator">=</span>60m
                       use_temp_path<span class="token operator">=</span>off<span class="token punctuation">;</span>
 
-    <span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token keyword">server</span> <span class="token punctuation">{</span>
         <span class="token keyword">listen</span>       <span class="token number">80</span><span class="token punctuation">;</span>
         <span class="token keyword">server_name</span>  www<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
 
-        <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+        <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
             <span class="token keyword">root</span>   html<span class="token punctuation">;</span>
             <span class="token keyword">index</span>  <span class="token keyword">index</span><span class="token punctuation">.</span>html <span class="token keyword">index</span><span class="token punctuation">.</span>htm<span class="token punctuation">;</span>
-            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$request_method</span> <span class="token operator">~</span><span class="token operator">*</span> <span class="token string">"PUT"</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$request_method</span> <span class="token operator">~</span><span class="token operator">*</span> <span class="token string">"PUT"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
                 <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.12</span><span class="token punctuation">;</span>
                 <span class="token keyword">break</span><span class="token punctuation">;</span>
-            <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-        <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
 
-        <span class="token keyword">location</span> <span class="token operator">/</span>bbs <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+        <span class="token keyword">location</span> <span class="token operator">/</span>bbs <span class="token punctuation">{</span>
             <span class="token keyword">proxy_pass</span>         <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.11</span><span class="token operator">/</span><span class="token punctuation">;</span>
             <span class="token keyword">proxy_cache</span>        first<span class="token punctuation">;</span>
             <span class="token keyword">proxy_cache_valid</span>  <span class="token number">200</span> 1d<span class="token punctuation">;</span>
             <span class="token keyword">proxy_cache_valid</span>  <span class="token number">301</span> <span class="token number">302</span> 10m<span class="token punctuation">;</span>
             <span class="token keyword">proxy_cache_valid</span>  any 1m<span class="token punctuation">;</span>
-        <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="6-3-使用-upstream"><a href="#6-3-使用-upstream" class="headerlink" title="6.3 使用 upstream"></a>6.3 使用 upstream</h3><ul>
 <li><strong>upstream 不启用缓存</strong></li>
 </ul>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">http</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">http</span> <span class="token punctuation">{</span>
     <span class="token keyword">include</span>       mime<span class="token punctuation">.</span><span class="token keyword">types</span><span class="token punctuation">;</span>
     <span class="token keyword">default_type</span>  application<span class="token operator">/</span>octet<span class="token operator">-</span>stream<span class="token punctuation">;</span>
     <span class="token keyword">sendfile</span>        on<span class="token punctuation">;</span>
     <span class="token keyword">keepalive_timeout</span>  <span class="token number">65</span><span class="token punctuation">;</span>
 
-    <span class="token keyword">upstream</span> websrv <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token keyword">upstream</span> websrv <span class="token punctuation">{</span>
         <span class="token keyword">server</span> <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.11</span> weight<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">;</span>
         <span class="token keyword">server</span> <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.12</span> weight<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">;</span>
         <span class="token keyword">server</span> <span class="token number">127.0</span><span class="token punctuation">.</span><span class="token number">0.1</span><span class="token punctuation">:</span><span class="token number">8080</span> backup<span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+    <span class="token punctuation">}</span>
 
-    <span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token keyword">server</span> <span class="token punctuation">{</span>
         <span class="token keyword">listen</span>       <span class="token number">80</span><span class="token punctuation">;</span>
         <span class="token keyword">server_name</span>  www<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
         <span class="token keyword">add_header</span> X<span class="token operator">-</span>Via <span class="token variable">$server_addr</span><span class="token punctuation">;</span>
 
-        <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+        <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
             <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>websrv<span class="token punctuation">;</span>
             <span class="token keyword">index</span>  <span class="token keyword">index</span><span class="token punctuation">.</span>html <span class="token keyword">index</span><span class="token punctuation">.</span>htm<span class="token punctuation">;</span>
-            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$request_method</span> <span class="token operator">~</span><span class="token operator">*</span> <span class="token string">"PUT"</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$request_method</span> <span class="token operator">~</span><span class="token operator">*</span> <span class="token string">"PUT"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
                 <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.12</span><span class="token punctuation">;</span>
                 <span class="token keyword">break</span><span class="token punctuation">;</span>
-            <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-        <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
 
         <span class="token keyword">error_page</span>   <span class="token number">500</span> <span class="token number">502</span> <span class="token number">503</span> <span class="token number">504</span>  <span class="token operator">/</span>50x<span class="token punctuation">.</span>html<span class="token punctuation">;</span>
-        <span class="token keyword">location</span> <span class="token operator">=</span> <span class="token operator">/</span>50x<span class="token punctuation">.</span>html <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+        <span class="token keyword">location</span> <span class="token operator">=</span> <span class="token operator">/</span>50x<span class="token punctuation">.</span>html <span class="token punctuation">{</span>
             <span class="token keyword">root</span>   html<span class="token punctuation">;</span>
-        <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
 
-    <span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token keyword">server</span> <span class="token punctuation">{</span>
         <span class="token keyword">listen</span> <span class="token number">8080</span><span class="token punctuation">;</span>
         <span class="token keyword">server_name</span> localhost<span class="token punctuation">;</span>
         <span class="token keyword">root</span> <span class="token operator">/</span>nginx<span class="token operator">/</span>htdocs<span class="token punctuation">;</span>
         <span class="token keyword">index</span> <span class="token keyword">index</span><span class="token punctuation">.</span>html<span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>测试效果：默认情况下，<code>nginx</code>对定义了权重的<code>upstream</code>服务器使用加权轮调的方法调度访问，因此，其多次访问应该由不同的服务器进行响应。如下所示。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># curl  http://172.16.100.107/</span>
@@ -1414,7 +1414,7 @@ Sorry<span class="token punctuation">.</span><span class="token punctuation">.</
 <ul>
 <li><strong>为 upstream 启用缓存</strong></li>
 </ul>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">http</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">http</span> <span class="token punctuation">{</span>
     <span class="token keyword">include</span>       mime<span class="token punctuation">.</span><span class="token keyword">types</span><span class="token punctuation">;</span>
     <span class="token keyword">default_type</span>  application<span class="token operator">/</span>octet<span class="token operator">-</span>stream<span class="token punctuation">;</span>
     <span class="token keyword">sendfile</span>        on<span class="token punctuation">;</span>
@@ -1422,43 +1422,43 @@ Sorry<span class="token punctuation">.</span><span class="token punctuation">.</
 
     <span class="token keyword">proxy_cache_path</span> <span class="token operator">/</span>data<span class="token operator">/</span>cache  levels<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token number">2</span>   keys_zone<span class="token operator">=</span>html<span class="token punctuation">:</span>10m max_size<span class="token operator">=</span>512m<span class="token punctuation">;</span>
 
-    <span class="token keyword">upstream</span> websrv <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token keyword">upstream</span> websrv <span class="token punctuation">{</span>
         <span class="token keyword">server</span> <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.11</span> weight<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">;</span>
         <span class="token keyword">server</span> <span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.12</span> weight<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">;</span>
         <span class="token keyword">server</span> <span class="token number">127.0</span><span class="token punctuation">.</span><span class="token number">0.1</span><span class="token punctuation">:</span><span class="token number">8080</span> backup<span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+    <span class="token punctuation">}</span>
 
-    <span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token keyword">server</span> <span class="token punctuation">{</span>
         <span class="token keyword">listen</span>       <span class="token number">80</span><span class="token punctuation">;</span>
         <span class="token keyword">server_name</span>  www<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
         <span class="token keyword">add_header</span> X<span class="token operator">-</span>Via <span class="token variable">$server_addr</span><span class="token punctuation">;</span>
         <span class="token keyword">add_header</span> X<span class="token operator">-</span>Cache<span class="token operator">-</span>Status <span class="token variable">$upstream_cache_status</span><span class="token punctuation">;</span>
-        <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+        <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
             <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>websrv<span class="token punctuation">;</span>
             <span class="token keyword">proxy_cache</span> first<span class="token punctuation">;</span>
             <span class="token keyword">proxy_cache_valid</span> <span class="token number">200</span> 1d<span class="token punctuation">;</span>
             <span class="token keyword">proxy_cache_valid</span> <span class="token number">301</span> <span class="token number">302</span> 10m<span class="token punctuation">;</span>
             <span class="token keyword">proxy_cache_valid</span> any 1m<span class="token punctuation">;</span>
             <span class="token keyword">index</span>  <span class="token keyword">index</span><span class="token punctuation">.</span>html <span class="token keyword">index</span><span class="token punctuation">.</span>htm<span class="token punctuation">;</span>
-            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$request_method</span> <span class="token operator">~</span><span class="token operator">*</span> <span class="token string">"PUT"</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$request_method</span> <span class="token operator">~</span><span class="token operator">*</span> <span class="token string">"PUT"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
                 <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">172.16</span><span class="token punctuation">.</span><span class="token number">100.12</span><span class="token punctuation">;</span>
                 <span class="token keyword">break</span><span class="token punctuation">;</span>
-            <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-        <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
 
         <span class="token keyword">error_page</span>   <span class="token number">500</span> <span class="token number">502</span> <span class="token number">503</span> <span class="token number">504</span>  <span class="token operator">/</span>50x<span class="token punctuation">.</span>html<span class="token punctuation">;</span>
-        <span class="token keyword">location</span> <span class="token operator">=</span> <span class="token operator">/</span>50x<span class="token punctuation">.</span>html <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+        <span class="token keyword">location</span> <span class="token operator">=</span> <span class="token operator">/</span>50x<span class="token punctuation">.</span>html <span class="token punctuation">{</span>
             <span class="token keyword">root</span>   html<span class="token punctuation">;</span>
-        <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
 
-    <span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token keyword">server</span> <span class="token punctuation">{</span>
         <span class="token keyword">listen</span> <span class="token number">8080</span><span class="token punctuation">;</span>
         <span class="token keyword">server_name</span> localhost<span class="token punctuation">;</span>
         <span class="token keyword">root</span> <span class="token operator">/</span>nginx<span class="token operator">/</span>htdocs<span class="token punctuation">;</span>
         <span class="token keyword">index</span> <span class="token keyword">index</span><span class="token punctuation">.</span>html<span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>第一次访问某可缓存资源时，在本地缓存中尚未有其对应的缓存对象，因此，其一定为未命中状态。而第二次请求时，则可以直接从本地缓存构建响应报文。</li>
@@ -1498,15 +1498,15 @@ Accept<span class="token operator">-</span>Ranges<span class="token punctuation"
 </ul>
 </li>
 </ul>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">http</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">http</span> <span class="token punctuation">{</span>
   <span class="token keyword">limit_zone</span>  first  <span class="token variable">$binary_remote_addr</span>  10m<span class="token punctuation">;</span>
-  <span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
-    <span class="token keyword">location</span> <span class="token operator">/</span>downloads<span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+  <span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">location</span> <span class="token operator">/</span>downloads<span class="token operator">/</span> <span class="token punctuation">{</span>
       <span class="token keyword">limit_conn</span>   first  <span class="token number">1</span><span class="token punctuation">;</span>
       <span class="token keyword">limit_rate</span> 50k<span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-  <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>这个示例中定义了一个名叫<code>first</code>的<code>10m</code>大小的容器，这个名字会在后面的<code>limit_conn</code>中使用。<code>limit_conn first 1;</code>限制在<code>first</code>中记录状态的每个<code>IP</code>只能发起一个并发连接。<code>limit_rate 50k;</code>&nbsp; 对每个连接限速<code>50k</code>。</p>
 <p>注意，这里是对连接限速，而不是对<code>IP</code>限速。如果一个<code>IP</code>允许三个并发连接，那么这个 IP 就是限速为<code>limit_rate×3</code>，在设置的时候要根据自己的需要做设置调整，要不然会达不到自己希望的目的。</p>
@@ -1514,11 +1514,11 @@ Accept<span class="token operator">-</span>Ranges<span class="token punctuation"
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">limit_conn_zone</span> <span class="token variable">$binary_remote_addr</span> zone<span class="token operator">=</span>perip<span class="token punctuation">:</span>10m<span class="token punctuation">;</span>
 <span class="token keyword">limit_conn_zone</span> <span class="token variable">$server_name</span> zone<span class="token operator">=</span>perserver<span class="token punctuation">:</span>10m<span class="token punctuation">;</span>
 
-<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<span class="token keyword">server</span> <span class="token punctuation">{</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
     <span class="token keyword">limit_conn</span> perip <span class="token number">10</span><span class="token punctuation">;</span>
     <span class="token keyword">limit_conn</span> perserver <span class="token number">100</span><span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
@@ -2056,7 +2056,7 @@ Accept<span class="token operator">-</span>Ranges<span class="token punctuation"
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1209.5k</span>
+                        class="white-color">1189.3k</span>
             
             
             

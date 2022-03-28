@@ -469,7 +469,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    3.9k
+                    3.8k
                 </div>
                 
 
@@ -511,8 +511,8 @@ NETWORK ID        NAME         DRIVER      SCOPE
 2e4d5111c51e      none         null        local
 
 <span class="token comment" spellcheck="true"># 查看本机Docker网段</span>
-$ docker inspect bridge -f <span class="token string">"&amp;#123;&amp;#123;json .IPAM.Config&amp;#125;&amp;#125;"</span>
-<span class="token punctuation">[</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;"Subnet":"172.17.0.0/16","Gateway":"172.17.0.1"&amp;#125;]</span>
+$ docker inspect bridge -f <span class="token string">"{{json .IPAM.Config}}"</span>
+<span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"Subnet"</span><span class="token keyword">:</span><span class="token string">"172.17.0.0/16"</span>,<span class="token string">"Gateway"</span><span class="token keyword">:</span><span class="token string">"172.17.0.1"</span><span class="token punctuation">}</span><span class="token punctuation">]</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><img src="../images/docker-network-way-2.png" alt="Docker网络配置"></p>
 <ul>
@@ -592,7 +592,7 @@ $ docker run -d -P training/webapp python app.py
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看映射端口配置</span>
 $ docker port myapp
-8081/tcp -<span class="token operator">&gt;</span> 127.0.0.1:32769
+8081/tcp -<span class="token operator">></span> 127.0.0.1:32769
 $ docker port myapp 8081
 127.0.0.1:32769
 
@@ -668,12 +668,12 @@ $  docker run -d --name<span class="token operator">=</span>mypg \
 <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>配置全部容器的 <code>DNS</code> ，也可以在 <code>/etc/docker/daemon.json</code> 文件中增加以下内容来设置。对应 <code>MacOS</code> 而已，需要在客户端内进行 <code>DNS</code> 的配置并重启，即可。</p>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">{</span>
   <span class="token string">"dns"</span> <span class="token keyword">:</span> <span class="token punctuation">[</span>
     <span class="token string">"114.114.114.114"</span>,
     <span class="token string">"8.8.8.8"</span>
   <span class="token punctuation">]</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>如果只是针对于不同的容器使用不同的配置，则可以在启动时 <code>docker run</code> 时候通过参数的指定来达到同样的效果。</p>
 <ul>
@@ -703,7 +703,7 @@ $ docker run -d -p 5000:5000 --name<span class="token operator">=</span>myapp \
 </ul>
 <p>当 <code>Docker</code> 启动时，会自动在主机上创建一个 <code>docker0</code> 虚拟网桥，实际上是 <code>Linux</code> 的一个 <code>bridge</code>，可以理解为一个<strong>软件交换机</strong>，它会在挂载到它的网口之间进行转发。此后启动的容器内的网口也会自动分配一个同一网段 <code>172.17.0.0/16</code> 的地址。</p>
 <pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">ifconfig</span>
-docker0: flags<span class="token operator">=</span>4099<span class="token operator">&lt;</span>UP,BROADCAST,MULTICAST<span class="token operator">&gt;</span>  mtu 1500
+docker0: flags<span class="token operator">=</span>4099<span class="token operator">&lt;</span>UP,BROADCAST,MULTICAST<span class="token operator">></span>  mtu 1500
  inet 172.17.42.1  netmask 255.255.0.0  broadcast 172.17.255.255
  ether 02:42:f3:87:34:a3  txqueuelen 0  <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>
  RX packets 0  bytes 0 <span class="token punctuation">(</span>0.0 B<span class="token punctuation">)</span>
@@ -789,9 +789,9 @@ $ <span class="token function">sudo</span> ip <span class="token function">link<
 $ ip addr show bridge0
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>在 <code>Docker</code> 配置文件 <code>/etc/docker/daemon.json</code> 中添加如下内容，即可将 <code>Docker</code> 默认桥接到创建的网桥上。启动 <code>Docker</code> 服务。新建一个容器，可以看到它已经桥接到了 <code>bridge0</code> 上。</p>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">{</span>
   <span class="token string">"bridge"</span><span class="token keyword">:</span> <span class="token string">"bridge0"</span>,
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="6-总结一下"><a href="#6-总结一下" class="headerlink" title="6. 总结一下"></a>6. 总结一下</h2><blockquote>
@@ -1356,7 +1356,7 @@ $ ip addr show bridge0
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1209.5k</span>
+                        class="white-color">1189.3k</span>
             
             
             

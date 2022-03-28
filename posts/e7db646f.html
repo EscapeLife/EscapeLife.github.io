@@ -469,7 +469,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    3.2k
+                    3.1k
                 </div>
                 
 
@@ -503,10 +503,10 @@
 <hr>
 <h2 id="1-排查问题原因"><a href="#1-排查问题原因" class="headerlink" title="1. 排查问题原因"></a>1. 排查问题原因</h2><p>说一个前几天的事，早上刚刚上班，系统运维的同事说，我们负责的一个区域的机器有一个<code>tomcat</code>的<code>TIME_WAIT</code>很多，其他的则都不较少，相差相近<code>20</code>倍的量级。让我帮忙排查下，是什么方面的问题导致的。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看TCP连接状态</span>
-<span class="token function">netstat</span> -n <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'/^tcp/ &amp;#123;++S[<span class="token variable">$NF</span>]&amp;#125; END &amp;#123;for(a in S) print a, S[a]&amp;#125;'</span>
+<span class="token function">netstat</span> -n <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'/^tcp/ {++S[<span class="token variable">$NF</span>]} END {for(a in S) print a, S[a]}'</span>
 
 <span class="token comment" spellcheck="true"># 查找较多time_wait连接</span>
-$ <span class="token function">netstat</span> -n <span class="token operator">|</span> <span class="token function">grep</span> TIME_WAIT <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'&amp;#123;print <span class="token variable">$5</span>&amp;#125;'</span> <span class="token operator">|</span> <span class="token function">sort</span> <span class="token operator">|</span> <span class="token function">uniq</span> -c <span class="token operator">|</span> <span class="token function">sort</span> -rn <span class="token operator">|</span> <span class="token function">head</span> -n 20
+$ <span class="token function">netstat</span> -n <span class="token operator">|</span> <span class="token function">grep</span> TIME_WAIT <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$5</span>}'</span> <span class="token operator">|</span> <span class="token function">sort</span> <span class="token operator">|</span> <span class="token function">uniq</span> -c <span class="token operator">|</span> <span class="token function">sort</span> -rn <span class="token operator">|</span> <span class="token function">head</span> -n 20
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>登录到两台主机（一台正常、一台异常）上，首先我需要确认的是两台机器的上游负载是否有问题，主要考虑反向代理服务器的调度算法。发现上游的<code>Nginx</code>代理使用的<code>RR</code>算法且再没有其他参数，所以排除了反代导致的后端服务器分配不一致导致的问题。</p>
 <p>其实，心里还是有点不放心，随即查看了两台后端服务器的访问日志，对比发现两者访问数目相差不大，确认不是负载导致的。</p>
@@ -1188,7 +1188,7 @@ net.ipv4.tcp_tw_recycle<span class="token operator">=</span>1
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1209.5k</span>
+                        class="white-color">1189.3k</span>
             
             
             

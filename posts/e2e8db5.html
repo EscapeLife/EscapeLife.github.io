@@ -472,7 +472,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    8 分
+                    7 分
                 </div>
                 
 
@@ -509,7 +509,7 @@
 
 exp <span class="token operator">=</span> re<span class="token punctuation">.</span>compile<span class="token punctuation">(</span>r<span class="token triple-quoted-string string">'''^(https?:\/\/)?
                   ([\da-z\.-]+)
-                  \.([a-z\.]&amp;#123;2,6&amp;#125;)
+                  \.([a-z\.]{2,6})
                   ([\/\w \.-]*)\/?$
                   '''</span><span class="token punctuation">,</span> re<span class="token punctuation">.</span>X<span class="token punctuation">)</span>
 
@@ -527,7 +527,7 @@ exp <span class="token operator">=</span> re<span class="token punctuation">.</s
 
 exp <span class="token operator">=</span> re<span class="token punctuation">.</span>compile<span class="token punctuation">(</span>r<span class="token triple-quoted-string string">'''^(?:(?:25[0-5]
                       |2[0-4][0-9]
-                      |[1]?[0-9][0-9]?)\.)&amp;#123;3&amp;#125;
+                      |[1]?[0-9][0-9]?)\.){3}
                       (?:25[0-5]
                       |2[0-4][0-9]
                       |[1]?[0-9][0-9]?)$'''</span><span class="token punctuation">,</span> re<span class="token punctuation">.</span>X<span class="token punctuation">)</span>
@@ -548,7 +548,7 @@ exp <span class="token operator">=</span> re<span class="token punctuation">.</s
 <pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> re
 
 date <span class="token operator">=</span> <span class="token string">'2018-01-01'</span>
-<span class="token keyword">assert</span> re<span class="token punctuation">.</span>sub<span class="token punctuation">(</span><span class="token string">'(\d&amp;#123;4&amp;#125;)-(\d&amp;#123;2&amp;#125;)-(\d&amp;#123;2&amp;#125;)'</span><span class="token punctuation">,</span> r<span class="token string">'\2/\3/\1'</span><span class="token punctuation">,</span> date<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token string">'01/01/2018'</span>
+<span class="token keyword">assert</span> re<span class="token punctuation">.</span>sub<span class="token punctuation">(</span><span class="token string">'(\d{4})-(\d{2})-(\d{2})'</span><span class="token punctuation">,</span> r<span class="token string">'\2/\3/\1'</span><span class="token punctuation">,</span> date<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token string">'01/01/2018'</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">convert</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">:</span>
     res <span class="token operator">=</span> re<span class="token punctuation">.</span>sub<span class="token punctuation">(</span>r<span class="token string">'(.)([A-Z][a-z]+)'</span><span class="token punctuation">,</span>r<span class="token string">'\1_\2'</span><span class="token punctuation">,</span> s<span class="token punctuation">)</span>
@@ -557,15 +557,15 @@ date <span class="token operator">=</span> <span class="token string">'2018-01-0
 <span class="token keyword">assert</span> convert<span class="token punctuation">(</span><span class="token string">'CamelCase'</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token string">'camel_case'</span>
 <span class="token keyword">assert</span> convert<span class="token punctuation">(</span><span class="token string">'SimpleHTTPServer'</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token string">'simple_http_server'</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-python"><code class="language-python">ID_NAMES <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;'U1EAT8MG9': 'xiaoming', 'U0K1MF23Z': 'laolin'&amp;#125;</span>
-s <span class="token operator">=</span> <span class="token string">'&lt;@U1EAT8MG9&gt;, &lt;@U0K1MF23Z&gt; 嗯 确实是这样的'</span>
+<pre class="line-numbers language-python"><code class="language-python">ID_NAMES <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">'U1EAT8MG9'</span><span class="token punctuation">:</span> <span class="token string">'xiaoming'</span><span class="token punctuation">,</span> <span class="token string">'U0K1MF23Z'</span><span class="token punctuation">:</span> <span class="token string">'laolin'</span><span class="token punctuation">}</span>
+s <span class="token operator">=</span> <span class="token string">'&lt;@U1EAT8MG9>, &lt;@U0K1MF23Z> 嗯 确实是这样的'</span>
 
-exp <span class="token operator">=</span> re<span class="token punctuation">.</span>compile<span class="token punctuation">(</span>r<span class="token string">'\&lt;@.*?\&gt;'</span><span class="token punctuation">)</span>
+exp <span class="token operator">=</span> re<span class="token punctuation">.</span>compile<span class="token punctuation">(</span>r<span class="token string">'\&lt;@.*?\>'</span><span class="token punctuation">)</span>
 
 <span class="token keyword">def</span> <span class="token function">id_to_name</span><span class="token punctuation">(</span>match<span class="token punctuation">)</span><span class="token punctuation">:</span>
     content <span class="token operator">=</span> match<span class="token punctuation">.</span>group<span class="token punctuation">(</span><span class="token punctuation">)</span>
     name <span class="token operator">=</span> ID_NAMES<span class="token punctuation">.</span>get<span class="token punctuation">(</span>content<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-    <span class="token keyword">return</span> <span class="token string">'@&amp;#123;&amp;#125;'</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>name<span class="token punctuation">)</span> <span class="token keyword">if</span> name <span class="token keyword">else</span> content
+    <span class="token keyword">return</span> <span class="token string">'@{}'</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>name<span class="token punctuation">)</span> <span class="token keyword">if</span> name <span class="token keyword">else</span> content
 
 <span class="token keyword">assert</span> exp<span class="token punctuation">.</span>sub<span class="token punctuation">(</span>id_to_name<span class="token punctuation">,</span> s<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token string">'@xiaoming, @laolin 嗯 确实是这样的'</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
@@ -574,7 +574,7 @@ exp <span class="token operator">=</span> re<span class="token punctuation">.</s
 <ul>
 <li>实现<code>Fibonacci</code>(斐波那契数列)函数。</li>
 </ul>
-<pre class="line-numbers language-python"><code class="language-python"><span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> <span class="token punctuation">[</span>fib<span class="token punctuation">(</span>n<span class="token punctuation">)</span> <span class="token keyword">for</span> n <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token operator">>></span><span class="token operator">></span> <span class="token punctuation">[</span>fib<span class="token punctuation">(</span>n<span class="token punctuation">)</span> <span class="token keyword">for</span> n <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
 <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">,</span> <span class="token number">13</span><span class="token punctuation">,</span> <span class="token number">21</span><span class="token punctuation">,</span> <span class="token number">34</span><span class="token punctuation">,</span> <span class="token number">55</span><span class="token punctuation">,</span> <span class="token number">89</span><span class="token punctuation">,</span> <span class="token number">144</span><span class="token punctuation">,</span> <span class="token number">233</span><span class="token punctuation">,</span> <span class="token number">377</span><span class="token punctuation">,</span> <span class="token number">610</span><span class="token punctuation">]</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <p><strong>标准实现</strong></p>
@@ -700,7 +700,7 @@ Cost<span class="token punctuation">:</span> <span class="token number">2.005033
     <span class="token keyword">def</span> <span class="token function">__exit__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> type<span class="token punctuation">,</span> value<span class="token punctuation">,</span> traceback<span class="token punctuation">)</span><span class="token punctuation">:</span>
         self<span class="token punctuation">.</span>end <span class="token operator">=</span> time<span class="token punctuation">(</span><span class="token punctuation">)</span>
         cost <span class="token operator">=</span> self<span class="token punctuation">.</span>end <span class="token operator">-</span> self<span class="token punctuation">.</span>start
-        <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">'Cost: &amp;#123;cost&amp;#125;'</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">'Cost: {cost}'</span><span class="token punctuation">)</span>
 
 
 <span class="token keyword">class</span> <span class="token class-name">Timed2</span><span class="token punctuation">(</span>ContextDecorator<span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -711,7 +711,7 @@ Cost<span class="token punctuation">:</span> <span class="token number">2.005033
     <span class="token keyword">def</span> <span class="token function">__exit__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> type<span class="token punctuation">,</span> value<span class="token punctuation">,</span> traceback<span class="token punctuation">)</span><span class="token punctuation">:</span>
         self<span class="token punctuation">.</span>end <span class="token operator">=</span> time<span class="token punctuation">(</span><span class="token punctuation">)</span>
         cost <span class="token operator">=</span> self<span class="token punctuation">.</span>end <span class="token operator">-</span> self<span class="token punctuation">.</span>start
-        <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">'Cost: &amp;#123;cost&amp;#125;'</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">'Cost: {cost}'</span><span class="token punctuation">)</span>
 
 
 <span class="token keyword">with</span> Timed<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -732,7 +732,7 @@ f<span class="token punctuation">(</span><span class="token punctuation">)</span
 </ul>
 <pre class="line-numbers language-python"><code class="language-python">In <span class="token punctuation">:</span> Seq<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span>\
 <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">:</span>     <span class="token punctuation">.</span>map<span class="token punctuation">(</span><span class="token keyword">lambda</span> x<span class="token punctuation">:</span> x <span class="token operator">*</span> <span class="token number">2</span><span class="token punctuation">)</span>\
-<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">:</span>     <span class="token punctuation">.</span>filter<span class="token punctuation">(</span><span class="token keyword">lambda</span> x<span class="token punctuation">:</span> x <span class="token operator">&gt;</span> <span class="token number">4</span><span class="token punctuation">)</span>\
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">:</span>     <span class="token punctuation">.</span>filter<span class="token punctuation">(</span><span class="token keyword">lambda</span> x<span class="token punctuation">:</span> x <span class="token operator">></span> <span class="token number">4</span><span class="token punctuation">)</span>\
 <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">:</span>     <span class="token punctuation">.</span>reduce<span class="token punctuation">(</span><span class="token keyword">lambda</span> x<span class="token punctuation">,</span> y<span class="token punctuation">:</span> x <span class="token operator">+</span> y<span class="token punctuation">)</span>
 <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">:</span>
 Out<span class="token punctuation">:</span> <span class="token number">14</span>
@@ -1328,7 +1328,7 @@ Out<span class="token punctuation">:</span> <span class="token number">14</span>
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1209.5k</span>
+                        class="white-color">1189.3k</span>
             
             
             

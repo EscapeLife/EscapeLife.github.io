@@ -469,7 +469,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    3.4k
+                    3.3k
                 </div>
                 
 
@@ -779,17 +779,17 @@ $ <span class="token function">rsync</span> -avz --progress -e <span class="toke
 <li><strong>[4] 并发同步文件或目录(最佳实践)</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 最佳实践</span>
---dry-run <span class="token operator">==</span><span class="token operator">&gt;</span> rsync_files_list.txt <span class="token operator">==</span><span class="token operator">&gt;</span> <span class="token function">rsync</span>
+--dry-run <span class="token operator">==</span><span class="token operator">></span> rsync_files_list.txt <span class="token operator">==</span><span class="token operator">></span> <span class="token function">rsync</span>
 
 <span class="token comment" spellcheck="true"># 即先使用--dry-run参数先跑一遍将需要需要同步的文件路径都记录到txt文本</span>
 $ <span class="token function">rsync</span> -avz --progress -e <span class="token string">'ssh -p 2222'</span> --dry-run \
     /data/app/data/files/* \
     escape@app.escapelife.site:/data_backup/app/files \
-    <span class="token operator">&gt;</span> /tmp/rsync_files_list.txt
+    <span class="token operator">></span> /tmp/rsync_files_list.txt
 
 <span class="token comment" spellcheck="true"># 然后对输出到txt文本的内容进行筛选，删除无用的信息，在使用rsync命令并发同步文件</span>
-$ <span class="token function">cat</span> /tmp/rsync_files_list.txt <span class="token operator">|</span> <span class="token function">xargs</span> -n1 -P4 -I<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;&amp;#125; \</span>
-    <span class="token function">rsync</span> -avhz --progress <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;&amp;#125; remote_server:/data</span>
+$ <span class="token function">cat</span> /tmp/rsync_files_list.txt <span class="token operator">|</span> <span class="token function">xargs</span> -n1 -P4 -I<span class="token punctuation">{</span><span class="token punctuation">}</span> \
+    <span class="token function">rsync</span> -avhz --progress <span class="token punctuation">{</span><span class="token punctuation">}</span> remote_server:/data
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><img src="../images/use-rsync-command-1.png" alt="愉快的使用rsync备份数据"></p>
 <hr>
@@ -925,12 +925,12 @@ DAY<span class="token operator">=</span>`date <span class="token string">"+%A"</
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/sh</span>
 <span class="token function">cd</span> ~susan
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<span class="token punctuation">{</span>
 <span class="token keyword">echo</span>
 <span class="token function">date</span>
 dest<span class="token operator">=</span>~/backup/<span class="token variable"><span class="token variable">`</span><span class="token function">date</span> +%A<span class="token variable">`</span></span>
 <span class="token function">mkdir</span> <span class="token variable">$dest</span>.new
-<span class="token function">find</span> <span class="token keyword">.</span> -xdev -type f \<span class="token punctuation">(</span> -mtime 0 -or -mtime 1 \<span class="token punctuation">)</span> -exec <span class="token function">cp</span> -aPv <span class="token string">"&amp;#123;&amp;#125;"</span>
+<span class="token function">find</span> <span class="token keyword">.</span> -xdev -type f \<span class="token punctuation">(</span> -mtime 0 -or -mtime 1 \<span class="token punctuation">)</span> -exec <span class="token function">cp</span> -aPv <span class="token string">"{}"</span>
 <span class="token variable">$dest</span>.new \<span class="token punctuation">;</span>
 cnt<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token function">find</span> $dest.new -type f <span class="token operator">|</span> <span class="token function">wc</span> -l<span class="token variable">`</span></span>
 <span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token variable">$cnt</span> -gt 0 <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
@@ -939,7 +939,7 @@ cnt<span class="token operator">=</span><span class="token variable"><span class
 <span class="token keyword">fi</span>
 <span class="token function">rm</span> -rf <span class="token variable">$dest</span>.new
 <span class="token function">rsync</span> -Cavze <span class="token function">ssh</span> <span class="token keyword">.</span> samba:backup
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125; &gt;&gt; ~/backup/backup.log 2&gt;&amp;1</span>
+<span class="token punctuation">}</span> <span class="token operator">>></span> ~/backup/backup.log 2<span class="token operator">></span><span class="token operator">&amp;</span>1
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[4] 花式备份远程文件列表</strong></li>
@@ -1624,7 +1624,7 @@ could not <span class="token function">make</span> way <span class="token keywor
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1209.5k</span>
+                        class="white-color">1189.3k</span>
             
             
             
