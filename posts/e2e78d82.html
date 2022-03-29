@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-12-17
+                    2022-03-29
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    4.2k
+                    4.5k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    16 分
+                    17 分
                 </div>
                 
 
@@ -580,7 +580,7 @@ $ systemctl restart sshd.service
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>远程主机将用户的<strong>公钥</strong>，保存在登录后的用户主目录的 <code>$HOME/.ssh/authorized_keys</code> 文件中。公钥就是一段字符串，只要把它追加在 <code>authorized_keys</code> 文件的末尾就行了。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 不使用上面的ssh-copy-id命令，进行无密码登录配置</span>
-<span class="token function">ssh</span> user@host <span class="token string">'mkdir -p .ssh'</span>
+$ <span class="token function">ssh</span> user@host <span class="token string">'mkdir -p .ssh'</span>
 $ <span class="token function">ssh</span> user@host <span class="token string">'cat >> .ssh/authorized_keys'</span> <span class="token operator">&lt;</span> ~/.ssh/id_rsa.pub
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
@@ -793,6 +793,45 @@ Host ubuntu
     Port 1022
     User root
     IdentityFile /Users/escape/.ssh/id_rsa.pub
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<ul>
+<li><strong>[2] 秘钥权限不正确</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息 - 提示信息</span>
+➜ <span class="token function">ssh</span> -v -p 22 escape@escxxxlife.site
+kex_exchange_identification: read: Connection reset by peer
+Connection reset by 127.0.0.1 port 7890
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 问题排除 - 对应域名地址可以ping通</span>
+➜ <span class="token function">ping</span> 222.22.222.22
+0 ▁ 10 ▂ 20 ▃ 30 ▄ 40 ▅ 50 ▆ 60 ▇ 70 █ 80 ▁ 90 ▂ 100 ▃ 110 ▄ 120 ▅
+PING 222.22.222.22 <span class="token punctuation">(</span>222.22.222.22<span class="token punctuation">)</span>: 56 data bytes
+▂▂▁^C
+ 0/  3 <span class="token punctuation">(</span> 0%<span class="token punctuation">)</span> lost<span class="token punctuation">;</span>    5/  10/  13ms<span class="token punctuation">;</span> last:    5ms
+ 0/  3 <span class="token punctuation">(</span> 0%<span class="token punctuation">)</span> lost<span class="token punctuation">;</span>    5/  10/  13/   4ms <span class="token punctuation">(</span>last 3<span class="token punctuation">)</span>
+--- 222.22.222.22 <span class="token function">ping</span> statistics ---
+
+<span class="token comment" spellcheck="true"># 问题排除 - 使用-v参数并没有发现问题</span>
+➜ <span class="token function">ssh</span> -v -p 22 escape@escxxxlife.site
+
+<span class="token comment" spellcheck="true"># 问题排除 - 登录远程服务器进行本机登录</span>
+➜ <span class="token function">ssh</span> -v -p 22 192.168.33.100
+
+<span class="token comment" spellcheck="true"># 问题排除 - 确保已经安装OpenSSH</span>
+<span class="token comment" spellcheck="true"># 发现只安装了openssh-client工具并没有服务端</span>
+$ <span class="token function">sudo</span> apt list --installed <span class="token operator">|</span> <span class="token function">grep</span> openssh-server
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 解决方法 - 安装服务端</span>
+$ <span class="token function">sudo</span> apt <span class="token function">install</span> -y openssh-server
+
+<span class="token comment" spellcheck="true"># 解决方法 - 重启服务</span>
+$ <span class="token function">sudo</span> systemctl restart sshd.service
+
+<span class="token comment" spellcheck="true"># 解决方法 - 成功登录</span>
+➜ <span class="token function">ssh</span> -v -p 22 escape@escxxxlife.site
+This key is not known by any other names
+Are you sure you want to <span class="token keyword">continue</span> connecting <span class="token punctuation">(</span>yes/no/<span class="token punctuation">[</span>fingerprint<span class="token punctuation">]</span><span class="token punctuation">)</span>?
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="7-命令常用参数总结"><a href="#7-命令常用参数总结" class="headerlink" title="7. 命令常用参数总结"></a>7. 命令常用参数总结</h2><blockquote>
@@ -1344,7 +1383,7 @@ Host ubuntu
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1189.9k</span>
+                        class="white-color">1190.2k</span>
             
             
             
