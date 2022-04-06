@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-03-31
+                    2022-04-06
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    4.6k
+                    4.9k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    18 分
+                    19 分
                 </div>
                 
 
@@ -767,12 +767,12 @@ $ <span class="token function">ssh</span> -o ServerAliveInterval<span class="tok
 <h2 id="6-常见问题处理"><a href="#6-常见问题处理" class="headerlink" title="6. 常见问题处理"></a>6. 常见问题处理</h2><blockquote>
 <p><strong>记录日常使用 ssh 命令常见遇到的问题</strong></p>
 </blockquote>
-<ul>
-<li><strong>[1] 秘钥权限不正确</strong><ul>
-<li><code>SSH Key: “Permissions 0644 for 'id_rsa.pub' are too open.” on mac</code></li>
-</ul>
-</li>
-</ul>
+<p><code>SSH</code> 是 <code>Linux</code> 中的基础服务，作为 <code>IT</code> 从业者，基本上每天都要 <code>SSH</code> 连接到服务器中，从事各种各样的工作。作为这样基础的不能再基础的服务，一旦出现问题，影响也是巨大的，连不上就无法对服务器进行配置和更改，所有的事情也就无从谈起。</p>
+<p><img src="../images/ssh-authenticity-and-use-8.jpg" alt="SSH服务原理和使用技巧 - 常见问题处理"></p>
+<hr>
+<h3 id="6-1-秘钥权限不正确"><a href="#6-1-秘钥权限不正确" class="headerlink" title="6.1 秘钥权限不正确"></a>6.1 秘钥权限不正确</h3><blockquote>
+<p><strong><code>SSH Key: “Permissions 0644 for 'id_rsa.pub' are too open.” on mac</code></strong></p>
+</blockquote>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息 - 提示信息</span>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @         WARNING: UNPROTECTED PRIVATE KEY FILE<span class="token operator">!</span>          @
@@ -795,9 +795,9 @@ Host ubuntu
     IdentityFile /Users/escape/.ssh/id_rsa.pub
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<ul>
-<li><strong>[2] 秘钥权限不正确</strong></li>
-</ul>
+<h3 id="6-2-没有安装服务端"><a href="#6-2-没有安装服务端" class="headerlink" title="6.2 没有安装服务端"></a>6.2 没有安装服务端</h3><blockquote>
+<p><strong>在 Linux 桌面端操作系统中，默认是没有安装 SSH 的服务端！</strong></p>
+</blockquote>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息 - 提示信息</span>
 ➜ <span class="token function">ssh</span> -v -p 22 escape@escxxxlife.site
 kex_exchange_identification: read: Connection reset by peer
@@ -834,9 +834,9 @@ This key is not known by any other names
 Are you sure you want to <span class="token keyword">continue</span> connecting <span class="token punctuation">(</span>yes/no/<span class="token punctuation">[</span>fingerprint<span class="token punctuation">]</span><span class="token punctuation">)</span>?
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<ul>
-<li><strong>[3] 强制使用 IPv4 地址</strong></li>
-</ul>
+<h3 id="6-3-强制使用-IPv4-地址"><a href="#6-3-强制使用-IPv4-地址" class="headerlink" title="6.3 强制使用 IPv4 地址"></a>6.3 强制使用 IPv4 地址</h3><blockquote>
+<p><strong>SSH 端口转发的时候，有时会用到 IPv6 的地址上面！</strong></p>
+</blockquote>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息 - 提示信息</span>
 $ autossh -T -N -L 0.0.0.0:1234:12.12.12.12:1234 app@app.escapelife.site
 bind <span class="token punctuation">[</span>::1<span class="token punctuation">]</span>:56633: Cannot assign requested address
@@ -844,6 +844,30 @@ bind <span class="token punctuation">[</span>::1<span class="token punctuation">
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 解决方法 - 权限不对</span>
 <span class="token comment" spellcheck="true"># 可能是ssh在试图使用ipv6的地址，可以在命令中加个参数-4强制使用ipv4</span>
 $ autossh -T -N -L 0.0.0.0:1234:12.12.12.12:1234 app@app.escapelife.site -4
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="6-4-删除之前域名解析"><a href="#6-4-删除之前域名解析" class="headerlink" title="6.4 删除之前域名解析"></a>6.4 删除之前域名解析</h3><blockquote>
+<p><strong>如果连接的服务器域名会动态变化的话，会导致连接异常！</strong></p>
+</blockquote>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息 - 提示信息</span>
+➜ <span class="token function">ssh</span> -v -p 1234 escape@escape-xxx-life.site
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED<span class="token operator">!</span>     @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY<span class="token operator">!</span>
+Someone could be eavesdropping on you right now <span class="token punctuation">(</span>man-in-the-middle attack<span class="token punctuation">)</span><span class="token operator">!</span>
+It is also possible that a host key has just been changed.
+The fingerprint <span class="token keyword">for</span> the ED25519 key sent by the remote host is
+SHA256:1234A1234B1234CahVgF/N233.
+Please contact your system administrator.
+Add correct host key <span class="token keyword">in</span> /Users/escape/.ssh/known_hosts to get rid of this message.
+Offending ED25519 key <span class="token keyword">in</span> /Users/escape/.ssh/known_hosts:1236
+Host key <span class="token keyword">for</span> <span class="token punctuation">[</span>escape-xxx-life<span class="token punctuation">]</span>:1234 has changed and you have requested strict checking.
+Host key verification failed.
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 解决方法 - 之前有记录</span>
+<span class="token comment" spellcheck="true"># 删除本地 .ssh 下的 known_hosts 文件中之前的域名记录历史</span>
+➜ vim .ssh/known_hosts
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="7-命令常用参数总结"><a href="#7-命令常用参数总结" class="headerlink" title="7. 命令常用参数总结"></a>7. 命令常用参数总结</h2><blockquote>
@@ -1395,7 +1419,7 @@ $ autossh -T -N -L 0.0.0.0:1234:12.12.12.12:1234 app@app.escapelife.site -4
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1195.9k</span>
+                        class="white-color">1196.2k</span>
             
             
             
