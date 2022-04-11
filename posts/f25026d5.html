@@ -440,17 +440,17 @@ sqlalchemy.exc.OperationalError: <span class="token punctuation">(</span>psycopg
 <p><strong>查找问题的过程还是真的有点费劲</strong></p>
 </blockquote>
 <p>之前看出日志，发现 <code>Nginx</code> 的日志有出现 <code>timeout</code> 的情况，后来为了保证 <code>stream</code> 的持久连接，加上了如下参数配置。配置之后，这样算是解决了 <code>timeout</code> 的问题，但是发现还是会有上述跳转的问题出现。哎，头发白了…..</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx">stream <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx">stream <span class="token punctuation">{</span>
     <span class="token keyword">tcp_nodelay</span> on<span class="token punctuation">;</span>
 
-    <span class="token keyword">upstream</span> app_postgres <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token keyword">upstream</span> app_postgres <span class="token punctuation">{</span>
         hash <span class="token variable">$remote_addr</span> consistent<span class="token punctuation">;</span>
         <span class="token keyword">server</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">10.100</span><span class="token punctuation">:</span><span class="token number">5432</span><span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-    <span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">server</span> <span class="token punctuation">{</span>
         <span class="token keyword">listen</span> <span class="token number">5432</span> <span class="token keyword">so_keepalive</span><span class="token operator">=</span>on<span class="token punctuation">;</span>
         <span class="token keyword">proxy_pass</span> app_postgres<span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+    <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>其实上述登录问题是概率性问题，是间隔一段时间之后才会复现一次的。后来发现是，设置的 <code>Nginx</code> 的 <code>stream</code> 超时时间导致的。超时时间已过期或者重启数据库就会出现该问题。后来，决定看看服务连接数据库的代码。如下所示，使用的熟知的 <code>SQLAlchemy</code>，顺便查了查对应的参数，发现解决问题的方法了。</p>
 <ul>
@@ -1029,7 +1029,7 @@ e <span class="token operator">=</span> create_engine<span class="token punctuat
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1218k</span>
+                        class="white-color">1197.4k</span>
             
             
             

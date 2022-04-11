@@ -469,7 +469,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    6.2k
+                    6.1k
                 </div>
                 
 
@@ -539,7 +539,7 @@ $ <span class="token function">sudo</span> yum <span class="token function">inst
 
 <span class="token comment" spellcheck="true"># 创建备份目录</span>
 <span class="token function">mkdir</span> -pv /data/pg_wal_backup/
-<span class="token function">mkdir</span> -pv /data/pg_wal_backup/<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;basebackup, wal&amp;#125;</span>
+<span class="token function">mkdir</span> -pv /data/pg_wal_backup/<span class="token punctuation">{</span>basebackup, wal<span class="token punctuation">}</span>
 
 <span class="token comment" spellcheck="true"># 进入备份目录做一次基础备份</span>
 <span class="token comment" spellcheck="true"># 用于获取正在运行的PostgreSQL数据库集群的基本备份</span>
@@ -550,11 +550,11 @@ $ <span class="token function">sudo</span> /usr/lib/postgresql/10/bin/pg_basebac
 <ul>
 <li><strong>[2] 修改数据库配置文件</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># [数据库默认配置文件] =&gt; 容器映射出来的数据库地址</span>
-<span class="token comment" spellcheck="true"># [archive_mode]    =&gt; 参数修改后需重启数据库才生效，而archive_command则不需要</span>
-<span class="token comment" spellcheck="true"># [archive_command] =&gt; WAL日志备份的Unix命令或者脚本用于将日志拷贝到其他的地方</span>
-<span class="token comment" spellcheck="true"># [archive_command] =&gt; 需要注意备份的目录权限需要设置为数据库启动的用户权限</span>
-<span class="token comment" spellcheck="true"># [备份不使用压缩工具] =&gt; archive_command = 'cp %p /data/pg_wal_backup/wal/%f'</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># [数据库默认配置文件] => 容器映射出来的数据库地址</span>
+<span class="token comment" spellcheck="true"># [archive_mode]    => 参数修改后需重启数据库才生效，而archive_command则不需要</span>
+<span class="token comment" spellcheck="true"># [archive_command] => WAL日志备份的Unix命令或者脚本用于将日志拷贝到其他的地方</span>
+<span class="token comment" spellcheck="true"># [archive_command] => 需要注意备份的目录权限需要设置为数据库启动的用户权限</span>
+<span class="token comment" spellcheck="true"># [备份不使用压缩工具] => archive_command = 'cp %p /data/pg_wal_backup/wal/%f'</span>
 $ <span class="token function">sudo</span> vim /data/app/pg_data/postgresql.conf
 wal_level <span class="token operator">=</span> replica  <span class="token comment" spellcheck="true"># 需要将日志级别设置为replica或更高级别; 可使用默认值</span>
 archive_mode <span class="token operator">=</span> on    <span class="token comment" spellcheck="true"># 打开归档备份</span>
@@ -577,31 +577,31 @@ archive_command <span class="token operator">=</span> <span class="token string"
 <li><strong>[3] 添加 WAL 备份脚本</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 这里我们对备份机制做了一点点优化</span>
-<span class="token comment" spellcheck="true"># %f =&gt; 是要被归档的日志文件的文件名</span>
-<span class="token comment" spellcheck="true"># %p =&gt; 是要被归档的日志文件的路径及名称</span>
+<span class="token comment" spellcheck="true"># %f => 是要被归档的日志文件的文件名</span>
+<span class="token comment" spellcheck="true"># %p => 是要被归档的日志文件的路径及名称</span>
 <span class="token comment" spellcheck="true"># /usr/local/bin/archive_wal.sh %f %p /data/pg_wal_backup/wal</span>
 
 $ <span class="token function">sudo</span> vim /usr/local/bin/archive_wal.sh
 <span class="token comment" spellcheck="true">#!/usr/bin/env bash</span>
 
 EXIT_CODE<span class="token operator">=</span>0
-ARCHIVE_FILE<span class="token operator">=</span>$<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;1&amp;#125;  # %f</span>
-ARCHIVE_DIR<span class="token operator">=</span>$<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;2&amp;#125;   # %p</span>
-BACKUP_PATH<span class="token operator">=</span>$<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;3&amp;#125;   # /data/pg_wal_backup/wal</span>
+ARCHIVE_FILE<span class="token operator">=</span><span class="token variable">${1}</span>  <span class="token comment" spellcheck="true"># %f</span>
+ARCHIVE_DIR<span class="token operator">=</span><span class="token variable">${2}</span>   <span class="token comment" spellcheck="true"># %p</span>
+BACKUP_PATH<span class="token operator">=</span><span class="token variable">${3}</span>   <span class="token comment" spellcheck="true"># /data/pg_wal_backup/wal</span>
 
-<span class="token keyword">if</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> -d <span class="token string">"$&amp;#123;BACKUP_PATH&amp;#125;"</span> <span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
-    <span class="token function">command</span> -v zstd <span class="token operator">&gt;</span> /dev/null 2<span class="token operator">&gt;</span><span class="token operator">&amp;</span>1
+<span class="token keyword">if</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> -d <span class="token string">"<span class="token variable">${BACKUP_PATH}</span>"</span> <span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+    <span class="token function">command</span> -v zstd <span class="token operator">></span> /dev/null 2<span class="token operator">></span><span class="token operator">&amp;</span>1
     <span class="token keyword">if</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token variable">$?</span> -gt 0 <span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
-        <span class="token function">gzip</span> <span class="token operator">&lt;</span> $<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;ARCHIVE_DIR&amp;#125; &gt; "$&amp;#123;BACKUP_PATH&amp;#125;/$&amp;#123;ARCHIVE_FILE&amp;#125;"</span>
-        <span class="token comment" spellcheck="true"># restore_command =&gt; gunzip &lt; $&amp;#123;BACKUP_PATH&amp;#125;/$&amp;#123;ARCHIVE_FILE&amp;#125; &gt; $ARCHIVE_DIR</span>
+        <span class="token function">gzip</span> <span class="token operator">&lt;</span> <span class="token variable">${ARCHIVE_DIR}</span> <span class="token operator">></span> <span class="token string">"<span class="token variable">${BACKUP_PATH}</span>/<span class="token variable">${ARCHIVE_FILE}</span>"</span>
+        <span class="token comment" spellcheck="true"># restore_command => gunzip &lt; ${BACKUP_PATH}/${ARCHIVE_FILE} > $ARCHIVE_DIR</span>
     <span class="token keyword">else</span>
-        zstd -f -q -o <span class="token string">"$&amp;#123;BACKUP_PATH&amp;#125;/$&amp;#123;ARCHIVE_FILE&amp;#125;"</span> $<span class="token operator">&amp;</span>#123<span class="token punctuation">;</span>ARCHIVE_DIR<span class="token operator">&amp;</span>#125<span class="token punctuation">;</span>
-        <span class="token comment" spellcheck="true"># restore_command =&gt; zstd -d -q -o $ARCHIVE_DIR $&amp;#123;BACKUP_PATH&amp;#125;/$&amp;#123;ARCHIVE_FILE&amp;#125;</span>
+        zstd -f -q -o <span class="token string">"<span class="token variable">${BACKUP_PATH}</span>/<span class="token variable">${ARCHIVE_FILE}</span>"</span> <span class="token variable">${ARCHIVE_DIR}</span>
+        <span class="token comment" spellcheck="true"># restore_command => zstd -d -q -o $ARCHIVE_DIR ${BACKUP_PATH}/${ARCHIVE_FILE}</span>
     <span class="token keyword">fi</span>
     EXIT_CODE<span class="token operator">=</span><span class="token variable">$?</span>
 <span class="token keyword">fi</span>
 
-<span class="token keyword">exit</span> $<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;EXIT_CODE&amp;#125;</span>
+<span class="token keyword">exit</span> <span class="token variable">${EXIT_CODE}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="3-自动归档备份"><a href="#3-自动归档备份" class="headerlink" title="3. 自动归档备份"></a>3. 自动归档备份</h2><blockquote>
@@ -616,7 +616,7 @@ $ <span class="token function">sudo</span> supervisorctl restarrt app-postgres
 postgres<span class="token operator">=</span><span class="token comment" spellcheck="true"># SELECT pg_reload_conf();</span>
 postgres<span class="token operator">=</span><span class="token comment" spellcheck="true"># show archive_command;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 定时任务 =&gt; 创建用于执行还原的命名点</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 定时任务 => 创建用于执行还原的命名点</span>
 <span class="token comment" spellcheck="true"># 默认情况下仅限于超级用户，但可以授予其他用户EXECUTE以运行该功能</span>
 $ <span class="token function">sudo</span> <span class="token function">crontab</span> -l
 0 * * * *    <span class="token function">bash</span> -c <span class="token string">"psql -U postgres -h 127.0.0.1 -p 5432 -c
@@ -687,8 +687,8 @@ $ /usr/lib/postgresql/10/bin/pg_basebackup -U postgres -D /data/pg_wal_backup/ba
 
 <span class="token comment" spellcheck="true"># 3.数据初始化</span>
 $ psql -U postgres -h 127.0.0.1 -p 5432 -d app
-<span class="token operator">&gt;</span>   app<span class="token operator">=</span><span class="token comment" spellcheck="true"># create table test01(id int primary key,name varchar(20));</span>
-<span class="token operator">&gt;</span>   app<span class="token operator">=</span><span class="token comment" spellcheck="true"># insert into test01 values(1,'a'), (2,'b'), (3,'c');</span>
+<span class="token operator">></span>   app<span class="token operator">=</span><span class="token comment" spellcheck="true"># create table test01(id int primary key,name varchar(20));</span>
+<span class="token operator">></span>   app<span class="token operator">=</span><span class="token comment" spellcheck="true"># insert into test01 values(1,'a'), (2,'b'), (3,'c');</span>
          List of relations
  Schema <span class="token operator">|</span>  Name  <span class="token operator">|</span> Type  <span class="token operator">|</span>  Owner
 --------+--------+-------+----------
@@ -697,14 +697,14 @@ $ psql -U postgres -h 127.0.0.1 -p 5432 -d app
 
 <span class="token comment" spellcheck="true"># 4.备份完之后做一次WAL切换，保证最新的WAL日志归档到归档目录</span>
 $ psql -U postgres -h 127.0.0.1 -p 5432 -d app
-<span class="token operator">&gt;</span>   app<span class="token operator">=</span><span class="token comment" spellcheck="true"># select pg_switch_wal();</span>
+<span class="token operator">></span>   app<span class="token operator">=</span><span class="token comment" spellcheck="true"># select pg_switch_wal();</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[创建] 创建还原点并删除数据</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 1.test01表目前有三条数据</span>
 $ psql -U postgres -h 127.0.0.1 -p 5432 -d app
-<span class="token operator">&gt;</span>   app<span class="token operator">=</span><span class="token comment" spellcheck="true"># select * from test01;</span>
+<span class="token operator">></span>   app<span class="token operator">=</span><span class="token comment" spellcheck="true"># select * from test01;</span>
  <span class="token function">id</span> <span class="token operator">|</span> name
 ----+------
   1 <span class="token operator">|</span> a
@@ -723,12 +723,12 @@ $ <span class="token function">bash</span> -c <span class="token string">"psql -
 
 <span class="token comment" spellcheck="true"># 3.误操作将数据删除</span>
 $ psql -U postgres -h 127.0.0.1 -p 5432 -d app
-<span class="token operator">&gt;</span>   app<span class="token operator">=</span><span class="token comment" spellcheck="true"># delete from test01;</span>
+<span class="token operator">></span>   app<span class="token operator">=</span><span class="token comment" spellcheck="true"># delete from test01;</span>
 DELETE 3
 
 <span class="token comment" spellcheck="true"># 4.记录下现在时间和误操作时间的大致间隔</span>
 $ psql -U postgres -h 127.0.0.1 -p 5432 -d app
-<span class="token operator">&gt;</span>   app<span class="token operator">=</span><span class="token comment" spellcheck="true"># select current_timestamp;</span>
+<span class="token operator">></span>   app<span class="token operator">=</span><span class="token comment" spellcheck="true"># select current_timestamp;</span>
   current_timestamp
 -------------------------------
  2019-06-12 22:54:55.794813+08
@@ -737,7 +737,7 @@ $ psql -U postgres -h 127.0.0.1 -p 5432 -d app
 <span class="token comment" spellcheck="true"># 由于WAL文件是写满16MB才会进行归档，测试阶段可能写入会非常少</span>
 <span class="token comment" spellcheck="true"># 可以在执行完基础备份之后，手动进行一次WAL切换，顺便归个档</span>
 $ psql -U postgres -h 127.0.0.1 -p 5432 -d app
-<span class="token operator">&gt;</span>   app<span class="token operator">=</span><span class="token comment" spellcheck="true"># select pg_switch_wal();</span>
+<span class="token operator">></span>   app<span class="token operator">=</span><span class="token comment" spellcheck="true"># select pg_switch_wal();</span>
  pg_switch_wal
 ---------------
  0/A0005N8
@@ -826,7 +826,7 @@ server started
 
 <span class="token comment" spellcheck="true"># 10.重启后，我们对test01表进行查询，看数据是否正常恢复</span>
 $ psql -U postgres -h 127.0.0.1 -p 5432 -d app
-<span class="token operator">&gt;</span>   app<span class="token operator">=</span><span class="token comment" spellcheck="true"># select * from test01;</span>
+<span class="token operator">></span>   app<span class="token operator">=</span><span class="token comment" spellcheck="true"># select * from test01;</span>
  <span class="token function">id</span> <span class="token operator">|</span> name
 ----+------
   1 <span class="token operator">|</span> a
@@ -836,7 +836,7 @@ $ psql -U postgres -h 127.0.0.1 -p 5432 -d app
 <span class="token comment" spellcheck="true"># 11.解除暂停状态，将recovery.conf变成了recovery.done文件</span>
 <span class="token comment" spellcheck="true"># 当然recovery.conf可以移除，避免下次数据重启数据再次恢复到该还原点</span>
 $ psql -U postgres -h 127.0.0.1 -p 5432 -d app
-<span class="token operator">&gt;</span>   app<span class="token operator">=</span><span class="token comment" spellcheck="true"># select pg_wal_replay_resume();</span>
+<span class="token operator">></span>   app<span class="token operator">=</span><span class="token comment" spellcheck="true"># select pg_wal_replay_resume();</span>
 2019-12-12 23:49:06.133 CST <span class="token punctuation">[</span>4608<span class="token punctuation">]</span> LOG:  redo <span class="token keyword">done</span> at 0/A000460
 2019-12-12 23:49:06.133 CST <span class="token punctuation">[</span>4608<span class="token punctuation">]</span> LOG:  last completed transaction was at log <span class="token function">time</span> 2019-12-12 23:06:57.417227+08
 2019-12-12 23:49:06.157 CST <span class="token punctuation">[</span>4608<span class="token punctuation">]</span> LOG:  selected new timeline ID: 2
@@ -884,7 +884,7 @@ standby_mode <span class="token operator">=</span> <span class="token string">'o
 <li><strong>[3] history 文件</strong></li>
 </ul>
 <p>每次创建一个新的时间线，<code>PostgreSQL</code> 都会创建一个<strong>“时间线历史”</strong>文件，文件名类似 <code>.history</code>，它里面的内容是由原时间线 <code>history</code> 文件的内容再追加一条当前时间线切换记录。假设数据库恢复启动后，切换到新的时间线 <code>ID＝5</code>，那么文件名就是 <code>00000005.history</code>，该文件记录了自己从什么时间哪个时间线什么原因分出来的，该文件可能含有多行记录，每个记录的内容格式如下所示。</p>
-<pre class="line-numbers language-bash"><code class="language-bash">* <span class="token operator">&lt;</span>parentTLI<span class="token operator">&gt;</span> <span class="token operator">&lt;</span>switchpoint<span class="token operator">&gt;</span> <span class="token operator">&lt;</span>reason<span class="token operator">&gt;</span>
+<pre class="line-numbers language-bash"><code class="language-bash">* <span class="token operator">&lt;</span>parentTLI<span class="token operator">></span> <span class="token operator">&lt;</span>switchpoint<span class="token operator">></span> <span class="token operator">&lt;</span>reason<span class="token operator">></span>
 *      parentTLI       ID of the parent timeline
 *      switchpoint     XLogRecPtr of the WAL position where the switch happened
 *      reason          human-readable explanation of why the timeline was changed
@@ -1499,7 +1499,7 @@ $ <span class="token function">cat</span> 00000004.history
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1218k</span>
+                        class="white-color">1197.4k</span>
             
             
             

@@ -511,18 +511,18 @@
 <span class="token keyword">from</span> apscheduler<span class="token punctuation">.</span>executors<span class="token punctuation">.</span>pool <span class="token keyword">import</span> ProcessPoolExecutor
 
 
-jobstores <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
-    <span class="token string">'mongo'</span><span class="token punctuation">:</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;'type': 'mongodb'&amp;#125;,</span>
+jobstores <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">'mongo'</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">'type'</span><span class="token punctuation">:</span> <span class="token string">'mongodb'</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
     <span class="token string">'default'</span><span class="token punctuation">:</span> SQLAlchemyJobStore<span class="token punctuation">(</span>url<span class="token operator">=</span><span class="token string">'sqlite:///jobs.sqlite'</span><span class="token punctuation">)</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-executors <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
-    <span class="token string">'default'</span><span class="token punctuation">:</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;'type': 'threadpool', 'max_workers': 20&amp;#125;,</span>
+<span class="token punctuation">}</span>
+executors <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">'default'</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">'type'</span><span class="token punctuation">:</span> <span class="token string">'threadpool'</span><span class="token punctuation">,</span> <span class="token string">'max_workers'</span><span class="token punctuation">:</span> <span class="token number">20</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
     <span class="token string">'processpool'</span><span class="token punctuation">:</span> ProcessPoolExecutor<span class="token punctuation">(</span>max_workers<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">)</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-job_defaults <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<span class="token punctuation">}</span>
+job_defaults <span class="token operator">=</span> <span class="token punctuation">{</span>
     <span class="token string">'coalesce'</span><span class="token punctuation">:</span> <span class="token boolean">False</span><span class="token punctuation">,</span>
     <span class="token string">'max_instances'</span><span class="token punctuation">:</span> <span class="token number">3</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 scheduler <span class="token operator">=</span> BackgroundScheduler<span class="token punctuation">(</span><span class="token punctuation">)</span>
 
 <span class="token comment" spellcheck="true"># .. do something else here, maybe add jobs etc.</span>
@@ -535,7 +535,7 @@ scheduler<span class="token punctuation">.</span>configure<span class="token pun
 <li>该工具包含三个命令，分别是 <code>pyrasite</code> 查看 <code>CPU</code> 使用情况，<code>pyrasite-shell</code> 进入进程的 <code>shell</code> 中进行调试，<code>pyrasite-memory-viewer</code> 查看当前进程的最大对象。但是，好像所有的命令都只支持 <code>Python2</code>，真的不推荐各位用了，废材！</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将任意代码注入正在运行的Python进程</span>
-$ pyrasite <span class="token operator">&lt;</span>PID<span class="token operator">&gt;</span> pyrasite/payloads/reverse_shell.py
+$ pyrasite <span class="token operator">&lt;</span>PID<span class="token operator">></span> pyrasite/payloads/reverse_shell.py
 
 <span class="token comment" spellcheck="true"># 进入指定的进程中进行调试</span>
 $ pyrasite-shell pid
@@ -643,7 +643,7 @@ securityContext:
 
 
 <span class="token keyword">async</span> <span class="token keyword">def</span> <span class="token function">homepage</span><span class="token punctuation">(</span>request<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">return</span> JSONResponse<span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;'hello': 'world'&amp;#125;)</span>
+    <span class="token keyword">return</span> JSONResponse<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">'hello'</span><span class="token punctuation">:</span> <span class="token string">'world'</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
 
 routes <span class="token operator">=</span> <span class="token punctuation">[</span>
     Route<span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">,</span> endpoint<span class="token operator">=</span>homepage<span class="token punctuation">)</span>
@@ -737,7 +737,7 @@ $ pyflame -o prof.txt -t py.test tests/
 <span class="token comment" spellcheck="true"># 生成火焰图</span>
 $ <span class="token function">git</span> clone https://github.com/brendangregg/FlameGraph.git
 $ <span class="token function">cd</span> FlameGraph
-$ pyflame -s 5 -r 0.01 -p 768 <span class="token operator">|</span> flamegraph.pl <span class="token operator">&gt;</span> myprofile.svg
+$ pyflame -s 5 -r 0.01 -p 768 <span class="token operator">|</span> flamegraph.pl <span class="token operator">></span> myprofile.svg
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="Click"><a href="#Click" class="headerlink" title="Click"></a><a target="_blank" rel="noopener" href="https://github.com/pallets/click"><strong>Click</strong></a></h3><ul>
@@ -751,7 +751,7 @@ $ pyflame -s 5 -r 0.01 -p 768 <span class="token operator">|</span> flamegraph.p
 <span class="token keyword">def</span> <span class="token function">hello</span><span class="token punctuation">(</span>count<span class="token punctuation">,</span> name<span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token triple-quoted-string string">"""Simple program that greets NAME for a total of COUNT times."""</span>
     <span class="token keyword">for</span> _ <span class="token keyword">in</span> range<span class="token punctuation">(</span>count<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        click<span class="token punctuation">.</span>echo<span class="token punctuation">(</span>f<span class="token string">"Hello, &amp;#123;name&amp;#125;!"</span><span class="token punctuation">)</span>
+        click<span class="token punctuation">.</span>echo<span class="token punctuation">(</span>f<span class="token string">"Hello, {name}!"</span><span class="token punctuation">)</span>
 
 <span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
     hello<span class="token punctuation">(</span><span class="token punctuation">)</span>
@@ -821,14 +821,14 @@ $ python -m scalene test/testme.py
 name <span class="token operator">=</span> <span class="token string">"poetry-demo"</span>
 version <span class="token operator">=</span> <span class="token string">"0.1.0"</span>
 description <span class="token operator">=</span> <span class="token string">""</span>
-authors <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">"Sébastien Eustace &lt;sebastien@eustace.io&gt;"</span><span class="token punctuation">]</span>
+authors <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">"Sébastien Eustace &lt;sebastien@eustace.io>"</span><span class="token punctuation">]</span>
 
 <span class="token comment" spellcheck="true"># 项目依赖</span>
-<span class="token comment" spellcheck="true"># 特殊依赖pendulum的版本^1.4表示(&gt;=1.4.0 &amp; &lt;2.0.0)之间</span>
+<span class="token comment" spellcheck="true"># 特殊依赖pendulum的版本^1.4表示(>=1.4.0 &amp; &lt;2.0.0)之间</span>
 <span class="token punctuation">[</span>tool<span class="token punctuation">.</span>poetry<span class="token punctuation">.</span>dependencies<span class="token punctuation">]</span>
 python <span class="token operator">=</span> <span class="token string">"*"</span>
 pendulum <span class="token operator">=</span> <span class="token string">"^1.4"</span>
-my<span class="token operator">-</span>package <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;path = "../my/path", develop = false&amp;#125;</span>
+my<span class="token operator">-</span>package <span class="token operator">=</span> <span class="token punctuation">{</span>path <span class="token operator">=</span> <span class="token string">"../my/path"</span><span class="token punctuation">,</span> develop <span class="token operator">=</span> false<span class="token punctuation">}</span>
 
 <span class="token comment" spellcheck="true"># 开发依赖</span>
 <span class="token punctuation">[</span>tool<span class="token punctuation">.</span>poetry<span class="token punctuation">.</span>dev<span class="token operator">-</span>dependencies<span class="token punctuation">]</span>
@@ -1434,7 +1434,7 @@ $ <span class="token function">sudo</span> procmon -p 738 -e read,write
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1218k</span>
+                        class="white-color">1197.4k</span>
             
             
             

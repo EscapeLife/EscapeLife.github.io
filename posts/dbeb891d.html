@@ -577,11 +577,11 @@ EOF</span>
 
 <span class="token comment" spellcheck="true"># 编辑配置文件</span>
 <span class="token function">sudo</span> <span class="token function">tee</span> /etc/docker/daemon.json<span class="token operator">&lt;&lt;</span><span class="token string">EOF
-&amp;#123;
+{
    "insecure-registries": [
      "172.30.0.0/16"
    ]
-&amp;#125;
+}
 EOF</span>
 
 <span class="token comment" spellcheck="true"># 重启服务</span>
@@ -597,11 +597,11 @@ EOF</span>
 <li><strong>[3] 配置防火墙</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Configure Firewalld.</span>
-DOCKER_BRIDGE<span class="token operator">=</span>`docker network inspect -f <span class="token string">"&amp;#123;&amp;#123;range .IPAM.Config &amp;#125;&amp;#125;&amp;#123;&amp;#123; .Subnet &amp;#125;&amp;#125;&amp;#123;&amp;#123;end&amp;#125;&amp;#125;"</span> bridge`
+DOCKER_BRIDGE<span class="token operator">=</span>`docker network inspect -f <span class="token string">"{{range .IPAM.Config }}{{ .Subnet }}{{end}}"</span> bridge`
 <span class="token function">sudo</span> firewall-cmd --permanent --new-zone dockerc
 <span class="token function">sudo</span> firewall-cmd --permanent --zone dockerc --add-source <span class="token variable">$DOCKER_BRIDGE</span>
-<span class="token function">sudo</span> firewall-cmd --permanent --zone dockerc --add-port<span class="token operator">=</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;80,443,8443&amp;#125;/tcp</span>
-<span class="token function">sudo</span> firewall-cmd --permanent --zone dockerc --add-port<span class="token operator">=</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;53,8053&amp;#125;/udp</span>
+<span class="token function">sudo</span> firewall-cmd --permanent --zone dockerc --add-port<span class="token operator">=</span><span class="token punctuation">{</span>80,443,8443<span class="token punctuation">}</span>/tcp
+<span class="token function">sudo</span> firewall-cmd --permanent --zone dockerc --add-port<span class="token operator">=</span><span class="token punctuation">{</span>53,8053<span class="token punctuation">}</span>/udp
 <span class="token function">sudo</span> firewall-cmd --reload
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
@@ -642,7 +642,7 @@ oc cluster up
 <span class="token comment" spellcheck="true"># 常用操作</span>
 oc get svc
 oc get nodes
-oc describe node <span class="token operator">&lt;</span>node<span class="token operator">&gt;</span>
+oc describe node <span class="token operator">&lt;</span>node<span class="token operator">></span>
 oc new-project test-project
 oc new-app deployment-example
 oc expose service/deployment-example
@@ -692,9 +692,9 @@ oc version
 
 <span class="token comment" spellcheck="true"># Allow use of Insecure Docker registry</span>
 <span class="token function">cat</span> <span class="token operator">&lt;&lt;</span> EOF <span class="token operator">|</span> <span class="token function">sudo</span> <span class="token function">tee</span> /etc/docker/daemon.json
- <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+ <span class="token punctuation">{</span>
      <span class="token string">"insecure-registries"</span> <span class="token keyword">:</span> <span class="token punctuation">[</span> <span class="token string">"172.30.0.0/16"</span> <span class="token punctuation">]</span>
- <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+ <span class="token punctuation">}</span>
 EOF
 
 <span class="token comment" spellcheck="true"># Restart Docker service after adding the file</span>
@@ -708,8 +708,8 @@ oc cluster up
 
 <span class="token comment" spellcheck="true"># 自定义配置</span>
 <span class="token comment" spellcheck="true"># oc cluster up --public-hostname=192.168.10.10</span>
-oc cluster up --routing-suffix<span class="token operator">=</span><span class="token operator">&lt;</span>ServerPublicIP<span class="token operator">&gt;</span>.xip.io \
-    --public-hostname<span class="token operator">=</span><span class="token operator">&lt;</span>ServerPulicDNSName<span class="token operator">&gt;</span>
+oc cluster up --routing-suffix<span class="token operator">=</span><span class="token operator">&lt;</span>ServerPublicIP<span class="token operator">></span>.xip.io \
+    --public-hostname<span class="token operator">=</span><span class="token operator">&lt;</span>ServerPulicDNSName<span class="token operator">></span>
 
 <span class="token comment" spellcheck="true"># 登录</span>
 oc login -u system:admin
@@ -720,8 +720,8 @@ oc login -u system:admin
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 部署之后启动Pod时，如果遇到权限问题</span>
 <span class="token comment" spellcheck="true"># 这是因为OpenShift默认不允许Root用户来启动程序</span>
 <span class="token comment" spellcheck="true"># 可以使用如下命令，对创建的project赋权</span>
-oc adm policy add-scc-to-user anyuid -z <span class="token operator">&lt;</span>project_name<span class="token operator">&gt;</span> -n rook
-oc adm policy add-scc-to-user anyuid -z <span class="token operator">&lt;</span>project_name<span class="token operator">&gt;</span> -n rook-system
+oc adm policy add-scc-to-user anyuid -z <span class="token operator">&lt;</span>project_name<span class="token operator">></span> -n rook
+oc adm policy add-scc-to-user anyuid -z <span class="token operator">&lt;</span>project_name<span class="token operator">></span> -n rook-system
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="4-功能项目展示"><a href="#4-功能项目展示" class="headerlink" title="4. 功能项目展示"></a>4. 功能项目展示</h2><blockquote>
@@ -748,7 +748,7 @@ mkdir: cannot create directory ‘/data/docs’: Permission denied
 <span class="token comment" spellcheck="true"># 处理方式</span>
 <span class="token comment" spellcheck="true"># 需要切换到管理员用户才能够授权</span>
 oc login -u system:admin
-oc adm policy add-scc-to-user anyuid -z default -n <span class="token operator">&lt;</span>namespace<span class="token operator">&gt;</span>
+oc adm policy add-scc-to-user anyuid -z default -n <span class="token operator">&lt;</span>namespace<span class="token operator">></span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[2] 系统磁盘资源不足导致服务无法启动</strong></li>
@@ -1305,7 +1305,7 @@ oc adm policy add-scc-to-user anyuid -z default -n <span class="token operator">
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1218k</span>
+                        class="white-color">1197.4k</span>
             
             
             

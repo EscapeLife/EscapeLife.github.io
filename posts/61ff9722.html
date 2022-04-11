@@ -473,7 +473,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    773
+                    755
                 </div>
                 
 
@@ -553,15 +553,15 @@ docker run -d --name nexus3 -p 5000:8081 \
 <h2 id="3-Nginx-加密代理"><a href="#3-Nginx-加密代理" class="headerlink" title="3. Nginx 加密代理"></a>3. Nginx 加密代理</h2><ul>
 <li>关于证书的生成，可以参考《私有仓库高级配置》里面证书生成一节。</li>
 </ul>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">upstream</span> register <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">upstream</span> register <span class="token punctuation">{</span>
     <span class="token comment" spellcheck="true"># 端口为上面添加的私有镜像仓库是设置的HTTP选项的端口号</span>
     <span class="token keyword">server</span> <span class="token string">"YourHostName OR IP"</span><span class="token punctuation">:</span><span class="token number">5001</span><span class="token punctuation">;</span>
     check interval<span class="token operator">=</span><span class="token number">3000</span> rise<span class="token operator">=</span><span class="token number">2</span> fall<span class="token operator">=</span><span class="token number">10</span> <span class="token keyword">timeout</span><span class="token operator">=</span><span class="token number">1000</span> type<span class="token operator">=</span><span class="token keyword">http</span><span class="token punctuation">;</span>
     check_http_send <span class="token string">"HEAD / HTTP/1.0\r\n\r\n"</span><span class="token punctuation">;</span>
     check_http_expect_alive http_4xx<span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 
-<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<span class="token keyword">server</span> <span class="token punctuation">{</span>
     <span class="token comment" spellcheck="true"># 如果没有DNS服务器做解析，请删除此选项使用本机IP地址访问</span>
     <span class="token keyword">server_name</span> YourDomainName<span class="token punctuation">;</span>
     <span class="token keyword">listen</span>       <span class="token number">443</span> <span class="token keyword">ssl</span><span class="token punctuation">;</span>
@@ -584,7 +584,7 @@ docker run -d --name nexus3 -p 5000:8081 \
     <span class="token keyword">proxy_busy_buffers_size</span> 128k<span class="token punctuation">;</span>
     <span class="token keyword">proxy_temp_file_write_size</span> 512k<span class="token punctuation">;</span>
 
-    <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
         <span class="token keyword">proxy_set_header</span> Host <span class="token variable">$host</span><span class="token punctuation">;</span>
         <span class="token keyword">proxy_set_header</span> X<span class="token operator">-</span>Forwarded<span class="token operator">-</span>Proto <span class="token variable">$scheme</span><span class="token punctuation">;</span>
         <span class="token keyword">proxy_set_header</span> X<span class="token operator">-</span>Forwarded<span class="token operator">-</span>Port <span class="token variable">$server_port</span><span class="token punctuation">;</span>
@@ -596,17 +596,17 @@ docker run -d --name nexus3 -p 5000:8081 \
         <span class="token keyword">proxy_set_header</span> X<span class="token operator">-</span>Real<span class="token operator">-</span>IP <span class="token variable">$remote_addr</span><span class="token punctuation">;</span>
         <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>register<span class="token punctuation">;</span>
         <span class="token keyword">proxy_read_timeout</span> 900s<span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+    <span class="token punctuation">}</span>
     <span class="token keyword">error_page</span>   <span class="token number">500</span> <span class="token number">502</span> <span class="token number">503</span> <span class="token number">504</span>  <span class="token operator">/</span>50x<span class="token punctuation">.</span>html<span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>使用 <code>SSL</code> 加密以后程序需要访问就不能采用修改配置的访问了。修改完之后，使用 <code>docker login YourDomainName OR HostIP</code> 进行测试，用户名密码填写上面 <code>Nexus</code> 中生成的。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 生成ssl的证书</span>
 $ openssl s_client -showcerts -connect \
-    YourDomainName OR HostIP:443 <span class="token operator">&lt;</span> /dev/null 2<span class="token operator">&gt;</span> /dev/null <span class="token operator">|</span> \
-    openssl x509 -outform PEM <span class="token operator">&gt;</span> ca.crt
+    YourDomainName OR HostIP:443 <span class="token operator">&lt;</span> /dev/null 2<span class="token operator">></span> /dev/null <span class="token operator">|</span> \
+    openssl x509 -outform PEM <span class="token operator">></span> ca.crt
 
 
 <span class="token comment" spellcheck="true"># 添加到信任证书列表中</span>
@@ -620,14 +620,14 @@ $ systemctl restart docker
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 修改配置文件</span>
 $ <span class="token function">sudo</span> vim /etc/docker/daemon.json
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<span class="token punctuation">{</span>
     <span class="token string">"registry-mirror"</span><span class="token keyword">:</span> <span class="token punctuation">[</span>
         <span class="token string">"https://registry.docker-cn.com"</span>
     <span class="token punctuation">]</span>,
     <span class="token string">"insecure-registries"</span><span class="token keyword">:</span> <span class="token punctuation">[</span>
         <span class="token string">"192.168.31.191:5000"</span>
     <span class="token punctuation">]</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
@@ -1173,7 +1173,7 @@ $ <span class="token function">sudo</span> vim /etc/docker/daemon.json
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1218k</span>
+                        class="white-color">1197.4k</span>
             
             
             

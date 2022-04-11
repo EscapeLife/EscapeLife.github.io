@@ -469,14 +469,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    14.2k
+                    12.5k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    57 分
+                    51 分
                 </div>
                 
 
@@ -613,8 +613,8 @@ KeepAliveTimeout      # 最大持久连接的超时时间，单位为秒钟
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 测试方法，持久连接在telnet中可以多次请求不中断</span>
 $ telnet 192.168.31.94 80
-<span class="token operator">&gt;</span> GET / HTTP/1.1
-<span class="token operator">&gt;</span> Host: 192.168.31.94
+<span class="token operator">></span> GET / HTTP/1.1
+<span class="token operator">></span> Host: 192.168.31.94
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="2-3-选择MPM模式"><a href="#2-3-选择MPM模式" class="headerlink" title="2.3 选择MPM模式"></a>2.3 选择<code>MPM</code>模式</h3><blockquote>
@@ -680,23 +680,23 @@ PIDFILE<span class="token operator">=</span>/var/run/httpd/httpd.pid
 </ul>
 <pre class="line-numbers language-apache"><code class="language-apache"># httpd.conf主配置文件
 # prefork的配置：httpd2.2中event还不稳定
-<ifmodule prefork.c="">
+<IfModule prefork.c>
   StartServers       8       # 服务启动时启动的子进程数，即主控进程启动的子进程数
   MinSpareServers    5       # 最少空闲的子进程数
   MaxSpareServers   20       # 最大空闲的子进程数
   ServerLimit      256       # 服务器进程数量最大值，限制MaxClients
   MaxClients       256       # 允许同时伺服的最大接入请求数量，数值取决于资源
   MaxRequestsPerChild  4000  # 每个子进程在其生存期允许伺服的最大请求数量，超过时就重新启动
-</ifmodule>
+</IfModule>
 # worker的配置：多进程多线程模型
-<ifmodule worker.c="">
+<IfModule worker.c>
   StartServers         4     # 服务启动时启动的进程数，主控进程启动的子进程数
   MaxClients         300     # 服务器端最大启动的线程数量，数值取决于资源
   MinSpareThreads     25     # 最少空闲线程数
   MaxSpareThreads     75     # 最大空闲线程数
   ThreadsPerChild     25     # 每个进程最大能够启动的线程数
   MaxRequestsPerChild  0     # 每个线程最大的响应次数，0表示不做限制
-</ifmodule>
+</IfModule>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><strong>通过<code>PV</code>和<code>UV</code>粗略计算带宽</strong></p>
 <ul>
@@ -733,15 +733,15 @@ LoadModule authn_dbm_module modules/mod_authn_dbm.so
 DocumentRoot "/var/www/html"
 
 # 基于文件系统实现访问控制
-<directory "="" var="" www="" html"="">
+<Directory "/var/www/html">
 
 # 定义DocumentRoot
 DocumentRoot "/var/www/htocs"
 
 # 访问网站下的bash二进制包会映射到/var/www/htdocs/下查找
 http://www.escape.com/download/bash-4.4.2-3.el6.x86_64.rpm
-  --&gt; /var/www/htdocs/download/bash-4.4.2-3.el6.x86_64.rpm
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></directory></code></pre>
+  --> /var/www/htdocs/download/bash-4.4.2-3.el6.x86_64.rpm
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="2-6-定义默认主页面"><a href="#2-6-定义默认主页面" class="headerlink" title="2.6 定义默认主页面"></a>2.6 定义默认主页面</h3><ul>
 <li>定义的默认页面可以有多个，自左往右查找</li>
@@ -759,7 +759,7 @@ Alias /bbs/ "/forum/htdocs"
 
 # 访问网站的bbs会映射到/forum/htdocs目录下的bbs子目录
 http://www.escape.com/bbs/index.html
-  --&gt; /forum/htdocs/bbs/index.html
+  --> /forum/htdocs/bbs/index.html
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="2-8-设定默认字符集"><a href="#2-8-设定默认字符集" class="headerlink" title="2.8 设定默认字符集"></a>2.8 设定默认字符集</h3><ul>
@@ -884,9 +884,9 @@ BrowserMatch \bMSI<span class="token punctuation">[</span>E<span class="token pu
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 可以使用在全局，也可以使用在特定Directory容器内</span>
 Options Indexes FollowSymLinks
 Options -Indexes FollowSymLinks
-<span class="token operator">&lt;</span>Directory <span class="token string">"/var/www/html"</span><span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span>Directory <span class="token string">"/var/www/html"</span><span class="token operator">></span>
   Options Indexes FollowSymLinks
-<span class="token operator">&lt;</span>/Directory<span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span>/Directory<span class="token operator">></span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <p><strong>（2）基于来源地址的访问控制机制</strong></p>
@@ -909,13 +909,13 @@ Options -Indexes FollowSymLinks
 </li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 在/var/www/html中定义白名单，拒绝192.168.31.173的访问，允许192.168网络的访问</span>
-<span class="token operator">&lt;</span>Directory <span class="token string">"/var/www/html"</span><span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span>Directory <span class="token string">"/var/www/html"</span><span class="token operator">></span>
   Options Indexes FollowSymLinks
   Order allow,deny
   Deny from 192.168.31.173
   Allow from 192.168
   Allow from all
-<span class="token operator">&lt;</span>/Directory<span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span>/Directory<span class="token operator">></span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <p><strong>（3）是否允许<code>Directory</code>定义下的文件自行进行设置</strong></p>
@@ -957,14 +957,14 @@ Options -Indexes FollowSymLinks
 </ul>
 <p><strong><code>Basic</code>认证</strong></p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># (1) 定义安全域</span>
-<span class="token operator">&lt;</span>Directory <span class="token string">""</span><span class="token operator">&gt;</span>          <span class="token comment" spellcheck="true"># 指定需要控制的文件目录</span>
+<span class="token operator">&lt;</span>Directory <span class="token string">""</span><span class="token operator">></span>          <span class="token comment" spellcheck="true"># 指定需要控制的文件目录</span>
   Options None
   AllowOverride None
   AuthType Basic      <span class="token comment" spellcheck="true"># 认证类型</span>
   AuthName <span class="token string">"STRING"</span>   <span class="token comment" spellcheck="true"># 认证提示信息</span>
   AuthUserFile <span class="token string">"/PATH/TO/HTTPD_USER_PASSWD_FILE"</span>  <span class="token comment" spellcheck="true"># 用户认证文件</span>
   Require user username1 username2 <span class="token punctuation">..</span>.            <span class="token comment" spellcheck="true"># 可选，需要哪些用户可以登录</span>
-<span class="token operator">&lt;</span>/Directory<span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span>/Directory<span class="token operator">></span>
 
 <span class="token comment" spellcheck="true"># 允许账号文件中的所有用户登录访问</span>
 Require valid-user
@@ -978,7 +978,7 @@ Require valid-user
     -D: 删除指定用户
 
 <span class="token comment" spellcheck="true"># (3) 实现基于组进行认证，要提供用户账号文件和组文件</span>
-<span class="token operator">&lt;</span>Directory <span class="token string">""</span><span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span>Directory <span class="token string">""</span><span class="token operator">></span>
   Options None
   AllowOverride None
   AuthType Basic
@@ -986,14 +986,14 @@ Require valid-user
   AuthUserFile <span class="token string">"/PATH/TO/HTTPD_USER_PASSWD_FILE"</span>  <span class="token comment" spellcheck="true"># 用户认证文件</span>
   AuthGroupFile <span class="token string">"/PATH/TO/HTTPD_GROUP_FILE"</span>       <span class="token comment" spellcheck="true"># 组认证文件</span>
   Require group GROUP1 GROUP2 <span class="token punctuation">..</span>.                 <span class="token comment" spellcheck="true"># 可选，需要哪些组可以登录</span>
-<span class="token operator">&lt;</span>/Directory<span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span>/Directory<span class="token operator">></span>
 
 <span class="token comment" spellcheck="true"># 组文件格式: 每一行定义一个组</span>
 webadmin: tom bob
 sysadmin: root escape
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-apache"><code class="language-apache"># 实例说明
-<directory "="" www="" htdocs="" admin"="">
+<Directory "/www/htdocs/admin">
     Options None
     AllowOverride None
     AuthType Basic
@@ -1001,7 +1001,7 @@ sysadmin: root escape
     AuthUserFile "/etc/httpd/conf.d/.htpasswd"
     AuthGroupFile "/etc/httpd/conf.d/.htgroup"
     Require group webadmin
-</directory>
+</Directory>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="3-2-虚拟主机"><a href="#3-2-虚拟主机" class="headerlink" title="3.2 虚拟主机"></a>3.2 虚拟主机</h3><blockquote>
@@ -1035,16 +1035,16 @@ sysadmin: root escape
 <li>每个虚拟主机都有专用配置：包括日志、访问控制、虚拟主机的别名等指令</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 虚拟主机一般配置如下</span>
-<span class="token operator">&lt;</span>VirtualHost <span class="token string">"IP:PORT"</span><span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span>VirtualHost <span class="token string">"IP:PORT"</span><span class="token operator">></span>
   SeverName         <span class="token comment" spellcheck="true"># [主要] 定义虚拟主机名称</span>
   DocumentRoot <span class="token string">""</span>   <span class="token comment" spellcheck="true"># [主要] 定义网站访问根目录</span>
   ServerAlias
   ErrorLog
   CustomLog
-  <span class="token operator">&lt;</span>Directory <span class="token string">""</span><span class="token operator">&gt;</span>
+  <span class="token operator">&lt;</span>Directory <span class="token string">""</span><span class="token operator">></span>
     <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
-  <span class="token operator">&lt;</span>/Directory<span class="token operator">&gt;</span>
-<span class="token operator">&lt;</span>/VirtualHost<span class="token operator">&gt;</span>
+  <span class="token operator">&lt;</span>/Directory<span class="token operator">></span>
+<span class="token operator">&lt;</span>/VirtualHost<span class="token operator">></span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><strong>检测配置语法</strong></p>
 <ul>
@@ -1070,15 +1070,15 @@ $ <span class="token function">ifconfig</span> eth0:0 192.168.31.7 netmask 255.2
 $ <span class="token function">ifconfig</span> eth0:0
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><strong>(2) 配置虚拟主机</strong></p>
-<pre class="line-numbers language-apache"><code class="language-apache"><virtualhost 192.168.31.6:80="">
+<pre class="line-numbers language-apache"><code class="language-apache"><VirtualHost 192.168.31.6:80>
     ServerName web1.escape.com
     DocumentRoot "/vhosts/web1/htdocs"
-</virtualhost>
+</VirtualHost>
 
-<virtualhost 192.168.31.7:80="">
+<VirtualHost 192.168.31.7:80>
     ServerName web2.escape.com
     DocumentRoot "/vhosts/web2/htdocs"
-</virtualhost>
+</VirtualHost>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><strong>让虚拟主机支持<code>SSL</code></strong></p>
 <ul>
@@ -1086,29 +1086,29 @@ $ <span class="token function">ifconfig</span> eth0:0
 </ul>
 <pre class="line-numbers language-apache"><code class="language-apache">Listen 443
 
-<virtualhost 192.168.31.6:80="">
+<VirtualHost 192.168.31.6:80>
     ServerName web1.escape.com
     DocumentRoot "/vhosts/web1/htdocs"
     SSLEngine on
     SSLCertificateFile /srv/www/ssl/escape.crt
     SSKcertificateKeyFile /srv/www/ssl/escape.key
-</virtualhost>
+</VirtualHost>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h4 id="3-2-2-基于端口号的虚拟主机"><a href="#3-2-2-基于端口号的虚拟主机" class="headerlink" title="3.2.2 基于端口号的虚拟主机"></a>3.2.2 基于端口号的虚拟主机</h4><pre class="line-numbers language-apache"><code class="language-apache"><virtualhost 172.16.100.7:80="">
+<h4 id="3-2-2-基于端口号的虚拟主机"><a href="#3-2-2-基于端口号的虚拟主机" class="headerlink" title="3.2.2 基于端口号的虚拟主机"></a>3.2.2 基于端口号的虚拟主机</h4><pre class="line-numbers language-apache"><code class="language-apache"><VirtualHost 172.16.100.7:80>
     ServerName web1.escape.com
     DocumentRoot "/vhosts/web1/htdocs"
-</virtualhost>
+</VirtualHost>
 
-<virtualhost 172.16.100.7:8000="">
+<VirtualHost 172.16.100.7:8000>
     ServerName web2.escape.com
     DocumentRoot "/vhosts/web2/htdocs"
-</virtualhost>
+</VirtualHost>
 
-<virtualhost 172.16.100.7:8080="">
+<VirtualHost 172.16.100.7:8080>
     ServerName web3.escape.com
     DocumentRoot "/vhosts/web3/htdocs"
-</virtualhost>
+</VirtualHost>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h4 id="3-2-3-基于主机名的虚拟主机"><a href="#3-2-3-基于主机名的虚拟主机" class="headerlink" title="3.2.3 基于主机名的虚拟主机"></a>3.2.3 基于主机名的虚拟主机</h4><blockquote>
@@ -1140,20 +1140,20 @@ NameVirtualHost [fe80::20c:29ff:feae:471b]:80
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><strong>(3) 设置虚拟主机配置</strong></p>
 <pre class="line-numbers language-apache"><code class="language-apache"># 使用httpd -S检测语法错误，没有问题重启服务器即可生效
-<virtualhost 172.16.100.6:80="">
+<VirtualHost 172.16.100.6:80>
     ServerName web1.escape.com
     DocumentRoot "/vhosts/web1/htdocs"
-</virtualhost>
+</VirtualHost>
 
-<virtualhost 172.16.100.6:80="">
+<VirtualHost 172.16.100.6:80>
     ServerName web2.escape.com
     DocumentRoot "/vhosts/web2/htdocs"
-</virtualhost>
+</VirtualHost>
 
-<virtualhost 172.16.100.6:80="">
+<VirtualHost 172.16.100.6:80>
     ServerName web3.escape.com
     DocumentRoot "/vhosts/web3/htdocs"
-</virtualhost>
+</VirtualHost>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="3-3-动态虚拟主机"><a href="#3-3-动态虚拟主机" class="headerlink" title="3.3 动态虚拟主机"></a>3.3 动态虚拟主机</h3><h4 id="3-3-1-vhost-alias-mudule模块"><a href="#3-3-1-vhost-alias-mudule模块" class="headerlink" title="3.3.1&nbsp;vhost_alias_mudule模块"></a>3.3.1&nbsp;<code>vhost_alias_mudule</code>模块</h4><blockquote>
@@ -1218,7 +1218,7 @@ VirtualDocumentRoot /srv/www/vhosts/%1/%2/%p
 <span class="token comment" spellcheck="true"># 通过正则表达式对所有进来请求的HTTP_HOST进行确认</span>
 <span class="token comment" spellcheck="true"># 然后过滤出www和com，再将匹配jonsk到/srv/www/jonsk目录中去</span>
 RewriteEngine on
-RewriteConf %<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;HTTP_HOST&amp;#125; ^(WWW\.)?([^.]+).com$</span>
+RewriteConf %<span class="token punctuation">{</span>HTTP_HOST<span class="token punctuation">}</span> ^<span class="token punctuation">(</span>WWW\.<span class="token punctuation">)</span>?<span class="token punctuation">(</span><span class="token punctuation">[</span>^.<span class="token punctuation">]</span>+<span class="token punctuation">)</span>.com$
 RewriteRule ^<span class="token punctuation">(</span>.*<span class="token punctuation">)</span>$ /srv/www/%2<span class="token variable">$1</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
@@ -1435,18 +1435,18 @@ http://localhost/awstats/swstats.pl
 <h4 id="3-4-8-合并虚拟主机日志"><a href="#3-4-8-合并虚拟主机日志" class="headerlink" title="3.4.8 合并虚拟主机日志"></a>3.4.8 合并虚拟主机日志</h4><ul>
 <li>虚拟主机中配置错误日志和访问日志</li>
 </ul>
-<pre class="line-numbers language-apache"><code class="language-apache"><virtualhost 172.16.100.6:80="">
+<pre class="line-numbers language-apache"><code class="language-apache"><VirtualHost 172.16.100.6:80>
     ServerName www.escape.com
     DocumentRoot "srv/www"
     ErrorLog /var/log/apache/error_log_www.escape.com
     CustomLog /var/log/apache/access_log_www.escape.com
-</virtualhost>
+</VirtualHost>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>合并方法</li>
 </ul>
 <pre class="line-numbers language-apache"><code class="language-apache"># 在httpd.conf配置vhost，在虚拟主机配置中进行引入
-CustomLog "%h %l %u %t \"%r\" %&gt;s %b" vhost
+CustomLog "%h %l %u %t \"%r\" %>s %b" vhost
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="3-5-支持SSL功能"><a href="#3-5-支持SSL功能" class="headerlink" title="3.5 支持SSL功能"></a>3.5 支持<code>SSL</code>功能</h3><blockquote>
@@ -1608,7 +1608,7 @@ Email Address <span class="token punctuation">[</span><span class="token punctua
 <span class="token punctuation">[</span>root@MiWiFi-R3-srv CA<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># touch /etc/pki/CA/index.txt</span>
 
 <span class="token comment" spellcheck="true"># 第一次创建的时候需要给予证书序列号</span>
-<span class="token punctuation">[</span>root@MiWiFi-R3-srv CA<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># echo "01" &gt; /etc/pki/CA/serial</span>
+<span class="token punctuation">[</span>root@MiWiFi-R3-srv CA<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># echo "01" > /etc/pki/CA/serial</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <p><strong>（2）生成服务器证书(<code>192.168.31.7</code>)</strong></p>
@@ -1702,8 +1702,8 @@ subject<span class="token operator">=</span>/C<span class="token operator">=</sp
 <span class="token punctuation">[</span>root@MiWiFi-R3-srv ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># scp /etc/pki/CA/certs/httpd.crt root@192.168.31.7:/etc/httpd/ssl</span>
 
 <span class="token comment" spellcheck="true"># 删除服务器和CA主机上签署前的*.csr文件，确保安全</span>
-CA主机    <span class="token operator">==</span><span class="token operator">&gt;</span>  <span class="token function">rm</span> -rf /tmp/httpd.csr
-httpd主机 <span class="token operator">==</span><span class="token operator">&gt;</span>  <span class="token function">rm</span> -rf /etc/httpd/ssl/httpd.csr
+CA主机    <span class="token operator">==</span><span class="token operator">></span>  <span class="token function">rm</span> -rf /tmp/httpd.csr
+httpd主机 <span class="token operator">==</span><span class="token operator">></span>  <span class="token function">rm</span> -rf /etc/httpd/ssl/httpd.csr
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><strong>（3）生成客户端证书</strong></p>
 <ul>
@@ -1732,7 +1732,7 @@ $ openssl pkcs12 -in ./YOUR-PFX-FILE.pfx -nocerts -nodes -out domain.private.rsa
 <span class="token comment" spellcheck="true"># 生成CRT信息(删除domain.public.crt和domain.bundle.crt临时文件)</span>
 $ openssl pkcs12 -in ./YOUR-PFX-FILE.pfx -clcerts -nokeys -out domain.public.crt
 $ openssl pkcs12 -in ./YOUR-PFX-FILE.pfx -cacerts -out domain.bundle.crt
-$ <span class="token function">cat</span> domain.public.crt domain.bundle.crt <span class="token operator">&gt;</span> domain.crt
+$ <span class="token function">cat</span> domain.public.crt domain.bundle.crt <span class="token operator">></span> domain.crt
 
 <span class="token comment" spellcheck="true"># 生成解密后的KEY信息(删除domain.encrypted.key临时文件)</span>
 <span class="token comment" spellcheck="true"># 这个domain.encrypted.key也可以称之为domain.encrypted.pem</span>
@@ -1744,7 +1744,7 @@ $ <span class="token function">sudo</span> <span class="token function">chmod</s
 $ <span class="token function">sudo</span> <span class="token function">chown</span> root:root domain.tld.*
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 对应如下Nginx配置</span>
-<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<span class="token keyword">server</span> <span class="token punctuation">{</span>
    <span class="token keyword">listen</span>       <span class="token number">443</span> <span class="token keyword">ssl</span><span class="token punctuation">;</span>
    <span class="token keyword">server_name</span>  domain<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
 
@@ -1754,7 +1754,7 @@ $ <span class="token function">sudo</span> <span class="token function">chown</s
 
    <span class="token keyword">root</span> <span class="token operator">/</span>mnt<span class="token operator">/</span>www<span class="token operator">/</span>nginx<span class="token punctuation">;</span>
    <span class="token keyword">index</span> <span class="token keyword">index</span><span class="token punctuation">.</span>html<span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h4 id="3-5-4-配置启用SSL功能"><a href="#3-5-4-配置启用SSL功能" class="headerlink" title="3.5.4 配置启用SSL功能"></a>3.5.4 配置启用<code>SSL</code>功能</h4><pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 配置httpd支持使用ssl功能</span>
@@ -1771,7 +1771,7 @@ AddType application/x-pkcs7-crl .crl     # 定义以.crl后缀的文件为证书
 SSLPassPhraseDialog builtin              # 定义SSL在启动时使用哪种方式对私钥文件进行解密
 
 # 虚拟主机配置
-<virtualhost *:443="">
+<VirtualHost *:443>
   SSLEngine on            # 是否启用
   SSLProtocol all -SSLv2  # 支持所有SSL协议但是除过SSLv2，因为不安全
   SSLCertificateFile /etc/httpd/ssl/httpd.crt      # 设置证书文件位置
@@ -1781,10 +1781,10 @@ SSLPassPhraseDialog builtin              # 定义SSL在启动时使用哪种方�
   ServerAdmin escape@escape.com  # 设置邮件地址
   ErrorLog "/vhosts/www/htdocs/logs/error_log"      # 设置错误日志位置
   TransferLog "/vhosts/www/htdocs/logs/access_log"  # 设置访问日志位置
-  <directory "="" vhosts="" www="" htdocs="" cgi-bin"="">
+  <Directory "/vhosts/www/htdocs/cgi-bin">
     SSLOptions +StdEnvVars  # 启动对cgi-bin目录的支持
-  </directory>
-</virtualhost>
+  </Directory>
+</VirtualHost>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 重启httpd服务，会需要输入密码短语</span>
 <span class="token comment" spellcheck="true"># 如果客户端连接服务器，提示该网站的安全证书不受信任，这是因为证书使我们自己签发的</span>
@@ -1958,7 +1958,7 @@ SSLVerifyDepth 1
 </li>
 </ul>
 <pre class="line-numbers language-apache"><code class="language-apache"># 使用mod_authn_file模块的方式
-<directory "="" docroot"="">     # 指定需要控制的文件目录
+<Directory "/docroot">     # 指定需要控制的文件目录
   Options None
   AllowOverride None
   AuthType Basic         # 认证类型
@@ -1966,17 +1966,18 @@ SSLVerifyDepth 1
   AuthBasicProvide file  # 认证支持模块
   AuthUserFile "/PATH/TO/HTTPD_USER_PASSWD_FILE"    # 用户认证文件
   Require user username1 username2 ...              # 可选，需要哪些用户可以登录
-</directory>
+</Directory>
 
 # 使用mod_auth_basic模块和mod_authn_dbm模块联合认证
-<location "="" secure"="">
+<Location "/secure">
   AuthType Basic                        # 认证类型
   AuthName "STRING"
   AuthBasicProvide dbm                  # 支持mod_authn_dbm模块作为认证与授权方式
   AuthDBMType SDBM                      # 定义存放密码的数据库文件为SDBM
   AuthDBMUserFile /www/etc/dbmpasswd    # 存放位置为/www/etc/dbmpasswd
   Require valid-user                    # 指定所以用户如果通过认证都可以访问secure目录
-</location><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></code></pre>
+</Location/
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <p><strong><code>mod_auth_digest</code>模块</strong></p>
 <ul>
@@ -1995,7 +1996,7 @@ SSLVerifyDepth 1
 </li>
 </ul>
 <pre class="line-numbers language-apache"><code class="language-apache"># 使用mod_auth_digest模块和mod_authn_file模块联合认证
-<location "="" secure"="">
+<Location "/secure">
   AuthType Digest                   # 认证类型
   AuthName "private area"           # 认证提示信息
   # 指定需要保护的区域为http://mirror.my.dom/secure
@@ -2003,7 +2004,8 @@ SSLVerifyDepth 1
   AuthDigestProvide file            # 支持mod_authn_file模块作为认证与授权方式
   AuthUserFile /www/etc/password    # 密码存放位置
   Require valid-user                # 指定所以用户如果通过认证都可以访问secure目录
-</location><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></code></pre>
+</Location/
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="4-2-认证支持模块"><a href="#4-2-认证支持模块" class="headerlink" title="4.2 认证支持模块"></a>4.2 认证支持模块</h3><blockquote>
 <p>这里只对比较重要的认证支持模块进行说明</p>
@@ -2038,13 +2040,13 @@ DBDMin 1         # 最小连接数
 DBDMax 10        # 最大连接数
 DBDKeep 2
 DBDExptime 60    # 超时时间
-<directory "="" docroot"="">
+<Directory "/docroot">
   AuthType Basic         # 认证类型
   AuthName "Server"      # 认证提示信息
   AuthBasicProvide dbd   # 认证支持模块
   AuthDBDUserPWQuery "SELECT password FORM authn WHERE username = %s"
   Require valid-user     # 可选，需要哪些用户可以登录
-</directory>
+</Directory>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="4-2-认证支持模块-1"><a href="#4-2-认证支持模块-1" class="headerlink" title="4.2 认证支持模块"></a>4.2 认证支持模块</h3><blockquote>
@@ -2106,13 +2108,13 @@ $ dbmmanage .htpasswd_SDBM delete escape
 </ul>
 </li>
 </ul>
-<pre class="line-numbers language-apache"><code class="language-apache"><directory "="" docroot"="">     # 指定需要控制的文件目录
+<pre class="line-numbers language-apache"><code class="language-apache"><Directory "/docroot">     # 指定需要控制的文件目录
   AuthType Basic         # 认证类型
   AuthName "file"        # 认证提示信息
   AuthBasicProvide file  # 认证支持模块
   AuthUserFile /usr/local/auth/passwd    # 用户认证文件
   Require user escape bob tom peter      # 可选，需要哪些用户可以登录
-</directory>
+</Directory>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><code>htpasswd</code>程序</li>
@@ -2209,17 +2211,17 @@ admin: escape
 </li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 基于文件所有者的身份授权，file-owner</span>
-<span class="token operator">&lt;</span>Directory /home/*/public_html/private<span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span>Directory /home/*/public_html/private<span class="token operator">></span>
   AuthType Basic
   AuthName <span class="token string">"My Private Files"</span>
   AuthBasicProvider dbm
   AuthDBMUserFile /usr/local/etc/.htdbm-all
   Satisfy All
   require file-owner
-<span class="token operator">&lt;</span>/Directory<span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span>/Directory<span class="token operator">></span>
 
 <span class="token comment" spellcheck="true"># 基于文件所有者的组授权，file-group</span>
-<span class="token operator">&lt;</span>Directory /home/*/public_html/private<span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span>Directory /home/*/public_html/private<span class="token operator">></span>
   AuthType Basic
   AuthName <span class="token string">"My Private Files"</span>
   AuthBasicProvider dbm
@@ -2227,7 +2229,7 @@ admin: escape
   AuthDBMGroupFile /usr/local/etc/.htdbm-all
   Satisfy All
   require file-group
-<span class="token operator">&lt;</span>/Directory<span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span>/Directory<span class="token operator">></span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <p><strong><code>mod_authz_user</code>模块</strong></p>
@@ -2280,11 +2282,11 @@ Deny from 172.16.3.0/255.255.255.128
 
 <span class="token comment" spellcheck="true"># 使用mod_setenvif提供的SetEnvIf指令定义浏览器类型进行过滤</span>
 SetEnvIf User-Agent ^KnockKnock/2\.0 let_me_in
-<span class="token operator">&lt;</span>Directory /docroot<span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span>Directory /docroot<span class="token operator">></span>
   Order Deny,Allow
   Deny from All
   Allow from env<span class="token operator">=</span>let_me_in
-<span class="token operator">&lt;</span>/Directory<span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span>/Directory<span class="token operator">></span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 黑名单，先执行Deny在执行Allow，所以172.16.2.3可以访问</span>
 Order Deny,Allow
@@ -2938,7 +2940,7 @@ Allow from 172.16.2.3
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1218k</span>
+                        class="white-color">1197.4k</span>
             
             
             

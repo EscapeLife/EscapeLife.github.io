@@ -526,10 +526,10 @@
 </blockquote>
 <p>浏览器检索网页文件时，会将副本保留在本地磁盘缓存中。这样，当你再次访问该页面时，浏览器就不必从服务器重新获取文件。每个浏览器都有自己的使用逻辑，来决定何时使用该文件对应的本地副本，以及何时在服务器更改了该文件时再次获取它。但是，作为网站所有者，你可以在发送的 <code>HTTP</code> 响应中设置缓存控制和过期标头，以提高浏览器的缓存行为的效率，从而减少很多不必要的 <code>HTTP</code> 请求。</p>
 <p>首先，可以为字体和图像设置较长的缓存过期时间，这些字体和图像可能不会经常更改。在下面的示例中，设置客户端浏览器将字体和图像在本地缓存中保留一个月。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">~</span><span class="token operator">*</span> \<span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token operator">?</span><span class="token punctuation">:</span>jpg<span class="token operator">|</span>jpeg<span class="token operator">|</span>gif<span class="token operator">|</span>png<span class="token operator">|</span>ico<span class="token operator">|</span>woff2<span class="token punctuation">)</span>$ <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">~</span><span class="token operator">*</span> \<span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token operator">?</span><span class="token punctuation">:</span>jpg<span class="token operator">|</span>jpeg<span class="token operator">|</span>gif<span class="token operator">|</span>png<span class="token operator">|</span>ico<span class="token operator">|</span>woff2<span class="token punctuation">)</span>$ <span class="token punctuation">{</span>
     <span class="token keyword">expires</span> 1M<span class="token punctuation">;</span>
     <span class="token keyword">add_header</span> Cache<span class="token operator">-</span>Control <span class="token string">"public"</span><span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="3-启用-HTTP2-协议"><a href="#3-启用-HTTP2-协议" class="headerlink" title="3. 启用 HTTP2 协议"></a>3. 启用 HTTP2 协议</h2><blockquote>
@@ -556,9 +556,9 @@ utilization of available network capacity.
 <li><strong>[1] 禁用页面资源请求的日志记录</strong></li>
 </ul>
 <p>如果我们不需要记录检索普通页面资源的请求，比如图像文件、<code>JavaScript</code> 文件和 <code>CSS</code> 文件等等，那么这是一个快速而简单的解决方案。你所需要做的就是创建一个与这些文件类型匹配的 <code>location</code> 块，并配置禁用其中的日志记录。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">~</span><span class="token operator">*</span> \<span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token operator">?</span><span class="token punctuation">:</span>jpg<span class="token operator">|</span>jpeg<span class="token operator">|</span>gif<span class="token operator">|</span>png<span class="token operator">|</span>ico<span class="token operator">|</span>woff2<span class="token operator">|</span>js<span class="token operator">|</span>css<span class="token punctuation">)</span>$ <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">~</span><span class="token operator">*</span> \<span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token operator">?</span><span class="token punctuation">:</span>jpg<span class="token operator">|</span>jpeg<span class="token operator">|</span>gif<span class="token operator">|</span>png<span class="token operator">|</span>ico<span class="token operator">|</span>woff2<span class="token operator">|</span>js<span class="token operator">|</span>css<span class="token punctuation">)</span>$ <span class="token punctuation">{</span>
     <span class="token keyword">access_log</span> off<span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[2] 禁用成功请求的日志记录</strong></li>
@@ -569,10 +569,10 @@ utilization of available network capacity.
 <span class="token keyword">access_log</span> <span class="token operator">/</span>var<span class="token operator">/</span>log<span class="token operator">/</span>nginx<span class="token operator">/</span>access<span class="token punctuation">.</span>log<span class="token punctuation">;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># access_log directive</span>
-<span class="token keyword">map</span> <span class="token variable">$status</span> <span class="token variable">$loggable</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<span class="token keyword">map</span> <span class="token variable">$status</span> <span class="token variable">$loggable</span> <span class="token punctuation">{</span>
     <span class="token operator">~</span><span class="token operator">^</span><span class="token punctuation">[</span><span class="token number">23</span><span class="token punctuation">]</span> <span class="token number">0</span><span class="token punctuation">;</span>
     default <span class="token number">1</span><span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 
 <span class="token keyword">access_log</span> <span class="token operator">/</span>var<span class="token operator">/</span>log<span class="token operator">/</span>nginx<span class="token operator">/</span>access<span class="token punctuation">.</span>log combined <span class="token keyword">if</span><span class="token operator">=</span><span class="token variable">$loggable</span><span class="token punctuation">;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
@@ -588,15 +588,15 @@ utilization of available network capacity.
 </blockquote>
 <p>如果服务器提供较大的文件(或较小但非常受欢迎的文件，例如表单或报表文件等)，则设置客户端下载文件的最大速度可能是一个非常有用的选择。如果你的站点已经承受了很高的网络负载，则限制下载速度会留下更多带宽，以使应用程序的关键部分保持响应，这是硬件制造商使用的非常受欢迎的解决方案。</p>
 <p>使用 <code>limit_rate</code> 指令来限制特定 <code>URL</code> 的带宽。在这里，我们将 <code>/download</code> 下每个文件的传输速率限制为每秒 <code>50KB</code> 的速度。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span>download<span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span>download<span class="token operator">/</span> <span class="token punctuation">{</span>
     <span class="token keyword">limit_rate</span> 50k<span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <p>你可能还希望仅对较大的文件进行速率限制，这可以通过 <code>limit_rate_after</code> 指令进行。在此示例中，每个文件(来自任何目录)的前 <code>500KB</code> 都不受速度限制地进行传输，之后的所有内容均以 <code>50KB/s</code> 的速度为上限。这样可以加快网站关键部分的交付速度，同时降低其他部分的速度。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
     <span class="token keyword">limit_rate_after</span> 500k<span class="token punctuation">;</span>
     <span class="token keyword">limit_rate</span> 50k<span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <p>请注意，速率限制适用于浏览器和 <code>Nginx</code> 之间的单个 <code>HTTP</code> 连接，因此请不要阻止用户使用下载管理器来绕开速率限制。</p>
 <hr>
@@ -1141,7 +1141,7 @@ utilization of available network capacity.
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1218k</span>
+                        class="white-color">1197.4k</span>
             
             
             

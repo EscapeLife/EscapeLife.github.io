@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-01-20
+                    2022-04-11
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.7k
+                    2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    6 分
+                    7 分
                 </div>
                 
 
@@ -502,7 +502,7 @@
 <p>诡异的问题时常发生，如果正确的处理它们呢？将是一个值得思考和学习的问题！通过对错误和异常问题的排除和处理，能够增长我们的知识储备已经掌握处理问题最为有效和使用的方式。这里将会记录常见的集群使用的问题，以备不时之需。</p>
 <p><img src="../images/kubernetes-have-some-trouble.png" alt="Kubernetes 疑难杂症汇总"></p>
 <hr>
-<h2 id="1-Kubernetes-证书过期处理"><a href="#1-Kubernetes-证书过期处理" class="headerlink" title="1. Kubernetes 证书过期处理"></a>1. Kubernetes 证书过期处理</h2><blockquote>
+<h2 id="1-K8S-证书过期处理"><a href="#1-K8S-证书过期处理" class="headerlink" title="1. K8S 证书过期处理"></a>1. K8S 证书过期处理</h2><blockquote>
 <p><strong>默认 K8S 集群的证书(certificate)有效期为一年时间 =&gt; 最佳的做法是经常升级集群以确保安全</strong></p>
 </blockquote>
 <ul>
@@ -549,7 +549,7 @@ front-proxy-client         Jun 17, 2021 <span class="token punctuation">..</span
 scheduler.conf             Jun 17, 2021 <span class="token punctuation">..</span>   345d            <span class="token boolean">false</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="2-Kubernetes-磁盘容量不足"><a href="#2-Kubernetes-磁盘容量不足" class="headerlink" title="2. Kubernetes 磁盘容量不足"></a>2. Kubernetes 磁盘容量不足</h2><blockquote>
+<h2 id="2-K8S-磁盘容量不足"><a href="#2-K8S-磁盘容量不足" class="headerlink" title="2. K8S 磁盘容量不足"></a>2. K8S 磁盘容量不足</h2><blockquote>
 <p><strong>K8S 检测磁盘容量是按照百分比检测的，而不是实际剩余容量！</strong></p>
 </blockquote>
 <ul>
@@ -566,7 +566,7 @@ scheduler.conf             Jun 17, 2021 <span class="token punctuation">..</span
 </li>
 </ul>
 <hr>
-<h2 id="3-Kubernetes-跳板机实例配置"><a href="#3-Kubernetes-跳板机实例配置" class="headerlink" title="3. Kubernetes 跳板机实例配置"></a>3. Kubernetes 跳板机实例配置</h2><blockquote>
+<h2 id="3-K8S-跳板机实例配置"><a href="#3-K8S-跳板机实例配置" class="headerlink" title="3. K8S 跳板机实例配置"></a>3. K8S 跳板机实例配置</h2><blockquote>
 <p><strong>这里只是记录一下，顺便后续自己需要的时候看看。</strong></p>
 </blockquote>
 <ul>
@@ -580,10 +580,54 @@ $ <span class="token function">sudo</span> iptables -t nat -A POSTROUTING -o eth
 <li><strong>[解决方法]</strong> 这里记一下，上面三条命令到底做了什么呢？<ul>
 <li><strong>第一条：</strong>配置 <code>Linux</code> 内核参数，主要是用来把 <code>Linux</code> 当成路由器来用。一般来说，一个路由器至少要有两个网络接口，一个是 <code>WAN</code>，另一个是 <code>LAN</code>，为了让 <code>LAN</code> 和 <code>WAN</code> 的流量相通，需要进行内核上路由转发。</li>
 <li><strong>第二条：</strong>通行所有需要转发的包，只有机器成为一个路由器时，需要在两个网卡间进行网络包转发时，才需要配置这条规则。</li>
-<li><strong>第三条：</strong>关键字 <code>MASQUERADE</code> 意思是“伪装“，<code>NAT</code> 的工作原理是就像是个宿舍收发室对学生宿舍一样，学生宿舍的地址外部不可见邮递员只看得见整栋宿舍收发室的地址，邮递员把快递交给收发室，收发室再把快递转给学习宿舍（反之，如果学生要对外寄邮件，也是先到收发室，收发室传给邮局）。现在的问题是，所有的学生宿舍如何才能参与到任何快递的通信中，如果把学生宿舍地址发到外部，则没人能把信送回来。如果这个收发室是个自动化的机器人，他要干的事就是，把学生宿舍的地址换成收发室地址。这就是 <code>MASQUERADE</code> 的意思 —— 来自具有接收方 <code>1</code> 地址的本地网络到达 <code>Internet</code> 某处的数据包必须进行修改，也就是让发送方的地址等于路由器的地址</li>
+<li><strong>第三条：</strong>关键字 <code>MASQUERADE</code> 意思是“伪装“，<code>NAT</code> 的工作原理是就像是个宿舍收发室对学生宿舍一样，学生宿舍的地址外部不可见邮递员只看得见整栋宿舍收发室的地址，邮递员把快递交给收发室，收发室再把快递转给学习宿舍（反之，如果学生要对外寄邮件，也是先到收发室，收发室传给邮局）。现在的问题是，所有的学生宿舍如何才能参与到任何快递的通信中，如果把学生宿舍地址发到外部，则没人能把信送回来。如果这个收发室是个自动化的机器人，他要干的事就是，把学生宿舍的地址换成收发室地址。这就是 <code>MASQUERADE</code> 的意思 —— 来自具有接收方 <code>1</code> 地址的本地网络到达 <code>Internet</code> 某处的数据包必须进行修改，也就是让发送方的地址等于路由器的地址。</li>
 </ul>
 </li>
 </ul>
+<hr>
+<h2 id="4-K8S-日志空间不足"><a href="#4-K8S-日志空间不足" class="headerlink" title="4. K8S 日志空间不足"></a>4. K8S 日志空间不足</h2><blockquote>
+<p><strong>不做设置的话，Pod 将使用 emptyDir 这个模式使用临时目录！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 主要原因就是，对应节点上面启动的容器，占用了太多的临时目录，导致系统使用率太高了。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错提示信息</span>
+The node was low on resource: ephemeral-storage.
+Container xxx was using 44Ki, <span class="token function">which</span> exceeds its request of 0.
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 解决方案有以下几种：<ul>
+<li>第一种就是通过配置如下设置，将容器使用临时空间大小进行限制，设置好值以后，用超过 <code>Limit</code> 的话，<code>kubernetes</code> 就会干掉我们的 <code>Pod</code> 服务，防止系统空间不足。</li>
+<li>第二种就是将 <code>/var/log/</code> 目录的磁盘空间改大，有些情况会看到其会挂载到 <code>/</code> 目录下，而 <code>/</code> 目录分配的空间有特别小，就会导致这个问题的出现。建议使用该方式，一劳永逸。</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token comment" spellcheck="true"># ephemeral-storage</span>
+<span class="token comment" spellcheck="true"># 来调度和管理节点上的应用对主分区的消耗</span>
+<span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> wordpress
+  <span class="token key atrule">image</span><span class="token punctuation">:</span> wordpress
+  <span class="token key atrule">resources</span><span class="token punctuation">:</span>
+    <span class="token key atrule">requests</span><span class="token punctuation">:</span>
+      <span class="token key atrule">ephemeral-storage</span><span class="token punctuation">:</span> <span class="token string">"2Gi"</span>
+    <span class="token key atrule">limits</span><span class="token punctuation">:</span>
+      <span class="token key atrule">ephemeral-storage</span><span class="token punctuation">:</span> <span class="token string">"4Gi"</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="5-K8S-日志空间不足"><a href="#5-K8S-日志空间不足" class="headerlink" title="5. K8S 日志空间不足"></a>5. K8S 日志空间不足</h2><blockquote>
+<p><strong>部署平台要不惜磁盘和内存，不然会存在很多异常的问题</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错提示信息</span>
+Failed to create pod sandbox: rpc error: code <span class="token operator">=</span> Unknown desc <span class="token operator">=</span> rewrite resolv.conf failed <span class="token keyword">for</span> pod <span class="token string">"redis-xxx"</span>
+ResolvConfPath: <span class="token string">"/var/lib/docker/containers/xxx/resolv.conf"</span> does not exist
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
                 
             </div>
@@ -1120,7 +1164,7 @@ $ <span class="token function">sudo</span> iptables -t nat -A POSTROUTING -o eth
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1218k</span>
+                        class="white-color">1197.4k</span>
             
             
             
