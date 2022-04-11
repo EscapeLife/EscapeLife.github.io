@@ -1087,7 +1087,7 @@ $ kubectl describe deployment nginx-deployment
 <h3 id="4-5-示例运行-缩放"><a href="#4-5-示例运行-缩放" class="headerlink" title="4.5 示例运行 - 缩放"></a>4.5 示例运行 - 缩放</h3><ul>
 <li>我们可以通过使用如下指令，缩放 <code>Deployment</code>。假设启用水平自动缩放 <code>Pod</code> 在集群中，可以为 <code>Deployment</code> 设置自动缩放器，并选择最小和最大 要基于现有 <code>Pods</code> 的 <code>CPU</code> 利用率运行的 <code>Pods</code>。</li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 扩容(3->10)</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 扩容(3-&gt;10)</span>
 $ kubectl scale deployment/nginx-deployment --replicas<span class="token operator">=</span>10
 deployment.apps/nginx-deployment scaled
 
@@ -1371,7 +1371,7 @@ statefulset.apps/web created
 <span class="token comment" spellcheck="true"># 验证是否成功创建</span>
 $ <span class="token function">sudo</span> kubectl get <span class="token function">service</span> nginx
 NAME      TYPE         CLUSTER-IP   EXTERNAL-IP   PORT<span class="token punctuation">(</span>S<span class="token punctuation">)</span>   AGE
-nginx     ClusterIP    None         <span class="token operator">&lt;</span>none<span class="token operator">></span>        80/TCP    12s
+nginx     ClusterIP    None         <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>        80/TCP    12s
 
 $ <span class="token function">sudo</span> kubectl get statefulset web
 NAME      DESIRED   CURRENT   AGE
@@ -1449,7 +1449,7 @@ $ <span class="token function">sudo</span> kubectl scale sts web --replicas<span
 statefulset.apps/web scaled
 
 <span class="token comment" spellcheck="true"># 缩容</span>
-$ <span class="token function">sudo</span> kubectl patch sts web -p <span class="token string">'{"spec":{"replicas":3}}'</span>
+$ <span class="token function">sudo</span> kubectl patch sts web -p <span class="token string">'&amp;#123;"spec":&amp;#123;"replicas":3&amp;#125;&amp;#125;'</span>
 statefulset.apps/web patched
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 五个存储仍然存在</span>
@@ -1466,13 +1466,13 @@ www-web-4   Bound     pvc-e11bb5f8-b508-11e6-932f-42010a800002   1Gi        RWO 
 </ul>
 <p><code>StatefulSet</code> 里的 <code>Pod</code> 采用和序号相反的顺序更新。在更新下一个 <code>Pod</code> 前，<code>StatefulSet</code> 控制器终止每个 <code>Pod</code> 并等待它们变成 <code>Running</code> 和 <code>Ready</code>。请注意，虽然在顺序后继者变成 <code>unning</code> 和 <code>Ready</code> 之前 <code>StatefulSet</code> 控制器不会更新下一个 <code>Pod</code>，但它仍然会重建任何在更新过程中发生故障的 <code>Pod</code>，使用的是它们当前的版本。已经接收到更新请求的 <code>Pod</code> 将会被恢复为更新的版本，没有收到请求的 <code>Pod</code> 则会被恢复为之前的版本。像这样，控制器尝试继续使应用保持健康并在出现间歇性故障时保持更新的一致性。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Patch web StatefulSet 来执行 RollingUpdate 更新策略</span>
-$ <span class="token function">sudo</span> kubectl patch statefulset web -p <span class="token string">'{"spec":{"updateStrategy":{"type":"RollingUpdate"}}}'</span>
+$ <span class="token function">sudo</span> kubectl patch statefulset web -p <span class="token string">'&amp;#123;"spec":&amp;#123;"updateStrategy":&amp;#123;"type":"RollingUpdate"&amp;#125;&amp;#125;&amp;#125;'</span>
 statefulset.apps/web patched
 
 <span class="token comment" spellcheck="true"># 在一个终端窗口中 patch web StatefulSet 来再次的改变容器镜像</span>
 $ <span class="token function">sudo</span> kubectl patch statefulset web --type<span class="token operator">=</span><span class="token string">'json'</span> \
-    -p<span class="token operator">=</span><span class="token string">'[{"op": "replace", "path": "/spec/template/spec/containers/0/image", \
-    "value":"gcr.io/google_containers/nginx-slim:0.8"}]'</span>
+    -p<span class="token operator">=</span><span class="token string">'[&amp;#123;"op": "replace", "path": "/spec/template/spec/containers/0/image", \
+    "value":"gcr.io/google_containers/nginx-slim:0.8"&amp;#125;]'</span>
 statefulset.apps/web patched
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
@@ -1644,7 +1644,7 @@ $ <span class="token function">sudo</span> kubectl describe jobs/pi
 $ <span class="token function">sudo</span> kubectl get pods
 
 <span class="token comment" spellcheck="true"># 查看PI输出结果</span>
-$ pods<span class="token operator">=</span><span class="token variable"><span class="token variable">$(</span>suod kubectl get pods --selector<span class="token operator">=</span>job-name<span class="token operator">=</span>pi --output<span class="token operator">=</span>jsonpath<span class="token operator">=</span><span class="token punctuation">{</span>.items<span class="token punctuation">..</span>metadata.name<span class="token punctuation">}</span><span class="token variable">)</span></span>
+$ pods<span class="token operator">=</span><span class="token punctuation">$(</span>suod kubectl get pods --selector<span class="token operator">=</span>job-name<span class="token operator">=</span>pi --output<span class="token operator">=</span>jsonpath<span class="token operator">=</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;.items..metadata.name&amp;#125;)</span>
 $ sduo kubectl logs <span class="token variable">$pods</span>
 3.141592653589793238462<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
@@ -1691,10 +1691,10 @@ hello-1202039034   1         1            49s
 <span class="token comment" spellcheck="true"># 查看</span>
 $ <span class="token function">sudo</span> kubectl get cronjob
 NAME      SCHEDULE      SUSPEND   ACTIVE    LAST-SCHEDULE
-hello     */1 * * * *   False     0         <span class="token operator">&lt;</span>none<span class="token operator">></span>
+hello     */1 * * * *   False     0         <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>
 
 <span class="token comment" spellcheck="true"># 输出</span>
-$ pods<span class="token operator">=</span><span class="token variable"><span class="token variable">$(</span><span class="token function">sudo</span> kubectl get pods --selector<span class="token operator">=</span>job-name<span class="token operator">=</span>hello-1202039034 --output<span class="token operator">=</span>jsonpath<span class="token operator">=</span><span class="token punctuation">{</span>.items<span class="token punctuation">..</span>metadata.name<span class="token punctuation">}</span><span class="token variable">)</span></span>
+$ pods<span class="token operator">=</span><span class="token punctuation">$(</span>sudo kubectl get pods --selector<span class="token operator">=</span>job-name<span class="token operator">=</span>hello-1202039034 --output<span class="token operator">=</span>jsonpath<span class="token operator">=</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;.items..metadata.name&amp;#125;)</span>
 $ <span class="token function">sudo</span> kubectl logs <span class="token variable">$pods</span>
 Mon Aug 29 21:34:09 UTC 2020
 Hello from the Kubernetes cluster
@@ -2265,7 +2265,7 @@ $ <span class="token function">sudo</span> kubectl delete <span class="token fun
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1196.5k</span>
+                        class="white-color">1218k</span>
             
             
             

@@ -570,7 +570,7 @@ $ pip <span class="token function">install</span> supervisor
 <li>当我们通过上述方式安装工具之后，对应的目录下面并没有我们需要的配置文件目录和文件，所以这就需要我们自行创建默认 <code>/etc/supervisord.d</code> 目录和 <code>/etc/supervisord.conf</code> 配置文件，即如果没有则自行创建。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 创建默认配置文件</span>
-$ echo_supervisord_conf <span class="token operator">></span> /etc/supervisord.conf
+$ echo_supervisord_conf <span class="token operator">&gt;</span> /etc/supervisord.conf
 
 <span class="token comment" spellcheck="true"># 启动默认配置</span>
 $ supervisord -c /etc/supervisord.conf
@@ -679,7 +679,7 @@ files <span class="token operator">=</span> /etc/supervisor/conf.d/*.conf
 <span class="token punctuation">;</span><span class="token punctuation">[</span>program:theprogramname<span class="token punctuation">]</span>      <span class="token punctuation">;</span> 必填选项，其格式为<span class="token punctuation">[</span>program:应用名称<span class="token punctuation">]</span>
 <span class="token punctuation">;</span>command<span class="token operator">=</span>/bin/cat              <span class="token punctuation">;</span> 启动命令，可以使用参数，不能是守护进程
 <span class="token punctuation">;</span>process_name<span class="token operator">=</span>%<span class="token punctuation">(</span>program_name<span class="token punctuation">)</span>s <span class="token punctuation">;</span> 当numprocs为1时，process_name<span class="token operator">=</span>%<span class="token punctuation">(</span>program_name<span class="token punctuation">)</span>s<span class="token punctuation">;</span>
-                                 当numprocs<span class="token operator">>=</span>2时，%<span class="token punctuation">(</span>program_name<span class="token punctuation">)</span>s_%<span class="token punctuation">(</span>process_num<span class="token punctuation">)</span>02d
+                                 当numprocs<span class="token operator">&gt;=</span>2时，%<span class="token punctuation">(</span>program_name<span class="token punctuation">)</span>s_%<span class="token punctuation">(</span>process_num<span class="token punctuation">)</span>02d
 <span class="token punctuation">;</span>numprocs<span class="token operator">=</span>1                    <span class="token punctuation">;</span> 启动的进程数量，默认为1个，类似进程池的概念
 <span class="token punctuation">;</span>directory<span class="token operator">=</span>/tmp                <span class="token punctuation">;</span> 程序的执行目录
 <span class="token punctuation">;</span>umask<span class="token operator">=</span>022                     <span class="token punctuation">;</span> 指定掩码，默认为None
@@ -889,22 +889,22 @@ $ <span class="token function">ps</span> aux <span class="token operator">|</spa
 prog<span class="token operator">=</span><span class="token string">"supervisord"</span>
 
 prefix<span class="token operator">=</span><span class="token string">"/usr"</span>
-exec_prefix<span class="token operator">=</span><span class="token string">"<span class="token variable">${prefix}</span>"</span>
-prog_bin<span class="token operator">=</span><span class="token string">"<span class="token variable">${exec_prefix}</span>/bin/supervisord"</span>
+exec_prefix<span class="token operator">=</span><span class="token string">"$&amp;#123;prefix&amp;#125;"</span>
+prog_bin<span class="token operator">=</span><span class="token string">"$&amp;#123;exec_prefix&amp;#125;/bin/supervisord"</span>
 PIDFILE<span class="token operator">=</span><span class="token string">"/var/run/<span class="token variable">$prog</span>.pid"</span>
 
-start<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+start<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">echo</span> -n $<span class="token string">"Starting <span class="token variable">$prog</span>: "</span>
     daemon <span class="token variable">$prog_bin</span> --pidfile <span class="token variable">$PIDFILE</span> -c /etc/supervisord.conf
     <span class="token punctuation">[</span> -f <span class="token variable">$PIDFILE</span> <span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> success $<span class="token string">"<span class="token variable">$prog</span> startup"</span> <span class="token operator">||</span> failure $<span class="token string">"<span class="token variable">$prog</span> startup"</span>
     <span class="token keyword">echo</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
-stop<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+stop<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">echo</span> -n $<span class="token string">"Shutting down <span class="token variable">$prog</span>: "</span>
     <span class="token punctuation">[</span> -f <span class="token variable">$PIDFILE</span> <span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> killproc <span class="token variable">$prog</span> <span class="token operator">||</span> success $<span class="token string">"<span class="token variable">$prog</span> shutdown"</span>
     <span class="token keyword">echo</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
 <span class="token keyword">case</span> <span class="token string">"<span class="token variable">$1</span>"</span> <span class="token keyword">in</span>
     start<span class="token punctuation">)</span>
@@ -921,7 +921,7 @@ stop<span class="token punctuation">(</span><span class="token punctuation">)</s
         start
         <span class="token punctuation">;</span><span class="token punctuation">;</span>
     *<span class="token punctuation">)</span>
-        <span class="token keyword">echo</span> <span class="token string">"Usage: <span class="token variable">$0</span> {start|stop|restart|status}"</span>
+        <span class="token keyword">echo</span> <span class="token string">"Usage: <span class="token variable">$0</span> &amp;#123;start|stop|restart|status&amp;#125;"</span>
         <span class="token punctuation">;</span><span class="token punctuation">;</span>
 esac
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
@@ -1661,7 +1661,7 @@ password<span class="token operator">=</span>1234         <span class="token pun
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1196.5k</span>
+                        class="white-color">1218k</span>
             
             
             

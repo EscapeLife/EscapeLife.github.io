@@ -519,7 +519,7 @@
 <ul>
 <li>因为浏览器同源策略的问题，导致在 <code>HTTPS</code> 的网站中无法引用 <code>HTTP</code> 网站的资源。所以，只能配置 <code>Nginx</code> 使访问的时候，间接的通过代理的方式来访问对应的资源。</li>
 </ul>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span> <span class="token number">443</span> default <span class="token keyword">ssl</span><span class="token punctuation">;</span>
     server_nam xxx<span class="token punctuation">.</span>xxx<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
 
@@ -529,7 +529,7 @@
 
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 
-    <span class="token keyword">location</span> <span class="token operator">/</span>xxx<span class="token operator">/</span>xxx<span class="token operator">/</span> <span class="token punctuation">{</span>
+    <span class="token keyword">location</span> <span class="token operator">/</span>xxx<span class="token operator">/</span>xxx<span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
         <span class="token keyword">proxy_pass_header</span> <span class="token keyword">Server</span><span class="token punctuation">;</span>
         <span class="token keyword">proxy_set_header</span> Host <span class="token variable">$http_host</span><span class="token punctuation">;</span>
         <span class="token keyword">proxy_set_header</span> X<span class="token operator">-</span>Real<span class="token operator">-</span>IP <span class="token variable">$remote_addr</span><span class="token punctuation">;</span>
@@ -537,8 +537,8 @@
         <span class="token keyword">proxy_set_header</span> Referer <span class="token string">"http://www.xxx.xxx"</span><span class="token punctuation">;</span>
         <span class="token keyword">proxy_http_version</span> <span class="token number">1.1</span><span class="token punctuation">;</span>
         <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>www<span class="token punctuation">.</span>xxx<span class="token punctuation">.</span>xxx<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><p>但是配置之后发现还是无法正常显示引用的外部文档，通过浏览器自带的控制台，发现基本和之前的情况是一样的，还是显示是因为同源策略导致的。后来，通过 <code>curl</code> 测试发现，在访问的时候，经过了一次 <code>302</code> 跳转。很奇怪，为什么还需要跳转呢？</p>
@@ -546,7 +546,7 @@
 <li><p>通过浏览器自带的控制台，再次对请求进行分析，发现 <code>proxy_pass</code> 代理的 <code>http://www.xxx.xxx</code> 网站 <code>302</code> 到了 <code>http://www3.xxx.xxx</code> 上面，这时候才真正的得到了 <code>200</code> 的文件内容。所以，对 <code>Nginx</code> 配置进行了调整。将 <code>proxy_pass</code> 的地址改到了真正的服务域名上面，即可。</p>
 </li>
 </ul>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span>xxx<span class="token operator">/</span>xxx<span class="token operator">/</span> <span class="token punctuation">{</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span>xxx<span class="token operator">/</span>xxx<span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">proxy_pass_header</span> <span class="token keyword">Server</span><span class="token punctuation">;</span>
     <span class="token keyword">proxy_set_header</span> Host <span class="token variable">$http_host</span><span class="token punctuation">;</span>
     <span class="token keyword">proxy_set_header</span> X<span class="token operator">-</span>Real<span class="token operator">-</span>IP <span class="token variable">$remote_addr</span><span class="token punctuation">;</span>
@@ -554,7 +554,7 @@
     <span class="token keyword">proxy_set_header</span> Referer <span class="token string">"http://www.xxx.xxx"</span><span class="token punctuation">;</span>
     <span class="token keyword">proxy_http_version</span> <span class="token number">1.1</span><span class="token punctuation">;</span>
     <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>www3<span class="token punctuation">.</span>xxx<span class="token punctuation">.</span>xxx<span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>重载配置文件，访问内容，正常了。后来发现是数据库中存储的就是一个假地址，很是尴尬。</li>
@@ -588,7 +588,7 @@ the same rules specified <span class="token keyword">in</span> the SameSiteLax v
 <ul>
 <li><strong>解决方法二</strong> 通过在 <code>Nginx</code> 中代理相关请求到 <code>B</code> 系统上，来间接使用并避免同源策略导致的登录异常问题。</li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash">location /xxx/xxx/ <span class="token punctuation">{</span>
+<pre class="line-numbers language-bash"><code class="language-bash">location /xxx/xxx/ <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     proxy_http_version 1.1<span class="token punctuation">;</span>
     proxy_pass_header Server<span class="token punctuation">;</span>
     proxy_set_header Host <span class="token variable">$http_host</span><span class="token punctuation">;</span>
@@ -1196,7 +1196,7 @@ http://www.domain2.com/b.js        不同域名                         不允�
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1196.5k</span>
+                        class="white-color">1218k</span>
             
             
             

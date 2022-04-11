@@ -569,7 +569,7 @@
       <span class="token key atrule">user</span><span class="token punctuation">:</span> kubernetes<span class="token punctuation">-</span>admin
     <span class="token key atrule">name</span><span class="token punctuation">:</span> kubernetes<span class="token punctuation">-</span>admin@kubernetes
 <span class="token key atrule">current-context</span><span class="token punctuation">:</span> kubernetes<span class="token punctuation">-</span>admin@kubernetes <span class="token comment" spellcheck="true"># 当前的集群</span>
-<span class="token key atrule">preferences</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token key atrule">preferences</span><span class="token punctuation">:</span> &amp;<span class="token comment" spellcheck="true">#123;&amp;#125;</span>
 <span class="token key atrule">users</span><span class="token punctuation">:</span>
   <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> kubernetes<span class="token punctuation">-</span>admin <span class="token comment" spellcheck="true"># 当前的用户名</span>
     <span class="token key atrule">user</span><span class="token punctuation">:</span>
@@ -633,23 +633,23 @@ $ kubectl describe secret default-token-5gm9r --namespace<span class="token oper
 <p><img src="../images/kubernetes-cluster-security-06.png" alt="Kubernetes之集群安全机制 - RBAC"></p>
 <p>需要注意的是 <code>Kubernetes</code> 并不会提供用户管理，那么 <code>User</code>、<code>Group</code>、<code>ServiceAccount</code> 指定的用户又是从哪里来的呢？<code>Kubernetes</code> 组件（<code>kubectl</code>、<code>kube-proxy</code>）或是其他自定义的用户在向 <code>CA</code> 申请证书时，需要提供一个证书请求文件。</p>
 <p>而在这个文件中就定义了对应的用户和组，<code>CN</code> 定义用户，<code>name.O</code> 定义了组。当 <code>K8S</code> 读取证书信息的时候，会自动把这个两个信息提取出来，当做用户名和组。</p>
-<pre class="line-numbers language-json"><code class="language-json"><span class="token punctuation">{</span>
+<pre class="line-numbers language-json"><code class="language-json">&amp;#<span class="token number">123</span><span class="token punctuation">;</span>
   <span class="token property">"CN"</span><span class="token operator">:</span> <span class="token string">"admin"</span><span class="token punctuation">,</span>
   <span class="token property">"hosts"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-  <span class="token property">"key"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+  <span class="token property">"key"</span><span class="token operator">:</span> &amp;#<span class="token number">123</span><span class="token punctuation">;</span>
     <span class="token property">"algo"</span><span class="token operator">:</span> <span class="token string">"rsa"</span><span class="token punctuation">,</span>
     <span class="token property">"size"</span><span class="token operator">:</span> <span class="token number">2048</span>
-  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  &amp;#<span class="token number">125</span><span class="token punctuation">;</span><span class="token punctuation">,</span>
   <span class="token property">"names"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-    <span class="token punctuation">{</span>
+    &amp;#<span class="token number">123</span><span class="token punctuation">;</span>
       <span class="token property">"C"</span><span class="token operator">:</span> <span class="token string">"CN"</span><span class="token punctuation">,</span>
       <span class="token property">"ST"</span><span class="token operator">:</span> <span class="token string">"HangZhou"</span><span class="token punctuation">,</span>
       <span class="token property">"L"</span><span class="token operator">:</span> <span class="token string">"XS"</span><span class="token punctuation">,</span>
       <span class="token property">"O"</span><span class="token operator">:</span> <span class="token string">"system:masters"</span><span class="token punctuation">,</span>
       <span class="token property">"OU"</span><span class="token operator">:</span> <span class="token string">"System"</span>
-    <span class="token punctuation">}</span>
+    &amp;#<span class="token number">125</span><span class="token punctuation">;</span>
   <span class="token punctuation">]</span>
-<span class="token punctuation">}</span>
+&amp;#<span class="token number">125</span><span class="token punctuation">;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><code>API Server</code> 会把客户端证书的 <code>CN</code> 字段作为 <code>User</code>，把 <code>names.O</code> 字段作为 <code>Group</code>。<code>kubelet</code> 使用 <code>TLS Bootstaping</code> 认证时，<code>API Server</code> 可以使用 <code>Bootstrap Tokens</code> 或者 <code>Token authentication file</code> 验证 <code>=token</code>，无论哪一种，<code>Kubernetes</code> 都会为 <code>token</code> 绑定一个默认的 <code>User</code> 和 <code>Group Pod</code> 使用 <code>ServiceAccount</code> 认证时，<code>service-account-token</code> 中的 <code>JWT</code> 会保存 <code>User</code> 信息有了用户信息，再创建一对角色/角色绑定(集群角色/集群角色绑定)资源对象，就可以完成权限绑定了。</p>
 <hr>
@@ -728,7 +728,7 @@ $ kubectl describe secret default-token-5gm9r --namespace<span class="token oper
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="4-4-Resources"><a href="#4-4-Resources" class="headerlink" title="4.4 Resources"></a>4.4 Resources</h3><p><code>Kubernetes</code> 集群内一些资源一般以其名称字符串来表示，这些字符串一般会在 <code>API</code> 的 <code>URL</code> 地址中出现；同时某些资源也会包含子资源，例如 <code>logs</code> 资源就属于 <code>pods</code> 的子资源，<code>API</code> 中 <code>URL</code> 样例如下。</p>
-<pre class="line-numbers language-bash"><code class="language-bash">GET /api/v1/namespaces/<span class="token punctuation">{</span>namespace<span class="token punctuation">}</span>/pods/<span class="token punctuation">{</span>name<span class="token punctuation">}</span>/log
+<pre class="line-numbers language-bash"><code class="language-bash">GET /api/v1/namespaces/<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;namespace&amp;#125;/pods/&amp;#123;name&amp;#125;/log</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>如果要在 <code>RBAC</code> 授权模型中控制这些子资源的访问权限，可以通过 <code>/</code> 分隔符来实现，以下是一个定义 <code>pods</code> 资资源 <code>logs</code> 访问权限的 <code>Role</code> 定义样例。</p>
 <pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> rbac.authorization.k8s.io/v1beta
@@ -766,23 +766,23 @@ $ <span class="token function">sudo</span> <span class="token function">passwd</
 </ul>
 <pre class="line-numbers language-json"><code class="language-json"># devuser-csr.json
 
-<span class="token punctuation">{</span>
+&amp;#<span class="token number">123</span><span class="token punctuation">;</span>
   <span class="token property">"CN"</span><span class="token operator">:</span> <span class="token string">"devuser"</span><span class="token punctuation">,</span> # 用户名称
   <span class="token property">"hosts"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> # 表明可以使用的主机；默认为空表示所有主机
-  <span class="token property">"key"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+  <span class="token property">"key"</span><span class="token operator">:</span> &amp;#<span class="token number">123</span><span class="token punctuation">;</span>
     <span class="token property">"algo"</span><span class="token operator">:</span> <span class="token string">"rsa"</span><span class="token punctuation">,</span> # 加密类型
     <span class="token property">"size"</span><span class="token operator">:</span> <span class="token number">2048</span> # 加密长度
-  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  &amp;#<span class="token number">125</span><span class="token punctuation">;</span><span class="token punctuation">,</span>
   <span class="token property">"names"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-    <span class="token punctuation">{</span>
+    &amp;#<span class="token number">123</span><span class="token punctuation">;</span>
       <span class="token property">"C"</span><span class="token operator">:</span> <span class="token string">"CN"</span><span class="token punctuation">,</span>
       <span class="token property">"ST"</span><span class="token operator">:</span> <span class="token string">"BeiJing"</span><span class="token punctuation">,</span>
       <span class="token property">"L"</span><span class="token operator">:</span> <span class="token string">"BeiJing"</span><span class="token punctuation">,</span>
       <span class="token property">"O"</span><span class="token operator">:</span> <span class="token string">"k8s"</span><span class="token punctuation">,</span> # 组
       <span class="token property">"OU"</span><span class="token operator">:</span> <span class="token string">"System"</span>
-    <span class="token punctuation">}</span>
+    &amp;#<span class="token number">125</span><span class="token punctuation">;</span>
   <span class="token punctuation">]</span>
-<span class="token punctuation">}</span>
+&amp;#<span class="token number">125</span><span class="token punctuation">;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[3] 生成 <code>devuser</code> 的证书请求相关文件</strong></li>
@@ -812,7 +812,7 @@ $ <span class="token function">export</span> KUBE_APISERVER<span class="token op
 $ kubectl config set-cluster kubernetes \
     --certificate-authority<span class="token operator">=</span>/etc/kubernetes/pki/ca.crt \
     --embed-certs<span class="token operator">=</span>true \
-    --server<span class="token operator">=</span><span class="token variable">${KUBE_APISERVER}</span> \
+    --server<span class="token operator">=</span>$<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;KUBE_APISERVER&amp;#125; \</span>
     --kubeconfig<span class="token operator">=</span>devuser.kubeconfig
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
@@ -1408,7 +1408,7 @@ $ <span class="token function">cp</span> -f ./devuser.kubeconfig /root/.kube/con
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1196.5k</span>
+                        class="white-color">1218k</span>
             
             
             

@@ -469,14 +469,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.7k
+                    3.7k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    12 分
+                    18 分
                 </div>
                 
 
@@ -503,7 +503,7 @@
 <p>大家都很熟悉的 <code>MVC</code> 框架，其中 <code>Model</code>(模型，通常在服务端)用于处理数据、<code>View</code>(视图，客户端代码)用于展现结果、<code>Controller</code>(控制器)用于控制数据流。确保 <code>M</code> 和 <code>V</code> 的同步，即一旦 <code>M</code> 改变，<code>V</code> 也应该同步更新。<code>Go</code> 语言提供了简单灵活的模板支持，而基于 <code>Go</code> 开发的 <code>Docker</code> 继承了该强大能力，使其可以脱离 <code>Shell</code> 的相关操作，直接对结果进行格式化输出。所有支持 <code>--format</code> 扩展的 <code>Docker CLI</code> 指令均支持该操作。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Go模板常用语法</span>
 docker network inspect \
-    --format<span class="token operator">=</span><span class="token string">'{{/*查看容器的默认网关*/}}{{range .IPAM.Config}}{{.Gateway}}{{end}}'</span> \
+    --format<span class="token operator">=</span><span class="token string">'&amp;#123;&amp;#123;/*查看容器的默认网关*/&amp;#125;&amp;#125;&amp;#123;&amp;#123;range .IPAM.Config&amp;#125;&amp;#125;&amp;#123;&amp;#123;.Gateway&amp;#125;&amp;#125;&amp;#123;&amp;#123;end&amp;#125;&amp;#125;'</span> \
     <span class="token variable">$INSTANCE_ID</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <p><img src="../images/docker-format-1.png" alt="Docker容器格式化输出"></p>
@@ -514,49 +514,49 @@ docker network inspect \
 <p>点号表示当前对象及上下文，和 <code>Java</code>、<code>C++</code> 中的 <code>this</code> 类似，可以直接通过点来获取当前对象。另外，如果返回结果也是一个 <code>Struct</code> 对象（<code>Json</code> 中以花括号/大括号包含），则可以直接通过点号级联调用，获取子对象的指定属性值。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 可以通过级联调用直接读取子对象State的Status属性</span>
 <span class="token comment" spellcheck="true"># 下面命令用于获取容器的状态信息，方便吧</span>
-docker inspect --format <span class="token string">'{{/*读取容器状态*/}}{{.State.Status}}'</span> <span class="token variable">$INSTANCE_ID</span>
+docker inspect --format <span class="token string">'&amp;#123;&amp;#123;/*读取容器状态*/&amp;#125;&amp;#125;&amp;#123;&amp;#123;.State.Status&amp;#125;&amp;#125;'</span> <span class="token variable">$INSTANCE_ID</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <p>注意： 如果需要获取的属性名称包含点号（比如下列示例数据）或者以数字开头，则不能直接通过级联调用获取信息。因为属性名称中的点号会被解析成级联信息，进而导致返回错误结果。即便使用引号将其包含也会提示语法格式错误。此时，需要通过 <code>index</code> 来读取指定属性信息。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 示例演示</span>
-<span class="token string">"Options"</span><span class="token keyword">:</span> <span class="token punctuation">{</span>
+<span class="token string">"Options"</span><span class="token keyword">:</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
      <span class="token string">"com.docker.network.bridge.default_bridge"</span><span class="token keyword">:</span> <span class="token string">"true"</span>,
      <span class="token string">"com.docker.network.bridge.enable_icc"</span><span class="token keyword">:</span> <span class="token string">"true"</span>,
      <span class="token string">"com.docker.network.bridge.enable_ip_masquerade"</span><span class="token keyword">:</span> <span class="token string">"true"</span>,
      <span class="token string">"com.docker.network.bridge.host_binding_ipv4"</span><span class="token keyword">:</span> <span class="token string">"0.0.0.0"</span>,
      <span class="token string">"com.docker.network.bridge.name"</span><span class="token keyword">:</span> <span class="token string">"docker0"</span>,
      <span class="token string">"com.docker.network.driver.mtu"</span><span class="token keyword">:</span> <span class="token string">"1500"</span>
-     <span class="token punctuation">}</span>,
+     <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;,</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 直接级联调用会提示找不到数据</span>
-docker inspect --format <span class="token string">'{{.Options.com.docker.network.driver.mtu}}'</span> bridge
-<span class="token operator">&lt;</span>no value<span class="token operator">></span>
+docker inspect --format <span class="token string">'&amp;#123;&amp;#123;.Options.com.docker.network.driver.mtu&amp;#125;&amp;#125;'</span> bridge
+<span class="token operator">&lt;</span>no value<span class="token operator">&gt;</span>
 
 <span class="token comment" spellcheck="true"># 用引号括起来会提示语法错误</span>
-docker inspect --format <span class="token string">'{{.Options."com.docker.network.driver.mtu"}}'</span> bridge
+docker inspect --format <span class="token string">'&amp;#123;&amp;#123;.Options."com.docker.network.driver.mtu"&amp;#125;&amp;#125;'</span> bridge
 Template parsing error: template: :1: bad character U+0022 <span class="token string">'"'</span>
 
 <span class="token comment" spellcheck="true"># 正确的用法，必须用index读取指定属性名称的属性值</span>
-docker inspect --format <span class="token string">'{{/*读取网络在hosts上的名称*/}}\
-    {{index .Options "com.docker.network.bridge.name"}}'</span> bridge
+docker inspect --format <span class="token string">'&amp;#123;&amp;#123;/*读取网络在hosts上的名称*/&amp;#125;&amp;#125;\
+    &amp;#123;&amp;#123;index .Options "com.docker.network.bridge.name"&amp;#125;&amp;#125;'</span> bridge
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[2] 自定义变量</strong></li>
 </ul>
 <p>可以在处理过程中设置自定义变量，然后结合自定义变量做更复杂的处理。 如果自定义变量的返回值是对象，则可以通过点号进一步级联访问其属性。比如 <code>{{$Myvar.Field1}}</code>。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 结合变量的使用，对输出结果进行组装展现，以输出容器的所有绑定端口列表</span>
-docker inspect --format <span class="token string">'{{/*通过变量组合展示容器绑定端口列表*/}}已绑定端口列表：\
-    {{println}}{{range <span class="token variable">$p</span>,<span class="token variable">$conf</span> := .NetworkSettings.Ports}}{{<span class="token variable">$p</span>}} -> \
-    {{(index <span class="token variable">$conf</span> 0).HostPort}}{{println}}{{end}}'</span> Web_web_1
+docker inspect --format <span class="token string">'&amp;#123;&amp;#123;/*通过变量组合展示容器绑定端口列表*/&amp;#125;&amp;#125;已绑定端口列表：\
+    &amp;#123;&amp;#123;println&amp;#125;&amp;#125;&amp;#123;&amp;#123;range <span class="token variable">$p</span>,<span class="token variable">$conf</span> := .NetworkSettings.Ports&amp;#125;&amp;#125;&amp;#123;&amp;#123;<span class="token variable">$p</span>&amp;#125;&amp;#125; -&gt; \
+    &amp;#123;&amp;#123;(index <span class="token variable">$conf</span> 0).HostPort&amp;#125;&amp;#125;&amp;#123;&amp;#123;println&amp;#125;&amp;#125;&amp;#123;&amp;#123;end&amp;#125;&amp;#125;'</span> Web_web_1
 
 <span class="token comment" spellcheck="true"># 示例输出信息</span>
 已绑定端口列表：
-80/tcp -<span class="token operator">></span> 32770
-8081/tcp -<span class="token operator">></span> 8081
+80/tcp -<span class="token operator">&gt;</span> 32770
+8081/tcp -<span class="token operator">&gt;</span> 8081
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="2-循环遍历-range"><a href="#2-循环遍历-range" class="headerlink" title="2. 循环遍历 - range"></a>2. 循环遍历 - range</h2><pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 格式</span>
-<span class="token punctuation">{</span><span class="token punctuation">{</span>range pipeline<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token punctuation">{</span>.<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token punctuation">{</span>end<span class="token punctuation">}</span><span class="token punctuation">}</span>
-<span class="token punctuation">{</span><span class="token punctuation">{</span>range pipeline<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token punctuation">{</span>.<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token punctuation">{</span>else<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token punctuation">{</span>.<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token punctuation">{</span>end<span class="token punctuation">}</span><span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;&amp;#123;range pipeline&amp;#125;&amp;#125;&amp;#123;&amp;#123;.&amp;#125;&amp;#125;&amp;#123;&amp;#123;end&amp;#125;&amp;#125;</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;&amp;#123;range pipeline&amp;#125;&amp;#125;&amp;#123;&amp;#123;.&amp;#125;&amp;#125;&amp;#123;&amp;#123;else&amp;#125;&amp;#125;&amp;#123;&amp;#123;.&amp;#125;&amp;#125;&amp;#123;&amp;#123;end&amp;#125;&amp;#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <p><code>range</code> 用于遍历结构内返回值的所有数据，支持的类型包括 <code>array</code>, <code>slice</code>, <code>map</code> 和 <code>channel</code>。使用要点：</p>
 <ul>
@@ -565,12 +565,12 @@ docker inspect --format <span class="token string">'{{/*通过变量组合展示
 <li>range 也支持 else 操作。效果是：当返回值为空或长度为 0 时执行 else 内的内容。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看容器网络下已挂载的所有容器名称，如果没有挂载任何容器，则输出 "With No Containers"</span>
-docker inspect --format <span class="token string">'{{range .Containers}}{{.Name}}{{println}}{{else}}With No Containers{{end}}'</span> bridge
+docker inspect --format <span class="token string">'&amp;#123;&amp;#123;range .Containers&amp;#125;&amp;#125;&amp;#123;&amp;#123;.Name&amp;#125;&amp;#125;&amp;#123;&amp;#123;println&amp;#125;&amp;#125;&amp;#123;&amp;#123;else&amp;#125;&amp;#125;With No Containers&amp;#123;&amp;#123;end&amp;#125;&amp;#125;'</span> bridge
 brtest
 peaceful_brown
 <span class="token function">test</span>
 
-docker inspect --format <span class="token string">'{{range .Containers}}{{.Name}}{{println}}{{else}}With No Containers{{end}}'</span> none
+docker inspect --format <span class="token string">'&amp;#123;&amp;#123;range .Containers&amp;#125;&amp;#125;&amp;#123;&amp;#123;.Name&amp;#125;&amp;#125;&amp;#123;&amp;#123;println&amp;#125;&amp;#125;&amp;#123;&amp;#123;else&amp;#125;&amp;#125;With No Containers&amp;#123;&amp;#123;end&amp;#125;&amp;#125;'</span> none
 With No Containers
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
@@ -578,21 +578,21 @@ With No Containers
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 示例代码</span>
 <span class="token comment" spellcheck="true"># docker inspect $INSTANCE_ID 查看容器绑定的端口信息，其 Config 属性就是一个 Map，包含了所有子网信息。</span>
 <span class="token punctuation">..</span>.
- <span class="token string">"IPAM"</span><span class="token keyword">:</span> <span class="token punctuation">{</span>
+ <span class="token string">"IPAM"</span><span class="token keyword">:</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
             <span class="token string">"Driver"</span><span class="token keyword">:</span> <span class="token string">"default"</span>,
             <span class="token string">"Options"</span><span class="token keyword">:</span> null,
             <span class="token string">"Config"</span><span class="token keyword">:</span> <span class="token punctuation">[</span>
-                <span class="token punctuation">{</span>
+                <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
                     <span class="token string">"Subnet"</span><span class="token keyword">:</span> <span class="token string">"172.31.254.1/24"</span>,
                     <span class="token string">"Gateway"</span><span class="token keyword">:</span> <span class="token string">"172.31.254.1"</span>
-                <span class="token punctuation">}</span>
+                <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
             <span class="token punctuation">]</span>
-        <span class="token punctuation">}</span>,
+        <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;,</span>
 <span class="token punctuation">..</span>.
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 示例操作</span>
 <span class="token comment" spellcheck="true"># 通过索引序号读取默认网关</span>
-docker inspect bridge --format <span class="token string">'{{/*查看网络的默认网关*/}}{{(index .IPAM.Config 0).Gateway}}'</span>
+docker inspect bridge --format <span class="token string">'&amp;#123;&amp;#123;/*查看网络的默认网关*/&amp;#125;&amp;#125;&amp;#123;&amp;#123;(index .IPAM.Config 0).Gateway&amp;#125;&amp;#125;'</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="4-条件判断-if-…-else-…-end"><a href="#4-条件判断-if-…-else-…-end" class="headerlink" title="4. 条件判断 - if … else … end"></a>4. 条件判断 - if … else … end</h2><ul>
@@ -602,21 +602,21 @@ docker inspect bridge --format <span class="token string">'{{/*查看网络的�
 <span class="token comment" spellcheck="true"># 返回单一参数的布尔否定值，即返回输入参数的否定值。</span>
 
 <span class="token comment" spellcheck="true"># 如果容器的 restarting 设置为 false，则返回信息“容器没有配置重启策略”</span>
-docker inspect --format <span class="token string">'{{if not .State.Restarting}}容器没有配置重启策略{{end}}'</span> <span class="token variable"><span class="token variable">$(</span>docker <span class="token function">ps</span> -q<span class="token variable">)</span></span>
+docker inspect --format <span class="token string">'&amp;#123;&amp;#123;if not .State.Restarting&amp;#125;&amp;#125;容器没有配置重启策略&amp;#123;&amp;#123;end&amp;#125;&amp;#125;'</span> <span class="token variable"><span class="token variable">$(</span>docker <span class="token function">ps</span> -q<span class="token variable">)</span></span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 2) or</span>
-<span class="token comment" spellcheck="true"># {{or x y}}: 表示如果 x 为真返回 x，否则返回 y。</span>
-<span class="token comment" spellcheck="true"># {{or x y z}}：后面跟多个参数时会逐一判断每个参数，并返回第一个非空的参数。如果都为 false，则返回最后一个参数。</span>
+<span class="token comment" spellcheck="true"># &amp;#123;&amp;#123;or x y&amp;#125;&amp;#125;: 表示如果 x 为真返回 x，否则返回 y。</span>
+<span class="token comment" spellcheck="true"># &amp;#123;&amp;#123;or x y z&amp;#125;&amp;#125;：后面跟多个参数时会逐一判断每个参数，并返回第一个非空的参数。如果都为 false，则返回最后一个参数。</span>
 <span class="token comment" spellcheck="true"># 除了 null（空）和 false 被识别为 false，其它值（字符串、数字、对象等）均被识别为 true。</span>
 
 <span class="token comment" spellcheck="true"># 示例演示</span>
-docker inspect --format <span class="token string">'{{or .State.Status .State.Restarting}}'</span> <span class="token variable">$INSTANCE_ID</span>
+docker inspect --format <span class="token string">'&amp;#123;&amp;#123;or .State.Status .State.Restarting&amp;#125;&amp;#125;'</span> <span class="token variable">$INSTANCE_ID</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[2] 判断条件</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 判断语句通常需要结合判断条件一起使用，使用格式基本相同</span>
-<span class="token punctuation">{</span><span class="token punctuation">{</span>if 判断条件 .Var1 .Var2<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token punctuation">{</span>end<span class="token punctuation">}</span><span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;&amp;#123;if 判断条件 .Var1 .Var2&amp;#125;&amp;#125;&amp;#123;&amp;#123;end&amp;#125;&amp;#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># go模板支持如下判断方式</span>
 
@@ -624,16 +624,16 @@ docker inspect --format <span class="token string">'{{or .State.Status .State.Re
 <span class="token comment" spellcheck="true"># 2) ne: 不等，即 arg1 != arg2。</span>
 <span class="token comment" spellcheck="true"># 3) lt: 小于，即 arg1 &lt; arg2。</span>
 <span class="token comment" spellcheck="true"># 4) le: 小于等于，即 arg1 &lt;= arg2。</span>
-<span class="token comment" spellcheck="true"># 5) gt: 大于，即 arg1 > arg2。</span>
-<span class="token comment" spellcheck="true"># 6) ge: 大于等于，即 arg1 >= arg2。</span>
+<span class="token comment" spellcheck="true"># 5) gt: 大于，即 arg1 &gt; arg2。</span>
+<span class="token comment" spellcheck="true"># 6) ge: 大于等于，即 arg1 &gt;= arg2。</span>
 
 <span class="token comment" spellcheck="true"># 输出所有已停止的容器名称：</span>
-docker inspect --format <span class="token string">'{{if ne 0.0 .State.ExitCode}}{{.Name}}{{end}}'</span> <span class="token variable"><span class="token variable">$(</span>docker <span class="token function">ps</span> -aq<span class="token variable">)</span></span>
-docker inspect --format <span class="token string">'{{if ne 0.0 .State.ExitCode}}{{.Name}}{{else}}该容器还在运行{{end}}'</span> <span class="token variable"><span class="token variable">$(</span>docker <span class="token function">ps</span> -aq<span class="token variable">)</span></span>
-docker inspect --format <span class="token string">'{{if ne 0.0 .State.ExitCode}}{{.Name}}{{else if .}}该容器还在运行{{end}}'</span> <span class="token variable"><span class="token variable">$(</span>docker <span class="token function">ps</span> -aq<span class="token variable">)</span></span>
+docker inspect --format <span class="token string">'&amp;#123;&amp;#123;if ne 0.0 .State.ExitCode&amp;#125;&amp;#125;&amp;#123;&amp;#123;.Name&amp;#125;&amp;#125;&amp;#123;&amp;#123;end&amp;#125;&amp;#125;'</span> <span class="token variable"><span class="token variable">$(</span>docker <span class="token function">ps</span> -aq<span class="token variable">)</span></span>
+docker inspect --format <span class="token string">'&amp;#123;&amp;#123;if ne 0.0 .State.ExitCode&amp;#125;&amp;#125;&amp;#123;&amp;#123;.Name&amp;#125;&amp;#125;&amp;#123;&amp;#123;else&amp;#125;&amp;#125;该容器还在运行&amp;#123;&amp;#123;end&amp;#125;&amp;#125;'</span> <span class="token variable"><span class="token variable">$(</span>docker <span class="token function">ps</span> -aq<span class="token variable">)</span></span>
+docker inspect --format <span class="token string">'&amp;#123;&amp;#123;if ne 0.0 .State.ExitCode&amp;#125;&amp;#125;&amp;#123;&amp;#123;.Name&amp;#125;&amp;#125;&amp;#123;&amp;#123;else if .&amp;#125;&amp;#125;该容器还在运行&amp;#123;&amp;#123;end&amp;#125;&amp;#125;'</span> <span class="token variable"><span class="token variable">$(</span>docker <span class="token function">ps</span> -aq<span class="token variable">)</span></span>
 
 <span class="token comment" spellcheck="true"># 输出所有已停止或配置了 Restarting 策略的容器名称</span>
-docker inspect --format <span class="token string">'{{if ne 0.0 .State.ExitCode}}{{.Name}}{{else if eq .State.Restarting true}}容器{{.Name}}配置了Restarting策略.{{else}}{{end}}'</span> <span class="token variable"><span class="token variable">$(</span>docker <span class="token function">ps</span> -aq<span class="token variable">)</span></span>
+docker inspect --format <span class="token string">'&amp;#123;&amp;#123;if ne 0.0 .State.ExitCode&amp;#125;&amp;#125;&amp;#123;&amp;#123;.Name&amp;#125;&amp;#125;&amp;#123;&amp;#123;else if eq .State.Restarting true&amp;#125;&amp;#125;容器&amp;#123;&amp;#123;.Name&amp;#125;&amp;#125;配置了Restarting策略.&amp;#123;&amp;#123;else&amp;#125;&amp;#125;&amp;#123;&amp;#123;end&amp;#125;&amp;#125;'</span> <span class="token variable"><span class="token variable">$(</span>docker <span class="token function">ps</span> -aq<span class="token variable">)</span></span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="5-打印信息-print"><a href="#5-打印信息-print" class="headerlink" title="5. 打印信息 - print"></a>5. 打印信息 - print</h2><p><code>docker --format</code> 默认调用 <code>go</code> 语言的 <code>print</code> 函数对模板中的字符串进行输出，而 <code>go</code>语言还有另外 <code>2</code> 种相似的内置函数，对比说明如下：</p>
@@ -651,30 +651,30 @@ docker inspect --format <span class="token string">'{{if ne 0.0 .State.ExitCode}
 </ul>
 </li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash">$ docker inspect --format <span class="token string">'{{.State.Pid}}{{.State.ExitCode}}'</span> <span class="token variable">$INSTANCE_ID</span>
+<pre class="line-numbers language-bash"><code class="language-bash">$ docker inspect --format <span class="token string">'&amp;#123;&amp;#123;.State.Pid&amp;#125;&amp;#125;&amp;#123;&amp;#123;.State.ExitCode&amp;#125;&amp;#125;'</span> <span class="token variable">$INSTANCE_ID</span>
 240390
 
-$ docker inspect --format <span class="token string">'{{print .State.Pid .State.ExitCode}}'</span> <span class="token variable">$INSTANCE_ID</span>
+$ docker inspect --format <span class="token string">'&amp;#123;&amp;#123;print .State.Pid .State.ExitCode&amp;#125;&amp;#125;'</span> <span class="token variable">$INSTANCE_ID</span>
 24039 0
 
-$ docker inspect --format <span class="token string">'{{.State.Pid}}{{println " 从这换行"}}{{.State.ExitCode}}'</span> <span class="token variable">$INSTANCE_ID</span>
+$ docker inspect --format <span class="token string">'&amp;#123;&amp;#123;.State.Pid&amp;#125;&amp;#125;&amp;#123;&amp;#123;println " 从这换行"&amp;#125;&amp;#125;&amp;#123;&amp;#123;.State.ExitCode&amp;#125;&amp;#125;'</span> <span class="token variable">$INSTANCE_ID</span>
 24039 从这换行
 0
 
-$ docker inspect --format <span class="token string">'{{printf "Pid:%d ExitCode:%d" .State.Pid .State.ExitCode}}'</span> <span class="token variable">$INSTANCE_ID</span>
+$ docker inspect --format <span class="token string">'&amp;#123;&amp;#123;printf "Pid:%d ExitCode:%d" .State.Pid .State.ExitCode&amp;#125;&amp;#125;'</span> <span class="token variable">$INSTANCE_ID</span>
 Pid:24039 ExitCode:0
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="6-管道"><a href="#6-管道" class="headerlink" title="6. 管道 - |"></a>6. 管道 - |</h2><p>管道 即 <code>pipeline</code> ，与 <code>shell</code> 中类似，可以是上下文的变量输出，也可以是函数通过管道传递的返回值。</p>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">{</span><span class="token punctuation">{</span>.Con <span class="token operator">|</span> markdown <span class="token operator">|</span> addlinks<span class="token punctuation">}</span><span class="token punctuation">}</span>
-<span class="token punctuation">{</span><span class="token punctuation">{</span>.Name <span class="token operator">|</span> <span class="token function">printf</span> <span class="token string">"%s"</span><span class="token punctuation">}</span><span class="token punctuation">}</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;&amp;#123;.Con | markdown | addlinks&amp;#125;&amp;#125;</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;&amp;#123;.Name | printf "%s"&amp;#125;&amp;#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="7-模板及函数"><a href="#7-模板及函数" class="headerlink" title="7. 模板及函数"></a>7. 模板及函数</h2><ul>
 <li><strong>len</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 内置函数 len 返回相应对象的长度</span>
-docker inspect --format <span class="token string">'{{len .Name}}'</span> <span class="token variable">$INSTANCE_ID</span>
+docker inspect --format <span class="token string">'&amp;#123;&amp;#123;len .Name&amp;#125;&amp;#125;'</span> <span class="token variable">$INSTANCE_ID</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>json</strong></li>
@@ -683,7 +683,7 @@ docker inspect --format <span class="token string">'{{len .Name}}'</span> <span 
 <span class="token comment" spellcheck="true"># 而该函数可以将结果格式化为压缩后的json格式数据</span>
 
 <span class="token comment" spellcheck="true"># 获取Config字段对应的json数据</span>
-docker inspect --format<span class="token operator">=</span><span class="token string">'{{json .Config}}'</span> <span class="token variable">$INSTANCE_ID</span>
+docker inspect --format<span class="token operator">=</span><span class="token string">'&amp;#123;&amp;#123;json .Config&amp;#125;&amp;#125;'</span> <span class="token variable">$INSTANCE_ID</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>join</strong></li>
@@ -692,7 +692,7 @@ docker inspect --format<span class="token operator">=</span><span class="token s
 <span class="token comment" spellcheck="true"># 操作对象必须是字符串数组</span>
 
 <span class="token comment" spellcheck="true"># 输出容器配置的所有Entrypoint参数，以 " , " 分隔</span>
-docker inspect --format <span class="token string">'{{join .Config.Entrypoint " , "}}'</span> <span class="token variable">$INSTANCE_ID</span>
+docker inspect --format <span class="token string">'&amp;#123;&amp;#123;join .Config.Entrypoint " , "&amp;#125;&amp;#125;'</span> <span class="token variable">$INSTANCE_ID</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>lower</strong></li>
@@ -700,7 +700,7 @@ docker inspect --format <span class="token string">'{{join .Config.Entrypoint " 
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将返回结果中的字母全部转换为小写</span>
 <span class="token comment" spellcheck="true"># 操作对象必须是字符串</span>
 
-docker inspect --format <span class="token string">"{{lower .Name}}"</span> <span class="token variable">$INSTANCE_ID</span>
+docker inspect --format <span class="token string">"&amp;#123;&amp;#123;lower .Name&amp;#125;&amp;#125;"</span> <span class="token variable">$INSTANCE_ID</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>upper</strong></li>
@@ -708,14 +708,14 @@ docker inspect --format <span class="token string">"{{lower .Name}}"</span> <spa
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将返回结果中的字母全部转换为大写</span>
 <span class="token comment" spellcheck="true"># 操作对象必须是字符串</span>
 
-docker inspect --format <span class="token string">"{{upper .Name}}"</span> <span class="token variable">$INSTANCE_ID</span>
+docker inspect --format <span class="token string">"&amp;#123;&amp;#123;upper .Name&amp;#125;&amp;#125;"</span> <span class="token variable">$INSTANCE_ID</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>title</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 将返回结果的首字母转换为大写</span>
 <span class="token comment" spellcheck="true"># 操作对象必须是字符串，而且不能是纯数字</span>
-docker inspect --format <span class="token string">"{{title .State.Status}}"</span> <span class="token variable">$INSTANCE_ID</span>
+docker inspect --format <span class="token string">"&amp;#123;&amp;#123;title .State.Status&amp;#125;&amp;#125;"</span> <span class="token variable">$INSTANCE_ID</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>split</strong></li>
@@ -724,7 +724,7 @@ docker inspect --format <span class="token string">"{{title .State.Status}}"</sp
 <span class="token comment" spellcheck="true"># 操作对象必须是字符串且不能是纯数字</span>
 <span class="token comment" spellcheck="true"># 同时，字符串中必须包含相应的分隔符，否则会直接忽略操作</span>
 
-docker inspect --format <span class="token string">'{{split .HostsPath "/"}}'</span> <span class="token variable">$INSTANCE_ID</span>
+docker inspect --format <span class="token string">'&amp;#123;&amp;#123;split .HostsPath "/"&amp;#125;&amp;#125;'</span> <span class="token variable">$INSTANCE_ID</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="8-常用命令"><a href="#8-常用命令" class="headerlink" title="8. 常用命令"></a>8. 常用命令</h2><pre class="line-numbers language-bash"><code class="language-bash"><span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker ps</span>
@@ -735,82 +735,82 @@ CONTAINER ID        IMAGE                            COMMAND                  CR
 
 
 <span class="token comment" spellcheck="true"># 1) 获取容器的IP (后面使用容器名或容器ID都可以)</span>
-<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -q)</span>
+<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='&amp;#123;&amp;#123;range .NetworkSettings.Networks&amp;#125;&amp;#125;&amp;#123;&amp;#123;.IPAddress&amp;#125;&amp;#125;&amp;#123;&amp;#123;end&amp;#125;&amp;#125;' $(docker ps -q)</span>
 192.10.160.193
 173.20.19.128
 17.16.10.128
 
-<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' docker-test1</span>
+<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='&amp;#123;&amp;#123;range .NetworkSettings.Networks&amp;#125;&amp;#125;&amp;#123;&amp;#123;.IPAddress&amp;#125;&amp;#125;&amp;#123;&amp;#123;end&amp;#125;&amp;#125;' docker-test1</span>
 17.16.10.128
 
 
 <span class="token comment" spellcheck="true"># 2) 获取容器的MAC地址</span>
-<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='{{range .NetworkSettings.Networks}}{{.MacAddress}}{{end}}' $(docker ps -a -q)</span>
+<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='&amp;#123;&amp;#123;range .NetworkSettings.Networks&amp;#125;&amp;#125;&amp;#123;&amp;#123;.MacAddress&amp;#125;&amp;#125;&amp;#123;&amp;#123;end&amp;#125;&amp;#125;' $(docker ps -a -q)</span>
 ee:ee:ee:ee:ee:ee
 ee:ee:ee:ee:ee:ee
 ee:ee:ee:ee:ee:ee
 
-<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='{{range .NetworkSettings.Networks}}{{.MacAddress}}{{end}}' docker-test1</span>
+<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='&amp;#123;&amp;#123;range .NetworkSettings.Networks&amp;#125;&amp;#125;&amp;#123;&amp;#123;.MacAddress&amp;#125;&amp;#125;&amp;#123;&amp;#123;end&amp;#125;&amp;#125;' docker-test1</span>
 ee:ee:ee:ee:ee:ee
 
 
 <span class="token comment" spellcheck="true"># 3) 获取容器Name</span>
-<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='{{.Name}}' $(docker ps -aq)</span>
+<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='&amp;#123;&amp;#123;.Name&amp;#125;&amp;#125;' $(docker ps -aq)</span>
 /docker-test111
 /docker-test11
 /docker-test1
 /calico-node
 
-<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='{{.Name}}' $(docker ps -aq)|cut -d"/" -f2</span>
+<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='&amp;#123;&amp;#123;.Name&amp;#125;&amp;#125;' $(docker ps -aq)|cut -d"/" -f2</span>
 docker-test111
 docker-test11
 docker-test1
 
-<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='{{.Name}}' docker-test1</span>
+<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='&amp;#123;&amp;#123;.Name&amp;#125;&amp;#125;' docker-test1</span>
 /docker-test1
 
-<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='{{.Name}}' docker-test1|cut -d"/" -f2</span>
+<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='&amp;#123;&amp;#123;.Name&amp;#125;&amp;#125;' docker-test1|cut -d"/" -f2</span>
 docker-test1
 
 
 <span class="token comment" spellcheck="true"># 4) 获取容器Hostname</span>
-<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format '{{ .Config.Hostname }}' $(docker ps -q)</span>
+<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format '&amp;#123;&amp;#123; .Config.Hostname &amp;#125;&amp;#125;' $(docker ps -q)</span>
 2ed603e52896
 24e6607534f1
 19be6b264b6e
 
-<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format '{{ .Config.Hostname }}' docker-test1</span>
+<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format '&amp;#123;&amp;#123; .Config.Hostname &amp;#125;&amp;#125;' docker-test1</span>
 19be6b264b6e
 
 
 <span class="token comment" spellcheck="true"># 5) Hostname Name IP</span>
-<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format 'Hostname:{{ .Config.Hostname }}  Name:{{.Name}} IP:{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -q)</span>
+<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format 'Hostname:&amp;#123;&amp;#123; .Config.Hostname &amp;#125;&amp;#125;  Name:&amp;#123;&amp;#123;.Name&amp;#125;&amp;#125; IP:&amp;#123;&amp;#123;range .NetworkSettings.Networks&amp;#125;&amp;#125;&amp;#123;&amp;#123;.IPAddress&amp;#125;&amp;#125;&amp;#123;&amp;#123;end&amp;#125;&amp;#125;' $(docker ps -q)</span>
 Hostname:2ed603e52896  Name:/docker-test111 IP:192.10.160.193
 Hostname:24e6607534f1  Name:/docker-test11 IP:173.20.19.128
 Hostname:19be6b264b6e  Name:/docker-test1 IP:17.16.10.128
 
-<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format 'Hostname:{{ .Config.Hostname }}  Name:{{.Name}} IP:{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' docker-test1</span>
+<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format 'Hostname:&amp;#123;&amp;#123; .Config.Hostname &amp;#125;&amp;#125;  Name:&amp;#123;&amp;#123;.Name&amp;#125;&amp;#125; IP:&amp;#123;&amp;#123;range .NetworkSettings.Networks&amp;#125;&amp;#125;&amp;#123;&amp;#123;.IPAddress&amp;#125;&amp;#125;&amp;#123;&amp;#123;end&amp;#125;&amp;#125;' docker-test1</span>
 Hostname:19be6b264b6e  Name:/docker-test1 IP:17.16.10.128
 
 
 <span class="token comment" spellcheck="true"># 6) 获取容器的log path</span>
-<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='{{.LogPath}}' `docker ps -a -q`</span>
-<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='{{.LogPath}}' docker-test1</span>
+<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='&amp;#123;&amp;#123;.LogPath&amp;#125;&amp;#125;' `docker ps -a -q`</span>
+<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='&amp;#123;&amp;#123;.LogPath&amp;#125;&amp;#125;' docker-test1</span>
 
 
 <span class="token comment" spellcheck="true"># 7) 获取容器的image镜像名称</span>
-<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='{{.Config.Image}}' `docker ps -a -q`</span>
+<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='&amp;#123;&amp;#123;.Config.Image&amp;#125;&amp;#125;' `docker ps -a -q`</span>
 172.16.60.214:5000/kevin_nginx
 172.16.60.214:5000/kevin_nginx
 172.16.60.214:5000/kevin_nginx
 quay.io/calico/node:v2.6.10
-<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='{{.Config.Image}}' docker-test1</span>
+<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='&amp;#123;&amp;#123;.Config.Image&amp;#125;&amp;#125;' docker-test1</span>
 172.16.60.214:5000/kevin_nginx
 
 
 <span class="token comment" spellcheck="true"># 8) 获取容器绑定的端口(port bindings)</span>
-<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}} {{$p}} -> {{(index $conf 0).HostPort}} {{end}}' `docker ps -a -q`</span>
-<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}} {{$p}} -> {{(index $conf 0).HostPort}} {{end}}' docker-test1</span>
+<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='&amp;#123;&amp;#123;range $p, $conf := .NetworkSettings.Ports&amp;#125;&amp;#125; &amp;#123;&amp;#123;$p&amp;#125;&amp;#125; -&gt; &amp;#123;&amp;#123;(index $conf 0).HostPort&amp;#125;&amp;#125; &amp;#123;&amp;#123;end&amp;#125;&amp;#125;' `docker ps -a -q`</span>
+<span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect --format='&amp;#123;&amp;#123;range $p, $conf := .NetworkSettings.Ports&amp;#125;&amp;#125; &amp;#123;&amp;#123;$p&amp;#125;&amp;#125; -&gt; &amp;#123;&amp;#123;(index $conf 0).HostPort&amp;#125;&amp;#125; &amp;#123;&amp;#123;end&amp;#125;&amp;#125;' docker-test1</span>
 
 
 <span class="token comment" spellcheck="true"># 9) 获取service实例的Ip</span>
@@ -820,14 +820,14 @@ t71gqufekv2o  my-test.1  172.16.60.214:5000/kevin_nginx:latest  swarm-node2     
 9cuq2yf10d60 my-test.2  172.16.60.214:5000/kevin_nginx:latest  swarm-manager-node  Running   Running 16 seconds ago
 srt2yo817kpv  my-test.3  172.16.60.214:5000/kevin_nginx:latest  swarm-node1               Running    Running 16 seconds ago
 
-<span class="token punctuation">[</span>root@swarm-manager-node ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect ` docker service ps my-test -q` --format '{{range .NetworksAttachments}}{{.Addresses}}{{end}}' | cut -d '[' -f2|cut -d ']' -f1</span>
+<span class="token punctuation">[</span>root@swarm-manager-node ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect ` docker service ps my-test -q` --format '&amp;#123;&amp;#123;range .NetworksAttachments&amp;#125;&amp;#125;&amp;#123;&amp;#123;.Addresses&amp;#125;&amp;#125;&amp;#123;&amp;#123;end&amp;#125;&amp;#125;' | cut -d '[' -f2|cut -d ']' -f1</span>
 10.255.0.7/16
 10.255.0.8/16
 10.255.0.9/16
 
 
 <span class="token comment" spellcheck="true"># 10) 获取service示例的container ID  (获取的是ID的全称,一般只要取ID前面12个字符就可以了)</span>
-<span class="token punctuation">[</span>root@swarm-manager-node ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect ` docker service ps my-test -q` --format '{{ .Status.ContainerStatus.ContainerID }}'</span>
+<span class="token punctuation">[</span>root@swarm-manager-node ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># docker inspect ` docker service ps my-test -q` --format '&amp;#123;&amp;#123; .Status.ContainerStatus.ContainerID &amp;#125;&amp;#125;'</span>
 c6c18a74a465163757fe928fec9e633223200f92d1c59e5d2d77eabfaa5ae93a
 5f558bb014ea3d3eef5c8d4bd70e2e3048d7fc6725538303be960ac658d93b32
 dde578bf60190a63ed5c8c4a9f5a3044566a159e8debe8717342e263c6199f26
@@ -1376,7 +1376,7 @@ dde578bf60190a63ed5c8c4a9f5a3044566a159e8debe8717342e263c6199f26
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1196.5k</span>
+                        class="white-color">1218k</span>
             
             
             

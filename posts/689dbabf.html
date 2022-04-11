@@ -465,14 +465,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    5.8k
+                    6k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    23 分
+                    25 分
                 </div>
                 
 
@@ -627,10 +627,10 @@ $ <span class="token function">sudo</span> nginx -g <span class="token string">"
 <p>可以通过<code>debug_connection</code>，设置只针对选定的客户端地址开启调试日志。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">error_log</span>  <span class="token operator">/</span>path<span class="token operator">/</span>to<span class="token operator">/</span>log<span class="token punctuation">;</span>
 
-<span class="token keyword">events</span> <span class="token punctuation">{</span>
+<span class="token keyword">events</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">debug_connection</span>   <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">1.1</span><span class="token punctuation">;</span>
     <span class="token keyword">debug_connection</span>   <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">10.0</span><span class="token operator">/</span><span class="token number">24</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>当然，还可以设置日志的轮转缓冲区大小。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">error_log</span> memory<span class="token punctuation">:</span>32m debug<span class="token punctuation">;</span>
@@ -678,82 +678,82 @@ $ <span class="token function">sudo</span> nginx -g <span class="token string">"
 </ul>
 <p>在这个配置中，<code>Nginx</code>仅仅检查请求的<code>Host</code>头以决定该请求应由哪个虚拟主机来处理。如果<code>Host</code>头没有匹配任意一个虚拟主机，或者请求中根本没有包含<code>Host</code>头，那<code>Nginx</code>会将请求分发到定义在此端口上的默认虚拟主机。</p>
 <p><strong>注释：</strong><code>default_server</code>参数从<code>0.8.21</code>版开始可用，在之前的版本中，应该使用<code>default</code>参数代替。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>      <span class="token number">80</span> default_server<span class="token punctuation">;</span>
     <span class="token keyword">server_name</span> example<span class="token punctuation">.</span>org www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>org<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
-<span class="token keyword">server</span> <span class="token punctuation">{</span>
+<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>      <span class="token number">80</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span> example<span class="token punctuation">.</span>net www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>net<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
-<span class="token keyword">server</span> <span class="token punctuation">{</span>
+<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>      <span class="token number">80</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span> example<span class="token punctuation">.</span>com www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[2] 防止处理未定义主机名的请求</strong></li>
 </ul>
 <p>如果不允许请求中缺少 <code>Host</code> 头，可以定义如下主机，丢弃这些请求。</p>
 <p>在这里，我们设置主机名为空字符串以匹配未定义 <code>Host</code> 头的请求，而且返回了一个 <code>Nginx</code> 特有的非 <code>HTTP</code> 标准的返回码 <code>444</code>，它可以用来关闭连接。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>       <span class="token number">80</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span>  <span class="token string">""</span><span class="token punctuation">;</span>
     <span class="token keyword">return</span>       <span class="token number">444</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[3] 基于域名和 IP 混合的虚拟主机</strong></li>
 </ul>
 <p>这个配置中，<code>Nginx</code> 首先测试请求的 <code>IP</code> 地址和端口是否匹配某个 <code>server</code> 配置块中的 <code>listen</code> 指令配置。接着 <code>Nginx</code> 继续测试请求的 <code>Host</code> 头是否匹配这个 <code>server</code> 块中的某个 <code>server_name</code> 的值。如果主机名没有找到，<code>Nginx</code>将把这个请求交给默认虚拟主机处理。</p>
 <p>默认服务器是监听端口的属性，所以不同的监听端口可以设置不同的默认服务器。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>      <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">1.1</span><span class="token punctuation">:</span><span class="token number">80</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span> example<span class="token punctuation">.</span>org www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>org<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
-<span class="token keyword">server</span> <span class="token punctuation">{</span>
+<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>      <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">1.1</span><span class="token punctuation">:</span><span class="token number">80</span> default_server<span class="token punctuation">;</span>
     <span class="token keyword">server_name</span> example<span class="token punctuation">.</span>net www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>net<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
-<span class="token keyword">server</span> <span class="token punctuation">{</span>
+<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>      <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">1.2</span><span class="token punctuation">:</span><span class="token number">80</span> default_server<span class="token punctuation">;</span>
     <span class="token keyword">server_name</span> example<span class="token punctuation">.</span>com www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[4] 简单 PHP 站点配置</strong></li>
 </ul>
 <p>首先，<code>Nginx</code> 使用前缀匹配找出最准确的 <code>location</code>，这一步 <code>Nginx</code> 会忽略 <code>location</code> 在配置文件出现的顺序。</p>
 <p>上面的配置中，唯一的前缀匹配 <code>location</code> 是 <code>"/"</code>，而且因为它可以匹配任意的请求，所以被作为最后一个选择。接着，<code>Nginx</code> 继续按照配置中的顺序依次匹配正则表达式的 <code>location</code>，匹配到第一个正则表达式后停止搜索。匹配到的 <code>location</code> 将被使用。如果没有匹配到正则表达式的 <code>location</code>，则使用刚刚找到的最准确的前缀匹配的 <code>location</code>。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>      <span class="token number">80</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span> example<span class="token punctuation">.</span>org www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>org<span class="token punctuation">;</span>
     <span class="token keyword">root</span>        <span class="token operator">/</span>data<span class="token operator">/</span>www<span class="token punctuation">;</span>
 
-    <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+    <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
         <span class="token keyword">index</span>   <span class="token keyword">index</span><span class="token punctuation">.</span>html <span class="token keyword">index</span><span class="token punctuation">.</span>php<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
+    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
-    <span class="token keyword">location</span> <span class="token operator">~</span><span class="token operator">*</span> \<span class="token punctuation">.</span><span class="token punctuation">(</span>gif<span class="token operator">|</span>jpg<span class="token operator">|</span>png<span class="token punctuation">)</span>$ <span class="token punctuation">{</span>
+    <span class="token keyword">location</span> <span class="token operator">~</span><span class="token operator">*</span> \<span class="token punctuation">.</span><span class="token punctuation">(</span>gif<span class="token operator">|</span>jpg<span class="token operator">|</span>png<span class="token punctuation">)</span>$ <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
         <span class="token keyword">expires</span> 30d<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
+    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
-    <span class="token keyword">location</span> <span class="token operator">~</span> \<span class="token punctuation">.</span>php$ <span class="token punctuation">{</span>
+    <span class="token keyword">location</span> <span class="token operator">~</span> \<span class="token punctuation">.</span>php$ <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
         <span class="token keyword">fastcgi_pass</span>  localhost<span class="token punctuation">:</span><span class="token number">9000</span><span class="token punctuation">;</span>
         <span class="token keyword">fastcgi_param</span> SCRIPT_FILENAME <span class="token variable">$document_root</span><span class="token variable">$fastcgi_script_name</span><span class="token punctuation">;</span>
         <span class="token keyword">include</span>       fastcgi_params<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>请注意所有 <code>location</code> 匹配测试只使用请求的 <code>URI</code> 部分，而不使用参数部分，这是因为写参数的方法很多。除此以外，任何人在请求串中都可以随意添加字符串。</li>
@@ -811,29 +811,29 @@ $ <span class="token function">sudo</span> nginx -g <span class="token string">"
 <li>最长的以星号结束的通配符名字：<code>mail.*</code></li>
 <li>第一个匹配的正则表达式名字，按在配置文件中出现的顺序</li>
 </ol>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>       <span class="token number">80</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span>  example<span class="token punctuation">.</span>org  www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>org<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
-<span class="token keyword">server</span> <span class="token punctuation">{</span>
+<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>       <span class="token number">80</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span>  <span class="token operator">*</span><span class="token punctuation">.</span>example<span class="token punctuation">.</span>org<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
-<span class="token keyword">server</span> <span class="token punctuation">{</span>
+<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>       <span class="token number">80</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span>  mail<span class="token punctuation">.</span><span class="token operator">*</span><span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
-<span class="token keyword">server</span> <span class="token punctuation">{</span>
+<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>       <span class="token number">80</span><span class="token punctuation">;</span>
-    <span class="token keyword">server_name</span>  <span class="token operator">~</span><span class="token operator">^</span><span class="token punctuation">(</span><span class="token operator">?</span><span class="token operator">&lt;</span><span class="token keyword">user</span><span class="token operator">></span><span class="token punctuation">.</span><span class="token operator">+</span><span class="token punctuation">)</span>\<span class="token punctuation">.</span>example\<span class="token punctuation">.</span>net$<span class="token punctuation">;</span>
+    <span class="token keyword">server_name</span>  <span class="token operator">~</span><span class="token operator">^</span><span class="token punctuation">(</span><span class="token operator">?</span><span class="token operator">&lt;</span><span class="token keyword">user</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token operator">+</span><span class="token punctuation">)</span>\<span class="token punctuation">.</span>example\<span class="token punctuation">.</span>net$<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>通配符名字</strong></li>
@@ -845,17 +845,17 @@ $ <span class="token function">sudo</span> nginx -g <span class="token string">"
 </ul>
 <p><code>Nginx</code>使用的正则表达式兼容<code>PCRE</code>，虚拟主机名必须以波浪线<code>~</code>起始。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server_name</span>  <span class="token operator">~</span><span class="token operator">^</span>www\d<span class="token operator">+</span>\<span class="token punctuation">.</span>example\<span class="token punctuation">.</span>net$<span class="token punctuation">;</span>
-<span class="token keyword">server_name</span>  <span class="token string">"~^(?&lt;name>\w\d{1,3}+)\.example\.net$"</span><span class="token punctuation">;</span>
+<span class="token keyword">server_name</span>  <span class="token string">"~^(?&lt;name&gt;\w\d&amp;#123;1,3&amp;#125;+)\.example\.net$"</span><span class="token punctuation">;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <p>而且还支持正则表达式捕获，如<code>?&lt;name&gt;</code>/<code>?'name'</code>(兼容 Perl 5.10 语法)、<code>?P&lt;name&gt;</code>(兼容 Python 语法)。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># perl</span>
-<span class="token keyword">server</span> <span class="token punctuation">{</span>
-    <span class="token keyword">server_name</span>   <span class="token operator">~</span><span class="token operator">^</span><span class="token punctuation">(</span>www\<span class="token punctuation">.</span><span class="token punctuation">)</span><span class="token operator">?</span><span class="token punctuation">(</span><span class="token operator">?</span><span class="token operator">&lt;</span>domain<span class="token operator">></span><span class="token punctuation">.</span><span class="token operator">+</span><span class="token punctuation">)</span>$<span class="token punctuation">;</span>
+<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token keyword">server_name</span>   <span class="token operator">~</span><span class="token operator">^</span><span class="token punctuation">(</span>www\<span class="token punctuation">.</span><span class="token punctuation">)</span><span class="token operator">?</span><span class="token punctuation">(</span><span class="token operator">?</span><span class="token operator">&lt;</span>domain<span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token operator">+</span><span class="token punctuation">)</span>$<span class="token punctuation">;</span>
 
-    <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+    <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
         <span class="token keyword">root</span>   <span class="token operator">/</span>sites<span class="token operator">/</span><span class="token variable">$domain</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>性能优化</strong></li>
@@ -864,18 +864,18 @@ $ <span class="token function">sudo</span> nginx -g <span class="token string">"
 <p>因为名字是按照域名的节来搜索的，所以<strong>搜索通配符名字</strong>的哈希表比搜索<strong>确切名字</strong>的哈希表慢。<strong>正则表达式</strong>是一个一个串行的测试，所以是最慢的，而且不可扩展。</p>
 <p>鉴于以上原因，请尽可能使用确切的名字。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 效率更高</span>
-<span class="token keyword">server</span> <span class="token punctuation">{</span>
+<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>       <span class="token number">80</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span>  example<span class="token punctuation">.</span>org  www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>org  <span class="token operator">*</span><span class="token punctuation">.</span>example<span class="token punctuation">.</span>org<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
 <span class="token comment" spellcheck="true"># 方法简单</span>
-<span class="token keyword">server</span> <span class="token punctuation">{</span>
+<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>       <span class="token number">80</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span>  <span class="token punctuation">.</span>example<span class="token punctuation">.</span>org<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>如果定义了大量名字，或者定义了非常长的名字，那可能需要在<code>http</code>配置块中使用<code>server_names_hash_max_size</code>和<code>server_names_hash_bucket_size</code>指令进行调整。</li>
@@ -885,10 +885,10 @@ could not build the server_names_hash<span class="token punctuation">,</span>
 you should increase <span class="token keyword">server_names_hash_bucket_size</span><span class="token punctuation">:</span> <span class="token number">32</span>
 
 <span class="token comment" spellcheck="true"># 解决方法</span>
-<span class="token keyword">http</span> <span class="token punctuation">{</span>
+<span class="token keyword">http</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">server_names_hash_bucket_size</span>  <span class="token number">64</span><span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># nginx显示下面错误信息</span>
 could not build the server_names_hash<span class="token punctuation">,</span>
@@ -896,11 +896,11 @@ you should increase either <span class="token keyword">server_names_hash_max_siz
 or <span class="token keyword">server_names_hash_bucket_size</span><span class="token punctuation">:</span> <span class="token number">32</span>
 
 <span class="token comment" spellcheck="true"># 解决方法</span>
-<span class="token keyword">http</span> <span class="token punctuation">{</span>
+<span class="token keyword">http</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">server_names_hash_max_size</span><span class="token punctuation">:</span> <span class="token number">512</span>
     <span class="token keyword">server_names_hash_bucket_size</span>  <span class="token number">64</span><span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="8-HTTP-负载均衡"><a href="#8-HTTP-负载均衡" class="headerlink" title="8. HTTP 负载均衡"></a>8. HTTP 负载均衡</h2><p>负载均衡是一个常用的跨多个应用程序实例的技术，能够优化资源利用率、减少延迟、最大化吞吐量以及容错机制。</p>
@@ -921,43 +921,43 @@ or <span class="token keyword">server_names_hash_bucket_size</span><span class="
 </li>
 </ul>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 定义为轮转的负载均衡</span>
-<span class="token keyword">http</span> <span class="token punctuation">{</span>
-    <span class="token keyword">upstream</span> myapp1 <span class="token punctuation">{</span>
+<span class="token keyword">http</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token keyword">upstream</span> myapp1 <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
         <span class="token keyword">server</span> srv1<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
         <span class="token keyword">server</span> srv2<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
         <span class="token keyword">server</span> srv3<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
+    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
-    <span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
         <span class="token keyword">listen</span> <span class="token number">80</span><span class="token punctuation">;</span>
-        <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+        <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
             <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>myapp1<span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+        <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 定义为最少连接的负载均衡</span>
-<span class="token keyword">upstream</span> myapp1 <span class="token punctuation">{</span>
+<span class="token keyword">upstream</span> myapp1 <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     least_conn<span class="token punctuation">;</span>
     <span class="token keyword">server</span> srv1<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
     <span class="token keyword">server</span> srv2<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
     <span class="token keyword">server</span> srv3<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 定义为会话持久性的负载均衡</span>
-<span class="token keyword">upstream</span> myapp1 <span class="token punctuation">{</span>
+<span class="token keyword">upstream</span> myapp1 <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">ip_hash</span><span class="token punctuation">;</span>
     <span class="token keyword">server</span> srv1<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
     <span class="token keyword">server</span> srv2<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
     <span class="token keyword">server</span> srv3<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 定义为加权的负载均衡的负载均衡</span>
-<span class="token keyword">upstream</span> myapp1 <span class="token punctuation">{</span>
+<span class="token keyword">upstream</span> myapp1 <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">server</span> srv1<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com weight<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">;</span>
     <span class="token keyword">server</span> srv2<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
     <span class="token keyword">server</span> srv3<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>健康监测</strong></li>
@@ -965,7 +965,7 @@ or <span class="token keyword">server_names_hash_bucket_size</span><span class="
 <p><code>Nginx</code>的反向代理实现了服务器的健康监测(<code>in-band or passive</code>)机制。如果特定服务器因为错误导致无法响应，<code>Nginx</code>将其标记为<code>failed</code>，之后尽量避免后续入站的请求再去请求该服务器。</p>
 <p><code>max_fails</code>指令用于设定在失败超时时间之内，与服务器连接的失败次数。默认<code>max_fails</code>指令的值为<code>1</code>，当值为<code>0</code>的时候，将不会此服务器做健康监测。</p>
 <p><code>fail_timeout</code>指令用于定义多长时间将服务器标记为<code>failed</code>状态。之后，<code>Nginx</code>会定时去监测该<code>failed</code>状态的服务器，如果监测成功了，将其标记为<code>live</code>状态。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">upstream</span> dynamic <span class="token punctuation">{</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">upstream</span> dynamic <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     zone upstream_dynamic 64k<span class="token punctuation">;</span>
 
     <span class="token keyword">server</span> backend1<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com      weight<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">;</span>
@@ -976,21 +976,21 @@ or <span class="token keyword">server_names_hash_bucket_size</span><span class="
 
     <span class="token keyword">server</span> backup1<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">:</span><span class="token number">8080</span>  backup<span class="token punctuation">;</span>
     <span class="token keyword">server</span> backup2<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">:</span><span class="token number">8080</span>  backup<span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
-<span class="token keyword">server</span> <span class="token punctuation">{</span>
-    <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
         <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>dynamic<span class="token punctuation">;</span>
         health_check<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="9-配置-HTTPS-服务器"><a href="#9-配置-HTTPS-服务器" class="headerlink" title="9. 配置 HTTPS 服务器"></a>9. 配置 HTTPS 服务器</h2><ul>
 <li><strong>基本配置</strong></li>
 </ul>
 <p>配置<code>HTTPS</code>主机，必须在<code>server</code>配置块中打开<code>SSL</code>协议，还需要指定服务器端证书和密钥文件的位置。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>              <span class="token number">443</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span>         www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
     <span class="token keyword">ssl</span>                 on<span class="token punctuation">;</span>
@@ -999,7 +999,7 @@ or <span class="token keyword">server_names_hash_bucket_size</span><span class="
     <span class="token keyword">ssl_protocols</span>       SSLv3 TLSv1 TLSv1<span class="token number">.1</span> TLSv1<span class="token number">.2</span><span class="token punctuation">;</span>  <span class="token comment" spellcheck="true"># 支持协议</span>
     <span class="token keyword">ssl_ciphers</span>         HIGH<span class="token punctuation">:</span><span class="token operator">!</span>aNULL<span class="token punctuation">:</span><span class="token operator">!</span>MD5<span class="token punctuation">;</span>  <span class="token comment" spellcheck="true"># 加密方式</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>服务器证书是公开的，会被传送到每一个连接到服务器的客户端。而私钥不是公开的，需要存放在访问受限的文件中，当然<code>Nginx</code>主进程必须有读取密钥的权限。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 私钥和证书可以存放在同一个文件中</span>
@@ -1022,11 +1022,11 @@ or <span class="token keyword">server_names_hash_bucket_size</span><span class="
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 针对4核系统的配置优化的例子，使用10M的共享会话缓存</span>
 <span class="token keyword">worker_processes</span>  <span class="token number">4</span><span class="token punctuation">;</span>
 
-<span class="token keyword">http</span> <span class="token punctuation">{</span>
+<span class="token keyword">http</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">ssl_session_cache</span>    shared<span class="token punctuation">:</span><span class="token keyword">SSL</span><span class="token punctuation">:</span>10m<span class="token punctuation">;</span>
     <span class="token keyword">ssl_session_timeout</span>  10m<span class="token punctuation">;</span>
 
-    <span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
         <span class="token keyword">listen</span>              <span class="token number">443</span><span class="token punctuation">;</span>
         <span class="token keyword">server_name</span>         www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
         <span class="token keyword">keepalive_timeout</span>   <span class="token number">70</span><span class="token punctuation">;</span>
@@ -1037,8 +1037,8 @@ or <span class="token keyword">server_names_hash_bucket_size</span><span class="
         <span class="token keyword">ssl_protocols</span>       SSLv3 TLSv1 TLSv1<span class="token number">.1</span> TLSv1<span class="token number">.2</span><span class="token punctuation">;</span>
         <span class="token keyword">ssl_ciphers</span>         HIGH<span class="token punctuation">:</span><span class="token operator">!</span>aNULL<span class="token punctuation">:</span><span class="token operator">!</span>MD5<span class="token punctuation">;</span>
         <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>SSL 证书链</strong></li>
@@ -1046,17 +1046,17 @@ or <span class="token keyword">server_names_hash_bucket_size</span><span class="
 <p>有些浏览器不接受那些众所周知的证书认证机构签署的证书，而另外一些浏览器却接受它们。这是由于证书签发使用了一些中间认证机构，这些中间机构被众所周知的证书认证机构授权代为签发证书，但是它们自己却不被广泛认知，所以有些客户端不予识别。</p>
 <p>针对这种情况，证书认证机构提供一个<strong>证书链</strong>的包裹，用来声明众所周知的认证机构和自己的关系，需要将这个证书链包裹与服务器证书合并成一个文件。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 在这个文件里，服务器证书需要出现在认证方证书链的前面</span>
-$ cat www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">.</span>crt bundle<span class="token punctuation">.</span>crt <span class="token operator">></span> www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">.</span>chained<span class="token punctuation">.</span>crt
+$ cat www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">.</span>crt bundle<span class="token punctuation">.</span>crt <span class="token operator">&gt;</span> www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">.</span>chained<span class="token punctuation">.</span>crt
 
 <span class="token comment" spellcheck="true"># 这个文件需要使用ssl_certificate指令来引用</span>
-<span class="token keyword">server</span> <span class="token punctuation">{</span>
+<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>              <span class="token number">443</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span>         www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
     <span class="token keyword">ssl</span>                 on<span class="token punctuation">;</span>
     <span class="token keyword">ssl_certificate</span>     www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">.</span>chained<span class="token punctuation">.</span>crt<span class="token punctuation">;</span>
     <span class="token keyword">ssl_certificate_key</span> www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">.</span>key<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>如果服务器证书和认证方证书链合并时顺序弄错了，<code>Nginx</code>就不能正常启动，而且会显示下面的错误信息。因为<code>Nginx</code>首先需要用私钥去解密服务器证书，而遇到的却是认证方的证书。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token function">SSL_CTX_use_PrivateKey_file</span><span class="token punctuation">(</span><span class="token string">" ... /www.example.com.key"</span><span class="token punctuation">)</span> <span class="token function">failed</span>
@@ -1092,14 +1092,14 @@ Certificate chain
 <li><strong>合并 HTTP/HTTPS 主机</strong></li>
 </ul>
 <p>如果<code>HTTP</code>和<code>HTTPS</code>虚拟主机的功能是一致的，可以配置一个虚拟主机，既处理<code>HTTP</code>请求，又处理<code>HTTPS</code>请求。配置的方法是删除<code>ssl on</code>的指令，并在<code>*:443</code>端口添加参数<code>ssl</code>。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>              <span class="token number">80</span><span class="token punctuation">;</span>
     <span class="token keyword">listen</span>              <span class="token number">443</span> <span class="token keyword">ssl</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span>         www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
     <span class="token keyword">ssl_certificate</span>     www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">.</span>crt<span class="token punctuation">;</span>
     <span class="token keyword">ssl_certificate_key</span> www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">.</span>key<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
 <span class="token comment" spellcheck="true"># 在0.8.21版本以前，只有添加了default参数的监听端口才能添加ssl参数</span>
 <span class="token keyword">listen</span>  <span class="token number">443</span>  default <span class="token keyword">ssl</span><span class="token punctuation">;</span>
@@ -1108,39 +1108,39 @@ Certificate chain
 <li><strong>基于名字的 HTTPS 主机</strong></li>
 </ul>
 <p>如果在同一个 IP 上配置多个<code>HTTPS</code>主机，会出现一个很普遍的问题。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>          <span class="token number">443</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span>     www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
     <span class="token keyword">ssl</span>             on<span class="token punctuation">;</span>
     <span class="token keyword">ssl_certificate</span> www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">.</span>crt<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
-<span class="token keyword">server</span> <span class="token punctuation">{</span>
+<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>          <span class="token number">443</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span>     www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>org<span class="token punctuation">;</span>
     <span class="token keyword">ssl</span>             on<span class="token punctuation">;</span>
     <span class="token keyword">ssl_certificate</span> www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>org<span class="token punctuation">.</span>crt<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>使用上面的配置，不论浏览器请求哪个主机，都只会收到默认主机<code>www.example.com</code>的证书。这是由<code>SSL</code>协议本身的行为引起的——先建立<code>SSL</code>连接，再发送<code>HTTP</code>请求，所以<code>Nginx</code>建立<code>SSL</code>连接时不知道所请求主机的名字，因此它只会返回默认主机的证书。</p>
 <p>最古老的也是最稳定的解决方法就是每个<code>HTTPS</code>主机使用不同的 IP 地址。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>          <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">1.1</span><span class="token punctuation">:</span><span class="token number">443</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span>     www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
     <span class="token keyword">ssl</span>             on<span class="token punctuation">;</span>
     <span class="token keyword">ssl_certificate</span> www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">.</span>crt<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
-<span class="token keyword">server</span> <span class="token punctuation">{</span>
+<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>          <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">1.2</span><span class="token punctuation">:</span><span class="token number">443</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span>     www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>org<span class="token punctuation">;</span>
     <span class="token keyword">ssl</span>             on<span class="token punctuation">;</span>
     <span class="token keyword">ssl_certificate</span> www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>org<span class="token punctuation">.</span>crt<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>带有多个主机名的 SSL 证书</strong></li>
@@ -1151,19 +1151,19 @@ Certificate chain
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">ssl_certificate</span>      common<span class="token punctuation">.</span>crt<span class="token punctuation">;</span>
 <span class="token keyword">ssl_certificate_key</span>  common<span class="token punctuation">.</span>key<span class="token punctuation">;</span>
 
-<span class="token keyword">server</span> <span class="token punctuation">{</span>
+<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>          <span class="token number">443</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span>     www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
     <span class="token keyword">ssl</span>             on<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
-<span class="token keyword">server</span> <span class="token punctuation">{</span>
+<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>          <span class="token number">443</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span>     www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>org<span class="token punctuation">;</span>
     <span class="token keyword">ssl</span>             on<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>主机名指示</strong></li>
@@ -1182,31 +1182,31 @@ TLS SNI support enabled
 <li><strong>重定向到主站</strong></li>
 </ul>
 <p>共享站点的管理员，习惯于只在<code>Apache</code>下使用<code>.htaccess</code>文件配置所有信息，通常会将下面规则。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx">RewriteCond  <span class="token operator">%</span><span class="token punctuation">{</span>HTTP_HOST<span class="token punctuation">}</span>  example<span class="token punctuation">.</span>org
+<pre class="line-numbers language-nginx"><code class="language-nginx">RewriteCond  <span class="token operator">%</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;HTTP_HOST&amp;#125;  example.org</span>
 <span class="token function">RewriteRule</span>  <span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token operator">*</span><span class="token punctuation">)</span>          <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>org$<span class="token number">1</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <p>翻译成这样，这种做法是错的，复杂而且低效。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>       <span class="token number">80</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span>  www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>org  example<span class="token punctuation">.</span>org<span class="token punctuation">;</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$http_host</span> <span class="token operator">=</span> example<span class="token punctuation">.</span>org<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$http_host</span> <span class="token operator">=</span> example<span class="token punctuation">.</span>org<span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
         <span class="token keyword">rewrite</span>  <span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token operator">*</span><span class="token punctuation">)</span>  <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>org$<span class="token number">1</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
+    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>正确的方式是为<code>example.org</code>定义一个单独的服务器。</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>       <span class="token number">80</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span>  example<span class="token punctuation">.</span>org<span class="token punctuation">;</span>
     <span class="token keyword">return</span>       <span class="token number">301</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>org<span class="token variable">$request_uri</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
-<span class="token keyword">server</span> <span class="token punctuation">{</span>
+<span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">listen</span>       <span class="token number">80</span><span class="token punctuation">;</span>
     <span class="token keyword">server_name</span>  www<span class="token punctuation">.</span>example<span class="token punctuation">.</span>org<span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>转化混合规则</strong></li>
@@ -1214,33 +1214,33 @@ TLS SNI support enabled
 <p>典型的混合规则如下：</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx">DocumentRoot <span class="token operator">/</span>var<span class="token operator">/</span>www<span class="token operator">/</span>myapp<span class="token punctuation">.</span>com<span class="token operator">/</span>current<span class="token operator">/</span>public
 
-RewriteCond <span class="token operator">%</span><span class="token punctuation">{</span>DOCUMENT_ROOT<span class="token punctuation">}</span><span class="token operator">/</span>system<span class="token operator">/</span>maintenance<span class="token punctuation">.</span>html <span class="token operator">-</span>f
-RewriteCond <span class="token operator">%</span><span class="token punctuation">{</span>SCRIPT_FILENAME<span class="token punctuation">}</span> <span class="token operator">!</span>maintenance<span class="token punctuation">.</span>html
-RewriteRule <span class="token operator">^</span><span class="token punctuation">.</span><span class="token operator">*</span>$ <span class="token operator">%</span><span class="token punctuation">{</span>DOCUMENT_ROOT<span class="token punctuation">}</span><span class="token operator">/</span>system<span class="token operator">/</span>maintenance<span class="token punctuation">.</span>html <span class="token punctuation">[</span>L<span class="token punctuation">]</span>
+RewriteCond <span class="token operator">%</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;DOCUMENT_ROOT&amp;#125;/system/maintenance.html -f</span>
+RewriteCond <span class="token operator">%</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;SCRIPT_FILENAME&amp;#125; !maintenance.html</span>
+RewriteRule <span class="token operator">^</span><span class="token punctuation">.</span><span class="token operator">*</span>$ <span class="token operator">%</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;DOCUMENT_ROOT&amp;#125;/system/maintenance.html [L]</span>
 
-RewriteCond <span class="token operator">%</span><span class="token punctuation">{</span>REQUEST_FILENAME<span class="token punctuation">}</span> <span class="token operator">-</span>f
+RewriteCond <span class="token operator">%</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;REQUEST_FILENAME&amp;#125; -f</span>
 RewriteRule <span class="token operator">^</span><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token operator">*</span><span class="token punctuation">)</span>$ $<span class="token number">1</span> <span class="token punctuation">[</span>QSA<span class="token punctuation">,</span>L<span class="token punctuation">]</span>
 
-RewriteCond <span class="token operator">%</span><span class="token punctuation">{</span>REQUEST_FILENAME<span class="token punctuation">}</span><span class="token operator">/</span><span class="token keyword">index</span><span class="token punctuation">.</span>html <span class="token operator">-</span>f
+RewriteCond <span class="token operator">%</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;REQUEST_FILENAME&amp;#125;/index.html -f</span>
 RewriteRule <span class="token operator">^</span><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token operator">*</span><span class="token punctuation">)</span>$ $<span class="token number">1</span><span class="token operator">/</span><span class="token keyword">index</span><span class="token punctuation">.</span>html <span class="token punctuation">[</span>QSA<span class="token punctuation">,</span>L<span class="token punctuation">]</span>
 
-RewriteCond <span class="token operator">%</span><span class="token punctuation">{</span>REQUEST_FILENAME<span class="token punctuation">}</span><span class="token punctuation">.</span>html <span class="token operator">-</span>f
+RewriteCond <span class="token operator">%</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;REQUEST_FILENAME&amp;#125;.html -f</span>
 RewriteRule <span class="token operator">^</span><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token operator">*</span><span class="token punctuation">)</span>$ $<span class="token number">1</span><span class="token operator">/</span><span class="token keyword">index</span><span class="token punctuation">.</span>html <span class="token punctuation">[</span>QSA<span class="token punctuation">,</span>L<span class="token punctuation">]</span>
 
-RewriteRule <span class="token operator">^</span><span class="token operator">/</span><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token operator">*</span><span class="token punctuation">)</span>$ balancer<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>mongrel_cluster<span class="token operator">%</span><span class="token punctuation">{</span>REQUEST_URI<span class="token punctuation">}</span> <span class="token punctuation">[</span>P<span class="token punctuation">,</span>QSA<span class="token punctuation">,</span>L<span class="token punctuation">]</span>
+RewriteRule <span class="token operator">^</span><span class="token operator">/</span><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token operator">*</span><span class="token punctuation">)</span>$ balancer<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>mongrel_cluster<span class="token operator">%</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;REQUEST_URI&amp;#125; [P,QSA,L]</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>转换成<code>Nginx</code>配置应该是这样：</p>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">root</span>       <span class="token operator">/</span>var<span class="token operator">/</span>www<span class="token operator">/</span>myapp<span class="token punctuation">.</span>com<span class="token operator">/</span>current<span class="token operator">/</span>public<span class="token punctuation">;</span>
 
     <span class="token keyword">try_files</span>  <span class="token operator">/</span>system<span class="token operator">/</span>maintenance<span class="token punctuation">.</span>html
                <span class="token variable">$uri</span>  <span class="token variable">$uri</span><span class="token operator">/</span><span class="token keyword">index</span><span class="token punctuation">.</span>html <span class="token variable">$uri</span><span class="token punctuation">.</span>html
                @mongrel<span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
-<span class="token keyword">location</span> @mongrel <span class="token punctuation">{</span>
+<span class="token keyword">location</span> @mongrel <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">proxy_pass</span>  <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>mongrel<span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
@@ -1774,7 +1774,7 @@ RewriteRule <span class="token operator">^</span><span class="token operator">/<
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1196.5k</span>
+                        class="white-color">1218k</span>
             
             
             

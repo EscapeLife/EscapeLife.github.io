@@ -469,14 +469,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    10k
+                    10.1k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    40 分
+                    41 分
                 </div>
                 
 
@@ -543,10 +543,10 @@ ExecStart<span class="token operator">=</span>/usr/bin/dockerd --graph<span clas
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># [方式二] 改动docker启动配置文件</span>
 $ <span class="token function">sudo</span> vim /etc/docker/daemon.json
-<span class="token punctuation">{</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token string">"live-restore"</span><span class="token keyword">:</span> true,
     <span class="token string">"graph"</span><span class="token keyword">:</span> <span class="token punctuation">[</span> <span class="token string">"/data/docker/"</span> <span class="token punctuation">]</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[操作注意事项]</strong> 在迁移 <code>docker</code> 目录的时候注意使用的命令，要么使用 <code>mv</code> 命令直接移动，要么使用 <code>cp</code> 命令复制文件，但是需要注意同时复制文件权限和对应属性，不然在使用的时候可能会存在权限问题。如果容器中，也是使用 <code>root</code> 用户，则不会存在该问题，但是也是需要按照正确的操作来迁移目录。</li>
@@ -603,7 +603,7 @@ Storage Driver: devicemapper
 $ <span class="token function">du</span> -d1 -h /var/lib/docker/containers <span class="token operator">|</span> <span class="token function">sort</span> -h
 
 <span class="token comment" spellcheck="true"># 清除您选择的容器日志文件的内容</span>
-$ <span class="token function">cat</span> /dev/null <span class="token operator">></span> /var/lib/docker/containers/container_id/container_log_name
+$ <span class="token function">cat</span> /dev/null <span class="token operator">&gt;</span> /var/lib/docker/containers/container_id/container_log_name
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <ul>
@@ -624,10 +624,10 @@ cp: cannot create regular <span class="token function">file</span> <span class="
 <li><strong>[解决方法 1] 改动 docker 启动配置文件</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># /etc/docker/daemon.json</span>
-<span class="token punctuation">{</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token string">"live-restore"</span><span class="token keyword">:</span> true,
     <span class="token string">"storage-opt"</span><span class="token keyword">:</span> <span class="token punctuation">[</span> <span class="token string">"dm.basesize=20G"</span> <span class="token punctuation">]</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法 2] 改动 systemctl 的 docker 启动文件</strong></li>
@@ -745,9 +745,9 @@ $ <span class="token function">sudo</span> systemctl start docker
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Keep containers alive during daemon downtime</span>
 $ <span class="token function">sudo</span> vim /etc/docker/daemon.yaml
-<span class="token punctuation">{</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
   <span class="token string">"live-restore"</span><span class="token keyword">:</span> <span class="token boolean">true</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
 <span class="token comment" spellcheck="true"># 在守护进程停机期间保持容器存活</span>
 $ <span class="token function">sudo</span> dockerd --live-restore
@@ -763,35 +763,35 @@ $ <span class="token function">sudo</span> systemctl restart docker
 <li><strong>[解决方法]</strong> 可以通过以下操作将容器删除/重建。</li>
 </ul>
 <pre class="line-numbers language-json"><code class="language-json"># /etc/docker/daemon.yaml
-<span class="token punctuation">{</span>
+&amp;#<span class="token number">123</span><span class="token punctuation">;</span>
     <span class="token property">"registry-mirrors"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"https://vec0xydj.mirror.aliyuncs.com"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>  # 配置获取官方镜像的仓库地址
     <span class="token property">"experimental"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>  # 启用实验功能
     <span class="token property">"default-runtime"</span><span class="token operator">:</span> <span class="token string">"nvidia"</span><span class="token punctuation">,</span>  # 容器的默认OCI运行时(默认为runc<span class="token punctuation">)</span>
     <span class="token property">"live-restore"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>  # 重启dockerd服务的时候容易不终止
-    <span class="token property">"runtimes"</span><span class="token operator">:</span> <span class="token punctuation">{</span>  # 配置容器运行时
-        <span class="token property">"nvidia"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"runtimes"</span><span class="token operator">:</span> &amp;#<span class="token number">123</span><span class="token punctuation">;</span>  # 配置容器运行时
+        <span class="token property">"nvidia"</span><span class="token operator">:</span> &amp;#<span class="token number">123</span><span class="token punctuation">;</span>
             <span class="token property">"path"</span><span class="token operator">:</span> <span class="token string">"/usr/bin/nvidia-container-runtime"</span><span class="token punctuation">,</span>
             <span class="token property">"runtimeArgs"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        &amp;#<span class="token number">125</span><span class="token punctuation">;</span>
+    &amp;#<span class="token number">125</span><span class="token punctuation">;</span><span class="token punctuation">,</span>
     <span class="token property">"default-address-pools"</span><span class="token operator">:</span> <span class="token punctuation">[</span>  # 配置容器使用的子网地址池
-        <span class="token punctuation">{</span>
+        &amp;#<span class="token number">123</span><span class="token punctuation">;</span>
             <span class="token property">"scope"</span><span class="token operator">:</span> <span class="token string">"local"</span><span class="token punctuation">,</span>
             <span class="token property">"base"</span><span class="token operator">:</span><span class="token string">"172.17.0.0/12"</span><span class="token punctuation">,</span>
             <span class="token property">"size"</span><span class="token operator">:</span><span class="token number">24</span>
-        <span class="token punctuation">}</span>
+        &amp;#<span class="token number">125</span><span class="token punctuation">;</span>
     <span class="token punctuation">]</span>
-<span class="token punctuation">}</span>
+&amp;#<span class="token number">125</span><span class="token punctuation">;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash">$ vim /etc/docker/daemon.json
-<span class="token punctuation">{</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
   <span class="token string">"default-address-pools"</span> <span class="token keyword">:</span> <span class="token punctuation">[</span>
-    <span class="token punctuation">{</span>
+    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
       <span class="token string">"base"</span> <span class="token keyword">:</span> <span class="token string">"172.240.0.0/16"</span>,
       <span class="token string">"size"</span> <span class="token keyword">:</span> 24
-    <span class="token punctuation">}</span>
+    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
   <span class="token punctuation">]</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="6-Docker-容器无法删除"><a href="#6-Docker-容器无法删除" class="headerlink" title="6. Docker 容器无法删除"></a>6. Docker 容器无法删除</h2><blockquote>
@@ -848,13 +848,13 @@ docker run --name some-mysql \
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 启动Nginx服务</span>
 $ docker run -d -p 80:80 <span class="token variable">$PWD</span>:/etc/nginx nginx
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-    <span class="token keyword">location</span> <span class="token operator">/</span>api <span class="token punctuation">{</span>
+    <span class="token keyword">location</span> <span class="token operator">/</span>api <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
         <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>localhost<span class="token punctuation">:</span><span class="token number">8080</span>
-    <span class="token punctuation">}</span>
+    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><p><strong>[解决方法]</strong> 后面发现是因为 <code>nginx.conf</code> 配置文件中的 <code>localhost</code> 配置的有问题，由于 <code>Nginx</code> 是在容器中运行，所以 <code>localhost</code> 为容器中的 <code>localhost</code>，而非本机的 <code>localhost</code>，所以导致无法访问。</p>
@@ -862,22 +862,22 @@ $ docker run -d -p 80:80 <span class="token variable">$PWD</span>:/etc/nginx ngi
 <li><p>可以将 <code>nginx.conf</code> 中的 <code>localhost</code> 改为宿主机的 <code>IP</code> 地址，就可以解决 <code>502</code> 的错误。</p>
 </li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查询宿主机IP地址 => 172.17.0.1</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查询宿主机IP地址 =&gt; 172.17.0.1</span>
 $ ip addr show docker0
-docker0: <span class="token operator">&lt;</span>BROADCAST,MULTICAST,UP,LOWER_UP<span class="token operator">></span> mtu 1500 qdisc noqueue state UP group default
+docker0: <span class="token operator">&lt;</span>BROADCAST,MULTICAST,UP,LOWER_UP<span class="token operator">&gt;</span> mtu 1500 qdisc noqueue state UP group default
     link/ether 02:42:d5:4c:f2:1e brd ff:ff:ff:ff:ff:ff
     inet 172.17.0.1/16 scope global docker0
        valid_lft forever preferred_lft forever
     inet6 fe80::42:d5ff:fe4c:f21e/64 scope <span class="token function">link</span>
        valid_lft forever preferred_lft forever
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-    <span class="token keyword">location</span> <span class="token operator">/</span>api <span class="token punctuation">{</span>
+    <span class="token keyword">location</span> <span class="token operator">/</span>api <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
         <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">172.17</span><span class="token punctuation">.</span><span class="token number">0.1</span><span class="token punctuation">:</span><span class="token number">8080</span>
-    <span class="token punctuation">}</span>
+    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>当容器使用 <code>host</code> 网络时，容器与宿主共用网络，这样就能在容器中访问宿主机网络，那么容器的 <code>localhost</code> 就是宿主机的 <code>localhost</code> 了。</li>
@@ -964,19 +964,19 @@ NFS clients support flock<span class="token punctuation">(</span><span class="to
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看docker容器配置</span>
 $ <span class="token function">cat</span> /etc/docker/daemon.json
-<span class="token punctuation">{</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token string">"registry-mirrors"</span><span class="token keyword">:</span> <span class="token punctuation">[</span><span class="token string">"https://vec0xydj.mirror.aliyuncs.com"</span><span class="token punctuation">]</span>,
-    <span class="token string">"default-address-pools"</span>:<span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"base"</span><span class="token keyword">:</span><span class="token string">"172.17.0.0/12"</span>, <span class="token string">"size"</span>:24<span class="token punctuation">}</span><span class="token punctuation">]</span>,
+    <span class="token string">"default-address-pools"</span>:<span class="token punctuation">[</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;"base":"172.17.0.0/12", "size":24&amp;#125;],</span>
     <span class="token string">"experimental"</span><span class="token keyword">:</span> true,
     <span class="token string">"default-runtime"</span><span class="token keyword">:</span> <span class="token string">"nvidia"</span>,
     <span class="token string">"live-restore"</span><span class="token keyword">:</span> true,
-    <span class="token string">"runtimes"</span><span class="token keyword">:</span> <span class="token punctuation">{</span>
-        <span class="token string">"nvidia"</span><span class="token keyword">:</span> <span class="token punctuation">{</span>
+    <span class="token string">"runtimes"</span><span class="token keyword">:</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+        <span class="token string">"nvidia"</span><span class="token keyword">:</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
             <span class="token string">"path"</span><span class="token keyword">:</span> <span class="token string">"/usr/bin/nvidia-container-runtime"</span>,
             <span class="token string">"runtimeArgs"</span><span class="token keyword">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+        <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="12-Docker-服务启动串台"><a href="#12-Docker-服务启动串台" class="headerlink" title="12. Docker 服务启动串台"></a>12. Docker 服务启动串台</h2><blockquote>
@@ -1018,7 +1018,7 @@ $ docker-compose -f ./docker-compose.yml -p app1 up -d
 <li>随即，查看了脚本发现报错地方是执行了一个 <code>exec</code> 的 <code>docker</code> 命令，大致如下所示。很奇怪的是，手动执行或直接调脚本的时候，怎么都是没有问题的，但是等到 <code>CI</code> 调用的时候怎么都是有问题。后来好好看下，下面这个命令，注意到 <code>-it</code> 这个参数了。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 脚本调用docker命令</span>
-docker <span class="token function">exec</span> -it <span class="token operator">&lt;</span>container_name<span class="token operator">></span> psql -Upostgres <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+docker <span class="token function">exec</span> -it <span class="token operator">&lt;</span>container_name<span class="token operator">&gt;</span> psql -Upostgres <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
 <li>我们可以一起看下 <code>exec</code> 命令的这两个参数，自然就差不多理解了。</li>
@@ -1055,7 +1055,7 @@ docker <span class="token function">exec</span> -it <span class="token operator"
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Crontab定时任务</span>
 0 */6 * * * \
-    docker <span class="token function">exec</span> -it <span class="token operator">&lt;</span>container_name<span class="token operator">></span> sh -c \
+    docker <span class="token function">exec</span> -it <span class="token operator">&lt;</span>container_name<span class="token operator">&gt;</span> sh -c \
         <span class="token string">'exec mysqldump --all-databases -uroot -ppassword ......'</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
@@ -1124,7 +1124,7 @@ Error response from daemon: conflict: unable to delete 3ccxxxx2e862 <span class=
 <li><strong>[解决方法]</strong> 后来才发现，出现这个原因主要是因为 <code>TAG</code>，即存在其他镜像引用了这个镜像。这里我们可以使用如下命令查看对应镜像文件的依赖关系，然后根据对应 <code>TAG</code> 来删除镜像。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查询依赖 - image_id表示镜像名称</span>
-$ docker image inspect --format<span class="token operator">=</span><span class="token string">'{{.RepoTags}} {{.Id}} {{.Parent}}'</span> <span class="token variable"><span class="token variable">$(</span>docker image <span class="token function">ls</span> -q --filter since<span class="token operator">=</span><span class="token operator">&lt;</span>image_id<span class="token operator">></span><span class="token variable">)</span></span>
+$ docker image inspect --format<span class="token operator">=</span><span class="token string">'&amp;#123;&amp;#123;.RepoTags&amp;#125;&amp;#125; &amp;#123;&amp;#123;.Id&amp;#125;&amp;#125; &amp;#123;&amp;#123;.Parent&amp;#125;&amp;#125;'</span> <span class="token variable"><span class="token variable">$(</span>docker image <span class="token function">ls</span> -q --filter since<span class="token operator">=</span><span class="token operator">&lt;</span>image_id<span class="token operator">&gt;</span><span class="token variable">)</span></span>
 
 <span class="token comment" spellcheck="true"># 根据TAG删除镜像</span>
 $ docker rmi -f c565xxxxc87f
@@ -1152,11 +1152,11 @@ nginx: <span class="token punctuation">[</span>alert<span class="token punctuati
 <span class="token keyword">error_log</span>  <span class="token operator">/</span>data<span class="token operator">/</span>logs<span class="token operator">/</span>master_error<span class="token punctuation">.</span>log warn<span class="token punctuation">;</span>
 <span class="token keyword">pid</span>        <span class="token operator">/</span>dev<span class="token operator">/</span>shm<span class="token operator">/</span>nginx<span class="token punctuation">.</span><span class="token keyword">pid</span><span class="token punctuation">;</span>
 
-<span class="token keyword">events</span> <span class="token punctuation">{</span>
+<span class="token keyword">events</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">worker_connections</span>  <span class="token number">1024</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
-<span class="token keyword">http</span> <span class="token punctuation">{</span>
+<span class="token keyword">http</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">include</span>       <span class="token operator">/</span>etc<span class="token operator">/</span>nginx<span class="token operator">/</span>mime<span class="token punctuation">.</span><span class="token keyword">types</span><span class="token punctuation">;</span>
     <span class="token keyword">default_type</span>  application<span class="token operator">/</span>octet<span class="token operator">-</span>stream<span class="token punctuation">;</span>
 
@@ -1172,7 +1172,7 @@ nginx: <span class="token punctuation">[</span>alert<span class="token punctuati
     uwsgi_temp_path        <span class="token operator">/</span>tmp<span class="token operator">/</span>uwsgi_temp<span class="token punctuation">;</span>
 
     <span class="token keyword">include</span> <span class="token operator">/</span>etc<span class="token operator">/</span>nginx<span class="token operator">/</span>conf<span class="token punctuation">.</span>d<span class="token operator">/</span><span class="token operator">*</span><span class="token punctuation">.</span>conf<span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="18-Docker-绑定到-IPv6-上"><a href="#18-Docker-绑定到-IPv6-上" class="headerlink" title="18. Docker 绑定到 IPv6 上"></a>18. Docker 绑定到 IPv6 上</h2><blockquote>
@@ -1217,10 +1217,10 @@ net.ipv6.conf.all.disable_ipv6<span class="token operator">=</span>1
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 修改配置</span>
 $ vim /etc/docker/daemon.json
-<span class="token punctuation">{</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
   <span class="token string">"ipv6"</span><span class="token keyword">:</span> false,
   <span class="token string">"fixed-cidr-v6"</span><span class="token keyword">:</span> <span class="token string">"2001:db8:1::/64"</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
 <span class="token comment" spellcheck="true"># 重启服务</span>
 $ systemctl reload docker
@@ -1229,10 +1229,10 @@ $ systemctl reload docker
 <li><strong>[方法三]</strong> <code>Docker</code> 默认情况下会同时将端口映射于 <code>IPv4</code> 与 <code>IPv6</code> 两者上，而且有的时候会出现只绑定到了 <code>IPv6</code>，导致服务无法正常访问的情况。现在通用的始终还是 <code>IPv4</code> 地址，因此最简单的做法就是关闭 <code>IPv6</code> 地址。详细的配置，可以参考 <a target="_blank" rel="noopener" href="https://github.com/moby/moby/issues/2174">Port redirecting binding to IPv6 but not IPv4 interfaces</a> 这个 <code>issus</code> 地址。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 修改系统配置</span>
-<span class="token keyword">echo</span> <span class="token string">'1'</span> <span class="token operator">></span> /proc/sys/net/ipv6/conf/lo/disable_ipv6
-<span class="token keyword">echo</span> <span class="token string">'1'</span> <span class="token operator">></span> /proc/sys/net/ipv6/conf/lo/disable_ipv6
-<span class="token keyword">echo</span> <span class="token string">'1'</span> <span class="token operator">></span> /proc/sys/net/ipv6/conf/all/disable_ipv6
-<span class="token keyword">echo</span> <span class="token string">'1'</span> <span class="token operator">></span> /proc/sys/net/ipv6/conf/default/disable_ipv6
+<span class="token keyword">echo</span> <span class="token string">'1'</span> <span class="token operator">&gt;</span> /proc/sys/net/ipv6/conf/lo/disable_ipv6
+<span class="token keyword">echo</span> <span class="token string">'1'</span> <span class="token operator">&gt;</span> /proc/sys/net/ipv6/conf/lo/disable_ipv6
+<span class="token keyword">echo</span> <span class="token string">'1'</span> <span class="token operator">&gt;</span> /proc/sys/net/ipv6/conf/all/disable_ipv6
+<span class="token keyword">echo</span> <span class="token string">'1'</span> <span class="token operator">&gt;</span> /proc/sys/net/ipv6/conf/default/disable_ipv6
 
 <span class="token comment" spellcheck="true"># 重启网络</span>
 $ /etc/init.d/networking restart
@@ -1276,8 +1276,8 @@ If you encounter this issue regularly because of slow network conditions, consid
 <li><strong>[问题起因]</strong> 启用服务之后，登录跳转发现直接 <code>502</code> 报错了。排除了配置等相关原因都没有任何问题(做过相关测试)，这就非常奇怪了！</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 部署服务架构</span>
-nginx<span class="token punctuation">(</span>80<span class="token punctuation">)</span> -<span class="token operator">></span> web1<span class="token punctuation">(</span>8080<span class="token punctuation">)</span>
-          -<span class="token operator">></span> web2<span class="token punctuation">(</span>8081<span class="token punctuation">)</span>
+nginx<span class="token punctuation">(</span>80<span class="token punctuation">)</span> -<span class="token operator">&gt;</span> web1<span class="token punctuation">(</span>8080<span class="token punctuation">)</span>
+          -<span class="token operator">&gt;</span> web2<span class="token punctuation">(</span>8081<span class="token punctuation">)</span>
 
 <span class="token comment" spellcheck="true"># 报错信息如下所示</span>
 nginx connect<span class="token punctuation">(</span><span class="token punctuation">)</span> failed <span class="token punctuation">(</span>113: No route to host<span class="token punctuation">)</span> <span class="token keyword">while</span> connecting to upstream
@@ -1319,15 +1319,15 @@ Error response from daemon: manifest <span class="token keyword">for</span> dock
 <li><strong>[解决方法]</strong> 太坑了，我还以为我发现某个隐藏的 <code>bug</code> 了，可劲的排查，最后发现，原来是自己镜像包名字写错了，应该写成 <code>0.0.10</code> 的，自己却写成了 <code>0.10</code>。这里，纪念一下，以后碰到上述报错，那肯定是镜像不存在的。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 登录私有仓库之后会在用户家目录下生成一个docker配置</span>
-<span class="token comment" spellcheck="true"># 其用来记录docker私有仓库的登录认证信息(是加密过的信息但不安全) => base64</span>
+<span class="token comment" spellcheck="true"># 其用来记录docker私有仓库的登录认证信息(是加密过的信息但不安全) =&gt; base64</span>
 $ <span class="token function">cat</span> .docker/config.json
-<span class="token punctuation">{</span>
-    <span class="token string">"auths"</span><span class="token keyword">:</span> <span class="token punctuation">{</span>
-        <span class="token string">"docker.escapelife.site"</span><span class="token keyword">:</span> <span class="token punctuation">{</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    <span class="token string">"auths"</span><span class="token keyword">:</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+        <span class="token string">"docker.escapelife.site"</span><span class="token keyword">:</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
             <span class="token string">"auth"</span><span class="token keyword">:</span> <span class="token string">"d00u11Fu22B3355VG2xasE12w=="</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+        <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="22-Docker-使容器不退出"><a href="#22-Docker-使容器不退出" class="headerlink" title="22. Docker 使容器不退出"></a>22. Docker 使容器不退出</h2><blockquote>
@@ -1405,9 +1405,9 @@ Connection to 172.16.100.12 8000 port <span class="token punctuation">[</span>tc
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 修改配置</span>
 $ <span class="token function">sudo</span> <span class="token function">cat</span> /etc/docker/daemon.json
-<span class="token punctuation">{</span>
-  <span class="token string">"default-address-pools"</span>:<span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"base"</span><span class="token keyword">:</span><span class="token string">"192.168.100.0/20"</span>,<span class="token string">"size"</span>:24<span class="token punctuation">}</span><span class="token punctuation">]</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+  <span class="token string">"default-address-pools"</span>:<span class="token punctuation">[</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;"base":"192.168.100.0/20","size":24&amp;#125;]</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
 <span class="token comment" spellcheck="true"># 重启服务</span>
 $ <span class="token function">sudo</span> systemctl restart docker
@@ -1426,9 +1426,9 @@ Error response from daemon: could not <span class="token function">find</span> a
 <span class="token comment" spellcheck="true"># 按照下图我们可以对 pool 进行合理划分</span>
 <span class="token comment" spellcheck="true"># 给定 10.210.200.0 + 255.255.255.0 的网段来划分子网</span>
 $ <span class="token function">sudo</span> <span class="token function">cat</span> /etc/docker/daemon.json
-<span class="token punctuation">{</span>
-  <span class="token string">"default-address-pools"</span>:<span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"base"</span><span class="token keyword">:</span><span class="token string">"10.210.200.0/24"</span>,<span class="token string">"size"</span>:28<span class="token punctuation">}</span><span class="token punctuation">]</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+  <span class="token string">"default-address-pools"</span>:<span class="token punctuation">[</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;"base":"10.210.200.0/24","size":28&amp;#125;]</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li>其中，<code>base</code> 告诉我们划分子网的网段是什么(从来开始)，是从前两位(<code>/16</code>)开始，还是第三位开始(<code>/24</code>)呢？而 <code>size</code> 则告诉我们划分的每个子网有多少 <code>IP</code> 地址可以使用呢？从 <code>"10.210.200.0/24"</code> 我们可以知道，该网络下面只有 <code>254</code> 个可用的 <code>IP</code> 地址(直接使用肯定不够)，然后我们需要给 <code>docker</code> 使用，划分每个子网可用 <code>16</code> 个 <code>IP</code> 地址，所以子网就应该写成 <code>28</code> 了。</li>
@@ -1450,9 +1450,9 @@ x509: certificate signed by unknown authority
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 添加配置</span>
 $ <span class="token function">sudo</span> <span class="token function">cat</span> /etc/docker/daemon.json
-<span class="token punctuation">{</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token string">"insecure-registries"</span><span class="token keyword">:</span> <span class="token punctuation">[</span><span class="token string">"192.168.31.191:5000"</span><span class="token punctuation">]</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
 <span class="token comment" spellcheck="true"># 重启docker</span>
 $ <span class="token function">sudo</span> systemctl restart docker
@@ -2035,7 +2035,7 @@ environment:
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1196.5k</span>
+                        class="white-color">1218k</span>
             
             
             

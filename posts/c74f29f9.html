@@ -473,7 +473,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.8k
+                    1.9k
                 </div>
                 
 
@@ -513,7 +513,7 @@
 </ul>
 <p>如何才能尽量防止某个重要的进程被杀死呢？<code>Linux</code> 每个进程都有一个 <code>oom_adj</code>(位于<code>/proc/&lt;pid&gt;/oom_adj</code>文件中)，这个值的范围是 <code>[-17, +15]</code>，默认值为 <code>0</code>，值越大越容易被 <code>kill</code> 掉。如果设置为 <code>-17</code> 的话，表示永远不会被清除。进程的 <code>oom_adj</code> 会影响 <code>oom_score</code> 的计算，也就是说，我们可以通过调小进程的 <code>oom_adj</code> 从而降低进程的 <code>oom_score</code>。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># MySQL OOM Killer</span>
-$ <span class="token function">sudo</span> <span class="token keyword">echo</span> -10 <span class="token operator">></span> /proc/<span class="token variable"><span class="token variable">$(</span>pidof mysqld<span class="token variable">)</span></span>/oom_adj
+$ <span class="token function">sudo</span> <span class="token keyword">echo</span> -10 <span class="token operator">&gt;</span> /proc/<span class="token variable"><span class="token variable">$(</span>pidof mysqld<span class="token variable">)</span></span>/oom_adj
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="1-问题现象"><a href="#1-问题现象" class="headerlink" title="1. 问题现象"></a>1. 问题现象</h2><blockquote>
@@ -552,8 +552,8 @@ Linux 5.3.0-53-generic <span class="token punctuation">(</span>bohr<span class="
 06:48:22  PM  999  21465   0.52      0.09       11195580  104888   0.32  java
 
 <span class="token comment" spellcheck="true"># 查看swap使用情况</span>
-$ <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token punctuation">$(</span>ls /proc <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">"^[0-9]"</span> <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'<span class="token variable">$0</span>>100'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token keyword">do</span> \
-      <span class="token function">awk</span> <span class="token string">'/Swap:/{a=a+<span class="token variable">$2</span>}END{print '</span><span class="token string">"<span class="token variable">$i</span>"</span><span class="token string">', a/1024"M"}'</span> \
+$ <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token punctuation">$(</span>ls /proc <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">"^[0-9]"</span> <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'<span class="token variable">$0</span>&gt;100'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token keyword">do</span> \
+      <span class="token function">awk</span> <span class="token string">'/Swap:/&amp;#123;a=a+<span class="token variable">$2</span>&amp;#125;END&amp;#123;print '</span><span class="token string">"<span class="token variable">$i</span>"</span><span class="token string">', a/1024"M"&amp;#125;'</span> \
       /proc/<span class="token variable">$i</span>/smaps<span class="token punctuation">;</span> <span class="token keyword">done</span> <span class="token operator">|</span> <span class="token function">sort</span> -k2nr <span class="token operator">|</span> <span class="token function">head</span>
 7859 292.898M
 
@@ -576,7 +576,7 @@ $ <span class="token function">cat</span> /proc/21465/oom_score_adj
 0
 
 <span class="token comment" spellcheck="true"># 我们自己进行设置</span>
-$ <span class="token keyword">echo</span> -15 <span class="token operator">></span> /proc/21465/oom_score_adj
+$ <span class="token keyword">echo</span> -15 <span class="token operator">&gt;</span> /proc/21465/oom_score_adj
 
 <span class="token comment" spellcheck="true"># 计算oom_score_adj数值</span>
 oom_score_adj <span class="token operator">=</span> -15
@@ -597,8 +597,8 @@ oom_score_adj <span class="token operator">=</span> -15
       <span class="token operator">*</span>totalpages <span class="token operator">=</span> totalram_pages <span class="token operator">+</span> total_swap_pages<span class="token punctuation">;</span>
 
       <span class="token comment" spellcheck="true">// 累加 常驻内存RSS + 进程页面 + 换内存</span>
-      points <span class="token operator">=</span> <span class="token function">get_mm_rss</span><span class="token punctuation">(</span>p<span class="token operator">-</span><span class="token operator">></span>mm<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token function">atomic_long_read</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>p<span class="token operator">-</span><span class="token operator">></span>mm<span class="token operator">-</span><span class="token operator">></span>nr_ptes<span class="token punctuation">)</span> <span class="token operator">+</span>
-                   <span class="token function">get_mm_counter</span><span class="token punctuation">(</span>p<span class="token operator">-</span><span class="token operator">></span>mm<span class="token punctuation">,</span> MM_SWAPENTS<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      points <span class="token operator">=</span> <span class="token function">get_mm_rss</span><span class="token punctuation">(</span>p<span class="token operator">-</span><span class="token operator">&gt;</span>mm<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token function">atomic_long_read</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>p<span class="token operator">-</span><span class="token operator">&gt;</span>mm<span class="token operator">-</span><span class="token operator">&gt;</span>nr_ptes<span class="token punctuation">)</span> <span class="token operator">+</span>
+                   <span class="token function">get_mm_counter</span><span class="token punctuation">(</span>p<span class="token operator">-</span><span class="token operator">&gt;</span>mm<span class="token punctuation">,</span> MM_SWAPENTS<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
       <span class="token comment" spellcheck="true">// oom_score_adj</span>
       <span class="token comment" spellcheck="true">// oom = oom_score + oom_score_adj</span>
@@ -614,7 +614,7 @@ oom_score_adj <span class="token operator">=</span> -15
     <span class="token keyword">unsigned</span> <span class="token keyword">int</span> <span class="token operator">*</span>ppoints<span class="token punctuation">,</span> <span class="token keyword">unsigned</span> <span class="token keyword">long</span> totalpages<span class="token punctuation">,</span>
     <span class="token keyword">const</span> nodemask_t <span class="token operator">*</span>nodemask<span class="token punctuation">,</span> <span class="token keyword">bool</span> force_kill<span class="token punctuation">)</span>
       <span class="token comment" spellcheck="true">// 循环遍历所有进程</span>
-      <span class="token function">for_each_process_thread</span><span class="token punctuation">(</span>g<span class="token punctuation">,</span> p<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">for_each_process_thread</span><span class="token punctuation">(</span>g<span class="token punctuation">,</span> p<span class="token punctuation">)</span> <span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span>
       <span class="token comment" spellcheck="true">// 调用上面的oom_badness方法计算oom</span>
       points <span class="token operator">=</span> <span class="token function">oom_badness</span><span class="token punctuation">(</span>p<span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> nodemask<span class="token punctuation">,</span> totalpages<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -655,15 +655,15 @@ oom_score_adj <span class="token operator">=</span> -15
 <li><strong>4.配置 OOM killer</strong></li>
 </ul>
 <p>通过一些内核参数来调整 <code>OOM killer</code> 的行为，避免系统在那里不停的杀进程。比如我们可以在触发 <code>OOM</code> 后立刻触发 <code>kernel panic</code>，<code>kernel panic 10</code> 秒后自动重启系统。</p>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token keyword">echo</span> <span class="token string">"vm.panic_on_oom=1"</span> <span class="token operator">>></span> /etc/sysctl.conf
-<span class="token keyword">echo</span> <span class="token string">"kernel.panic=10"</span> <span class="token operator">>></span> /etc/sysctl.conf
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token keyword">echo</span> <span class="token string">"vm.panic_on_oom=1"</span> <span class="token operator">&gt;&gt;</span> /etc/sysctl.conf
+<span class="token keyword">echo</span> <span class="token string">"kernel.panic=10"</span> <span class="token operator">&gt;&gt;</span> /etc/sysctl.conf
 sysctl -p
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>5.关闭/打开<code>oom-killer</code>(慎用)</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token keyword">echo</span> <span class="token string">"0"</span> <span class="token operator">></span> /proc/sys/vm/oom-kill
-<span class="token keyword">echo</span> <span class="token string">"1"</span> <span class="token operator">></span> /proc/sys/vm/oom-kill
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token keyword">echo</span> <span class="token string">"0"</span> <span class="token operator">&gt;</span> /proc/sys/vm/oom-kill
+<span class="token keyword">echo</span> <span class="token string">"1"</span> <span class="token operator">&gt;</span> /proc/sys/vm/oom-kill
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>6.通过<code>choom</code>命令设置优先级</strong></li>
@@ -1265,7 +1265,7 @@ autorestart<span class="token operator">=</span>unexpected
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1196.5k</span>
+                        class="white-color">1218k</span>
             
             
             

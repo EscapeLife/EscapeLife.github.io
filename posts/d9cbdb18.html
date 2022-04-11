@@ -469,14 +469,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.8k
+                    1.9k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    8 分
+                    9 分
                 </div>
                 
 
@@ -634,7 +634,7 @@ httpd2.4中默认没有文件授权，所以不会显示文件列表，拒绝访
     拒绝所有主机访问：Require all deny
 
 控制特定IP访问：
-    需要在<span class="token operator">&lt;</span>RequireAll<span class="token operator">></span>中封装起来
+    需要在<span class="token operator">&lt;</span>RequireAll<span class="token operator">&gt;</span>中封装起来
     Require ip IPADDR：授权指定来源地址的主机访问
     Require not ip IPADDR：拒绝指定来源地址的主机访问
     IPADDR：
@@ -651,10 +651,10 @@ httpd2.4中默认没有文件授权，所以不会显示文件列表，拒绝访
         DOMAIN：指定域内的所有主机
 
 举例说明: 需要使用Directory/RequireAll进行封装才能使用生效
-    <span class="token operator">&lt;</span>RequireAll<span class="token operator">></span>
+    <span class="token operator">&lt;</span>RequireAll<span class="token operator">&gt;</span>
         Require all granted
         Require not ip 10.252.46.165
-    <span class="token operator">&lt;</span>/RequireAll<span class="token operator">></span>
+    <span class="token operator">&lt;</span>/RequireAll<span class="token operator">&gt;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="4-3-虚拟主机"><a href="#4-3-虚拟主机" class="headerlink" title="4.3 虚拟主机"></a>4.3 虚拟主机</h3><pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># (3) 虚拟主机</span>
@@ -716,7 +716,7 @@ ss -tnl
 <span class="token keyword">fi</span>
 
 <span class="token comment" spellcheck="true"># Start httpd in the C locale by default.</span>
-HTTPD_LANG<span class="token operator">=</span>$<span class="token punctuation">{</span>HTTPD_LANG-<span class="token string">"C"</span><span class="token punctuation">}</span>
+HTTPD_LANG<span class="token operator">=</span>$<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;HTTPD_LANG-"C"&amp;#125;</span>
 
 <span class="token comment" spellcheck="true"># This will prevent initlog from swallowing up a pass-phrase prompt if</span>
 <span class="token comment" spellcheck="true"># mod_ssl needs a pass-phrase from the user.</span>
@@ -731,50 +731,50 @@ INITLOG_ARGS<span class="token operator">=</span><span class="token string">""</
 apachectl<span class="token operator">=</span>/usr/local/apache/bin/apachectl
 httpd<span class="token operator">=</span>/usr/local/apache/bin/httpd
 prog<span class="token operator">=</span>httpd
-pidfile<span class="token operator">=</span><span class="token variable">${PIDFILE-/var/run/httpd/httpd24.pid}</span>
-lockfile<span class="token operator">=</span><span class="token variable">${LOCKFILE-/var/lock/subsys/httpd24}</span>
+pidfile<span class="token operator">=</span>$<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;PIDFILE-/var/run/httpd/httpd24.pid&amp;#125;</span>
+lockfile<span class="token operator">=</span>$<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;LOCKFILE-/var/lock/subsys/httpd24&amp;#125;</span>
 RETVAL<span class="token operator">=</span>0
-STOP_TIMEOUT<span class="token operator">=</span><span class="token variable">${STOP_TIMEOUT-10}</span>
+STOP_TIMEOUT<span class="token operator">=</span>$<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;STOP_TIMEOUT-10&amp;#125;</span>
 
 <span class="token comment" spellcheck="true"># The semantics of these two functions differ from the way apachectl does</span>
 <span class="token comment" spellcheck="true"># things -- attempting to start while running is a failure, and shutdown</span>
 <span class="token comment" spellcheck="true"># when not running is also a failure.  So we just do it the way init scripts</span>
 <span class="token comment" spellcheck="true"># are expected to behave here.</span>
-start<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+start<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
         <span class="token keyword">echo</span> -n $<span class="token string">"Starting <span class="token variable">$prog</span>: "</span>
-        LANG<span class="token operator">=</span><span class="token variable">$HTTPD_LANG</span> daemon --pidfile<span class="token operator">=</span><span class="token variable">${pidfile}</span> <span class="token variable">$httpd</span> <span class="token variable">$OPTIONS</span>
+        LANG<span class="token operator">=</span><span class="token variable">$HTTPD_LANG</span> daemon --pidfile<span class="token operator">=</span>$<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;pidfile&amp;#125; $httpd $OPTIONS</span>
         RETVAL<span class="token operator">=</span><span class="token variable">$?</span>
         <span class="token keyword">echo</span>
-        <span class="token punctuation">[</span> <span class="token variable">$RETVAL</span> <span class="token operator">=</span> 0 <span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token function">touch</span> <span class="token variable">${lockfile}</span>
+        <span class="token punctuation">[</span> <span class="token variable">$RETVAL</span> <span class="token operator">=</span> 0 <span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token function">touch</span> $<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;lockfile&amp;#125;</span>
         <span class="token keyword">return</span> <span class="token variable">$RETVAL</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
 <span class="token comment" spellcheck="true"># When stopping httpd, a delay (of default 10 second) is required</span>
 <span class="token comment" spellcheck="true"># before SIGKILLing the httpd parent; this gives enough time for the</span>
 <span class="token comment" spellcheck="true"># httpd parent to SIGKILL any errant children.</span>
-stop<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+stop<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">echo</span> -n $<span class="token string">"Stopping <span class="token variable">$prog</span>: "</span>
-    killproc -p <span class="token variable">${pidfile}</span> -d <span class="token variable">${STOP_TIMEOUT}</span> <span class="token variable">$httpd</span>
+    killproc -p $<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;pidfile&amp;#125; -d $&amp;#123;STOP_TIMEOUT&amp;#125; $httpd</span>
     RETVAL<span class="token operator">=</span><span class="token variable">$?</span>
     <span class="token keyword">echo</span>
-    <span class="token punctuation">[</span> <span class="token variable">$RETVAL</span> <span class="token operator">=</span> 0 <span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token function">rm</span> -f <span class="token variable">${lockfile}</span> <span class="token variable">${pidfile}</span>
-<span class="token punctuation">}</span>
-reload<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">[</span> <span class="token variable">$RETVAL</span> <span class="token operator">=</span> 0 <span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token function">rm</span> -f $<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;lockfile&amp;#125; $&amp;#123;pidfile&amp;#125;</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+reload<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
     <span class="token keyword">echo</span> -n $<span class="token string">"Reloading <span class="token variable">$prog</span>: "</span>
-    <span class="token keyword">if</span> <span class="token operator">!</span> LANG<span class="token operator">=</span><span class="token variable">$HTTPD_LANG</span> <span class="token variable">$httpd</span> <span class="token variable">$OPTIONS</span> -t <span class="token operator">></span><span class="token operator">&amp;</span>/dev/null<span class="token punctuation">;</span> <span class="token keyword">then</span>
+    <span class="token keyword">if</span> <span class="token operator">!</span> LANG<span class="token operator">=</span><span class="token variable">$HTTPD_LANG</span> <span class="token variable">$httpd</span> <span class="token variable">$OPTIONS</span> -t <span class="token operator">&gt;</span><span class="token operator">&amp;</span>/dev/null<span class="token punctuation">;</span> <span class="token keyword">then</span>
         RETVAL<span class="token operator">=</span>6
         <span class="token keyword">echo</span> $<span class="token string">"not reloading due to configuration syntax error"</span>
         failure $<span class="token string">"not reloading <span class="token variable">$httpd</span> due to configuration syntax error"</span>
     <span class="token keyword">else</span>
         <span class="token comment" spellcheck="true"># Force LSB behaviour from killproc</span>
-        LSB<span class="token operator">=</span>1 killproc -p <span class="token variable">${pidfile}</span> <span class="token variable">$httpd</span> -HUP
+        LSB<span class="token operator">=</span>1 killproc -p $<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;pidfile&amp;#125; $httpd -HUP</span>
         RETVAL<span class="token operator">=</span><span class="token variable">$?</span>
         <span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token variable">$RETVAL</span> -eq 7 <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
             failure $<span class="token string">"httpd shutdown"</span>
         <span class="token keyword">fi</span>
     <span class="token keyword">fi</span>
     <span class="token keyword">echo</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
 
 <span class="token comment" spellcheck="true"># See how we were called.</span>
 <span class="token keyword">case</span> <span class="token string">"<span class="token variable">$1</span>"</span> <span class="token keyword">in</span>
@@ -785,7 +785,7 @@ reload<span class="token punctuation">(</span><span class="token punctuation">)<
     stop
     <span class="token punctuation">;</span><span class="token punctuation">;</span>
   status<span class="token punctuation">)</span>
-        status -p <span class="token variable">${pidfile}</span> <span class="token variable">$httpd</span>
+        status -p $<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;pidfile&amp;#125; $httpd</span>
     RETVAL<span class="token operator">=</span><span class="token variable">$?</span>
     <span class="token punctuation">;</span><span class="token punctuation">;</span>
   restart<span class="token punctuation">)</span>
@@ -793,7 +793,7 @@ reload<span class="token punctuation">(</span><span class="token punctuation">)<
     start
     <span class="token punctuation">;</span><span class="token punctuation">;</span>
   condrestart<span class="token operator">|</span>try-restart<span class="token punctuation">)</span>
-    <span class="token keyword">if</span> status -p <span class="token variable">${pidfile}</span> <span class="token variable">$httpd</span> <span class="token operator">></span><span class="token operator">&amp;</span>/dev/null<span class="token punctuation">;</span> <span class="token keyword">then</span>
+    <span class="token keyword">if</span> status -p $<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;pidfile&amp;#125; $httpd &gt;&amp;/dev/null; then</span>
         stop
         start
     <span class="token keyword">fi</span>
@@ -806,7 +806,7 @@ reload<span class="token punctuation">(</span><span class="token punctuation">)<
     RETVAL<span class="token operator">=</span><span class="token variable">$?</span>
     <span class="token punctuation">;</span><span class="token punctuation">;</span>
   *<span class="token punctuation">)</span>
-    <span class="token keyword">echo</span> $<span class="token string">"Usage: <span class="token variable">$prog</span> {start|stop|restart|condrestart|try-restart|force-reload|reload|status|fullstatus|graceful|help|configtest}"</span>
+    <span class="token keyword">echo</span> $<span class="token string">"Usage: <span class="token variable">$prog</span> &amp;#123;start|stop|restart|condrestart|try-restart|force-reload|reload|status|fullstatus|graceful|help|configtest&amp;#125;"</span>
     RETVAL<span class="token operator">=</span>2
 esac
 
@@ -1352,7 +1352,7 @@ esac
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1196.5k</span>
+                        class="white-color">1218k</span>
             
             
             
