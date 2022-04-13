@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-03-24
+                    2022-04-13
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.7k
+                    3.6k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    10 分
+                    15 分
                 </div>
                 
 
@@ -869,6 +869,155 @@ server.crt: OK
 <li><a target="_blank" rel="noopener" href="https://ubuntu.com/about/release-cycle#ubuntu-kernel-release-cycle">Ubuntu kernel release cycle</a></li>
 </ul>
 <p><img src="../images/linux_use_problems_06.png" alt="Linux常见零碎问题汇总 - Ubuntu发行版的支持时间"></p>
+<hr>
+<h2 id="8-Linux-系统启动性能分析"><a href="#8-Linux-系统启动性能分析" class="headerlink" title="8. Linux 系统启动性能分析"></a>8. Linux 系统启动性能分析</h2><blockquote>
+<p><strong>分析系统性能，发现并解决引起性能不佳、启动时间长的问题</strong></p>
+</blockquote>
+<p><code>Linux</code> 启动过程是值得学习关注的地方，因为 <a target="_blank" rel="noopener" href="https://linux.cn/article-14462-1.html?utm_source=rss&amp;utm_medium=rss"><code>systemd-analyze</code></a> 工具很多功能聚焦在启动 <code>startup</code> 过程。但是首先，要理解引导 <code>boot</code> 和启动 <code>startup</code>。引导阶段从 <code>BIOS</code> 加电自检（<code>POST</code>）开始，结束于内核完成加载并控制主机系统，然后是开始了启动过程，也是 <code>systemd</code> 日志的开始点。</p>
+<ul>
+<li><strong>[1] 启动的几个主要部分耗费的时间</strong><ul>
+<li>防火墙(<code>BIOS</code>)、内核启动、装载运行(<code>initrd</code>)、用户空间</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ systemd-analyze
+Startup finished <span class="token keyword">in</span> 7.038s <span class="token punctuation">(</span>firmware<span class="token punctuation">)</span> + 32.527s <span class="token punctuation">(</span>loader<span class="token punctuation">)</span> + 2.323s <span class="token punctuation">(</span>kernel<span class="token punctuation">)</span> + 22.704s <span class="token punctuation">(</span>userspace<span class="token punctuation">)</span> <span class="token operator">=</span> 1min 4.594s
+graphical.target reached after 22.695s <span class="token keyword">in</span> userspace
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 哪个 systemd 单元的初始化时间最长</strong><ul>
+<li>果按照初始化时间长短排序，从多到少</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ systemd-analyze blame
+1min 26.562s fstrim.service
+     21.255s plymouth-quit-wait.service
+      4.325s NetworkManager-wait-online.service
+       838ms snapd.service
+       602ms apt-daily-upgrade.service
+       <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 启动过程中发生的时间关键的事件链</strong><ul>
+<li>前面有 <code>+</code> 的数字显示单元启动所需的时间</li>
+<li>前面有 <code>@</code> 的数字表示单元激活开始启动所使用的绝对秒数</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ systemd-analyze critical-chain
+graphical.target @22.695s
+└─multi-user.target @22.695s
+  └─plymouth-quit-wait.service @1.440s +21.255s
+    └─systemd-user-sessions.service @1.435s +2ms
+      └─network.target @1.432s
+        └─NetworkManager.service @1.309s +122ms
+          └─dbus.service @1.308s
+            <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] 转储了当前系统状态的大量数据</strong><ul>
+<li>有主要的启动时间戳</li>
+<li>每个 <code>systemd</code> 单元的列表，并对每个单元状态进行了完整描述</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ systemd-analyze dump
+Timestamp firmware: 39.566011s
+Timestamp loader: 32.527224s
+Timestamp kernel: Fri 2022-04-08 15:07:47 CST
+Timestamp userspace: Fri 2022-04-08 15:07:49 CST
+Timestamp finish: Fri 2022-04-08 15:08:12 CST
+Timestamp security-start: Fri 2022-04-08 15:07:49 CST
+Timestamp security-finish: Fri 2022-04-08 15:07:49 CST
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] 生成一个矢量图文件显示在引导和启动过程发生的事件</strong><ul>
+<li>时间轴上零点的左边是引导阶段，零点的右边是启动阶段</li>
+<li>这一小部分显示了内核、<code>initrd</code> 和 <code>initrd</code> 启动的进程</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># svg</span>
+$ systemd-analyze plot <span class="token operator">></span> /tmp/bootup.svg
+
+<span class="token comment" spellcheck="true"># dot</span>
+$ <span class="token function">time</span> systemd-analyze dot <span class="token operator">|</span> dot -Tsvg <span class="token operator">></span> /tmp/test.svg
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[6] 其他高级设置和操作</strong><ul>
+<li>条件子命令</li>
+<li>列出配置文件</li>
+<li>单元文件检查</li>
+<li>检查指定服务的安全级别</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 条件子命令</span>
+$ systemd-analyze condition \
+    <span class="token string">'ConditionKernelVersion = ! &lt;4.0'</span> \
+    <span class="token string">'ConditionKernelVersion = >=5.1'</span> \
+    <span class="token string">'ConditionACPower=|false'</span> \
+    <span class="token string">'ConditionArchitecture=|!arm'</span> \
+    <span class="token string">'AssertPathExists=/etc/os-release'</span> <span class="token punctuation">;</span> \
+    <span class="token keyword">echo</span> <span class="token variable">$?</span>
+
+<span class="token comment" spellcheck="true"># 列出配置文件</span>
+$ systemd-analyze cat-config systemd/system/display-manager.service
+$ systemctl <span class="token function">cat</span> backup*
+
+<span class="token comment" spellcheck="true"># 单元文件检查</span>
+$ systemd-analyze verify /etc/systemd/system/backup.service
+
+<span class="token comment" spellcheck="true"># 检查指定服务的安全级别</span>
+$ systemd-analyze security display-manager
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="9-非交互下安装工具和软件"><a href="#9-非交互下安装工具和软件" class="headerlink" title="9. 非交互下安装工具和软件"></a>9. 非交互下安装工具和软件</h2><blockquote>
+<p><strong>因为某些问题，我们不需要安装的时候遇到系统提示！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 打包镜像的时候，安装工具绝大多数都是不应该需要人为参与的(妨碍自动化)，所以我们静默自动化安装。常常遇到问题是，安装时区、键盘布局等，需要我们选择时区和键盘布局。如下所示，是安装 <code>chef</code> 工具提示的对话框。</li>
+</ul>
+<p><img src="../images/linux_use_problems_07.png" alt="Linux常见零碎问题汇总 - "></p>
+<ul>
+<li><strong>[解决方法]</strong> 可以通过 <a target="_blank" rel="noopener" href="https://unix.stackexchange.com/questions/106552/apt-get-install-without-debconf-prompt">StackExchange</a> 这解决方法，达到非交互安装。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># DEBIAN_FRONTEND</span>
+$ <span class="token function">sudo</span> DEBIAN_FRONTEND<span class="token operator">=</span>noninteractive apt <span class="token function">install</span> -y -q chef
+
+<span class="token comment" spellcheck="true"># DebConf</span>
+<span class="token comment" spellcheck="true"># 查出对应包的预配置项</span>
+$ <span class="token function">sudo</span> debconf-show chef
+
+<span class="token comment" spellcheck="true"># 设置对应默认值</span>
+<span class="token comment" spellcheck="true"># 格式: {包名} {包名}/{配置项key} {配置项类型} {配置项value}</span>
+<span class="token comment" spellcheck="true"># 格式: package package/key {boolean,string} {true, some string}</span>
+$ <span class="token keyword">echo</span> <span class="token string">"chef chef/chef_server_url string"</span> <span class="token operator">|</span> <span class="token function">sudo</span> debconf-set-selections
+$ <span class="token function">sudo</span> <span class="token function">apt-get</span> <span class="token function">install</span> chef
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查出对应包的预配置项</span>
+$ <span class="token function">sudo</span> debconf-show tzdata
+* tzdata/Zones/Etc: UTC
+  tzdata/Zones/US:
+  tzdata/Zones/Asia:
+  tzdata/Zones/Africa:
+  tzdata/Zones/Pacific:
+  tzdata/Zones/America:
+  tzdata/Zones/Antarctica:
+  tzdata/Zones/Atlantic:
+  tzdata/Zones/Arctic:
+  tzdata/Zones/Indian:
+  tzdata/Zones/Australia:
+* tzdata/Areas: Etc
+  tzdata/Zones/Europe:
+
+<span class="token comment" spellcheck="true"># 设置对应默认值</span>
+$ <span class="token keyword">echo</span> <span class="token string">"tzdata tzdata/Areas select Etc"</span> <span class="token operator">|</span> debconf-set-selections
+$ <span class="token keyword">echo</span> <span class="token string">"tzdata tzdata/Zones/Etc select UTC"</span> <span class="token operator">|</span> debconf-set-selections
+$ <span class="token function">sudo</span> <span class="token function">apt-get</span> <span class="token function">install</span> -y tzdata
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1417,7 +1566,7 @@ server.crt: OK
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1197.4k</span>
+                        class="white-color">1198.3k</span>
             
             
             
