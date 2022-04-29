@@ -29,11 +29,11 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
-
+<meta name="generator" content="Hexo 5.4.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
-<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"><link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
+</head>
 
 
 
@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-04-13
+                    2022-04-29
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    3.6k
+                    4.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    15 分
+                    18 分
                 </div>
                 
 
@@ -1018,6 +1018,66 @@ $ <span class="token keyword">echo</span> <span class="token string">"tzdata tzd
 $ <span class="token keyword">echo</span> <span class="token string">"tzdata tzdata/Zones/Etc select UTC"</span> <span class="token operator">|</span> debconf-set-selections
 $ <span class="token function">sudo</span> <span class="token function">apt-get</span> <span class="token function">install</span> -y tzdata
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="10-普通用户执行特权指令"><a href="#10-普通用户执行特权指令" class="headerlink" title="10. 普通用户执行特权指令"></a>10. 普通用户执行特权指令</h2><blockquote>
+<p><strong>这是一种偷巧的方法，所以并不推荐使用！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 安装某个系统工具(<code>xxx</code>)的时候发现，发现有如下报错，提示 <code>zfsutils-linux</code> 需要更高版本的依赖。尝试使用提供的命令，进行解决，无果。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 问题排除</span>
+$ <span class="token function">sudo</span> apt <span class="token function">install</span> --no-install-recommends -y xxx
+Reading package lists<span class="token punctuation">..</span>. Done
+Building dependency tree
+Reading state information<span class="token punctuation">..</span>. Done
+You might want to run <span class="token string">'apt --fix-broken install'</span> to correct these.
+The following packages have unmet dependencies:
+ zfsutils-linux <span class="token keyword">:</span> Depends: libnvpair3linux <span class="token punctuation">(</span><span class="token operator">=</span> 2.1.4-0york0~18.04<span class="token punctuation">)</span> but 2.1.1-0york0~18.04 is to be installed
+                  Depends: libuutil3linux <span class="token punctuation">(</span><span class="token operator">=</span> 2.1.4-0york0~18.04<span class="token punctuation">)</span> but 2.1.1-0york0~18.04 is to be installed
+                  Depends: libzfs4linux <span class="token punctuation">(</span><span class="token operator">=</span> 2.1.4-0york0~18.04<span class="token punctuation">)</span> but 2.1.1-0york0~18.04 is to be installed
+E: Unmet dependencies. Try <span class="token string">'apt --fix-broken install'</span> with no packages <span class="token punctuation">(</span>or specify a solution<span class="token punctuation">)</span>.
+
+<span class="token comment" spellcheck="true"># 尝试修复</span>
+$ <span class="token function">sudo</span> apt --fix-broken <span class="token function">install</span>
+Reading package lists<span class="token punctuation">..</span>. Done
+Building dependency tree
+Reading state information<span class="token punctuation">..</span>. Done
+Correcting dependencies<span class="token punctuation">..</span>. Done
+The following packages were automatically installed and are no longer required:
+  <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+The following packages will be upgraded:
+  libnvpair3linux libuutil3linux libzfs4linux
+3 upgraded, 0 newly installed, 0 to remove and 121 not upgraded.
+46 not fully installed or removed.
+Need to get 0 B/355 kB of archives.
+After this operation, 8,192 B of additional disk space will be used.
+Do you want to continue? <span class="token punctuation">[</span>Y/n<span class="token punctuation">]</span> y
+<span class="token punctuation">(</span>Reading database <span class="token punctuation">..</span>. 212110 files and directories currently installed.<span class="token punctuation">)</span>
+Preparing to unpack <span class="token punctuation">..</span>./libnvpair3linux_2.1.4-0york0~18.04_amd64.deb <span class="token punctuation">..</span>.
+Unpacking libnvpair3linux <span class="token punctuation">(</span>2.1.4-0york0~18.04<span class="token punctuation">)</span> over <span class="token punctuation">(</span>2.1.1-0york0~18.04<span class="token punctuation">)</span> <span class="token punctuation">..</span>.
+dpkg: error processing archive /var/cache/apt/archives/libnvpair3linux_2.1.4-0york0~18.04_amd64.deb <span class="token punctuation">(</span>--unpack<span class="token punctuation">)</span>:
+  trying to overwrite <span class="token string">'/lib/x86_64-linux-gnu/libnvpair.so.3.0.0'</span>, <span class="token function">which</span> is also <span class="token keyword">in</span> package libnvpair1linux 2.0.4-0york0~18.04
+  <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+Errors were encountered <span class="token keyword">while</span> processing:
+  /var/cache/apt/archives/libnvpair3linux_2.1.4-0york0~18.04_amd64.deb
+  /var/cache/apt/archives/libuutil3linux_2.1.4-0york0~18.04_amd64.deb
+  /var/cache/apt/archives/libzfs4linux_2.1.4-0york0~18.04_amd64.deb
+E: Sub-process /usr/bin/dpkg returned an error code <span class="token punctuation">(</span>1<span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 其实问题可以通过更新系统软件包来处理这个问题(系统帮我们处理掉了)，如果因为某些需求导致不能这样操作的话，则可以手动查找对应上述冲突的包，手动将其依赖删除掉，就可以了。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查找依赖</span>
+$ <span class="token function">ls</span> -lh /var/lib/dpkg/info/libnvpair3linux.list
+
+<span class="token comment" spellcheck="true"># 手动处理</span>
+$ <span class="token function">cat</span> /var/lib/dpkg/info/libnvpair3linux.list
+/.
+/usr/share/lintian
+/usr/share/lintian/overrides
+/usr/share/lintian/overrides/libnvpair3linux
+/lib/x86_64-linux-gnu/libnvpair.so.3
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1566,7 +1626,7 @@ $ <span class="token function">sudo</span> <span class="token function">apt-get<
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1202.4k</span>
+                        class="white-color">1202.9k</span>
             
             
             
