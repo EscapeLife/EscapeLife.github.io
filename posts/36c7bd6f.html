@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-09-29
+                    2022-05-09
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.8k
+                    3.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    11 分
+                    12 分
                 </div>
                 
 
@@ -809,6 +809,42 @@ RUN --mount<span class="token operator">=</span>type<span class="token operator"
     <span class="token comment" spellcheck="true"># --mount=type=cache,target/tmp/dist,from=my_app_dist,sharing=locked \</span>
     <span class="token function">mkdir</span> -p /app/dist <span class="token operator">&amp;&amp;</span> <span class="token function">cp</span> -r /tmp/dist/* /app/dist
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="10-二进制工具安装"><a href="#10-二进制工具安装" class="headerlink" title="10. 二进制工具安装"></a>10. 二进制工具安装</h2><blockquote>
+<p><strong>二进制文件安装和使用都相对来说很简单，考虑自己维护还是依赖第三方镜像了！- <a target="_blank" rel="noopener" href="https://twitter.com/muzi_ii/status/1522599179918647296">来自</a></strong></p>
+</blockquote>
+<ul>
+<li>当我们需要安装一个二进制(<code>binary</code>)工具的时候，比如 <code>docker-compose</code>、<code>jq</code>、<code>kubectl</code>、<code>docker</code> 等命令，可以考虑直接从他们的镜像里直接 <code>COPY</code> 过来，替代使用 <code>wget</code>/<code>curl</code> 下载安装的方式。<ul>
+<li>简洁高效，省去下载、解压、<code>chmod</code>、清理临时文件等操作</li>
+<li>可以无缝适配多 <code>CPU</code> 体系架构</li>
+<li>可以充分利用 <code>docker build</code> 的缓存</li>
+<li>避免在 <code>base image</code> 中引入 <code>wget/curl/tar/gzip/ca-certificates/openssl</code> 这类工具的依赖</li>
+<li><code>OCI Artifacts</code> 更加云原生</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-dockerfile"><code class="language-dockerfile"># docker
+COPY --from=docker:20.10.12-dind-rootless /usr/local/bin/docker /usr/local/bin/docker
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-dockerfile"><code class="language-dockerfile">FROM golang:1.17
+
+ARG GOLANG_LINT_VERSION=V1.43.0
+
+ENV GOV PATH=/usr/local/bin/govc
+
+COPY --from=vmware/govc:v0.27.2 /govc /usr/local/bin
+CoPY --from=dtzar/helm-kubectl:3.8.0 /usr/local/bin /usr/local/bin
+COPY --from=koalaman/shellcheck:stable /bin/shellcheck /usr/local/bin/shellcheck
+COPY -from=docker: 20.10.12-dind-rootless /usr/local/bin/docker /usr/local/bin/docker
+COPY --from=hashicorp/packer:1.8 /bin/packer /usr/local/bin
+COPY --from=quay.io/argoproj/argocli:v3.2.6 /bin/argo /usr/local/bin
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>虽然有很多好处，但是容易被供应链攻击，特别是国内受限于 <code>DockerHub</code> 被墙的环境下，大家都会依赖五花八门的 <code>Registry</code> 加速，而 <code>Docker</code> 默认对于镜像的 <code>checksum</code> 支持很差，容易被加料一波带走。而且国内大部分用 <code>curl</code> 的研发也没 <code>checksum</code> 的习惯。—— <a target="_blank" rel="noopener" href="https://twitter.com/Manjusaka_Lee/status/1522605104305967104">@Manjusaka_Lee</a></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 镜像加MD5校验</span>
+docker:20.10.15-dind-rootless@sha256:dcc529a<span class="token punctuation">..</span>.51223c19
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1353,7 +1389,7 @@ RUN --mount<span class="token operator">=</span>type<span class="token operator"
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1205.6k</span>
+                        class="white-color">1206.4k</span>
             
             
             
