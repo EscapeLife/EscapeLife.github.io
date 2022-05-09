@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-09-29
+                    2022-05-09
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.1k
+                    2.3k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    8 分
+                    9 分
                 </div>
                 
 
@@ -546,13 +546,14 @@
 <li><strong>[方法一] 重建仓库</strong></li>
 </ul>
 <p>重建仓库的这种做法，算是一种比较一劳永逸且相对而言比较简单的方式。既然现在的仓库已经让我们无法忍受，与其这样，还不是删除重建来的爽快。但是，这种做法一般情况下，都是不可行，除非是自己的本地项目。</p>
+<hr>
 <ul>
 <li><strong>[方法二] 删除大文件</strong></li>
 </ul>
 <p>第二种做法就是，直接找到 <code>.git</code> 目录下的大文件，将其删除掉，之后推送到远程代码库里面。这样做的前提是，删除所有其他分支，保留 <code>master</code> 或者 <code>main</code> 分支。这里需要注意的是，操作有风险，后果请自负。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查找大文件</span>
 $ <span class="token function">git</span> verify-pack -v .git/objects/pack/*.idx
-12235d<span class="token punctuation">..</span>.dewaaaa34 tree   135 137 144088922
+12235d<span class="token punctuation">..</span>.123456789 tree   135 137 144088922
 a453ab<span class="token punctuation">..</span>.34se212qz blob   3695898 695871 144734158
 <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
 
@@ -560,16 +561,16 @@ a453ab<span class="token punctuation">..</span>.34se212qz blob   3695898 695871 
 $ <span class="token function">git</span> verify-pack \
     -v .git/objects/pack/*.idx <span class="token operator">|</span> \
     <span class="token function">sort</span> -k 3 -n <span class="token operator">|</span> <span class="token function">tail</span> -5 <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print<span class="token variable">$1</span>}'</span>
-12q626a<span class="token punctuation">..</span>.23a3
-2z32ax1<span class="token punctuation">..</span>.azfd
+12q626a<span class="token punctuation">..</span>.1234
+2z32ax1<span class="token punctuation">..</span>.1234
 <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
 
 <span class="token comment" spellcheck="true"># 查找出最大的5个文件和对应Commit信息</span>
 $ <span class="token function">git</span> rev-list --objects --all <span class="token operator">|</span> \
     <span class="token function">grep</span> <span class="token string">"<span class="token variable"><span class="token variable">$(</span><span class="token function">git</span> verify-pack -v .git/objects/pack/*.idx <span class="token operator">|</span> \
     <span class="token function">sort</span> -k 3 -n <span class="token operator">|</span> <span class="token function">tail</span> -5 <span class="token operator">|</span> <span class="token function">awk</span> '<span class="token punctuation">{</span>print$1<span class="token punctuation">}</span>'<span class="token variable">)</span></span>"</span>
-91266a<span class="token punctuation">..</span>.sdfa3    data/xxx.pkl
-232ax1<span class="token punctuation">..</span>.acafd    data/yyy.pkl
+91266a<span class="token punctuation">..</span>.12345    data/xxx.pkl
+232ax1<span class="token punctuation">..</span>.12345    data/yyy.pkl
 <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
 
 <span class="token comment" spellcheck="true"># rev-list:    列出Git仓库中的所有提交记录</span>
@@ -595,6 +596,33 @@ $ <span class="token function">rm</span> -rf .git/refs/original/
 $ <span class="token function">git</span> reflog expire --expire<span class="token operator">=</span>now --all
 $ <span class="token function">git</span> gc --prune<span class="token operator">=</span>now
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<ul>
+<li><strong>[方法二] 删除大文件</strong></li>
+</ul>
+<p>第二种做法就是，直接找到 <code>.git</code> 目录下的大文件，将其删除掉，之后推送到远程代码库里面。这样做的前提是，删除所有其他分支，保留 <code>master</code> 或者 <code>main</code> 分支。这里需要注意的是，操作有风险，后果请自负。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用如下的命令找出历史上的大文件</span>
+<span class="token comment" spellcheck="true"># 引用: https://stackoverfow.com/questions/ 10622179/how-to-find-identify-large-commits-in-git-history</span>
+<span class="token operator">></span> <span class="token function">git</span> rev-list --objects--all <span class="token operator">|</span>
+    <span class="token function">git</span> cat-file --batch-check<span class="token operator">=</span><span class="token string">'%(objecttype) %(objectname) %(objectsize) %(rest)'</span> <span class="token operator">|</span>
+    <span class="token function">sed</span> -n <span class="token string">'S/^blob //p'</span> <span class="token operator">|</span>
+    <span class="token function">sort</span> --numeric-sort--key<span class="token operator">=</span>2 <span class="token operator">|</span>
+    <span class="token function">cut</span> -c 1-12,41- <span class="token operator">|</span>
+    <span class="token variable"><span class="token variable">$(</span><span class="token function">command</span> -v gnumfmt <span class="token operator">||</span> <span class="token keyword">echo</span> numfmt<span class="token variable">)</span></span> --field<span class="token operator">=</span>2 --to<span class="token operator">=</span>iec-i --suffix<span class="token operator">=</span>B --padding<span class="token operator">=</span>7 --round<span class="token operator">=</span>neares
+
+<span class="token comment" spellcheck="true"># 直接删除</span>
+<span class="token comment" spellcheck="true"># 引用: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository</span>
+<span class="token operator">></span> bfg -D <span class="token operator">&lt;</span>文件名＞
+
+<span class="token comment" spellcheck="true"># 根据bfg 提示执行</span>
+<span class="token operator">></span> <span class="token function">git</span> reflog expire --expire<span class="token operator">=</span>now --all
+<span class="token operator">></span> <span class="token function">git</span> ac --prune<span class="token operator">=</span>now --aggressive
+
+<span class="token comment" spellcheck="true"># 推上Github</span>
+<span class="token operator">></span> <span class="token function">git</span> push -f
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="../images/fix-git-files-too-large-01.jpg" alt="解决.git目录过大问题"></p>
+<hr>
 <ul>
 <li><strong>[方法三] 使用工具清理</strong></li>
 </ul>
@@ -1243,7 +1271,7 @@ node_modules
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1205.4k</span>
+                        class="white-color">1205.6k</span>
             
             
             
