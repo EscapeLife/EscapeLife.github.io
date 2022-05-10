@@ -466,7 +466,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-05-09
+                    2022-05-10
                 </div>
                 
 
@@ -602,16 +602,17 @@ $ <span class="token function">git</span> gc --prune<span class="token operator"
 </ul>
 <p>第二种做法就是，直接找到 <code>.git</code> 目录下的大文件，将其删除掉，之后推送到远程代码库里面。这样做的前提是，删除所有其他分支，保留 <code>master</code> 或者 <code>main</code> 分支。这里需要注意的是，操作有风险，后果请自负。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用如下的命令找出历史上的大文件</span>
-<span class="token comment" spellcheck="true"># 引用: https://stackoverfow.com/questions/ 10622179/how-to-find-identify-large-commits-in-git-history</span>
-<span class="token operator">></span> <span class="token function">git</span> rev-list --objects--all <span class="token operator">|</span>
+<span class="token comment" spellcheck="true"># 引用: https://stackoverflow.com/questions/10622179/how-to-find-identify-large-commits-in-git-history</span>
+<span class="token operator">></span> <span class="token function">git</span> rev-list --objects --all <span class="token operator">|</span>
     <span class="token function">git</span> cat-file --batch-check<span class="token operator">=</span><span class="token string">'%(objecttype) %(objectname) %(objectsize) %(rest)'</span> <span class="token operator">|</span>
-    <span class="token function">sed</span> -n <span class="token string">'S/^blob //p'</span> <span class="token operator">|</span>
-    <span class="token function">sort</span> --numeric-sort--key<span class="token operator">=</span>2 <span class="token operator">|</span>
+    <span class="token function">sed</span> -n <span class="token string">'s/^blob //p'</span> <span class="token operator">|</span>
+    <span class="token function">sort</span> --numeric-sort --key<span class="token operator">=</span>2 <span class="token operator">|</span>
     <span class="token function">cut</span> -c 1-12,41- <span class="token operator">|</span>
-    <span class="token variable"><span class="token variable">$(</span><span class="token function">command</span> -v gnumfmt <span class="token operator">||</span> <span class="token keyword">echo</span> numfmt<span class="token variable">)</span></span> --field<span class="token operator">=</span>2 --to<span class="token operator">=</span>iec-i --suffix<span class="token operator">=</span>B --padding<span class="token operator">=</span>7 --round<span class="token operator">=</span>neares
+    <span class="token variable"><span class="token variable">$(</span><span class="token function">command</span> -v gnumfmt <span class="token operator">||</span> <span class="token keyword">echo</span> numfmt<span class="token variable">)</span></span> --field<span class="token operator">=</span>2 --to<span class="token operator">=</span>iec-i --suffix<span class="token operator">=</span>B --padding<span class="token operator">=</span>7 --round<span class="token operator">=</span>nearest
 
 <span class="token comment" spellcheck="true"># 直接删除</span>
 <span class="token comment" spellcheck="true"># 引用: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository</span>
+<span class="token comment" spellcheck="true"># 引用: https://rtyley.github.io/bfg-repo-cleaner</span>
 <span class="token operator">></span> bfg -D <span class="token operator">&lt;</span>文件名＞
 
 <span class="token comment" spellcheck="true"># 根据bfg 提示执行</span>
@@ -620,7 +621,7 @@ $ <span class="token function">git</span> gc --prune<span class="token operator"
 
 <span class="token comment" spellcheck="true"># 推上Github</span>
 <span class="token operator">></span> <span class="token function">git</span> push -f
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><img src="../images/fix-git-files-too-large-01.jpg" alt="解决.git目录过大问题"></p>
 <hr>
 <ul>
