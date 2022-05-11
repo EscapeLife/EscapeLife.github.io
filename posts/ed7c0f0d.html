@@ -426,20 +426,16 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/Find/">
-                                <span class="chip bg-color">Find</span>
-                            </a>
-                        
                             <a href="/tags/Shell/">
                                 <span class="chip bg-color">Shell</span>
                             </a>
                         
-                            <a href="/tags/PS/">
-                                <span class="chip bg-color">PS</span>
-                            </a>
-                        
                             <a href="/tags/Netstat/">
                                 <span class="chip bg-color">Netstat</span>
+                            </a>
+                        
+                            <a href="/tags/Command/">
+                                <span class="chip bg-color">Command</span>
                             </a>
                         
                     </div>
@@ -470,14 +466,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-09-17
+                    2022-05-11
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    318
+                    414
                 </div>
                 
 
@@ -515,18 +511,21 @@
 <ul>
 <li><strong>获取本机 IP 地址</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">ifconfig</span> eth0 <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">"inet addr"</span> <span class="token operator">|</span> <span class="token function">awk</span> -F: <span class="token string">'{print <span class="token variable">$2</span>}'</span> <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$1</span>}'</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">></span> ip a
+<span class="token operator">></span> <span class="token function">ifconfig</span> eth0 <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">"inet addr"</span> <span class="token operator">|</span> <span class="token function">awk</span> -F: <span class="token string">'{print <span class="token variable">$2</span>}'</span> <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$1</span>}'</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>查看内存占用最多</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">ps</span> -aux <span class="token operator">|</span> <span class="token function">sort</span> -k4nr <span class="token operator">|</span> <span class="token function">head</span> -5
-<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># -k: 指定筛选的列(4是%MEM)</span>
+<span class="token operator">></span> <span class="token function">ps</span> -aux <span class="token operator">|</span> <span class="token function">sort</span> -k4nr <span class="token operator">|</span> <span class="token function">head</span> -5
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>查使用 CPU 最多的进程</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">ps</span> -aux <span class="token operator">|</span> <span class="token function">sort</span> -k3nr <span class="token operator">|</span> <span class="token function">head</span> -5
-<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># -k: 指定筛选的列(3是%CPU)</span>
+<span class="token operator">></span> <span class="token function">ps</span> -aux <span class="token operator">|</span> <span class="token function">sort</span> -k3nr <span class="token operator">|</span> <span class="token function">head</span> -5
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="2-查看服务状况"><a href="#2-查看服务状况" class="headerlink" title="2. 查看服务状况"></a>2. 查看服务状况</h2><blockquote>
 <p><strong>获取网络相关的状态请求信息</strong></p>
@@ -534,17 +533,17 @@
 <ul>
 <li><strong>查看 TCP 连接状态</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">netstat</span> -n <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'/^tcp/ {++S[<span class="token variable">$NF</span>]} END {for(a in S) print a, S[a]}'</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">></span> <span class="token function">netstat</span> -n <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'/^tcp/ {++S[<span class="token variable">$NF</span>]} END {for(a in S) print a, S[a]}'</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <ul>
 <li><strong>找查较多的 SYN 连接</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">netstat</span> -an <span class="token operator">|</span> <span class="token function">grep</span> SYN <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$5</span>}'</span> <span class="token operator">|</span> <span class="token function">awk</span> -F: <span class="token string">'{print <span class="token variable">$1</span>}'</span> <span class="token operator">|</span> <span class="token function">sort</span> <span class="token operator">|</span> <span class="token function">uniq</span> -c <span class="token operator">|</span><span class="token function">sort</span> -nr <span class="token operator">|</span> <span class="token function">more</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">></span> <span class="token function">netstat</span> -an <span class="token operator">|</span> <span class="token function">grep</span> SYN <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$5</span>}'</span> <span class="token operator">|</span> <span class="token function">awk</span> -F: <span class="token string">'{print <span class="token variable">$1</span>}'</span> <span class="token operator">|</span> <span class="token function">sort</span> <span class="token operator">|</span> <span class="token function">uniq</span> -c <span class="token operator">|</span><span class="token function">sort</span> -nr <span class="token operator">|</span> <span class="token function">more</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <ul>
 <li><strong>查找较多 time_wait 连接</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token function">netstat</span> -n <span class="token operator">|</span> <span class="token function">grep</span> TIME_WAIT <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$5</span>}'</span> <span class="token operator">|</span> <span class="token function">sort</span> <span class="token operator">|</span> <span class="token function">uniq</span> -c <span class="token operator">|</span> <span class="token function">sort</span> -rn <span class="token operator">|</span> <span class="token function">head</span> -n 20
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">></span> <span class="token function">netstat</span> -n <span class="token operator">|</span> <span class="token function">grep</span> TIME_WAIT <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'{print <span class="token variable">$5</span>}'</span> <span class="token operator">|</span> <span class="token function">sort</span> <span class="token operator">|</span> <span class="token function">uniq</span> -c <span class="token operator">|</span> <span class="token function">sort</span> -rn <span class="token operator">|</span> <span class="token function">head</span> -n 20
 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <hr>
 <h2 id="3-设备驱动信息"><a href="#3-设备驱动信息" class="headerlink" title="3. 设备驱动信息"></a>3. 设备驱动信息</h2><blockquote>
@@ -553,42 +552,53 @@
 <ul>
 <li><strong>列出 PCI 总线及其连接的设备</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash">lspci
-lspci -v
-lspci -vv
-lspci -vvv
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">></span> lspci
+<span class="token operator">></span> lspci -v
+<span class="token operator">></span> lspci -vv
+<span class="token operator">></span> lspci -vvv
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>定位显卡信息</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash">lspci <span class="token operator">|</span> <span class="token function">grep</span> -e VGA
-lspci <span class="token operator">|</span> <span class="token function">grep</span> -e 3D
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">></span> lspci <span class="token operator">|</span> <span class="token function">grep</span> -e VGA
+<span class="token operator">></span> lspci <span class="token operator">|</span> <span class="token function">grep</span> -e 3D
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>按供应商 ID 搜索</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash">lspci -nn <span class="token operator">|</span> <span class="token function">grep</span> -e VGA
-lspci -nn -d 10de:
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">></span> lspci -nn <span class="token operator">|</span> <span class="token function">grep</span> -e VGA
+<span class="token operator">></span> lspci -nn -d 10de:
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>查看内核模块</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash">lspci -nn -k -d 10de:
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">></span> lspci -nn -k -d 10de:
 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <hr>
 <h2 id="4-命令使用注意"><a href="#4-命令使用注意" class="headerlink" title="4. 命令使用注意"></a>4. 命令使用注意</h2><blockquote>
 <p><strong>列出平时使用 Linux 命令时需要注意的小细节</strong></p>
 </blockquote>
 <ul>
-<li><strong><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/29360925/whats-the-difference-between-and-at-the-end-of-a-find-command">使用 find 命令</a></strong></li>
+<li><strong><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/29360925/whats-the-difference-between-and-at-the-end-of-a-find-command">使用 find 命令的小技巧</a></strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># ./abc</span>
 <span class="token comment" spellcheck="true"># ./xyz</span>
-$ <span class="token function">find</span> <span class="token keyword">.</span> -type f -exec <span class="token keyword">echo</span> <span class="token punctuation">{</span><span class="token punctuation">}</span> \<span class="token punctuation">;</span>
+<span class="token operator">></span> <span class="token function">find</span> <span class="token keyword">.</span> -type f -exec <span class="token keyword">echo</span> <span class="token punctuation">{</span><span class="token punctuation">}</span> \<span class="token punctuation">;</span>
 
 <span class="token comment" spellcheck="true"># ./xyz ./abc</span>
-$ <span class="token function">find</span> <span class="token keyword">.</span> -type f -exec <span class="token keyword">echo</span> <span class="token punctuation">{</span><span class="token punctuation">}</span> +
+<span class="token operator">></span> <span class="token function">find</span> <span class="token keyword">.</span> -type f -exec <span class="token keyword">echo</span> <span class="token punctuation">{</span><span class="token punctuation">}</span> +
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="5-性能相关命令"><a href="#5-性能相关命令" class="headerlink" title="5. 性能相关命令"></a>5. 性能相关命令</h2><blockquote>
+<p><strong>统计应用相关的命令，比如内存和 CPU 使用，以及瓶颈筛查</strong></p>
+</blockquote>
+<ul>
+<li><strong>统计进程使用的内存/CPU 等资源</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">></span> /usr/bin/time -f \
+    <span class="token string">"mem=%K RSS=%M elapsed=%E cpu.sys=%S .user=%U"</span> \
+    python3 -m app.op.stat_show_answer -c -m 4 -f 300 -t 300
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -653,20 +663,16 @@ $ <span class="token function">find</span> <span class="token keyword">.</span> 
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/Find/">
-                                    <span class="chip bg-color">Find</span>
-                                </a>
-                            
                                 <a href="/tags/Shell/">
                                     <span class="chip bg-color">Shell</span>
                                 </a>
                             
-                                <a href="/tags/PS/">
-                                    <span class="chip bg-color">PS</span>
-                                </a>
-                            
                                 <a href="/tags/Netstat/">
                                     <span class="chip bg-color">Netstat</span>
+                                </a>
+                            
+                                <a href="/tags/Command/">
+                                    <span class="chip bg-color">Command</span>
                                 </a>
                             
                         </div>
@@ -1133,7 +1139,7 @@ $ <span class="token function">find</span> <span class="token keyword">.</span> 
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1206.5k</span>
+                        class="white-color">1206.7k</span>
             
             
             
