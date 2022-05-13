@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-04-29
+                    2022-05-13
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    4.2k
+                    4.6k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    18 分
+                    19 分
                 </div>
                 
 
@@ -1019,7 +1019,7 @@ $ <span class="token keyword">echo</span> <span class="token string">"tzdata tzd
 $ <span class="token function">sudo</span> <span class="token function">apt-get</span> <span class="token function">install</span> -y tzdata
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="10-普通用户执行特权指令"><a href="#10-普通用户执行特权指令" class="headerlink" title="10. 普通用户执行特权指令"></a>10. 普通用户执行特权指令</h2><blockquote>
+<h2 id="10-修复安装依赖报错问题"><a href="#10-修复安装依赖报错问题" class="headerlink" title="10. 修复安装依赖报错问题"></a>10. 修复安装依赖报错问题</h2><blockquote>
 <p><strong>这是一种偷巧的方法，所以并不推荐使用！</strong></p>
 </blockquote>
 <ul>
@@ -1078,6 +1078,54 @@ $ <span class="token function">cat</span> /var/lib/dpkg/info/libnvpair3linux.lis
 /usr/share/lintian/overrides/libnvpair3linux
 /lib/x86_64-linux-gnu/libnvpair.so.3
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="11-在机器上使用-X11-做转发"><a href="#11-在机器上使用-X11-做转发" class="headerlink" title="11. 在机器上使用 X11 做转发"></a>11. 在机器上使用 X11 做转发</h2><blockquote>
+<p><strong>远程机器，使用其图形化工具界面！</strong></p>
+</blockquote>
+<p><code>X11-forwarding</code> 说简单点就是，可以通过一个支持 <code>X Server</code> 的 <code>SSH</code> 客户端连接到远程 <code>Linux 服务器</code>，可以在本地运行、操作一个远程 <code>Linux</code> 服务器上有图形界面的程序。其中，<code>X11</code> 中的 <code>X</code> 指的就是 <code>X</code> 协议，而 <code>11</code> 指的是采用 <code>X</code> 协议的第 <code>11</code> 个版本。</p>
+<p>出于安全原因，<code>OpenSSH</code> 服务默认将 <code>X11</code> 转发请求绑定到本地回环地址上，并且在 <code>DISPLAY</code> 环境变量中将主机名设置为 <code>“localhost”</code>。在这样的设定下，一些 <code>X11</code> 客户端不能正确处理 <code>X11</code> 转发，这会导致如下的错误。要解决这个问题，在 <code>/etc/ssh/sshd</code> 配置文件中加入下面这几行，它可以将 <code>X11</code> 转发请求绑定到外网卡地址上。</p>
+<ul>
+<li><strong>配置 <code>X11</code> 服务</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 配置服务</span>
+<span class="token comment" spellcheck="true"># https://linux.cn/article-4014-1.html</span>
+$ <span class="token function">sudo</span> vim /etc/ssh/sshd_config
+X11Forwarding <span class="token function">yes</span>    <span class="token comment" spellcheck="true"># 支持转发</span>
+X11DisplayOffset 10  <span class="token comment" spellcheck="true"># 默认的显示窗口</span>
+X11UseLocalhost no   <span class="token comment" spellcheck="true"># 不监听本地回环地址</span>
+AddressFamily inet   <span class="token comment" spellcheck="true"># SSH服务禁止了IPv6(可选)</span>
+
+<span class="token comment" spellcheck="true"># 重启服务</span>
+$ <span class="token function">sudo</span> systemctl restart sshd
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>本机使用 <code>X11</code> 服务</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Mac的话需要先安装工具</span>
+$ brew <span class="token function">install</span> xquartz
+
+<span class="token comment" spellcheck="true"># 链接远程主机</span>
+$ <span class="token function">ssh</span> -v -X user@hostname
+
+<span class="token comment" spellcheck="true"># 执行图形化工具(没有就安装下)</span>
+$ xeyes
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>常见的报错信息汇总</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 配置不对</span>
+X11 forwarding request failed on channel 0
+
+<span class="token comment" spellcheck="true"># 配置不对</span>
+x11 forwarding cannot <span class="token function">open</span> display localhost 10.0
+
+<span class="token comment" spellcheck="true"># 配置不对</span>
+Unable to init server: Could not connect: Connection refused
+<span class="token punctuation">(</span>gedit:26888<span class="token punctuation">)</span>: Gtk-WARNING **: 17:00:04.268: cannot <span class="token function">open</span> display:
+
+<span class="token comment" spellcheck="true"># Mac需要启动XQuartz工具</span>
+connect /tmp/.X11-unix/X10: No such <span class="token function">file</span> or directory
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1626,7 +1674,7 @@ $ <span class="token function">cat</span> /var/lib/dpkg/info/libnvpair3linux.lis
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1206.7k</span>
+                        class="white-color">1207.1k</span>
             
             
             
