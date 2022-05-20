@@ -31,9 +31,9 @@
 
 <meta name="generator" content="Hexo 5.4.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
-<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"><link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
-</head>
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
 
 
@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-03-29
+                    2022-05-20
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    10k
+                    10.8k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    40 分
+                    44 分
                 </div>
                 
 
@@ -1491,6 +1491,77 @@ RUN <span class="token function">ln</span> -sf /usr/share/zoneinfo/Asia/Shanghai
 environment:
   TZ: Asia/Shanghai
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="26-Docker-容器磁盘不足"><a href="#26-Docker-容器磁盘不足" class="headerlink" title="26. Docker 容器磁盘不足"></a>26. Docker 容器磁盘不足</h2><blockquote>
+<p><strong>启动很多容器服务，导致存储和运行的容器目录(/var/lib/docker/)磁盘消耗很大！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 服务器使用久了，就会出现磁盘不足的问题，这时候就需要排除到底是什么服务或者数据导致的。但如果使用容器化部署服务的话(<code>docker</code>)，大多数都是因为启动的容器导致，即启动的服务占用了大量的磁盘空间。</li>
+</ul>
+<p><img src="../images/docker-have-some-trouble-9.png" alt="Docker 容器导致磁盘不足"></p>
+<ul>
+<li><strong>[分析思路]</strong> 我们知道 <code>/var/lib/docker/overlay2</code> 目录下的文件夹名基本都是以 <code>md5</code> 编码命名的，而 <code>overlay2</code> 是 <code>docker</code> 使用的文件存储驱动，也就是说该目录里面存储的就是现在服务器运行的容器。同时，我们知道镜像是分层的结构，所以这容器每次层都在这里得到了体现。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看容器的默认文件驱动</span>
+$ docker info <span class="token operator">|</span> <span class="token function">grep</span> <span class="token string">"Storage Driver"</span>
+Storage Driver: overlay2
+
+<span class="token comment" spellcheck="true"># 查看磁盘消耗大户</span>
+$ <span class="token function">sudo</span> <span class="token function">du</span> -sh /var/lib/docker/overlay2
+900G    /var/lib/docker/overlay2
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="../images/docker-have-some-trouble-10.png" alt="Docker 容器导致磁盘不足"></p>
+<ul>
+<li><strong>[分析思路]</strong> 如果我们临时启动了一个服务，当时只是打算只是临时使用，但是后续因为某些原因导致长期使用。同时因为运行中产生的数据或者文件并没有挂载映射到宿主机，导致写入容器内本地的文件最终到了一个很大的量级(比如容器产生的日志文件、数据文件)。这就导致我们看到，对应层下面 <code>diff</code> 和 <code>merged</code> 目录很大的原因。<ul>
+<li><code>diff</code> -&gt; 保存的就是差分信息 -&gt; 容器的可读可写层且初始为空</li>
+<li><code>merged</code> -&gt; 容器运行时才会出现的存储情况集合 -&gt; 容器的挂载点</li>
+<li><code>upperdir</code> -&gt; 容器层</li>
+<li><code>lowerdir</code> -&gt; 初始镜像层</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 里面到底存储的啥</span>
+<span class="token comment" spellcheck="true"># diff文件夹占用100G+，merged文件夹占用200+G</span>
+$ <span class="token function">sudo</span> <span class="token function">ls</span> -lh /var/lib/docker/overlay2/1e3137<span class="token punctuation">..</span>.9706bca6
+drwxr-xr-x  10 root root  4096 8月   5  2021 diff/   <span class="token comment" spellcheck="true"># 大</span>
+-rw-r--r--   1 root root    26 8月   5  2021 <span class="token function">link</span>
+-rw-r--r--   1 root root   376 8月   5  2021 lower
+drwxr-xr-x   1 root root  4096 8月   5  2021 merged/ <span class="token comment" spellcheck="true"># 大</span>
+drwx------   3 root root  4096 4月  24 12:22 work/
+
+<span class="token comment" spellcheck="true"># link文件的内容对应了/var/lib/docker/overlay2/l的文件夹名称</span>
+<span class="token comment" spellcheck="true"># 保存了镜像层的短标识；用于解决mount参数中长字符超过页大小限制的问题</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="../images/docker-have-some-trouble-11.png" alt="Docker 容器导致磁盘不足"></p>
+<ul>
+<li><strong>[解决方法]</strong> 宿主机设置了时区，而 <code>Docker</code> 容器并没有设置，导致两者相差 <code>8</code> 小时。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看那个容器层占用了大量磁盘空间</span>
+$ <span class="token function">sudo</span> <span class="token function">du</span> -sh /var/lib/docker/overlay2/* <span class="token operator">|</span> <span class="token function">grep</span> G <span class="token operator">|</span> <span class="token function">sort</span> -rn
+121G    1e3137<span class="token punctuation">..</span>.9706bca6
+33G     9d50b3<span class="token punctuation">..</span>.ef3ae1b0
+12G     462157<span class="token punctuation">..</span>.03ce3935
+
+<span class="token comment" spellcheck="true"># 查找对应层所属于那个容器镜像</span>
+$ docker <span class="token function">ps</span> -q <span class="token operator">|</span> \
+    <span class="token function">xargs</span> docker inspect --format <span class="token string">'{{.State.Pid}}, {{.Id}}, {{.Name}}, {{.GraphDriver.Data.WorkDir}}'</span> <span class="token operator">|</span> \
+    <span class="token function">grep</span> xxx
+
+<span class="token comment" spellcheck="true"># 可以根据容器id和名称查看他的层数信息(从低到高)</span>
+$ docker inspect xxx <span class="token operator">|</span> <span class="token function">grep</span> -E <span class="token string">"LowerDir|UpperDir|MergedDir|WorkDir"</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 在该目录下也存在一个同样名字容器的文件夹(xxx)</span>
+$ <span class="token function">ls</span> -lh /var/lib/docker/image/overlay2/layerdb/mounts/
+fff30d<span class="token punctuation">..</span>.bc6a0222
+8078cf<span class="token punctuation">..</span>.73bda80b
+b801ce<span class="token punctuation">..</span>.cc78e234
+
+<span class="token comment" spellcheck="true"># mount-id: 表示了我们刚才创建的容器的目录(/var/lib/docker/overlay2)</span>
+$ <span class="token function">ls</span> -lh /var/lib/docker/image/overlay2/layerdb/mounts/ff30d<span class="token punctuation">..</span>.bc6a0222/
+-rw-r--r--  1 root root    69 8月   5  2021 init-id
+-rw-r--r--  1 root root    64 8月   5  2021 mount-id
+-rw-r--r--  1 root root    71 8月   5  2021 parent
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -2035,7 +2106,7 @@ environment:
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1219.9k</span>
+                        class="white-color">1221k</span>
             
             
             

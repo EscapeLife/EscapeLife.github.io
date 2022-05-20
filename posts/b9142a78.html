@@ -31,9 +31,9 @@
 
 <meta name="generator" content="Hexo 5.4.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
-<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"><link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
-</head>
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
 
 
@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-05-13
+                    2022-05-20
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    4.6k
+                    4.8k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    19 分
+                    20 分
                 </div>
                 
 
@@ -978,11 +978,11 @@ $ systemd-analyze security display-manager
 <p><strong>因为某些问题，我们不需要安装的时候遇到系统提示！</strong></p>
 </blockquote>
 <ul>
-<li><strong>[问题起因]</strong> 打包镜像的时候，安装工具绝大多数都是不应该需要人为参与的(妨碍自动化)，所以我们静默自动化安装。常常遇到问题是，安装时区、键盘布局等，需要我们选择时区和键盘布局。如下所示，是安装 <code>chef</code> 工具提示的对话框。</li>
+<li><strong>[问题起因 一]</strong> 打包镜像的时候，安装工具绝大多数都是不应该需要人为参与的(妨碍自动化)，所以我们静默自动化安装。常常遇到问题是，安装时区、键盘布局等，需要我们选择时区和键盘布局。如下所示，是安装 <code>chef</code> 工具提示的对话框。</li>
 </ul>
 <p><img src="../images/linux_use_problems_07.png" alt="Linux常见零碎问题汇总 - "></p>
 <ul>
-<li><strong>[解决方法]</strong> 可以通过 <a target="_blank" rel="noopener" href="https://unix.stackexchange.com/questions/106552/apt-get-install-without-debconf-prompt">StackExchange</a> 这解决方法，达到非交互安装。</li>
+<li><strong>[解决方法 一]</strong> 可以通过 <a target="_blank" rel="noopener" href="https://unix.stackexchange.com/questions/106552/apt-get-install-without-debconf-prompt">StackExchange</a> 这解决方法，达到非交互安装。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># DEBIAN_FRONTEND</span>
 $ <span class="token function">sudo</span> DEBIAN_FRONTEND<span class="token operator">=</span>noninteractive apt <span class="token function">install</span> -y -q chef
@@ -1018,6 +1018,31 @@ $ <span class="token keyword">echo</span> <span class="token string">"tzdata tzd
 $ <span class="token keyword">echo</span> <span class="token string">"tzdata tzdata/Zones/Etc select UTC"</span> <span class="token operator">|</span> debconf-set-selections
 $ <span class="token function">sudo</span> <span class="token function">apt-get</span> <span class="token function">install</span> -y tzdata
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<ul>
+<li><strong>[问题起因 二]</strong> 打包镜像的时候，容器里边 <code>upgrade</code> 卡住的话，看了一下是否配置文件冲突导致的。如果是的话，可以这么处理一下。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">Setting up <span class="token function">sudo</span> <span class="token punctuation">(</span>1.8.16-0ubuntu1.5<span class="token punctuation">)</span> <span class="token punctuation">..</span>.
+
+Configuration <span class="token function">file</span> <span class="token string">'/etc/sudoers'</span>
+<span class="token operator">==</span><span class="token operator">></span> Modified <span class="token punctuation">(</span>by you or by a script<span class="token punctuation">)</span> since installation.
+<span class="token operator">==</span><span class="token operator">></span> Package distributor has shipped an updated version.
+What would you like to <span class="token keyword">do</span> about it ?  Your options are:
+    Y or I  <span class="token keyword">:</span> <span class="token function">install</span> the package maintainer's version
+    N or O  <span class="token keyword">:</span> keep your currently-installed version
+      D     <span class="token keyword">:</span> show the differences between the versions
+      Z     <span class="token keyword">:</span> start a shell to examine the situation
+The default action is to keep your current version.
+*** sudoers <span class="token punctuation">(</span>Y/I/N/O/D/Z<span class="token punctuation">)</span> <span class="token punctuation">[</span>default<span class="token operator">=</span>N<span class="token punctuation">]</span> ?
+Setting up ubuntu-minimal <span class="token punctuation">(</span>1.361.1<span class="token punctuation">)</span> <span class="token punctuation">..</span>.
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方法 二]</strong> 可以通过 <a target="_blank" rel="noopener" href="https://devops.stackexchange.com/questions/4912/how-to-keep-configuration-files-automatically-during-apt-get-upgrade-or-install">StackExchange</a> 这解决方法，达到非交互安装。可以通过 <code>apt-get</code> 向 <code>dpkg</code> 传递一些选项来处理配置选择，通常可以这样做：</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">apt-get</span> <span class="token function">install</span> -y --no_install_recommends \
+    -o Dpkg::Options::<span class="token operator">=</span><span class="token string">'--force-confdef'</span> \
+    -o Dpkg::Options::<span class="token operator">=</span><span class="token string">'--force-confold'</span> <span class="token operator">&lt;</span>package_name<span class="token operator">></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="10-修复安装依赖报错问题"><a href="#10-修复安装依赖报错问题" class="headerlink" title="10. 修复安装依赖报错问题"></a>10. 修复安装依赖报错问题</h2><blockquote>
 <p><strong>这是一种偷巧的方法，所以并不推荐使用！</strong></p>
@@ -1674,7 +1699,7 @@ connect /tmp/.X11-unix/X10: No such <span class="token function">file</span> or 
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1219.9k</span>
+                        class="white-color">1221k</span>
             
             
             
