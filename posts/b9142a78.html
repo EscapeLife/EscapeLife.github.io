@@ -31,9 +31,9 @@
 
 <meta name="generator" content="Hexo 5.4.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
-<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"><link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
-</head>
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
 
 
@@ -430,12 +430,12 @@
                                 <span class="chip bg-color">Linux</span>
                             </a>
                         
-                            <a href="/tags/Supervisor/">
-                                <span class="chip bg-color">Supervisor</span>
-                            </a>
-                        
                             <a href="/tags/Diseases/">
                                 <span class="chip bg-color">Diseases</span>
+                            </a>
+                        
+                            <a href="/tags/Supervisor/">
+                                <span class="chip bg-color">Supervisor</span>
                             </a>
                         
                     </div>
@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-05-20
+                    2022-05-27
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    4.8k
+                    5.1k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    20 分
+                    22 分
                 </div>
                 
 
@@ -1155,6 +1155,34 @@ Unable to init server: Could not connect: Connection refused
 <span class="token comment" spellcheck="true"># Mac需要启动XQuartz工具</span>
 connect /tmp/.X11-unix/X10: No such <span class="token function">file</span> or directory
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="12-监控是哪个进程写的文件"><a href="#12-监控是哪个进程写的文件" class="headerlink" title="12. 监控是哪个进程写的文件"></a>12. 监控是哪个进程写的文件</h2><blockquote>
+<p><strong><a target="_blank" rel="noopener" href="https://serverfault.com/questions/320716/find-out-which-process-is-changing-a-file">Find out which process is changing a file</a></strong></p>
+</blockquote>
+<ul>
+<li>比如我们发现在 <code>/var/log</code> 目录下面有一个文件疯狂写文件，一会儿就几个 <code>GB</code> 的体量，这个时候就需要我们排除到底是哪个进行导致的呢？可以使用 <code>auditctl</code> 来监听对应文件，然后使用查询命令查询出对应进程。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># install</span>
+$ <span class="token function">sudo</span> <span class="token function">apt-get</span> <span class="token function">install</span> auditd
+$ <span class="token function">sudo</span> auditctl -l
+
+<span class="token comment" spellcheck="true"># config</span>
+/etc/audit/auditd.conf
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># -w watch /etc/hosts</span>
+<span class="token comment" spellcheck="true"># -p warx watch for write, attribute change, execute or read events</span>
+<span class="token comment" spellcheck="true"># -k hosts-file is a search key</span>
+$ /sbin/auditctl -w /etc/hosts -p war -k hosts-file
+
+<span class="token comment" spellcheck="true"># search</span>
+$ /sbin/ausearch -f /etc/hosts
+time-<span class="token operator">></span>Tue May 24 14:33:12 2022
+type<span class="token operator">=</span>PROCTITLE msg<span class="token operator">=</span>audit<span class="token punctuation">(</span>1653373992.503:379<span class="token punctuation">)</span>: proctitle<span class="token operator">=</span><span class="token string">"fcitx"</span>
+type<span class="token operator">=</span>PATH msg<span class="token operator">=</span>audit<span class="token punctuation">(</span>1653373992.503:379<span class="token punctuation">)</span>: item<span class="token operator">=</span>1 name<span class="token operator">=</span><span class="token string">"/tmp/xxxtmp.log"</span> inode<span class="token operator">=</span>4469 dev<span class="token operator">=</span>00:23 mode<span class="token operator">=</span>0100644 ouid<span class="token operator">=</span>1000 ogid<span class="token operator">=</span>1001 rdev<span class="token operator">=</span>00:00 nametype<span class="token operator">=</span>NORMAL cap_fp<span class="token operator">=</span>0 cap_fi<span class="token operator">=</span>0 cap_fe<span class="token operator">=</span>0 cap_fver<span class="token operator">=</span>0 cap_frootid<span class="token operator">=</span>0
+type<span class="token operator">=</span>PATH msg<span class="token operator">=</span>audit<span class="token punctuation">(</span>1653373992.503:379<span class="token punctuation">)</span>: item<span class="token operator">=</span>0 name<span class="token operator">=</span><span class="token string">"/tmp/"</span> inode<span class="token operator">=</span>1 dev<span class="token operator">=</span>00:23 mode<span class="token operator">=</span>041777 ouid<span class="token operator">=</span>0 ogid<span class="token operator">=</span>0 rdev<span class="token operator">=</span>00:00 nametype<span class="token operator">=</span>PARENT cap_fp<span class="token operator">=</span>0 cap_fi<span class="token operator">=</span>0 cap_fe<span class="token operator">=</span>0 cap_fver<span class="token operator">=</span>0 cap_frootid<span class="token operator">=</span>0
+type<span class="token operator">=</span>CWD msg<span class="token operator">=</span>audit<span class="token punctuation">(</span>1653373992.503:379<span class="token punctuation">)</span>: cwd<span class="token operator">=</span><span class="token string">"/dev/mqueue"</span>
+type<span class="token operator">=</span>SYSCALL msg<span class="token operator">=</span>audit<span class="token punctuation">(</span>1653373992.503:379<span class="token punctuation">)</span>: arch<span class="token operator">=</span>c000003e syscall<span class="token operator">=</span>257 success<span class="token operator">=</span>yes exit<span class="token operator">=</span>15 a0<span class="token operator">=</span>ffffff9c a1<span class="token operator">=</span>7f0bd1206b4b a2<span class="token operator">=</span>442 a3<span class="token operator">=</span>1b6 items<span class="token operator">=</span>2 ppid<span class="token operator">=</span>1 pid<span class="token operator">=</span>1720 auid<span class="token operator">=</span>1000 uid<span class="token operator">=</span>1000 gid<span class="token operator">=</span>1001 euid<span class="token operator">=</span>1000 suid<span class="token operator">=</span>1000 fsuid<span class="token operator">=</span>1000 egid<span class="token operator">=</span>1001 sgid<span class="token operator">=</span>1001 fsgid<span class="token operator">=</span>1001 tty<span class="token operator">=</span><span class="token punctuation">(</span>none<span class="token punctuation">)</span> ses<span class="token operator">=</span>1 comm<span class="token operator">=</span><span class="token string">"fcitx"</span> exe<span class="token operator">=</span><span class="token string">"/usr/bin/fcitx"</span> subj<span class="token operator">==</span>unconfined key<span class="token operator">=</span><span class="token punctuation">(</span>null<span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1223,12 +1251,12 @@ connect /tmp/.X11-unix/X10: No such <span class="token function">file</span> or 
                                     <span class="chip bg-color">Linux</span>
                                 </a>
                             
-                                <a href="/tags/Supervisor/">
-                                    <span class="chip bg-color">Supervisor</span>
-                                </a>
-                            
                                 <a href="/tags/Diseases/">
                                     <span class="chip bg-color">Diseases</span>
+                                </a>
+                            
+                                <a href="/tags/Supervisor/">
+                                    <span class="chip bg-color">Supervisor</span>
                                 </a>
                             
                         </div>
@@ -1703,7 +1731,7 @@ connect /tmp/.X11-unix/X10: No such <span class="token function">file</span> or 
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1221.1k</span>
+                        class="white-color">1221.5k</span>
             
             
             
