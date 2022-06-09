@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-05-27
+                    2022-06-09
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    5.8k
+                    6k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    26 分
+                    28 分
                 </div>
                 
 
@@ -1312,7 +1312,48 @@ Vagrant.configure<span class="token punctuation">(</span><span class="token stri
 end
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="7-参考链接"><a href="#7-参考链接" class="headerlink" title="7. 参考链接"></a>7. 参考链接</h2><blockquote>
+<h2 id="7-常见问题"><a href="#7-常见问题" class="headerlink" title="7. 常见问题"></a>7. 常见问题</h2><blockquote>
+<p><strong>记录日常使用 Vagrant 工具时遇到的问题以及对应解决方法</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题一]</strong> 使用 <code>vagrant</code> 启动虚拟机时，出现如下警告</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ vagrant up
+<span class="token operator">==</span><span class="token operator">></span> default: Booting VM<span class="token punctuation">..</span>.
+<span class="token operator">==</span><span class="token operator">></span> default: Waiting <span class="token keyword">for</span> machine to boot. This may take a few minutes<span class="token punctuation">..</span>.
+    default: SSH address: 127.0.0.1:2222
+    default: SSH username: vagrant
+    default: SSH auth method: private key
+    default: Warning: Remote connection disconnect. Retrying<span class="token punctuation">..</span>.
+    default: Warning: Connection reset. Retrying<span class="token punctuation">..</span>.
+    default: Warning: Authentication failure. Retrying<span class="token punctuation">..</span>.
+    default: Warning: Authentication failure. Retrying<span class="token punctuation">..</span>.
+^C    default: Warning: Connection refused. Retrying<span class="token punctuation">..</span>.
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决一]</strong> 主要原因是因为 <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/22922891/vagrant-ssh-authentication-failure">虚拟机获取不到物理机的公钥</a>，只需要将公钥复制到虚拟机 <code>vagrant</code> 用户家目录下的 <code>authorized_keys</code> 文件中并在 <code>Vagrantfile</code> 中指定物理机当前用户的私钥路径，即可。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Find the IdentityFile used by Vagrant</span>
+$ vagrant ssh-config
+Host default
+  IdentityFile /Users/escape/.vagrant.d/insecure_private_key
+
+<span class="token comment" spellcheck="true"># Check the public key in the IdentityFile</span>
+<span class="token comment" spellcheck="true"># ssh-rsa AAAAB3Nyc2EAAA...9gE98OHlnVYCzRdK8jlqm8hQ==</span>
+$ ssh-keygen -y -f <span class="token operator">&lt;</span>path-to-insecure_IdentityFile<span class="token operator">></span>
+
+<span class="token comment" spellcheck="true"># Log in to the Vagrant guest with the password vagrant</span>
+$ vagrant <span class="token function">ssh</span>
+$ <span class="token function">ssh</span> -p 2222 -o UserKnownHostsFile<span class="token operator">=</span>/dev/null vagrant@127.0.0.1
+
+<span class="token comment" spellcheck="true"># 在物理机的Vagrantfile中添加私钥信息</span>
+$ <span class="token keyword">echo</span> <span class="token string">"ssh-rsa AAAA...==="</span> <span class="token operator">></span> /home/vagrant/.ssh/authorized_keys
+
+<span class="token comment" spellcheck="true"># 重启虚拟机</span>
+$ vagrant reload
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="8-参考链接"><a href="#8-参考链接" class="headerlink" title="8. 参考链接"></a>8. 参考链接</h2><blockquote>
 <p><strong>送人玫瑰，手有余香！</strong></p>
 </blockquote>
 <ul>
@@ -1860,7 +1901,7 @@ end
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1224.9k</span>
+                        class="white-color">1225.2k</span>
             
             
             
