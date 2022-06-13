@@ -29,9 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
-
+<meta name="generator" content="Hexo 5.4.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-03-28
+                    2022-06-13
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    3k
+                    3.3k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    12 分
+                    13 分
                 </div>
                 
 
@@ -748,7 +748,7 @@ WebSocket connection to <span class="token string">'ws://xxx'</span> failed: Err
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="6-用-Nginx-解决跨域问题"><a href="#6-用-Nginx-解决跨域问题" class="headerlink" title="6. 用 Nginx 解决跨域问题"></a>6. 用 Nginx 解决跨域问题</h2><blockquote>
+<h2 id="7-用-Nginx-解决跨域问题"><a href="#7-用-Nginx-解决跨域问题" class="headerlink" title="7. 用 Nginx 解决跨域问题"></a>7. 用 Nginx 解决跨域问题</h2><blockquote>
 <p><strong>利用 Nginx Stream 模块把 SSH 藏在 443 端口</strong></p>
 </blockquote>
 <ul>
@@ -833,6 +833,41 @@ Access-Control-Max-Age
 Access-Control-Request-Method
 Access-Control-Request-Headers
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="8-为浏览器创建安全环境"><a href="#8-为浏览器创建安全环境" class="headerlink" title="8. 为浏览器创建安全环境"></a>8. 为浏览器创建安全环境</h2><blockquote>
+<p><strong>新的跨域策略：使用 COOP、COEP 为浏览器创建更安全的环境</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 前端界面报错，提示：</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># browser network</span>
+Uncaught <span class="token punctuation">(</span>in promise<span class="token punctuation">)</span> ReferenceError: ShareArrayBuffer is not defined
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 需要在 <code>Nginx</code> 配置里面新增如下 <code>header</code> 信息。<ul>
+<li><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy">Cross-Origin-Opener-Policy</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Cross-Origin-Embedder-Policy">Cross-Origin-Embedder-Policy</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/6855129007906963464">使用 COOP、COEP 为浏览器创建更安全的环境</a></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 可以通过 COOP、COEP 来创建隔离环境</span>
+add_header <span class="token string">'Cross-Origin-Opener-Policy'</span> <span class="token string">'same-origin'</span><span class="token punctuation">;</span>
+add_header <span class="token string">'Cross-Origin-Embedder-Policy'</span> <span class="token string">'require-corp'</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true"># 需要注意的是如果提示如下信息，则需要使用https协议</span>
+The Cross-Origin-Opener-Policy header has been ignored, because the URL is origin was untrustworthy.
+Is was defined either <span class="token keyword">in</span> the final response or redirect.
+Please deliver the response using the HTTPS protocol.
+You can also use the <span class="token string">'localhost'</span> origin install.
+
+<span class="token comment" spellcheck="true"># 所有跨域相关的名词列出来</span>
+COEP: Cross Origin Embedder Policy：跨源嵌入程序策略
+COOP: Cross Origin Opener Policy：跨源开放者政策
+CORP: Cross Origin Resource Policy：跨源资源策略
+CORS: Cross Origin Resource Sharing：跨源资源共享
+CORB: Cross Origin Read Blocking：跨源读取阻止
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1377,7 +1412,7 @@ Access-Control-Request-Headers
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1234k</span>
+                        class="white-color">1234.3k</span>
             
             
             
