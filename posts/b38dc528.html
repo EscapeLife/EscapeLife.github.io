@@ -469,14 +469,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    3.3k
+                    3.5k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    13 分
+                    14 分
                 </div>
                 
 
@@ -868,6 +868,34 @@ CORP: Cross Origin Resource Policy：跨源资源策略
 CORS: Cross Origin Resource Sharing：跨源资源共享
 CORB: Cross Origin Read Blocking：跨源读取阻止
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="9-负载均衡的排坑和思考"><a href="#9-负载均衡的排坑和思考" class="headerlink" title="9. 负载均衡的排坑和思考"></a>9. 负载均衡的排坑和思考</h2><blockquote>
+<p><strong>来自 - <a target="_blank" rel="noopener" href="https://xiaorui.cc/archives/5970">nginx grpc streaming 负载均衡的排坑和思考</a></strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> <code>Nginx</code> 在 <code>1.13</code> 版本之后就可以支持 <code>grpc</code> 的负载均衡了，使用方法类似 <code>proxy_pass</code> 的语法，但是使用的过程中遇到短连接的问题。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># project stack</span>
+<span class="token string">"grpc_message"</span><span class="token keyword">:</span><span class="token string">"Received RST_STREAM with error code 1"</span>, <span class="token string">"grpc_status"</span>:13
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> <code>grpc</code> 是基于 <code>http2</code> 的，而 <code>http2</code> 就是长连接的设计，即单个连接可以多路复用(<code>http1</code> 不支持)。知道在使用 <code>nginx proxy_pass upstream</code> 的时候，需要配置 <code>keepalive</code> 参数，不然 <code>nginx</code> 做负载均衡转发一律会按照短连接处理，没想到 <code>grpc upstream</code> 也要配置 <code>keepalive</code> 参数才行。需要注意的是 <code>keepalive</code> 是单个 <code>worker</code> 的连接池，毕竟 <code>nginx</code> 是多进程的，在 <code>nginx</code> 的架构模型下是不能连接共享的。</li>
+</ul>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">listen</span>       <span class="token number">9000</span> http2<span class="token punctuation">;</span>
+    <span class="token keyword">server_name</span>  _<span class="token punctuation">;</span>
+
+    <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+        grpc_pass grpc<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>grpc_servers<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">upstream</span> grpc_servers <span class="token punctuation">{</span>
+    <span class="token keyword">keepalive</span> <span class="token number">2000</span><span class="token punctuation">;</span>
+    <span class="token keyword">server</span> <span class="token number">100.100</span><span class="token punctuation">.</span><span class="token number">100.100</span><span class="token punctuation">:</span><span class="token number">8090</span><span class="token punctuation">;</span>
+    <span class="token keyword">server</span> <span class="token number">100.100</span><span class="token punctuation">.</span><span class="token number">100.101</span><span class="token punctuation">:</span><span class="token number">8090</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1412,7 +1440,7 @@ CORB: Cross Origin Read Blocking：跨源读取阻止
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1234.3k</span>
+                        class="white-color">1234.5k</span>
             
             
             
