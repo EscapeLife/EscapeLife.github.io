@@ -29,9 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
-
+<meta name="generator" content="Hexo 5.4.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -473,14 +473,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    5.4k
+                    6k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    23 分
+                    26 分
                 </div>
                 
 
@@ -579,32 +579,30 @@
 </blockquote>
 <p>申请证书要解决的一个关键问题就是，如何证明域名是你所拥有的？<code>Let's Encrypt</code> 提供了三种模式：<strong>HTTP</strong>、<strong>DNS</strong>、<strong>TLS-SNI</strong>。<code>HTTP</code> 模式和 <code>DNS</code> 模式各有优劣，适用于不同的场景。<code>HTTP</code> 模式不需要操作 <code>DNS</code> 记录，只需要新建一个文件就可以完成验证，带来的限制就是验证过程必须操作服务器；<code>DNS</code> 模式不需要操作服务器，只需添加 <code>DNS</code> 的 <code>TXT</code> 记录就行，缺点是必须登录到域名提供商的页面上修改 <code>DNS</code> 记录。不管是 <code>HTTP</code> 模式还是 <code>DNS</code> 模式，申请证书的操作都是可以在任意电脑上完成，申请完之后再将证书复制到服务器上。<code>HTTP</code> 模式验证过程需要操作服务器，<code>DNS</code> 模式验证过程需要操作 <code>DNS</code>。</p>
 <ul>
-<li><p><strong>[1] HTTP 模式 - 主机可以开放 80 或 443 端口的选择</strong></p>
-<ul>
+<li><strong>[1] HTTP 模式 - 主机可以开放 80 或 443 端口的选择</strong><ul>
+<li><strong>常用于匹配单个域名</strong> - 比如 <code>www.escapelife.site</code></li>
 <li>就是 <code>Let's Encrypt</code> 给你一个随机字符串，你需要在 <code>Web</code> 服务器的 <code>/.well-known/acme-challenge/</code> 服务路径下放置一个以该字符串命名的文件，当 <code>Let's Encrypt</code> 能够访问到这个文件时，证明你是这个域名的所有者。</li>
 </ul>
 </li>
-<li><p><strong>[2] DNS 模式 - 主机无法访问 80 或 443 端口时的选择</strong></p>
-<ul>
+<li><strong>[2] DNS 模式 - 主机无法访问 80 或 443 端口时的选择</strong><ul>
+<li><strong>常用于匹配多个域名</strong> - 比如 <code>*.escapelife.site</code></li>
 <li>同样是 <code>Let's Encrypt</code> 给你一个随机字符串，你需要以该字符串建立一个 <code>DNS</code> 的 <code>TXT</code> 记录，当 <code>Let's Encrypt</code> 查询域名的 <code>TXT</code> 记录时，发现得到的字符串一致，则证明你是这个域名的所有者。</li>
 </ul>
 </li>
-<li><p><strong>[3] TLS-SNI 模式 - (基本废弃)</strong></p>
-<ul>
+<li><strong>[3] TLS-SNI 模式 - (基本废弃)</strong><ul>
 <li>没有仔细研究过，似乎通过 <code>SSL</code> 加密传输。<code>http</code> 走的是 <code>80</code> 端口，<code>tls-sni</code> 走的是 <code>443</code> 端口。由于当前的 <code>tls-sni</code> 似乎有漏洞，该模式一度遭禁用，所以不推荐采用此模式，本文也不加以讨论。</li>
 </ul>
 </li>
-<li><p><strong>[4] 购买域名证书</strong></p>
-<ul>
+<li><strong>[4] 购买域名证书</strong><ul>
 <li>当然，这里我们也可以不使用免费的证书，而是使用自己购买的域名证书。</li>
 <li>其配置就更为简单了，只需要下载对应证书存放到指定目录下，配置对应参数即可。</li>
 </ul>
 </li>
 </ul>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
-    <span class="token keyword">ssl_certificate</span>            <span class="token string">"/etc/ssl/certs/escapelife_com-ssl-bundle.crt"</span><span class="token punctuation">;</span>
-    ssl_trusted_certificate    <span class="token string">"/etc/ssl/certs/escapelife_com-trusted.crt"</span><span class="token punctuation">;</span>
-    <span class="token keyword">ssl_certificate_key</span>        <span class="token string">"/etc/ssl/private/STAR_escapelife_com.key"</span><span class="token punctuation">;</span>
+    <span class="token keyword">ssl_certificate</span>            <span class="token string">"/etc/ssl/certs/escapelife_site-ssl-bundle.crt"</span><span class="token punctuation">;</span>
+    ssl_trusted_certificate    <span class="token string">"/etc/ssl/certs/escapelife_site-trusted.crt"</span><span class="token punctuation">;</span>
+    <span class="token keyword">ssl_certificate_key</span>        <span class="token string">"/etc/ssl/private/STAR_escapelife_site.key"</span><span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
@@ -619,7 +617,7 @@
 <li>对于 <code>ACME v2</code>，新订单限制为每个帐户每 <code>3</code> 小时 <code>1500</code> 个</li>
 </ul>
 <hr>
-<h2 id="4-申请证书-直接申请"><a href="#4-申请证书-直接申请" class="headerlink" title="4. 申请证书 - 直接申请"></a>4. 申请证书 - 直接申请</h2><blockquote>
+<h2 id="4-申请证书-直接申请-默认-HTTP"><a href="#4-申请证书-直接申请-默认-HTTP" class="headerlink" title="4. 申请证书 - 直接申请 - 默认(HTTP)"></a>4. 申请证书 - 直接申请 - 默认(HTTP)</h2><blockquote>
 <p><strong>就是通过域名解析之后的对应 IP 地址的服务器，来直接申请证书。</strong></p>
 </blockquote>
 <p>在我们自己的博客上线之前，最好能够给我们的网站加上 <code>HTTPS</code> 的，一方面是为了安全，再就是为了显示有逼格。如果我们使用像 <a target="_blank" rel="noopener" href="https://www.cloudflare.com/zh-cn/"><code>Cloudflare</code></a> 这样的服务提供商，直接在其后台配置即可添加。如果是使用 <code>Nginx</code> 等服务器来运行自己的网站，推荐大家最好使用 <code>Certbot</code> 工具，其可以自动化来配置 <code>SSL</code> 证书和定时更新。如果我们是在域名解析的那个服务器配置 <code>HTTPS</code> 的话，配置证书的过程大约需要 <code>5</code> 分钟左右。</p>
@@ -634,8 +632,8 @@
 <p>使用 <code>Certbot</code> 工具，其会自动检查到你的 <code>nginx.conf</code> 下的配置，把你所有的虚拟站点都列出来然后让你选择需要开启 <code>https</code> 的站点。简单的输入列表编号，用空格分隔符分开，然后使用 <code>Certbot</code> 工具就帮你下载证书并更新 <code>nginx.conf</code> 了。我们再次打开 <code>nginx.conf</code> 文件，发现文件中的 <code>server</code> 配置中添加了证书以及做了 <code>301</code> 的永久重定向。</p>
 <p>这里建议配置为 <code>HTTP2</code> 协议，<code>HTTP2</code> 具有更快的 <code>HTTPS</code> 传输性能，非常值得开启。同时需要注意的是，<code>Let's Encrypt</code> 的证书有效期为 <code>90</code> 天，过期的话可以再次续签。</p>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">listen</span> <span class="token number">443</span> <span class="token keyword">ssl</span> http2<span class="token punctuation">;</span>
-<span class="token keyword">ssl_certificate</span> <span class="token operator">/</span>etc<span class="token operator">/</span>letsencrypt<span class="token operator">/</span>live<span class="token operator">/</span>escapelife<span class="token punctuation">.</span>com<span class="token operator">/</span>fullchain<span class="token punctuation">.</span>pem<span class="token punctuation">;</span>
-<span class="token keyword">ssl_certificate_key</span> <span class="token operator">/</span>etc<span class="token operator">/</span>letsencrypt<span class="token operator">/</span>live<span class="token operator">/</span>escapelife<span class="token punctuation">.</span>com<span class="token operator">/</span>privkey<span class="token punctuation">.</span>pem<span class="token punctuation">;</span>
+<span class="token keyword">ssl_certificate</span> <span class="token operator">/</span>etc<span class="token operator">/</span>letsencrypt<span class="token operator">/</span>live<span class="token operator">/</span>escapelife<span class="token punctuation">.</span>site<span class="token operator">/</span>fullchain<span class="token punctuation">.</span>pem<span class="token punctuation">;</span>
+<span class="token keyword">ssl_certificate_key</span> <span class="token operator">/</span>etc<span class="token operator">/</span>letsencrypt<span class="token operator">/</span>live<span class="token operator">/</span>escapelife<span class="token punctuation">.</span>site<span class="token operator">/</span>privkey<span class="token punctuation">.</span>pem<span class="token punctuation">;</span>
 <span class="token keyword">include</span> <span class="token operator">/</span>etc<span class="token operator">/</span>letsencrypt<span class="token operator">/</span>options<span class="token operator">-</span><span class="token keyword">ssl</span><span class="token operator">-</span>nginx<span class="token punctuation">.</span>conf<span class="token punctuation">;</span>
 
 <span class="token comment" spellcheck="true"># Redirect non-https traffic to https</span>
@@ -644,13 +642,17 @@
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
+<li><strong>[1] 整体流程</strong><ul>
 <li>在新版本中，安装 <code>Certbot</code> 工具已经使用 <a target="_blank" rel="noopener" href="https://snapcraft.io/docs/installing-snapd"><code>snapd</code></a> 方式了</li>
 <li><strong><code>https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx</code></strong></li>
+</ul>
+</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 1.安装snapd工具</span>
 $ <span class="token function">sudo</span> <span class="token function">sudo</span> apt update
 $ <span class="token function">sudo</span> apt <span class="token function">install</span> snapd
 $ <span class="token function">sudo</span> snap <span class="token function">install</span> core<span class="token punctuation">;</span> <span class="token function">sudo</span> snap refresh core
+$ <span class="token function">sudo</span> <span class="token function">apt-get</span> remove certbot
 
 <span class="token comment" spellcheck="true"># 2.安装Certbot工具</span>
 $ <span class="token function">sudo</span> snap <span class="token function">install</span> --classic certbot
@@ -663,22 +665,26 @@ $ <span class="token function">sudo</span> certbot --nginx
 $ <span class="token function">sudo</span> certbot certonly --nginx
 
 <span class="token comment" spellcheck="true"># 3.指定获取证书的域名</span>
+<span class="token comment" spellcheck="true"># 如果使用apt安装的老版本可以不用使用--nginx参数</span>
 $ <span class="token function">sudo</span> certbot --nginx -d example.com -d www.example.com
 
 <span class="token comment" spellcheck="true"># 4.测试证书自动更新</span>
 $ <span class="token function">sudo</span> certbot renew --dry-run
 
 <span class="token comment" spellcheck="true"># 5.证书到期前自动更新 - crontab</span>
-<span class="token comment" spellcheck="true"># 配置位置: /etc/crontab/ or /etc/cron.*/*</span>
+<span class="token comment" spellcheck="true"># 配置位置: /etc/crontab/ or /etc/cron.*/* or systemctl list-timers</span>
 0 0 * * *    /usr/bin/certbot renew --force-renewal
 0 1 * * *    /usr/sbin/service nginx restart
 
 <span class="token comment" spellcheck="true"># 6. 确认配置成功</span>
 访问你的网站地址，然后查看是否已经添加上了HTTPS的标识了。
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li>这里主要介绍，具体的获取证书的过程(<code>blog.escapelife.com</code>)。</li>
+<li><strong>[2] certbot (–nginx)</strong><ul>
+<li>这里主要介绍，具体的获取证书的过程(<code>blog.escapelife.site</code>)。</li>
 <li>可能你在配置和执行的过程中会提示不同的信息，但是大致流程都是一致的。</li>
+</ul>
+</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 1.获取证书并自动配置Nginx服务</span>
 <span class="token comment" spellcheck="true"># ------------------------------------</span>
@@ -706,10 +712,10 @@ encrypting the web, EFF news, campaigns, and ways to support digital freedom.
 <span class="token punctuation">(</span>Y<span class="token punctuation">)</span>es/<span class="token punctuation">(</span>N<span class="token punctuation">)</span>o: y  <span class="token comment" spellcheck="true"># 是否需要接受邮件通知</span>
 Starting new HTTPS connection <span class="token punctuation">(</span>1<span class="token punctuation">)</span>: supporters.eff.org
 No names were found <span class="token keyword">in</span> your configuration files. Please enter <span class="token keyword">in</span> your domain
-name<span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token punctuation">(</span>comma and/or space separated<span class="token punctuation">)</span>  <span class="token punctuation">(</span>Enter <span class="token string">'c'</span> to cancel<span class="token punctuation">)</span>: blog.escapelife.com
+name<span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token punctuation">(</span>comma and/or space separated<span class="token punctuation">)</span>  <span class="token punctuation">(</span>Enter <span class="token string">'c'</span> to cancel<span class="token punctuation">)</span>: blog.escapelife.site
 Obtaining a new certificate
 Performing the following challenges:
-http-01 challenge <span class="token keyword">for</span> blog.escapelife.com
+http-01 challenge <span class="token keyword">for</span> blog.escapelife.site
 Waiting <span class="token keyword">for</span> verification<span class="token punctuation">..</span>.
 Cleaning up challenges
 Resetting dropped connection: acme-v02.api.letsencrypt.org
@@ -726,17 +732,17 @@ Select the appropriate number <span class="token punctuation">[</span>1-2<span c
 Redirecting all traffic on port 80 to ssl <span class="token keyword">in</span> /etc/nginx/nginx.conf
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Congratulations<span class="token operator">!</span> You have successfully enabled https://blog.escapelife.com
+Congratulations<span class="token operator">!</span> You have successfully enabled https://blog.escapelife.site
 
 You should <span class="token function">test</span> your configuration at:
-https://www.ssllabs.com/ssltest/analyze.html?d<span class="token operator">=</span>blog.escapelife.com
+https://www.ssllabs.com/ssltest/analyze.html?d<span class="token operator">=</span>blog.escapelife.site
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 IMPORTANT NOTES:
  - Congratulations<span class="token operator">!</span> Your certificate and chain have been saved at:
-   /etc/letsencrypt/live/bohr.escapelife.com/fullchain.pem
+   /etc/letsencrypt/live/bohr.escapelife.site/fullchain.pem
    Your key <span class="token function">file</span> has been saved at:
-   /etc/letsencrypt/live/bohr.escapelife.com/privkey.pem
+   /etc/letsencrypt/live/bohr.escapelife.site/privkey.pem
    Your cert will expire on 2019-07-25. To obtain a new or tweaked
    version of this certificate <span class="token keyword">in</span> the future, simply run certbot again
    with the <span class="token string">"certonly"</span> option. To non-interactively renew *all* of
@@ -751,8 +757,39 @@ IMPORTANT NOTES:
    Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
    Donating to EFF:                    https://eff.org/donate-le
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] certbot certonly (–nginx)</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 正式申请操作</span>
+$ <span class="token function">sudo</span> certbot certonly --nginx -d blog.escapelife.site
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+
+How would you like to authenticate with the ACME CA?
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+1: Spin up a temporary webserver <span class="token punctuation">(</span>standalone<span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 启动一个临时的网络服务器</span>
+2: Place files <span class="token keyword">in</span> webroot directory <span class="token punctuation">(</span>webroot<span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 将文件放在webroot目录中</span>
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Select the appropriate number <span class="token punctuation">[</span>1-2<span class="token punctuation">]</span> <span class="token keyword">then</span> <span class="token punctuation">[</span>enter<span class="token punctuation">]</span> <span class="token punctuation">(</span>press <span class="token string">'c'</span> to cancel<span class="token punctuation">)</span>: 2
+Plugins selected: Authenticator webroot, Installer None
+Cert not yet due <span class="token keyword">for</span> renewal
+
+You have an existing certificate that has exactly the same domains or certificate name you requested and is not close to expiry.
+<span class="token punctuation">(</span>ref: /etc/letsencrypt/renewal/blog.escapelife.site.conf<span class="token punctuation">)</span>
+
+What would you like to do?
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+1: Keep the existing certificate <span class="token keyword">for</span> now
+2: Renew <span class="token operator">&amp;</span> replace the cert <span class="token punctuation">(</span>limit ~5 per 7 days<span class="token punctuation">)</span>
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Select the appropriate number <span class="token punctuation">[</span>1-2<span class="token punctuation">]</span> <span class="token keyword">then</span> <span class="token punctuation">[</span>enter<span class="token punctuation">]</span> <span class="token punctuation">(</span>press <span class="token string">'c'</span> to cancel<span class="token punctuation">)</span>: /var/www/html
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+
+<span class="token comment" spellcheck="true"># 应该也可以直接在命令给对应选项</span>
+$ <span class="token function">sudo</span> certbot certonly -a manual -i nginx -d blog.escapelife.site
+$ <span class="token function">sudo</span> certbot certonly -a webroot -i nginx -w /var/www/html -d blog.escapelife.site
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="5-申请证书-DNS-认证"><a href="#5-申请证书-DNS-认证" class="headerlink" title="5. 申请证书 - DNS 认证"></a>5. 申请证书 - DNS 认证</h2><blockquote>
+<h2 id="5-申请证书-DNS-认证-通配符-DNS"><a href="#5-申请证书-DNS-认证-通配符-DNS" class="headerlink" title="5. 申请证书 - DNS 认证 - 通配符(DNS)"></a>5. 申请证书 - DNS 认证 - 通配符(DNS)</h2><blockquote>
 <p><strong>就是通过 DNS 的方式来认证对该域名的合法性，从而申请证书。</strong></p>
 </blockquote>
 <p>我们在使用 <code>letsencrypt</code> 获取免费的 <code>HTTPS</code> 证书的时候，<code>letsencrypt</code> 需要对域名进行验证。默认情况下它的验证方式是， <strong><code>certbot</code> 工具在 <code>web</code> 目录的根目录下放置一个文件，然后 <code>letsencrypt</code> 的服务器通过域名来访问这个文件，来验证你申请的域名是属于你的。</strong></p>
@@ -763,24 +800,87 @@ IMPORTANT NOTES:
 </li>
 </ul>
 <p>为了解决上述问题，我们可以更改验证方式，<strong>通过校验域名的 <code>TXT</code> 记录来验证你申请的域名是属于你的</strong>，从而获取证书。</p>
+<ul>
+<li><strong>[1] 安装基础工具</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看域名提供商是否支持自动续约(API)</span>
+<span class="token comment" spellcheck="true"># https://eff-certbot.readthedocs.io/en/stable/using.html#dns-plugins</span>
+certbot-dns-cloudflare
+certbot-dns-cloudxns
+certbot-dns-digitalocean
+
+<span class="token comment" spellcheck="true"># 不支持的话，就只能手动自己加或者写脚本</span>
+<span class="token comment" spellcheck="true"># https://eff-certbot.readthedocs.io/en/stable/using.html#manual</span>
+
+<span class="token comment" spellcheck="true"># 安装snapd和certbot工具</span>
+$ <span class="token function">sudo</span> <span class="token function">sudo</span> apt update
+$ <span class="token function">sudo</span> apt <span class="token function">install</span> snapd
+$ <span class="token function">sudo</span> snap <span class="token function">install</span> core<span class="token punctuation">;</span> <span class="token function">sudo</span> snap refresh core
+$ <span class="token function">sudo</span> <span class="token function">apt-get</span> remove certbot
+$ <span class="token function">sudo</span> <span class="token function">ln</span> -s /snap/bin/certbot /usr/bin/certbot
+
+<span class="token comment" spellcheck="true"># 确保g工具和插件可信</span>
+$ <span class="token function">sudo</span> snap <span class="token keyword">set</span> certbot trust-plugin-with-root<span class="token operator">=</span>ok
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 域名提供商支持该工具</strong><ul>
+<li><a target="_blank" rel="noopener" href="https://eff-certbot.readthedocs.io/en/stable/using.html#dns-plugins">dns-plugins</a></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 下载对应插件(DNS-Provider)</span>
+<span class="token comment" spellcheck="true"># sudo snap install certbot-dns-&lt;PLUGIN></span>
+$ <span class="token function">sudo</span> snap <span class="token function">install</span> certbot-dns-cloudflare
+
+<span class="token comment" spellcheck="true"># 获取域名服务商信息</span>
+dns_cloudflare_email <span class="token operator">=</span> cloudflare@example.com
+dns_cloudflare_api_key <span class="token operator">=</span> 0123456789abcdef0123456789abcdef01234
+dns_cloudflare_api_token <span class="token operator">=</span> 0123456789abcdef0123456789abcdef01234567
+
+<span class="token comment" spellcheck="true"># 需要设置DNS凭证</span>
+<span class="token comment" spellcheck="true"># 通过点击文档列表中的DNS插件名称来查找您的DNS提供商的凭证说明</span>
+$ certbot certonly \
+  --dns-cloudflare \
+  --dns-cloudflare-credentials ~/.secrets/certbot/cloudflare.ini \
+  --dns-cloudflare-propagation-seconds 60 \
+  -d blog.escapelife.site \
+  -d *.blog.escapelife.site
+
+<span class="token comment" spellcheck="true"># 测试证书自动更新</span>
+$ <span class="token function">sudo</span> certbot renew --dry-run
+
+<span class="token comment" spellcheck="true"># 证书到期前自动更新 - crontab</span>
+<span class="token comment" spellcheck="true"># 配置位置: /etc/crontab/ or /etc/cron.*/* or systemctl list-timers</span>
+0 0 * * *    /usr/bin/certbot renew --force-renewal
+0 1 * * *    /usr/sbin/service nginx restart
+
+<span class="token comment" spellcheck="true"># 确认配置成功</span>
+访问你的网站地址，然后查看是否已经添加上了HTTPS的标识了。
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 域名提供商不支持该工具</strong><ul>
+<li><a target="_blank" rel="noopener" href="https://eff-certbot.readthedocs.io/en/stable/using.html#manual">manual</a></li>
+</ul>
+</li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 命令行的方式获取证书</span>
 $ <span class="token function">sudo</span> certbot certonly --manual \
     --preferred-challenges<span class="token operator">=</span>dns \
     --email escapelife@gmail.com \
     --server https://acme-v02.api.letsencrypt.org/directory \
-    -d *.blog.escapelife.com -d blog.escapelife.com
+    -d *.blog.escapelife.site -d blog.escapelife.site
 
 <span class="token comment" spellcheck="true"># 上面命令的输出交互式信息</span>
 <span class="token comment" spellcheck="true"># 进行DNS认证时，在输出KEY的时候需要修改DNS的TXT记录，完成之后点击回车即可</span>
 <span class="token comment" spellcheck="true"># 解析类型为: TXT</span>
-<span class="token comment" spellcheck="true"># 主机记录为: _acme-challenge.blog.escapelife.com</span>
+<span class="token comment" spellcheck="true"># 主机记录为: _acme-challenge.blog.escapelife.site</span>
 <span class="token comment" spellcheck="true"># 记录值则为: 74H12USt......2345g6888</span>
 Saving debug log to /var/log/letsencrypt/letsencrypt.log
 Plugins selected: Authenticator manual, Installer None
 Starting new HTTPS connection <span class="token punctuation">(</span>1<span class="token punctuation">)</span>: acme-v02.api.letsencrypt.org
 Obtaining a new certificate
 Performing the following challenges:
-dns-01 challenge <span class="token keyword">for</span> blog.escapelife.com
+dns-01 challenge <span class="token keyword">for</span> blog.escapelife.site
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 NOTE: The IP of this machine will be publicly logged as having requested this
@@ -793,7 +893,7 @@ Are you OK with your IP being logged?
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Please deploy a DNS TXT record under the name
-_acme-challenge.blog.escapelife.com with the following value:
+_acme-challenge.blog.escapelife.site with the following value:
 
 74H12USt<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>2345g6888
 
@@ -806,9 +906,9 @@ Cleaning up challenges
 
 IMPORTANT NOTES:
  - Congratulations<span class="token operator">!</span> Your certificate and chain have been saved at:
-   /etc/letsencrypt/live/blog.escapelife.com/fullchain.pem
+   /etc/letsencrypt/live/blog.escapelife.site/fullchain.pem
    Your key <span class="token function">file</span> has been saved at:
-   /etc/letsencrypt/live/blog.escapelife.com/privkey.pem
+   /etc/letsencrypt/live/blog.escapelife.site/privkey.pem
    Your cert will expire on 2020-05-18. To obtain a new or tweaked
    version of this certificate <span class="token keyword">in</span> the future, simply run certbot
    again. To non-interactively renew *all* of your certificates, run
@@ -820,23 +920,21 @@ IMPORTANT NOTES:
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 执行完成之后会在如下目录下得到对应证书</span>
 <span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ll /etc/letsencrypt/live/</span>
-drwxr-xr-x 2 root root  93 Feb 18 23:02 blog.escapelife.com
+drwxr-xr-x 2 root root  93 Feb 18 23:02 blog.escapelife.site
 -rw-r--r-- 1 root root 740 Feb 18 23:02 README
 
 <span class="token comment" spellcheck="true"># 证书会被存储到如下配置</span>
-<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ll /etc/letsencrypt/live/blog.escapelife.com/</span>
-lrwxrwxrwx 1 root root  38 Feb 18 23:02 cert.pem -<span class="token operator">></span> <span class="token punctuation">..</span>/<span class="token punctuation">..</span>/archive/blog.escapelife.com/cert1.pem
-lrwxrwxrwx 1 root root  39 Feb 18 23:02 chain.pem -<span class="token operator">></span> <span class="token punctuation">..</span>/<span class="token punctuation">..</span>/archive/blog.escapelife.com/chain1.pem
-lrwxrwxrwx 1 root root  43 Feb 18 23:02 fullchain.pem -<span class="token operator">></span> <span class="token punctuation">..</span>/<span class="token punctuation">..</span>/archive/blog.escapelife.com/fullchain1.pem
-lrwxrwxrwx 1 root root  41 Feb 18 23:02 privkey.pem -<span class="token operator">></span> <span class="token punctuation">..</span>/<span class="token punctuation">..</span>/archive/blog.escapelife.com/privkey1.pem
+<span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># ll /etc/letsencrypt/live/blog.escapelife.site/</span>
+lrwxrwxrwx 1 root root  38 Feb 18 23:02 cert.pem -<span class="token operator">></span> <span class="token punctuation">..</span>/<span class="token punctuation">..</span>/archive/blog.escapelife.site/cert1.pem
+lrwxrwxrwx 1 root root  39 Feb 18 23:02 chain.pem -<span class="token operator">></span> <span class="token punctuation">..</span>/<span class="token punctuation">..</span>/archive/blog.escapelife.site/chain1.pem
+lrwxrwxrwx 1 root root  43 Feb 18 23:02 fullchain.pem -<span class="token operator">></span> <span class="token punctuation">..</span>/<span class="token punctuation">..</span>/archive/blog.escapelife.site/fullchain1.pem
+lrwxrwxrwx 1 root root  41 Feb 18 23:02 privkey.pem -<span class="token operator">></span> <span class="token punctuation">..</span>/<span class="token punctuation">..</span>/archive/blog.escapelife.site/privkey1.pem
 -rw-r--r-- 1 root root 692 Feb 18 23:02 README
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<ul>
-<li>得到上述信息，则表示证书已经生成了。</li>
-<li>我们现在需要做的就是，等待 <code>DNS</code> 解析成功，然后配置 <code>Nginx</code> 配置即可。</li>
-</ul>
-<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">dig</span> -t TXT _acme-challenge.blog.escapelife.com
-<span class="token punctuation">;</span> <span class="token operator">&lt;&lt;</span><span class="token operator">>></span> DiG 9.9.4-RedHat-9.9.4-50.el7 <span class="token operator">&lt;&lt;</span><span class="token operator">>></span> -t TXT _acme-challenge.blog.escapelife.com
+
+<span class="token comment" spellcheck="true"># 得到上述信息，则表示证书已经生成了</span>
+<span class="token comment" spellcheck="true"># 我们现在需要做的就是，等待DNS解析成功，然后配置Nginx配置即可</span>
+$ <span class="token function">dig</span> -t TXT _acme-challenge.blog.escapelife.site
+<span class="token punctuation">;</span> <span class="token operator">&lt;&lt;</span><span class="token operator">>></span> DiG 9.9.4-RedHat-9.9.4-50.el7 <span class="token operator">&lt;&lt;</span><span class="token operator">>></span> -t TXT _acme-challenge.blog.escapelife.site
 <span class="token punctuation">;</span><span class="token punctuation">;</span> global options: +cmd
 <span class="token punctuation">;</span><span class="token punctuation">;</span> Got answer:
 <span class="token punctuation">;</span><span class="token punctuation">;</span> -<span class="token operator">>></span>HEADER<span class="token operator">&lt;&lt;</span>- opcode: QUERY, status: NOERROR, id: 61108
@@ -845,20 +943,18 @@ lrwxrwxrwx 1 root root  41 Feb 18 23:02 privkey.pem -<span class="token operator
 <span class="token punctuation">;</span><span class="token punctuation">;</span> OPT PSEUDOSECTION:
 <span class="token punctuation">;</span> EDNS: version: 0, flags:<span class="token punctuation">;</span> udp: 512
 <span class="token punctuation">;</span><span class="token punctuation">;</span> QUESTION SECTION:
-<span class="token punctuation">;</span>_acme-challenge.blog.escapelife.com. IN TXT
+<span class="token punctuation">;</span>_acme-challenge.blog.escapelife.site. IN TXT
 
 <span class="token punctuation">;</span><span class="token punctuation">;</span> ANSWER SECTION:
-_acme-challenge.blog.escapelife.com.  299 IN TXT  <span class="token string">"74H12USt......2345g6888"</span>
+_acme-challenge.blog.escapelife.site.  299 IN TXT  <span class="token string">"74H12USt......2345g6888"</span>
 
 <span class="token punctuation">;</span><span class="token punctuation">;</span> Query time: 98 msec
 <span class="token punctuation">;</span><span class="token punctuation">;</span> SERVER: 8.8.8.8<span class="token comment" spellcheck="true">#53(8.8.8.8)</span>
 <span class="token punctuation">;</span><span class="token punctuation">;</span> WHEN: Tue Feb 18 23:10:39 CST 2020
 <span class="token punctuation">;</span><span class="token punctuation">;</span> MSG SIZE  rcvd: 115
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<ul>
-<li>当然，还可以使用 <code>docker</code> 申请 <code>letsencrypt</code> 证书的好处就是不需要在宿主机上安装依赖，命令如下所示。</li>
-</ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 用docker申请letsencrypt通配符证书</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 当然，还可以使用docker申请letsencrypt证书的好处就是不需要在宿主机上安装依赖</span>
+<span class="token comment" spellcheck="true"># 用docker申请letsencrypt通配符证书</span>
 docker run -it --rm \
     --name certbot \
     -v /mnt/letsencrypt:/etc/letsencrypt \
@@ -867,7 +963,7 @@ docker run -it --rm \
     certonly --manual --agree-tos \
     --server https://acme-v02.api.letsencrypt.org/directory \
     --preferred-challenges dns \
-    -d *.blog.escapelife.com -d blog.escapelife.com
+    -d *.blog.escapelife.site -d blog.escapelife.site
     <span class="token comment" spellcheck="true"># -d *.example.com -d example.com</span>
 
 <span class="token comment" spellcheck="true"># -v: 挂载目录; certbot申请到的或备份的证书会放在这两个目录</span>
@@ -876,13 +972,13 @@ docker run -it --rm \
 <span class="token comment" spellcheck="true"># --server: 指定使用acmev2协议的服务器地址; 因为通配符证书的申请需要这个协议</span>
 <span class="token comment" spellcheck="true"># -–preferred-challenges: 使用dns检验来证明你拥有这个域名</span>
 <span class="token comment" spellcheck="true"># -d: 指定了需要申请证书的通配符域名，根域名要额外再写一次</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="6-配置文件-nginx-conf"><a href="#6-配置文件-nginx-conf" class="headerlink" title="6. 配置文件 - nginx.conf"></a>6. 配置文件 - nginx.conf</h2><blockquote>
 <p><strong>展示配置 HTTPS 的 Nginx 配置文件: <a target="_blank" rel="noopener" href="https://www.digitalocean.com/community/tools/nginx#?0.redirect=false&amp;0.http2=false&amp;0.hsts=false&amp;0.php=false&amp;0.root=false&amp;gzip=false&amp;file_structure=unified"><code>nginx.conf</code></a></strong></p>
 </blockquote>
 <ul>
-<li>我们这里配置的是单个子域名的形式 - <code>blog.escapelife.com</code>。</li>
+<li>我们这里配置的是单个子域名的形式 - <code>blog.escapelife.site</code>。</li>
 <li>如果我们需要泛域名解析的话，在配置 <code>certbot</code> 的时候选择 <code>wildcard *</code> 进行配置。</li>
 <li>然后，申请、使用、配置证书的时候都是用泛域名的形式，即可。</li>
 </ul>
@@ -938,17 +1034,17 @@ docker run -it --rm \
   <span class="token comment" spellcheck="true"># load configs</span>
   <span class="token keyword">include</span> <span class="token operator">/</span>etc<span class="token operator">/</span>nginx<span class="token operator">/</span>conf<span class="token punctuation">.</span>d<span class="token operator">/</span><span class="token operator">*</span><span class="token punctuation">.</span>conf<span class="token punctuation">;</span>
 
-  <span class="token comment" spellcheck="true"># blog.escapelife.com</span>
+  <span class="token comment" spellcheck="true"># blog.escapelife.site</span>
   <span class="token keyword">server</span> <span class="token punctuation">{</span>
     <span class="token keyword">listen</span> <span class="token number">443</span> <span class="token keyword">ssl</span><span class="token punctuation">;</span>
     <span class="token keyword">listen</span> <span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token number">443</span> <span class="token keyword">ssl</span><span class="token punctuation">;</span>
 
-    <span class="token keyword">server_name</span> blog<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
+    <span class="token keyword">server_name</span> blog<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>site<span class="token punctuation">;</span>
 
     <span class="token comment" spellcheck="true"># SSL</span>
-    <span class="token keyword">ssl_certificate</span> <span class="token operator">/</span>etc<span class="token operator">/</span>letsencrypt<span class="token operator">/</span>live<span class="token operator">/</span>blog<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token operator">/</span>fullchain<span class="token punctuation">.</span>pem<span class="token punctuation">;</span> <span class="token comment" spellcheck="true"># managed by Certbot</span>
-    <span class="token keyword">ssl_certificate_key</span> <span class="token operator">/</span>etc<span class="token operator">/</span>letsencrypt<span class="token operator">/</span>live<span class="token operator">/</span>blog<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token operator">/</span>privkey<span class="token punctuation">.</span>pem<span class="token punctuation">;</span> <span class="token comment" spellcheck="true"># managed by Certbot</span>
-    ssl_trusted_certificate <span class="token operator">/</span>etc<span class="token operator">/</span>letsencrypt<span class="token operator">/</span>live<span class="token operator">/</span>blog<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token operator">/</span>chain<span class="token punctuation">.</span>pem<span class="token punctuation">;</span>
+    <span class="token keyword">ssl_certificate</span> <span class="token operator">/</span>etc<span class="token operator">/</span>letsencrypt<span class="token operator">/</span>live<span class="token operator">/</span>blog<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>site<span class="token operator">/</span>fullchain<span class="token punctuation">.</span>pem<span class="token punctuation">;</span> <span class="token comment" spellcheck="true"># managed by Certbot</span>
+    <span class="token keyword">ssl_certificate_key</span> <span class="token operator">/</span>etc<span class="token operator">/</span>letsencrypt<span class="token operator">/</span>live<span class="token operator">/</span>blog<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>site<span class="token operator">/</span>privkey<span class="token punctuation">.</span>pem<span class="token punctuation">;</span> <span class="token comment" spellcheck="true"># managed by Certbot</span>
+    ssl_trusted_certificate <span class="token operator">/</span>etc<span class="token operator">/</span>letsencrypt<span class="token operator">/</span>live<span class="token operator">/</span>blog<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>site<span class="token operator">/</span>chain<span class="token punctuation">.</span>pem<span class="token punctuation">;</span>
 
     <span class="token keyword">include</span> <span class="token operator">/</span>etc<span class="token operator">/</span>letsencrypt<span class="token operator">/</span>options<span class="token operator">-</span><span class="token keyword">ssl</span><span class="token operator">-</span>nginx<span class="token punctuation">.</span>conf<span class="token punctuation">;</span> <span class="token comment" spellcheck="true"># managed by Certbot</span>
 
@@ -982,7 +1078,7 @@ docker run -it --rm \
     <span class="token keyword">listen</span> <span class="token number">80</span><span class="token punctuation">;</span>
     <span class="token keyword">listen</span> <span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token number">80</span><span class="token punctuation">;</span>
 
-    <span class="token keyword">server_name</span> blog<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
+    <span class="token keyword">server_name</span> blog<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>site<span class="token punctuation">;</span>
 
     <span class="token comment" spellcheck="true"># ACME-challenge</span>
     <span class="token keyword">location</span> <span class="token operator">^</span><span class="token operator">~</span> <span class="token operator">/</span><span class="token punctuation">.</span>well<span class="token operator">-</span>known<span class="token operator">/</span>acme<span class="token operator">-</span>challenge<span class="token operator">/</span> <span class="token punctuation">{</span>
@@ -990,7 +1086,7 @@ docker run -it --rm \
     <span class="token punctuation">}</span>
 
     <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
-      <span class="token keyword">return</span> <span class="token number">301</span> <span class="token keyword">https</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>blog<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>com<span class="token variable">$request_uri</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> <span class="token number">301</span> <span class="token keyword">https</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>blog<span class="token punctuation">.</span>escapelife<span class="token punctuation">.</span>site<span class="token variable">$request_uri</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
@@ -1550,7 +1646,7 @@ docker run -it --rm \
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1238.5k</span>
+                        class="white-color">1239.1k</span>
             
             
             
