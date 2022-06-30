@@ -462,14 +462,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-05-20
+                    2022-06-30
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    10.8k
+                    10.9k
                 </div>
                 
 
@@ -1562,6 +1562,22 @@ $ <span class="token function">ls</span> -lh /var/lib/docker/image/overlay2/laye
 -rw-r--r--  1 root root    64 8月   5  2021 mount-id
 -rw-r--r--  1 root root    71 8月   5  2021 parent
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="27-Docker-挂载无法删除"><a href="#27-Docker-挂载无法删除" class="headerlink" title="27. Docker 挂载无法删除"></a>27. Docker 挂载无法删除</h2><blockquote>
+<p><strong>启动很多容器服务，导致存储和运行的容器目录(/var/lib/docker/)磁盘消耗很大！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 发现容器服务，有一个配置文件并没有更新生效，于是上面看了下，发现也无法删除。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">root@a06xxx9e799:/opt/app/config<span class="token comment" spellcheck="true"># rm config-docker-app.yml</span>
+rm: cannot remove <span class="token string">'config-docker-app.yml'</span><span class="token keyword">:</span> Device or resource busy
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[分析思路]</strong> 感觉很奇怪，就看了下挂载信息，发现原来是在服务启动的时候硬挂进去的，所以导致无法删除。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">root@a06xxx9e799:/opt/app<span class="token comment" spellcheck="true"># cat /proc/mounts | grep "config"</span>
+/dev/sda /opt/app/config/config-docker-app.yml ext4 rw,relatime,data<span class="token operator">=</span>ordered 0 0
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -2106,7 +2122,7 @@ $ <span class="token function">ls</span> -lh /var/lib/docker/image/overlay2/laye
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1239.1k</span>
+                        class="white-color">1239.2k</span>
             
             
             
