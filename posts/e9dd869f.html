@@ -368,21 +368,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-09-07
+                    2022-07-06
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    594
+                    1.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    2 分
+                    6 分
                 </div>
                 
 
@@ -564,6 +564,150 @@
 
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<blockquote>
+<p><strong><a target="_blank" rel="noopener" href="https://github.com/denji/nginx-tuning">Nginx 最佳实践 - nginx-tuning</a></strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] For Best Performance</strong></li>
+</ul>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># you must set worker processes based on your CPU cores, nginx does not benefit from setting more than that</span>
+<span class="token keyword">worker_processes</span> auto<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">#some last versions calculate it automatically</span>
+
+<span class="token comment" spellcheck="true"># number of file descriptors used for nginx</span>
+<span class="token comment" spellcheck="true"># the limit for the maximum FDs on the server is usually set by the OS.</span>
+<span class="token comment" spellcheck="true"># if you don't set FD's then OS settings will be used which is by default 2000</span>
+<span class="token keyword">worker_rlimit_nofile</span> <span class="token number">100000</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true"># only log critical errors</span>
+<span class="token keyword">error_log</span> <span class="token operator">/</span>var<span class="token operator">/</span>log<span class="token operator">/</span>nginx<span class="token operator">/</span>error<span class="token punctuation">.</span>log crit<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true"># provides the configuration file context in which the directives that affect connection processing are specified.</span>
+<span class="token keyword">events</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true"># determines how much clients will be served per worker</span>
+    <span class="token comment" spellcheck="true"># max clients = worker_connections * worker_processes</span>
+    <span class="token comment" spellcheck="true"># max clients is also limited by the number of socket connections available on the system (~64k)</span>
+    <span class="token keyword">worker_connections</span> <span class="token number">4000</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true"># optimized to serve many clients with each thread, essential for linux -- for testing environment</span>
+    <span class="token keyword">use</span> epoll<span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true"># accept as many connections as possible, may flood worker connections if set too low -- for testing environment</span>
+    <span class="token keyword">multi_accept</span> on<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">http</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true"># cache informations about FDs, frequently accessed files</span>
+    <span class="token comment" spellcheck="true"># can boost performance, but you need to test those values</span>
+    <span class="token keyword">open_file_cache</span> max<span class="token operator">=</span><span class="token number">200000</span> inactive<span class="token operator">=</span>20s<span class="token punctuation">;</span>
+    <span class="token keyword">open_file_cache_valid</span> 30s<span class="token punctuation">;</span>
+    <span class="token keyword">open_file_cache_min_uses</span> <span class="token number">2</span><span class="token punctuation">;</span>
+    <span class="token keyword">open_file_cache_errors</span> on<span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true"># to boost I/O on HDD we can disable access logs</span>
+    <span class="token keyword">access_log</span> off<span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true"># copies data between one FD and other from within the kernel</span>
+    <span class="token comment" spellcheck="true"># faster than read() + write()</span>
+    <span class="token keyword">sendfile</span> on<span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true"># send headers in one piece, it is better than sending them one by one</span>
+    <span class="token keyword">tcp_nopush</span> on<span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true"># reduce the data that needs to be sent over network -- for testing environment</span>
+    <span class="token keyword">gzip</span> on<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true"># gzip_static on;</span>
+    <span class="token keyword">gzip_min_length</span> <span class="token number">10240</span><span class="token punctuation">;</span>
+    <span class="token keyword">gzip_comp_level</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword">gzip_vary</span> on<span class="token punctuation">;</span>
+    <span class="token keyword">gzip_disable</span> msie6<span class="token punctuation">;</span>
+    <span class="token keyword">gzip_proxied</span> expired no<span class="token operator">-</span>cache no<span class="token operator">-</span>store private <span class="token keyword">auth</span><span class="token punctuation">;</span>
+    <span class="token keyword">gzip_types</span>
+        <span class="token comment" spellcheck="true"># text/html is always compressed by HttpGzipModule</span>
+        text<span class="token operator">/</span>css
+        text<span class="token operator">/</span>javascript
+        text<span class="token operator">/</span>xml
+        text<span class="token operator">/</span>plain
+        text<span class="token operator">/</span>x<span class="token operator">-</span>component
+        application<span class="token operator">/</span>javascript
+        application<span class="token operator">/</span>x<span class="token operator">-</span>javascript
+        application<span class="token operator">/</span>json
+        application<span class="token operator">/</span>xml
+        application<span class="token operator">/</span>rss<span class="token operator">+</span>xml
+        application<span class="token operator">/</span>atom<span class="token operator">+</span>xml
+        font<span class="token operator">/</span>truetype
+        font<span class="token operator">/</span>opentype
+        application<span class="token operator">/</span>vnd<span class="token punctuation">.</span>ms<span class="token operator">-</span>fontobject
+        image<span class="token operator">/</span>svg<span class="token operator">+</span>xml<span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true"># allow the server to close connection on non responding client, this will free up memory</span>
+    <span class="token keyword">reset_timedout_connection</span> on<span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true"># request timed out -- default 60</span>
+    <span class="token keyword">client_body_timeout</span> <span class="token number">10</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true"># if client stop responding, free up memory -- default 60</span>
+    <span class="token keyword">send_timeout</span> <span class="token number">2</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true"># server will close connection after this time -- default 75</span>
+    <span class="token keyword">keepalive_timeout</span> <span class="token number">30</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true"># number of requests client can make over keep-alive -- for testing environment</span>
+    <span class="token keyword">keepalive_requests</span> <span class="token number">100000</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] For Security Reasons</strong></li>
+</ul>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server_tokens</span> off<span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ul>
+<li><strong>[3] For Simple DDoS Defense</strong></li>
+</ul>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># limit the number of connections per single IP</span>
+<span class="token keyword">limit_conn_zone</span> <span class="token variable">$binary_remote_addr</span> zone<span class="token operator">=</span>conn_limit_per_ip<span class="token punctuation">:</span>10m<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true"># limit the number of requests for a given session</span>
+<span class="token keyword">limit_req_zone</span> <span class="token variable">$binary_remote_addr</span> zone<span class="token operator">=</span>req_limit_per_ip<span class="token punctuation">:</span>10m rate<span class="token operator">=</span>5r<span class="token operator">/</span>s<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true"># zone which we want to limit by upper values, we want limit whole server</span>
+<span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">limit_conn</span> conn_limit_per_ip <span class="token number">10</span><span class="token punctuation">;</span>
+    <span class="token keyword">limit_req</span> zone<span class="token operator">=</span>req_limit_per_ip burst<span class="token operator">=</span><span class="token number">10</span> nodelay<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true"># if the request body size is more than the buffer size, then the entire (or partial)</span>
+<span class="token comment" spellcheck="true"># request body is written into a temporary file</span>
+<span class="token keyword">client_body_buffer_size</span>  128k<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true"># buffer size for reading client request header -- for testing environment</span>
+<span class="token keyword">client_header_buffer_size</span> 3m<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true"># maximum number and size of buffers for large headers to read from client request</span>
+<span class="token keyword">large_client_header_buffers</span> <span class="token number">4</span> 256k<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true"># read timeout for the request body from client -- for testing environment</span>
+<span class="token keyword">client_body_timeout</span>   3m<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true"># how long to wait for the client to send a request header -- for testing environment</span>
+<span class="token keyword">client_header_timeout</span> 3m<span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] Boost Performance 9x</strong></li>
+</ul>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">map</span> <span class="token variable">$ssl_preread_protocol</span> <span class="token variable">$upstream</span> <span class="token punctuation">{</span>
+    <span class="token string">""</span>        ssh<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">:</span><span class="token number">22</span><span class="token punctuation">;</span>
+    <span class="token string">"TLSv1.2"</span> new<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">:</span><span class="token number">443</span><span class="token punctuation">;</span>
+    default   tls<span class="token punctuation">.</span>example<span class="token punctuation">.</span>com<span class="token punctuation">:</span><span class="token number">443</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true"># ssh and https on the same port</span>
+<span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">listen</span>      <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.1</span><span class="token punctuation">:</span><span class="token number">443</span><span class="token punctuation">;</span>
+    <span class="token keyword">proxy_pass</span>  <span class="token variable">$upstream</span><span class="token punctuation">;</span>
+    ssl_preread on<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1010,7 +1154,7 @@
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1240.6k</span>
+                        class="white-color">1241.2k</span>
             
             
             
