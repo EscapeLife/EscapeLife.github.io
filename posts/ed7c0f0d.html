@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-05-11
+                    2022-07-11
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    414
+                    1.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    5 分
                 </div>
                 
 
@@ -575,7 +575,18 @@
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">></span> lspci -nn -k -d 10de:
 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <hr>
-<h2 id="4-命令使用注意"><a href="#4-命令使用注意" class="headerlink" title="4. 命令使用注意"></a>4. 命令使用注意</h2><blockquote>
+<h2 id="4-性能相关命令"><a href="#4-性能相关命令" class="headerlink" title="4. 性能相关命令"></a>4. 性能相关命令</h2><blockquote>
+<p><strong>统计应用相关的命令，比如内存和 CPU 使用，以及瓶颈筛查</strong></p>
+</blockquote>
+<ul>
+<li><strong>统计进程使用的内存/CPU 等资源</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">></span> /usr/bin/time -f \
+    <span class="token string">"mem=%K RSS=%M elapsed=%E cpu.sys=%S .user=%U"</span> \
+    python3 -m app.op.stat_show_answer -c -m 4 -f 300 -t 300
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="5-命令使用注意"><a href="#5-命令使用注意" class="headerlink" title="5. 命令使用注意"></a>5. 命令使用注意</h2><blockquote>
 <p><strong>列出平时使用 Linux 命令时需要注意的小细节</strong></p>
 </blockquote>
 <ul>
@@ -589,16 +600,151 @@
 <span class="token operator">></span> <span class="token function">find</span> <span class="token keyword">.</span> -type f -exec <span class="token keyword">echo</span> <span class="token punctuation">{</span><span class="token punctuation">}</span> +
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="5-性能相关命令"><a href="#5-性能相关命令" class="headerlink" title="5. 性能相关命令"></a>5. 性能相关命令</h2><blockquote>
-<p><strong>统计应用相关的命令，比如内存和 CPU 使用，以及瓶颈筛查</strong></p>
+<h2 id="6-查询过滤相关"><a href="#6-查询过滤相关" class="headerlink" title="6. 查询过滤相关"></a>6. 查询过滤相关</h2><blockquote>
+<p><strong>记录查询和过滤相关的命令，有助于提高工作效率！</strong></p>
+</blockquote>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 去掉井号和分号开头的注释信息行并过滤空白行</span>
+<span class="token operator">></span> <span class="token function">cat</span> smb.conf <span class="token operator">|</span> <span class="token function">grep</span> -v <span class="token string">"#"</span> <span class="token operator">|</span> <span class="token function">grep</span> -v <span class="token string">";"</span> <span class="token operator">|</span> <span class="token function">grep</span> -v <span class="token string">"^$"</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="7-显卡相关命令"><a href="#7-显卡相关命令" class="headerlink" title="7. 显卡相关命令"></a>7. 显卡相关命令</h2><blockquote>
+<p><strong>其是一个跨平台工具，提供监控 GPU 使用情况和更改 GPU 状态的功能！</strong></p>
 </blockquote>
 <ul>
-<li><strong>统计进程使用的内存/CPU 等资源</strong></li>
+<li><strong>[1] 查看当前实时情况</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">></span> /usr/bin/time -f \
-    <span class="token string">"mem=%K RSS=%M elapsed=%E cpu.sys=%S .user=%U"</span> \
-    python3 -m app.op.stat_show_answer -c -m 4 -f 300 -t 300
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 显示所有GPU的当前信息状态</span>
+<span class="token operator">></span> nvidia-smi
+
+<span class="token comment" spellcheck="true"># 指定某个GPU</span>
+<span class="token operator">></span> nvidia-smi –i xxx
+
+<span class="token comment" spellcheck="true"># 动态刷新信息(默认5s刷新一次)</span>
+<span class="token operator">></span> nvidia-smi –l xxx
+
+<span class="token comment" spellcheck="true"># 将查询的信息输出到具体的文件中</span>
+<span class="token operator">></span> nvidia-smi –f xxx
+
+<span class="token comment" spellcheck="true"># 查看显卡型号</span>
+<span class="token operator">></span> nvidia-smi -L
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 查看当前详细情况</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查询所有GPU的当前详细信息</span>
+<span class="token operator">></span> nvidia-smi -q
+
+<span class="token comment" spellcheck="true"># 显示单元而不是GPU的属性</span>
+<span class="token operator">></span> nvidia-smi –q –u
+
+<span class="token comment" spellcheck="true"># 指定具体的GPU或unit信息</span>
+<span class="token operator">></span> nvidia-smi –q –i xxx
+
+<span class="token comment" spellcheck="true"># 将查询的信息输出到具体的文件中</span>
+<span class="token operator">></span> nvidia-smi –q –f xxx
+
+<span class="token comment" spellcheck="true"># 将查询的信息以xml的形式输出</span>
+<span class="token operator">></span> nvidia-smi –q –x
+
+<span class="token comment" spellcheck="true"># 指定显示GPU卡某些信息</span>
+<span class="token comment" spellcheck="true"># 参数: MEMORY, UTILIZATION, ECC, TEMPERATURE, POWER,CLOCK, COMPUTE, PIDS</span>
+<span class="token comment" spellcheck="true"># 参数: PERFORMANCE, SUPPORTED_CLOCKS, PAGE_RETIREMENT,ACCOUNTING</span>
+<span class="token operator">></span> nvidia-smi -q –d xxx
+
+<span class="token comment" spellcheck="true"># 动态刷新信息</span>
+<span class="token operator">></span> nvidia-smi –q –l xxx
+
+<span class="token comment" spellcheck="true"># 选择性查询选项</span>
+<span class="token operator">></span> nvidia-smi --query-gpu<span class="token operator">=</span>gpu_name,gpu_bus_id,vbios_version--format<span class="token operator">=</span>csv
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 可以设备修改选项</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 设置持久模式</span>
+<span class="token comment" spellcheck="true"># 0/DISABLED,1/ENABLED</span>
+<span class="token operator">></span> nvidia-smi –pm 0/1
+
+<span class="token comment" spellcheck="true"># 切换ECC支持</span>
+<span class="token comment" spellcheck="true"># 0/DISABLED, 1/ENABLED</span>
+<span class="token operator">></span> nvidia-smi –e 0/1
+
+<span class="token comment" spellcheck="true"># 重置ECC错误计数</span>
+<span class="token comment" spellcheck="true"># 0/VOLATILE, 1/AGGREGATE</span>
+<span class="token operator">></span> nvidia-smi –p 0/1
+
+<span class="token comment" spellcheck="true"># 设置计算应用模式</span>
+<span class="token comment" spellcheck="true"># 0/DEFAULT,1/EXCLUSIVE_PROCESS,2/PROHIBITED</span>
+<span class="token operator">></span> nvidia-smi –c
+
+<span class="token comment" spellcheck="true"># GPU复位</span>
+<span class="token operator">></span> nvidia-smi –r
+
+<span class="token comment" spellcheck="true"># 设置GPU虚拟化模式</span>
+<span class="token operator">></span> nvidia-smi –vm
+
+<span class="token comment" spellcheck="true"># 设置GPU运行的工作频率</span>
+<span class="token operator">></span> nvidia-smi –ac 2000,800
+
+<span class="token comment" spellcheck="true"># 将时钟频率重置为默认值</span>
+<span class="token operator">></span> nvidia-smi –rac
+
+<span class="token comment" spellcheck="true"># 切换-ac和-rac的权限要求</span>
+<span class="token comment" spellcheck="true"># 0/UNRESTRICTED, 1/RESTRICTED</span>
+<span class="token operator">></span> nvidia-smi –acp 0/1
+
+<span class="token comment" spellcheck="true"># 指定最大电源管理限制(瓦特)</span>
+<span class="token operator">></span> nvidia-smi –pl
+
+<span class="token comment" spellcheck="true"># 启用或禁用计数模式</span>
+<span class="token comment" spellcheck="true"># 0/DISABLED,1/ENABLED</span>
+<span class="token operator">></span> nvidia-smi –am 0/1
+
+<span class="token comment" spellcheck="true"># 清除缓冲区中的所有已记录PID</span>
+<span class="token comment" spellcheck="true"># 0/DISABLED,1/ENABLED</span>
+<span class="token operator">></span> nvidia-smi –caa
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] 设备监控相关命令</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 用逗号分隔GPU索引 | PCI总线ID或UUID</span>
+<span class="token operator">></span> nvidia-smi dmon –i xxx
+
+<span class="token comment" spellcheck="true"># 指定刷新时间(默认为1秒)</span>
+<span class="token operator">></span> nvidia-smi dmon –d xxx
+
+<span class="token comment" spellcheck="true"># 显示指定数目的统计信息并退出</span>
+<span class="token operator">></span> nvidia-smi dmon –c xxx
+
+<span class="token comment" spellcheck="true"># 指定显示哪些监控指标(默认为puc)</span>
+<span class="token operator">></span> nvidia-smi dmon –s xxx
+
+<span class="token comment" spellcheck="true"># 指定显示的时间格式</span>
+<span class="token operator">></span> nvidia-smi dmon –o D/T
+
+<span class="token comment" spellcheck="true"># 将查询的信息输出到具体的文件中</span>
+<span class="token operator">></span> nvidia-smi dmon –f xxx
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] 进程监控相关命令</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 用逗号分隔GPU索引 | PCI总线ID或UUID</span>
+<span class="token operator">></span> nvidia-smi pmon –i xxx
+
+<span class="token comment" spellcheck="true"># 指定刷新时间(默认为1秒最大为10秒)</span>
+<span class="token operator">></span> nvidia-smi pmon –d xxx
+
+<span class="token comment" spellcheck="true"># 显示指定数目的统计信息并退出</span>
+<span class="token operator">></span> nvidia-smi pmon –c xxx
+
+<span class="token comment" spellcheck="true"># 指定显示哪些监控指标</span>
+<span class="token operator">></span> nvidia-smi pmon –s xxx
+
+<span class="token comment" spellcheck="true"># 指定显示的时间格式</span>
+<span class="token operator">></span> nvidia-smi pmon –o D/T
+
+<span class="token comment" spellcheck="true"># nvidia-smi pmon –f xxx</span>
+<span class="token operator">></span> 将查询的信息输出到具体的文件中
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1139,7 +1285,7 @@
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1241.2k</span>
+                        class="white-color">1242.2k</span>
             
             
             
