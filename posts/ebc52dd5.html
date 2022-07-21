@@ -458,21 +458,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-11-23
+                    2022-07-21
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.4k
+                    2.7k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    8 分
+                    10 分
                 </div>
                 
 
@@ -605,6 +605,35 @@ utilization of available network capacity.
 </blockquote>
 <p>我们希望这五个技巧能帮助你优化网站的性能，然而速度和带宽增益因网站而异。即使调整你的服务 <code>Nginx</code> 配置，发现似乎并没有显着释放带宽或提高速度，但成千上万个网站分别调整其 <code>Nginx</code> 配置的整体影响加在一起呢？我们的全球网络得到更有效的利用，这意味着最关键的服务将在需要时提供。</p>
 <p>哈哈哈，当然我们还可以使用 <code>F5</code> 等负载均衡器。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 获取帮助信息</span>
+$ nginx -h
+nginx version: nginx/1.18.0 <span class="token punctuation">(</span>Ubuntu<span class="token punctuation">)</span>
+Usage: nginx <span class="token punctuation">[</span>-?hvVtTq<span class="token punctuation">]</span> <span class="token punctuation">[</span>-s signal<span class="token punctuation">]</span> <span class="token punctuation">[</span>-c filename<span class="token punctuation">]</span> <span class="token punctuation">[</span>-p prefix<span class="token punctuation">]</span> <span class="token punctuation">[</span>-g directives<span class="token punctuation">]</span>
+Options:
+  -?,-h         <span class="token keyword">:</span> this <span class="token function">help</span>
+  -v            <span class="token keyword">:</span> show version and <span class="token keyword">exit</span>
+  -V            <span class="token keyword">:</span> show version and configure options <span class="token keyword">then</span> <span class="token keyword">exit</span>
+  -t            <span class="token keyword">:</span> <span class="token function">test</span> configuration and <span class="token keyword">exit</span>
+  -T            <span class="token keyword">:</span> <span class="token function">test</span> configuration, dump it and <span class="token keyword">exit</span>
+  -q            <span class="token keyword">:</span> suppress non-error messages during configuration testing
+  -s signal     <span class="token keyword">:</span> send signal to a master process: stop, quit, reopen, reload
+  -p prefix     <span class="token keyword">:</span> <span class="token keyword">set</span> prefix path <span class="token punctuation">(</span>default: /usr/share/nginx/<span class="token punctuation">)</span>
+  -c filename   <span class="token keyword">:</span> <span class="token keyword">set</span> configuration <span class="token function">file</span> <span class="token punctuation">(</span>default: /etc/nginx/nginx.conf<span class="token punctuation">)</span>
+  -g directives <span class="token keyword">:</span> <span class="token keyword">set</span> global directives out of configuration <span class="token function">file</span>
+
+<span class="token comment" spellcheck="true"># 值得一说的就是 -s(发送信号)/-g(从配置文件中设置全局指令) 参数</span>
+stop: 快速停止nginx服务
+quit: 完整有序的停止nginx服务
+reopen: 重新打开日志文件<span class="token punctuation">(</span>日志文件mv等操作后会重新生成<span class="token punctuation">)</span>
+reload: 修改配置后重新加载生效
+
+<span class="token comment" spellcheck="true"># 简述reload命令的执行步骤</span>
+1. master进程检查配置文件的正确性，若错误则返回错误信息并终止<span class="token punctuation">(</span>采用原配置文件继续工作；因为worker并未受到影响<span class="token punctuation">)</span>，若正常则继续后续步骤。
+2. 用新的配置文件，启动新的worker进程。
+3. nginx将新的请求，分配新的worker进程。
+4. 等待以前的worker进程的全部请求已经都返回后，关闭相关worker进程。
+5. 重复上面过程，知道全部旧的worker进程都被关闭掉。
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1141,7 +1170,7 @@ utilization of available network capacity.
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1242.2k</span>
+                        class="white-color">1243.5k</span>
             
             
             

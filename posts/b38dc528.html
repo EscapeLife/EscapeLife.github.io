@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-06-30
+                    2022-07-21
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    4.5k
+                    5.3k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    19 分
+                    23 分
                 </div>
                 
 
@@ -501,6 +501,35 @@
 </blockquote>
 <p>诡异的问题时常发生，如果正确的处理它们呢？将是一个值得思考和学习的问题！通过对错误和异常问题的排除和处理，能够增长我们的知识储备已经掌握处理问题最为有效和使用的方式。这里将会记录常见的集群使用的问题，以备不时之需。</p>
 <p><img src="../images/nginx-diseases-all-list.png" alt="Nginx疑难杂症汇总"></p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 获取帮助信息</span>
+$ nginx -h
+nginx version: nginx/1.18.0 <span class="token punctuation">(</span>Ubuntu<span class="token punctuation">)</span>
+Usage: nginx <span class="token punctuation">[</span>-?hvVtTq<span class="token punctuation">]</span> <span class="token punctuation">[</span>-s signal<span class="token punctuation">]</span> <span class="token punctuation">[</span>-c filename<span class="token punctuation">]</span> <span class="token punctuation">[</span>-p prefix<span class="token punctuation">]</span> <span class="token punctuation">[</span>-g directives<span class="token punctuation">]</span>
+Options:
+  -?,-h         <span class="token keyword">:</span> this <span class="token function">help</span>
+  -v            <span class="token keyword">:</span> show version and <span class="token keyword">exit</span>
+  -V            <span class="token keyword">:</span> show version and configure options <span class="token keyword">then</span> <span class="token keyword">exit</span>
+  -t            <span class="token keyword">:</span> <span class="token function">test</span> configuration and <span class="token keyword">exit</span>
+  -T            <span class="token keyword">:</span> <span class="token function">test</span> configuration, dump it and <span class="token keyword">exit</span>
+  -q            <span class="token keyword">:</span> suppress non-error messages during configuration testing
+  -s signal     <span class="token keyword">:</span> send signal to a master process: stop, quit, reopen, reload
+  -p prefix     <span class="token keyword">:</span> <span class="token keyword">set</span> prefix path <span class="token punctuation">(</span>default: /usr/share/nginx/<span class="token punctuation">)</span>
+  -c filename   <span class="token keyword">:</span> <span class="token keyword">set</span> configuration <span class="token function">file</span> <span class="token punctuation">(</span>default: /etc/nginx/nginx.conf<span class="token punctuation">)</span>
+  -g directives <span class="token keyword">:</span> <span class="token keyword">set</span> global directives out of configuration <span class="token function">file</span>
+
+<span class="token comment" spellcheck="true"># 值得一说的就是 -s(发送信号)/-g(从配置文件中设置全局指令) 参数</span>
+stop: 快速停止nginx服务
+quit: 完整有序的停止nginx服务
+reopen: 重新打开日志文件<span class="token punctuation">(</span>日志文件mv等操作后会重新生成<span class="token punctuation">)</span>
+reload: 修改配置后重新加载生效
+
+<span class="token comment" spellcheck="true"># 简述reload命令的执行步骤</span>
+1. master进程检查配置文件的正确性，若错误则返回错误信息并终止<span class="token punctuation">(</span>采用原配置文件继续工作；因为worker并未受到影响<span class="token punctuation">)</span>，若正常则继续后续步骤。
+2. 用新的配置文件，启动新的worker进程。
+3. nginx将新的请求，分配新的worker进程。
+4. 等待以前的worker进程的全部请求已经都返回后，关闭相关worker进程。
+5. 重复上面过程，知道全部旧的worker进程都被关闭掉。
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="1-提示-Cookie-长度超限"><a href="#1-提示-Cookie-长度超限" class="headerlink" title="1. 提示 Cookie 长度超限"></a>1. 提示 Cookie 长度超限</h2><blockquote>
 <p><strong>报错信息：Request Request Header Or Cookie Too Large</strong></p>
@@ -897,42 +926,93 @@ CORB: Cross Origin Read Blocking：跨源读取阻止
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="10"><a href="#10" class="headerlink" title="10."></a>10.</h2><blockquote>
+<h2 id="10-请求客户端响应超时"><a href="#10-请求客户端响应超时" class="headerlink" title="10. 请求客户端响应超时"></a>10. 请求客户端响应超时</h2><blockquote>
+<p><strong>服务端请求之后，客户端响应超时，并非必现场景！</strong></p>
 </blockquote>
 <ul>
-<li><strong>[1] nginx commands</strong></li>
+<li><strong>[问题起因]</strong> 客户端请求某个服务的时候，当 <code>POST</code> 请求上传数据量打的时候，就会概率发生响应超时的情况。如下所示，在第三个请求的时候，请求超过 <code>60s</code> 之后服务就失败了。虽然可以通过加重试来间接解决这个问题，但是并没有找到对应的问题原因。</li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 获取帮助信息</span>
-$ nginx -h
-nginx version: nginx/1.18.0 <span class="token punctuation">(</span>Ubuntu<span class="token punctuation">)</span>
-Usage: nginx <span class="token punctuation">[</span>-?hvVtTq<span class="token punctuation">]</span> <span class="token punctuation">[</span>-s signal<span class="token punctuation">]</span> <span class="token punctuation">[</span>-c filename<span class="token punctuation">]</span> <span class="token punctuation">[</span>-p prefix<span class="token punctuation">]</span> <span class="token punctuation">[</span>-g directives<span class="token punctuation">]</span>
-Options:
-  -?,-h         <span class="token keyword">:</span> this <span class="token function">help</span>
-  -v            <span class="token keyword">:</span> show version and <span class="token keyword">exit</span>
-  -V            <span class="token keyword">:</span> show version and configure options <span class="token keyword">then</span> <span class="token keyword">exit</span>
-  -t            <span class="token keyword">:</span> <span class="token function">test</span> configuration and <span class="token keyword">exit</span>
-  -T            <span class="token keyword">:</span> <span class="token function">test</span> configuration, dump it and <span class="token keyword">exit</span>
-  -q            <span class="token keyword">:</span> suppress non-error messages during configuration testing
-  -s signal     <span class="token keyword">:</span> send signal to a master process: stop, quit, reopen, reload
-  -p prefix     <span class="token keyword">:</span> <span class="token keyword">set</span> prefix path <span class="token punctuation">(</span>default: /usr/share/nginx/<span class="token punctuation">)</span>
-  -c filename   <span class="token keyword">:</span> <span class="token keyword">set</span> configuration <span class="token function">file</span> <span class="token punctuation">(</span>default: /etc/nginx/nginx.conf<span class="token punctuation">)</span>
-  -g directives <span class="token keyword">:</span> <span class="token keyword">set</span> global directives out of configuration <span class="token function">file</span>
-
-<span class="token comment" spellcheck="true"># 值得一说的就是 -s(发送信号)/-g(从配置文件中设置全局指令) 参数</span>
-stop: 快速停止nginx服务
-quit: 完整有序的停止nginx服务
-reopen: 重新打开日志文件<span class="token punctuation">(</span>日志文件mv等操作后会重新生成<span class="token punctuation">)</span>
-reload: 修改配置后重新加载生效
-
-<span class="token comment" spellcheck="true"># 简述reload命令的执行步骤</span>
-1. master进程检查配置文件的正确性，若错误则返回错误信息并终止<span class="token punctuation">(</span>采用原配置文件继续工作；因为worker并未受到影响<span class="token punctuation">)</span>，若正常则继续后续步骤。
-2. 用新的配置文件，启动新的worker进程。
-3. nginx将新的请求，分配新的worker进程。
-4. 等待以前的worker进程的全部请求已经都返回后，关闭相关worker进程。
-5. 重复上面过程，知道全部旧的worker进程都被关闭掉。
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># project stack</span>
+122.100.11.123 - <span class="token string">"POST /api/v1/xxx/png/60895/xxx HTTP/1.1"</span> 200 426 2003840 0.513 0.096 <span class="token string">"-"</span>
+122.100.11.124 - <span class="token string">"POST /api/v1/xxx/png/60896/xxx HTTP/1.1"</span> 200 413 1868160 0.484 0.076 <span class="token string">"-"</span>
+122.100.11.125 - <span class="token string">"POST /api/v1/xxx/png/60897/xxx HTTP/1.1"</span> 200 383 11265848 60.114 0.132 <span class="token string">"-"</span>
+229.207.88.100 - <span class="token string">"POST /api/v1/xxx/png/60875/xxx HTTP/1.1"</span> 200 374 11350466 1.214 0.196 <span class="token string">"-"</span>
+229.207.88.100 - <span class="token string">"POST /api/v1/xxx/png/60876/xxx HTTP/1.1"</span> 200 383 16885939 1.148 0.224 <span class="token string">"-"</span>
+229.207.88.100 - <span class="token string">"POST /api/v1/xxx/png/60877/xxx HTTP/1.1"</span> 200 378 16439591 36.457 0.124 <span class="token string">"-"</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[2] Avoid logging for favicon.ico and robots.txt</strong></li>
+<li><strong>[解决方法]</strong> 很奇怪，并没有发现关于 <code>60</code> 的 <code>Nginx</code> 设置，所以必定是某些默认参数的默认值。有根据返回码 <code>408</code> 判断初始因为 <code>client_header_timeout</code> 和 <code>client_body_timeout</code> 这两个参数导致客户端请求超时了。我们可以看到，正常情况下响应都是非常快的，基本在 <code>60s</code> 之内完全可以返回的。后来发现，是因为上了防火墙，其拿到请求之后需要进行流量分析导致拿到请求半天不给你传 <code>header</code>。有可能需要充值信仰了。。。。</li>
+</ul>
+<p><img src="../images/nginx-diseases-all-list-07.png" alt="Nginx疑难杂症汇总 - 请求客户端响应超时"></p>
+<p><img src="../images/nginx-diseases-all-list-08.png" alt="Nginx疑难杂症汇总 - 请求客户端响应超时"></p>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">sendfile</span>                  on<span class="token punctuation">;</span>
+    <span class="token keyword">client_header_timeout</span>    <span class="token number">240</span><span class="token punctuation">;</span>
+    <span class="token keyword">client_body_timeout</span>      <span class="token number">240</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="11-配置-TCP-UDP-代理转发"><a href="#11-配置-TCP-UDP-代理转发" class="headerlink" title="11. 配置 TCP/UDP 代理转发"></a>11. 配置 TCP/UDP 代理转发</h2><blockquote>
+<p><strong>Nginx TCP/UDP Stream</strong></p>
+</blockquote>
+<p>我们都知道 <code>nginx</code> 是一款优秀的反向代理服务，用过 nginx 的 <code>upstream</code> 一般都是用于 <code>http</code> 代理的，如果想对后端服务的 <code>TCP</code> 进行代理呢？这时候就需要使用到 <code>stream</code> 了，就可以用于代理 <code>mysql</code>、<code>redis</code> 等服务。</p>
+<ul>
+<li><strong>应用 Stream 代理模块</strong>：<a target="_blank" rel="noopener" href="http://nginx.org/en/docs/stream/ngx_stream_proxy_module.html"><code>ngx_stream_proxy_module</code></a></li>
+<li><strong>应用 Stream 上游模块</strong>：<a target="_blank" rel="noopener" href="http://nginx.org/en/docs/stream/ngx_stream_upstream_module.html"><code>ngx_stream_upstream_module</code></a></li>
+<li><strong>应用 Stream 健康检查</strong>：<a target="_blank" rel="noopener" href="http://nginx.org/en/docs/stream/ngx_stream_upstream_hc_module.html"><code>ngx_stream_upstream_hc_module</code></a></li>
+</ul>
+<p><img src="../images/nginx-diseases-all-list-09.png" alt="Nginx疑难杂症汇总 - 配置 TCP/UDP 代理转发"></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.nginx.com/nginx/admin-guide/load-balancer/tcp-udp-load-balancer/"><strong>TCP and UDP Load Balancing</strong></a></li>
+</ul>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># /etc/nginx/nginx.conf</span>
+
+stream <span class="token punctuation">{</span>
+    <span class="token keyword">log_format</span> <span class="token keyword">proxy</span> <span class="token string">'$remote_addr [$time_local] '</span>
+                 <span class="token string">'$protocol $status $bytes_sent $bytes_received '</span>
+                 <span class="token string">'$session_time "$upstream_addr" '</span>
+                 <span class="token string">'"$upstream_bytes_sent" "$upstream_bytes_received" "$upstream_connect_time"'</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">access_log</span> <span class="token operator">/</span>var<span class="token operator">/</span>log<span class="token operator">/</span>nginx<span class="token operator">/</span>stream<span class="token punctuation">.</span>access<span class="token punctuation">.</span>log <span class="token keyword">proxy</span><span class="token punctuation">;</span>
+    <span class="token keyword">error_log</span> <span class="token operator">/</span>var<span class="token operator">/</span>log<span class="token operator">/</span>nginx<span class="token operator">/</span>stream<span class="token punctuation">.</span>error<span class="token punctuation">.</span>log error<span class="token punctuation">;</span>
+
+    <span class="token keyword">include</span> <span class="token operator">/</span>etc<span class="token operator">/</span>nginx<span class="token operator">/</span>stream<span class="token punctuation">.</span>d<span class="token operator">/</span><span class="token operator">*</span><span class="token punctuation">.</span>conf<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># /etc/nginx/stream.d/test1.conf</span>
+
+<span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">listen</span>     <span class="token number">9999</span><span class="token punctuation">;</span>
+    <span class="token keyword">proxy_pass</span> <span class="token number">120.120</span><span class="token punctuation">.</span><span class="token number">120.120</span><span class="token punctuation">:</span><span class="token number">5432</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># /etc/nginx/stream.d/test2.conf</span>
+
+<span class="token keyword">upstream</span> mysql_servers <span class="token punctuation">{</span>
+    least_conn<span class="token punctuation">;</span>
+    <span class="token keyword">server</span> <span class="token number">120.120</span><span class="token punctuation">.</span><span class="token number">120.120</span><span class="token punctuation">:</span><span class="token number">3306</span> max_fails<span class="token operator">=</span><span class="token number">3</span> fail_timeout<span class="token operator">=</span>5s<span class="token punctuation">;</span> <span class="token comment" spellcheck="true"># 5s内出现3次错误</span>
+    <span class="token keyword">server</span> <span class="token number">120.120</span><span class="token punctuation">.</span><span class="token number">120.121</span><span class="token punctuation">:</span><span class="token number">3306</span> max_fails<span class="token operator">=</span><span class="token number">3</span> fail_timeout<span class="token operator">=</span>5s<span class="token punctuation">;</span>
+    <span class="token keyword">server</span> <span class="token number">120.120</span><span class="token punctuation">.</span><span class="token number">120.122</span><span class="token punctuation">:</span><span class="token number">3306</span> max_fails<span class="token operator">=</span><span class="token number">3</span> fail_timeout<span class="token operator">=</span>5s<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">listen</span>                     <span class="token number">9999</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true"># 端口</span>
+    <span class="token keyword">proxy_connect_timeout</span>        5s<span class="token punctuation">;</span> <span class="token comment" spellcheck="true"># 与被代理服务器建立连接的超时时间</span>
+    <span class="token keyword">proxy_timeout</span>               10s<span class="token punctuation">;</span> <span class="token comment" spellcheck="true"># 获取被代理服务器的响应最大超时时间</span>
+    <span class="token keyword">proxy_next_upstream</span>          on<span class="token punctuation">;</span> <span class="token comment" spellcheck="true"># 将未返回响应的客户端连接请求传递给upstream中的下一个服务器</span>
+    proxy_next_upstream_tries     <span class="token number">3</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true"># 转发尝试请求最多3次</span>
+    proxy_next_upstream_timeout 10s<span class="token punctuation">;</span> <span class="token comment" spellcheck="true"># 总尝试超时时间为10s</span>
+    proxy_socket_keepalive       on<span class="token punctuation">;</span> <span class="token comment" spellcheck="true"># 开启SO_KEEPALIVE选项进行心跳检测</span>
+
+    <span class="token keyword">proxy_pass</span> mysql_servers<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="11-日常通常会设置的配置"><a href="#11-日常通常会设置的配置" class="headerlink" title="11. 日常通常会设置的配置"></a>11. 日常通常会设置的配置</h2><blockquote>
+<p><strong>记录日常使用通常会设置和优化的地方</strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] 避免记录 favicon.ico 和 robots.txt 的请求到日志里面</strong></li>
 </ul>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">=</span> <span class="token operator">/</span>favicon<span class="token punctuation">.</span>ico <span class="token punctuation">{</span>
     <span class="token keyword">log_not_found</span> off<span class="token punctuation">;</span>
@@ -946,7 +1026,7 @@ reload: 修改配置后重新加载生效
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[3] HTTP location on HTTPS server</strong></li>
+<li><strong>[2] HTTP 和 HTTPS 协议相互引用</strong></li>
 </ul>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># https server with http location</span>
 <span class="token keyword">server</span> <span class="token punctuation">{</span>
@@ -965,11 +1045,11 @@ reload: 修改配置后重新加载生效
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[4] Mobile Site Redirection</strong></li>
+<li><strong>[3] 标识移动端设备进行重定向</strong></li>
 </ul>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
 
-    <span class="token comment" spellcheck="true">#mobile site handling as per user agent</span>
+    <span class="token comment" spellcheck="true"># mobile site handling as per user agent</span>
     <span class="token keyword">set</span> <span class="token variable">$mobile_rewrite</span> do_not_perform<span class="token punctuation">;</span>     <span class="token operator">/</span><span class="token operator">/</span> variable to store action<span class="token punctuation">.</span> default <span class="token keyword">set</span> to not perform redirection to mobile site<span class="token punctuation">.</span>
 
     <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$http_user_agent</span> <span class="token operator">~</span><span class="token operator">*</span> <span class="token string">"(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
@@ -980,7 +1060,7 @@ reload: 修改配置后重新加载生效
         <span class="token keyword">set</span> <span class="token variable">$mobile_rewrite</span> perform<span class="token punctuation">;</span>
     <span class="token punctuation">}</span>
 
-    <span class="token comment" spellcheck="true">#google bot mobile handling</span>
+    <span class="token comment" spellcheck="true"># google bot mobile handling</span>
     <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$http_user_agent</span> <span class="token operator">~</span><span class="token operator">*</span> <span class="token string">"(googlebot-mobile)"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token keyword">set</span> <span class="token variable">$mobile_rewrite</span> perform<span class="token punctuation">;</span>
     <span class="token punctuation">}</span>
@@ -991,7 +1071,7 @@ reload: 修改配置后重新加载生效
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[5] Redirect requests to another server</strong></li>
+<li><strong>[4] 重定向请求到其他服务器上面</strong></li>
 </ul>
 <pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
    <span class="token keyword">server_name</span> example<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
@@ -1542,7 +1622,7 @@ reload: 修改配置后重新加载生效
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1242.2k</span>
+                        class="white-color">1243.5k</span>
             
             
             
