@@ -29,9 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.0">
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
+
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -434,6 +434,10 @@
                                 <span class="chip bg-color">Bug</span>
                             </a>
                         
+                            <a href="/tags/Nginx/">
+                                <span class="chip bg-color">Nginx</span>
+                            </a>
+                        
                     </div>
                     
                 </div>
@@ -462,7 +466,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-12-09
+                    2022-07-21
                 </div>
                 
 
@@ -501,11 +505,16 @@
 </blockquote>
 <p><img src="/images/crontab-log.png" alt="设置只保留最近七天的日志"></p>
 <hr>
-<h2 id="1-问题描述"><a href="#1-问题描述" class="headerlink" title="1. 问题描述"></a>1. 问题描述</h2><p>早上一同事收到一线反馈说，几台刚上没多久的服务器的磁盘打满了。上去看了一下，果然是日志文件太多而且没有及时清理导致的。本来是可以通过服务自己提供的配置文件进行配置，保留多少个日志文件的。但是因为需要对日志名称定制化导致配置失效，而且现在有需要紧急进行处理。</p>
-<p>考虑到这里问题，我第一个想到的就是直接配置一个<code>crontab</code>的定时任务，对该服务所产生的日志只保留最近七天的日志就可以了。</p>
-<p>本来说可以写一个<code>Shell</code>和<code>Python</code>脚本，从而精确的对日志时间进行删除，但是要的比较急，所有先处理掉线上的问题，之后再整改。将定时任务，改为一个可扩展的日志处理工具。其实，最好的方式还是通过服务自己的配置文件进行配置，方便管理和使用。</p>
+<h2 id="1-问题描述"><a href="#1-问题描述" class="headerlink" title="1. 问题描述"></a>1. 问题描述</h2><blockquote>
+<p><strong>日志轮转还是非常重要的，不清理容易磁盘满，清理多的话不容易溯源！</strong></p>
+</blockquote>
+<p>早上一同事收到一线反馈说，几台刚上没多久的服务器的磁盘打满了。上去看了一下，果然是日志文件太多而且没有及时清理导致的。本来是可以通过服务自己提供的配置文件进行配置，保留多少个日志文件的。但是因为需要对日志名称定制化导致配置失效，而且现在有需要紧急进行处理。</p>
+<p>考虑到这里问题，我第一个想到的就是直接配置一个 <code>crontab</code> 的定时任务，对该服务所产生的日志只保留最近七天的日志就可以了。本来说可以写一个 Shell<code>或</code>Python` 脚本，从而精确的对日志时间进行删除，但是要的比较急，所有先处理掉线上的问题，之后再整改。将定时任务，改为一个可扩展的日志处理工具。其实，最好的方式还是通过服务自己的配置文件进行配置，方便管理和使用。</p>
 <hr>
-<h2 id="2-定时任务"><a href="#2-定时任务" class="headerlink" title="2. 定时任务"></a>2. 定时任务</h2><p><strong>定时任务 crontab 的执行脚本</strong></p>
+<h2 id="2-定时任务"><a href="#2-定时任务" class="headerlink" title="2. 定时任务"></a>2. 定时任务</h2><blockquote>
+<p><strong>可以通过 <code>crontab</code> 定时执行实现日志切割功能</strong></p>
+</blockquote>
+<p><strong>定时任务 crontab 的执行脚本</strong></p>
 <ul>
 <li>脚本路径：<code>/var/spool/cron/</code>目录下</li>
 <li>注意事项：建议日常备份，避免误删除导致<code>crontab</code>文件丢失</li>
@@ -531,7 +540,10 @@
 <span class="token punctuation">[</span>root@node1 ~<span class="token punctuation">]</span><span class="token comment" spellcheck="true"># service crond stop</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="3-核心难点"><a href="#3-核心难点" class="headerlink" title="3. 核心难点"></a>3. 核心难点</h2><p>通过定时任务的方式配置来处理日志的定时删除工作，就需要熟悉文件的三个属性，分别为：</p>
+<h2 id="3-核心难点"><a href="#3-核心难点" class="headerlink" title="3. 核心难点"></a>3. 核心难点</h2><blockquote>
+<p><strong>难点就在于 <code>find</code> 命令查找所需要筛选的时间范围！</strong></p>
+</blockquote>
+<p>通过定时任务的方式配置来处理日志的定时删除工作，就需要熟悉文件的三个属性，分别为：</p>
 <ul>
 <li><strong>atime</strong>(<code>access time</code>)<ul>
 <li><strong>访问时间</strong> =&gt; 文件被访问过</li>
@@ -672,6 +684,10 @@ devtmpfs /dev devtmpfs rw,seclabel,relatime,size<span class="token operator">=</
                             
                                 <a href="/tags/Bug/">
                                     <span class="chip bg-color">Bug</span>
+                                </a>
+                            
+                                <a href="/tags/Nginx/">
+                                    <span class="chip bg-color">Nginx</span>
                                 </a>
                             
                         </div>
@@ -1146,7 +1162,7 @@ devtmpfs /dev devtmpfs rw,seclabel,relatime,size<span class="token operator">=</
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1243.5k</span>
+                        class="white-color">1244.1k</span>
             
             
             
