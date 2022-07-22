@@ -29,9 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
-
+<meta name="generator" content="Hexo 5.4.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -469,14 +469,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    4.3k
+                    4.7k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    17 分
+                    18 分
                 </div>
                 
 
@@ -930,7 +930,25 @@ CORB: Cross Origin Read Blocking：跨源读取阻止
 <p><strong>服务端请求之后，客户端响应超时，并非必现场景！</strong></p>
 </blockquote>
 <ul>
-<li><strong>[问题起因]</strong> 客户端请求某个服务的时候，当 <code>POST</code> 请求上传数据量打的时候，就会概率发生响应超时的情况。如下所示，在第三个请求的时候，请求超过 <code>60s</code> 之后服务就失败了。虽然可以通过加重试来间接解决这个问题，但是并没有找到对应的问题原因。</li>
+<li><strong>[问题起因]</strong> 客户端请求某个服务的时候，当 <code>POST</code> 请求上传数据量打的时候，就会概率发生响应超时的情况。如下所示，在第三个请求的时候，请求超过 <code>60s</code> 之后服务就失败了。虽然可以通过加重试来间接解决这个问题，但是并没有找到对应的问题原因。<ul>
+<li><strong><code>proxy_connect_timeout(60s)</code></strong> -&gt; 后端服务器连接的超时时间 发起握手等候响应超时时间<ul>
+<li>该指令设置与 <code>upstream server</code> 的连接超时时间，有必要记住这个超时不能超过 <code>75</code> 秒</li>
+<li>这个不是等待后端返回页面的时间，那是由 <code>proxy_read_timeout</code> 声明的</li>
+<li>如果你的 <code>upstream</code> 服务器起来了，但是 <code>hanging</code> 住了，那么这个声明是没有用的</li>
+</ul>
+</li>
+<li><strong><code>proxy_read_timeout(60s)</code></strong> -&gt; 该指令设置与代理服务器的读超时时间<ul>
+<li>它决定了 <code>nginx</code> 会等待多长时间来获得请求的响应</li>
+<li>这个时间不是获得整个 <code>response</code> 的时间，而是两次 <code>reading</code> 操作的时间</li>
+</ul>
+</li>
+<li><strong><code>proxy_send_timeout(60s)</code></strong> -&gt; 这个指定设置了发送请求给 <code>upstream</code> 服务器的超时时间<ul>
+<li>超时设置不是为了整个发送期间，而是在两次 <code>write</code> 操作期间</li>
+<li>如果超时后，<code>upstream</code> 没有收到新的数据，<code>nginx</code> 会关闭连接</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># project stack</span>
 122.100.11.123 - <span class="token string">"POST /api/v1/xxx/png/60895/xxx HTTP/1.1"</span> 200 426 2003840 0.513 0.096 <span class="token string">"-"</span>
@@ -941,7 +959,22 @@ CORB: Cross Origin Read Blocking：跨源读取阻止
 229.207.88.100 - <span class="token string">"POST /api/v1/xxx/png/60877/xxx HTTP/1.1"</span> 200 378 16439591 36.457 0.124 <span class="token string">"-"</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[解决方法]</strong> 很奇怪，并没有发现关于 <code>60</code> 的 <code>Nginx</code> 设置，所以必定是某些默认参数的默认值。有根据返回码 <code>408</code> 判断初始因为 <code>client_header_timeout</code> 和 <code>client_body_timeout</code> 这两个参数导致客户端请求超时了。我们可以看到，正常情况下响应都是非常快的，基本在 <code>60s</code> 之内完全可以返回的。后来发现，是因为上了防火墙，其拿到请求之后需要进行流量分析导致拿到请求半天不给你传 <code>header</code>。有可能需要充值信仰了。。。。</li>
+<li><strong>[解决方法]</strong> 很奇怪，并没有发现关于 <code>60</code> 的 <code>Nginx</code> 设置，所以必定是某些默认参数的默认值。有根据返回码 <code>408</code> 判断初始因为 <code>client_header_timeout</code> 和 <code>client_body_timeout</code> 这两个参数导致客户端请求超时了。我们可以看到，正常情况下响应都是非常快的，基本在 <code>60s</code> 之内完全可以返回的。后来发现，是因为上了防火墙，其拿到请求之后需要进行流量分析导致拿到请求半天不给你传 <code>header</code>。有可能需要充值信仰了。。。。<ul>
+<li><strong><code>client_header_timeout(60s)</code></strong> -&gt; 指定等待 <code>client</code> 发送一个请求头的超时时间<ul>
+<li>仅当在一次 <code>read</code> 中，没有收到请求头，才会算成超时</li>
+<li>如果在超时时间内，<code>client</code> 没发送任何东西，<code>nginx</code> 返回 <code>HTTP</code> 状态码 <code>408</code></li>
+</ul>
+</li>
+<li><strong><code>client_body_timeout(60s)</code></strong> -&gt; 该指令设置请求体的读超时时间<ul>
+<li>仅当在一次 <code>read step</code> 中，没有得到请求体就会设为超时，超时后 <code>nginx</code> 返回 <code>HTTP</code> 状态码 <code>408</code></li>
+</ul>
+</li>
+<li><strong><code>keepalive_timeout(75s)</code></strong> -&gt; 服务器将会在这个时间后关闭连接<ul>
+<li>这个头能够让一些浏览器主动关闭连接，这样服务器就不必要去关闭连接了</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 <p><img src="../images/nginx-diseases-all-list-07.png" alt="Nginx疑难杂症汇总 - 请求客户端响应超时"></p>
 <p><img src="../images/nginx-diseases-all-list-08.png" alt="Nginx疑难杂症汇总 - 请求客户端响应超时"></p>
@@ -1495,7 +1528,7 @@ CORB: Cross Origin Read Blocking：跨源读取阻止
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1244.1k</span>
+                        class="white-color">1244.5k</span>
             
             
             
