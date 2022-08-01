@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-07-21
+                    2022-08-01
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    6.1k
+                    6.6k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    25 分
+                    27 分
                 </div>
                 
 
@@ -1090,7 +1090,59 @@ stream <span class="token punctuation">{</span>
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="5-日常通常会设置的配置"><a href="#5-日常通常会设置的配置" class="headerlink" title="5. 日常通常会设置的配置"></a>5. 日常通常会设置的配置</h2><blockquote>
+<h2 id="5-配置服务高可用负载"><a href="#5-配置服务高可用负载" class="headerlink" title="5. 配置服务高可用负载"></a>5. 配置服务高可用负载</h2><blockquote>
+<p><strong>服务 5 求之后，客户端响应超时，并非必现场景！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 之前为了能够做到服务的高可用或者主备，需要使用 <code>KeepAlive</code> 的服务进行后端服务的心跳健康检查，或者使用 <code>Nginx·Plus</code> 企业版本，配置起来还是非常麻烦的。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">Syntax:    proxy_next_upstream error <span class="token operator">|</span> <span class="token function">timeout</span> <span class="token operator">|</span> invalid_header <span class="token operator">|</span> http_500 <span class="token operator">|</span> http_502 <span class="token operator">|</span> http_503 <span class="token operator">|</span> http_504 <span class="token operator">|</span> http_403 <span class="token operator">|</span> http_404 <span class="token operator">|</span> http_429 <span class="token operator">|</span> non_idempotent <span class="token operator">|</span> off <span class="token punctuation">..</span>.<span class="token punctuation">;</span>
+Default: proxy_next_upstream error <span class="token function">timeout</span><span class="token punctuation">;</span>
+Context:    http, server, location
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 现在已经可以借助 <a target="_blank" rel="noopener" href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_next_upstream">proxy_next_upstream</a> 来配置高可用服务。<ul>
+<li><strong>upstream</strong><ul>
+<li>在 <code>fail_timeout</code> 设定的时间内，某个 <code>server</code> 的请求失败次数达到 <code>max_fails</code> 之后，<code>upstream</code> 会认为该节点处于 <code>down</code> 状态，会从 <code>upstream</code> 中去除该节点。如果在 <code>fail_timeout</code> 时间内服务已经恢复了，会重新加回 <code>upstream</code> 中。</li>
+</ul>
+</li>
+<li><strong>proxy_next_upstream_xxx</strong><ul>
+<li><code>proxy_next_upstream_tries</code> 定义原始请求和重试请求的最大次数，此处表示 原始请求 <strong>1 次+重试 1 次</strong>，而 <code>proxy_next_upstream_timeout</code> 指重试请求所花的总时间，超过该定义后就不重试，所以需要结合 <code>upstream_tries</code> 定义合理值以免不断重试，默认 <code>0</code> 表示关闭该限制。</li>
+<li>此处特别注意 <code>proxy_next_upstream</code> 默认对于非幂等性方法不进行重试机制，需要设置 <code>non_idempotent</code> 参数才可以。但注意生产环境开启该参数带来的风险，例如前一个节点的 <code>post</code> 请求处理超时，导致 <code>next_upstream</code>，就会出现重复 <code>post</code> 的情况。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-yaml"><code class="language-yaml">upstream pdf_service <span class="token punctuation">{</span>
+  server 192.168.0.101<span class="token punctuation">:</span>8000 max_fails=1 fail_timeout=10s;
+  server 192.168.0.104<span class="token punctuation">:</span>8000 max_fails=1 fail_timeout=10s;
+<span class="token punctuation">}</span>
+
+server <span class="token punctuation">{</span>
+    listen       80;
+    server_name  localhost;
+
+    access_log  /var/log/nginx/access.log  main;
+    client_max_body_size    500m;
+    keepalive_timeout         65;
+    proxy_connect_timeout     60; <span class="token comment" spellcheck="true"># nginx与后端服务器建立连接超时时间</span>
+    proxy_read_timeout       600; <span class="token comment" spellcheck="true"># nginx从后端服务器读取响应超时时间</span>
+    proxy_send_timeout       600; <span class="token comment" spellcheck="true"># nginx往后端服务器发送请求的超时时间</span>
+
+  location /pdf <span class="token punctuation">{</span>
+    proxy_http_version 1.1;
+    proxy_pass_header Server;
+    proxy_set_header Host $http_host;
+    proxy_next_upstream error timeout http_502 http_504 non_idempotent;
+    proxy_next_upstream_tries 2;    <span class="token comment" spellcheck="true"># 该值定义原始请求和重试请求的最大次数</span>
+    proxy_next_upstream_timeout 0s; <span class="token comment" spellcheck="true"># 指重试请求所花的总时间超过该定义后就不重试</span>
+    proxy_pass http<span class="token punctuation">:</span>//pdf_service;
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="6-日常通常会设置的配置"><a href="#6-日常通常会设置的配置" class="headerlink" title="6. 日常通常会设置的配置"></a>6. 日常通常会设置的配置</h2><blockquote>
 <p><strong>记录日常使用通常会设置和优化的地方</strong></p>
 </blockquote>
 <ul>
@@ -1704,7 +1756,7 @@ stream <span class="token punctuation">{</span>
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1244.6k</span>
+                        class="white-color">1245.1k</span>
             
             
             
