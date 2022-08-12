@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-08-09
+                    2022-08-12
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.2k
+                    2.5k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    10 分
+                    11 分
                 </div>
                 
 
@@ -783,7 +783,94 @@ respond<span class="token operator">&amp;</span>nbsp<span class="token punctuati
 $ <span class="token function">sudo</span> caddy run
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="6-Caddy-思考总结"><a href="#6-Caddy-思考总结" class="headerlink" title="6. Caddy 思考总结"></a>6. Caddy 思考总结</h2><blockquote>
+<h2 id="6-Caddy-容器使用"><a href="#6-Caddy-容器使用" class="headerlink" title="6. Caddy 容器使用"></a>6. Caddy 容器使用</h2><blockquote>
+<p><strong>介绍容器使用 Caddy 服务的相关配置和注意事项</strong></p>
+</blockquote>
+<ul>
+<li><strong>配置信息</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Data directory(/data)</span>
+<span class="token variable">$HOME</span>/.local/share/caddy
+
+<span class="token comment" spellcheck="true"># Config directory(/config)</span>
+<span class="token variable">$HOME</span>/.config/caddy
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>Basic Usage</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># The default config file simply serves files</span>
+$ <span class="token keyword">echo</span> <span class="token string">"hello world"</span> <span class="token operator">></span> index.html
+$ docker run -d -p 80:80 \
+    -v <span class="token variable">$PWD</span>/index.html:/usr/share/caddy/index.html \
+    -v caddy_data:/data \
+    caddy
+<span class="token punctuation">..</span>.
+$ curl http://localhost/
+hello world
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># To override the default&amp;nbsp;Caddyfile</span>
+$ docker run -d -p 80:80 \
+    -v <span class="token variable">$PWD</span>/Caddyfile:/etc/caddy/Caddyfile \
+    -v caddy_data:/data \
+    caddy
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>Automatic TLS</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># its A/AAAA DNS records to public IP</span>
+$ docker run -d -p 80:80 -p 443:443 -p 443:443/udp \
+    -v /site:/srv \
+    -v caddy_data:/data \
+    -v caddy_config:/config \
+    caddy caddy file-server --domain example.com
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>Building your own Caddy-based image</strong></li>
+</ul>
+<pre class="line-numbers language-Dockerfile"><code class="language-Dockerfile">FROM caddy:<version>
+
+COPY Caddyfile /etc/caddy/Caddyfile
+COPY site /srv
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>Adding custom Caddy modules</strong></li>
+</ul>
+<pre class="line-numbers language-Dockerfile"><code class="language-Dockerfile">FROM caddy:<version>-builder AS builder
+
+RUN xcaddy build \
+    --with github.com/caddyserver/nginx-adapter \
+    --with github.com/hairyhenderson/caddy-teapot-module@v0.0.3-0
+
+FROM caddy:<version>
+
+COPY --from=builder /usr/bin/caddy /usr/bin/caddy
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>Docker Compose example</strong></li>
+</ul>
+<pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">version</span><span class="token punctuation">:</span> <span class="token string">"3.7"</span>
+
+<span class="token key atrule">services</span><span class="token punctuation">:</span>
+  <span class="token key atrule">caddy</span><span class="token punctuation">:</span>
+    <span class="token key atrule">image</span><span class="token punctuation">:</span> caddy<span class="token punctuation">:</span>&lt;version<span class="token punctuation">></span>
+    <span class="token key atrule">restart</span><span class="token punctuation">:</span> unless<span class="token punctuation">-</span>stopped
+    <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> <span class="token string">"80:80"</span>
+      <span class="token punctuation">-</span> <span class="token string">"443:443"</span>
+      <span class="token punctuation">-</span> <span class="token string">"443:443/udp"</span>
+    <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> $PWD/Caddyfile<span class="token punctuation">:</span>/etc/caddy/Caddyfile
+      <span class="token punctuation">-</span> $PWD/site<span class="token punctuation">:</span>/srv
+      <span class="token punctuation">-</span> caddy_data<span class="token punctuation">:</span>/data
+      <span class="token punctuation">-</span> caddy_config<span class="token punctuation">:</span>/config
+
+<span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+  <span class="token key atrule">caddy_data</span><span class="token punctuation">:</span>
+    <span class="token key atrule">external</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+  <span class="token key atrule">caddy_config</span><span class="token punctuation">:</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="7-Caddy-思考总结"><a href="#7-Caddy-思考总结" class="headerlink" title="7. Caddy 思考总结"></a>7. Caddy 思考总结</h2><blockquote>
 <p><strong>送人玫瑰，手有余香！</strong></p>
 </blockquote>
 <p>看到这里你应该对 <code>Caddy</code> 有了一些了解，有没有一种相见恨晚的感觉？虽然它的性能比不了 <code>Nginx</code> 但如果论上手的难易度，<code>Caddy</code> 甩 <code>Nginx</code> 几条街！主要是默认开启 <code>HTTPS</code> 功能太香了，你什么都不用管就可以免费、快速、轻松开启网站 <code>HTTPS</code>。</p>
@@ -1339,7 +1426,7 @@ $ <span class="token function">sudo</span> caddy run
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1254.5k</span>
+                        class="white-color">1254.7k</span>
             
             
             
