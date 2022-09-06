@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-03-18
+                    2022-09-06
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.4k
+                    1.9k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    6 分
+                    8 分
                 </div>
                 
 
@@ -505,7 +505,10 @@
 </blockquote>
 <p><img src="/images/use-supervisor-hup.png" alt="Supervisor不中断重启服务"></p>
 <hr>
-<h2 id="1-问题起因"><a href="#1-问题起因" class="headerlink" title="1. 问题起因"></a>1. 问题起因</h2><ul>
+<h2 id="1-问题起因"><a href="#1-问题起因" class="headerlink" title="1. 问题起因"></a>1. 问题起因</h2><blockquote>
+<p><strong>简述问题的起因和表象，用于分析原因。</strong></p>
+</blockquote>
+<ul>
 <li>我们常常使用 <code>supervisor</code> 来管理服务进程，因为其能够提供很好且很健全的便捷支持，比如服务异常退出之后可以自行重启等。同样，在部署服务的时候也是可以使用该工具进行管理。为了不中断服务对产品进行更新，我们通常会使用信号量来不中断的重启服务。当然，我们的 <code>supervisor</code> 是支持接收 <code>HUP</code> 信号量的。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 使用方式</span>
@@ -537,7 +540,10 @@ root  20694 20309  00:00:00 /usr/bin/python3 /usr/local/bin/celery -A remarkable
 root  20695 20309  00:00:00 /usr/bin/python3 /usr/local/bin/celery -A remarkable.worker.app worker -n norm-%n@%h -l debug -c 2 -Q celery
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="2-排除经过"><a href="#2-排除经过" class="headerlink" title="2. 排除经过"></a>2. 排除经过</h2><ul>
+<h2 id="2-排除经过"><a href="#2-排除经过" class="headerlink" title="2. 排除经过"></a>2. 排除经过</h2><blockquote>
+<p><strong>简单排除，发现 Celery 并不完美支持 Hup 信号量！</strong></p>
+</blockquote>
+<ul>
 <li>那么，我们看下是什么原因导致上述问题的出现呢？通过阅读 <a target="_blank" rel="noopener" href="https://docs.celeryproject.org/en/stable/userguide/workers.html#restarting-the-worker"><strong><code>celery</code> 的官方文档</strong></a> 得知，其实它是支持 <code>HUP</code> 信号量，虽然是处理试用阶段并不推荐用于正式环境。</li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash">Other than stopping, <span class="token keyword">then</span> starting the worker to restart, you can also restart
@@ -563,8 +569,11 @@ HUP is disabled on macOS because of a limitation on that platform.
 <span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="3-结果总结"><a href="#3-结果总结" class="headerlink" title="3. 结果总结"></a>3. 结果总结</h2><ul>
-<li>咳咳咳，很多天后，无意间我在 <code>stackoverflow</code> 中看到有个人提了一个问题: <strong>在 docker 中使用 python 多进程库 multiprocessing 系统就奔溃了</strong>。</li>
+<h2 id="3-结果总结"><a href="#3-结果总结" class="headerlink" title="3. 结果总结"></a>3. 结果总结</h2><blockquote>
+<p><strong>后续发现，为什么在 docker 容器中，才会出现该问题！</strong></p>
+</blockquote>
+<ul>
+<li>咳咳咳，很多天后，无意间我在 <code>StackOverflow</code> 中看到有个人提了一个问题: <strong>在 docker 中使用 python 多进程库 multiprocessing 系统就奔溃了</strong>。</li>
 </ul>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># mp.py</span>
 <span class="token keyword">import</span> multiprocessing <span class="token keyword">as</span> mp
@@ -623,7 +632,43 @@ root        20     0  0 07:29 pts/1    00:00:00 <span class="token function">bas
 root        30    20  0 07:30 pts/1    00:00:00 <span class="token function">ps</span> -ef
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="4-参考文档"><a href="#4-参考文档" class="headerlink" title="4. 参考文档"></a>4. 参考文档</h2><blockquote>
+<h2 id="4-解决方法"><a href="#4-解决方法" class="headerlink" title="4. 解决方法"></a>4. 解决方法</h2><blockquote>
+<p><strong>总结出现该问题的原因，以及解决方法！</strong></p>
+</blockquote>
+<ul>
+<li>还有一种比较常用的方式，就是使用 <code>inv</code> 来启动其他服务，包括 <code>celery</code> 等。这样就又会出现同样的问题，就是 <code>inv</code> 工具本身也并支持 <code>Hup</code> 信号量，导致服务被杀死了，但是本身启动的子进程并没有得到有效的管理，成为了为人看管的孤儿进程，游离在容器的进程之中。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># celery</span>
+supervisor
+  <span class="token operator">|</span>__ celery<span class="token punctuation">(</span>父<span class="token punctuation">)</span> --<span class="token operator">></span> 被杀死但是子没死
+        <span class="token operator">|</span>__ celery<span class="token punctuation">(</span>子<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># invoke</span>
+supervisor
+  <span class="token operator">|</span>__ invoke --<span class="token operator">></span> 被杀死导致启动的bash没死
+          <span class="token operator">|</span>__ bash<span class="token punctuation">(</span>父<span class="token punctuation">)</span>
+                <span class="token operator">|</span>__ celery<span class="token punctuation">(</span>子<span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><p>正常来说，通过 <code>bash</code> 命令启动的子服务，都会在主服务被杀死的时候，一并进行清除的，并不会存在孤儿进程的情况。但是，因为工具本身并不支持信号量的形式，导致产生的子进程无处安放，就会出现各种各样的问题。</p>
+</li>
+<li><p>解决方法就是，通过 <code>bash</code> 命令将启动 <code>celery</code> 命令进行保证一下，并且在启动服务的时候使用 <code>exec</code> 命令，将子进程提升一个等级，这样就不会因为父进程死亡导致成为孤儿进程的情况。虽然还是不够优雅，但是可以解决问题。</p>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">WORK_DIR<span class="token operator">=</span><span class="token punctuation">$(</span>dirname <span class="token punctuation">$(</span>realpath -s <span class="token string">"<span class="token variable">$BASH_SOURCE</span>"</span><span class="token punctuation">))</span>
+
+args<span class="token operator">=</span><span class="token punctuation">(</span><span class="token string">"<span class="token variable">$@</span>"</span><span class="token punctuation">)</span>
+
+<span class="token keyword">for</span> <span class="token variable"><span class="token punctuation">((</span>i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span> i<span class="token operator">&lt;</span>${#args[@]}<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">))</span></span><span class="token punctuation">;</span> <span class="token keyword">do</span>
+    <span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token string">"<span class="token variable">${args[$i]}</span>"</span> <span class="token operator">==</span> <span class="token string">"-B"</span> <span class="token punctuation">]</span> <span class="token operator">||</span> <span class="token punctuation">[</span> <span class="token string">"<span class="token variable">${args[$i]}</span>"</span> <span class="token operator">==</span> <span class="token string">"beat"</span> <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span>
+        <span class="token function">rm</span> -f /tmp/celerybeat*
+    <span class="token keyword">fi</span>
+<span class="token keyword">done</span>
+
+<span class="token function">exec</span> celery <span class="token string">"<span class="token variable">$@</span>"</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="5-参考文档"><a href="#5-参考文档" class="headerlink" title="5. 参考文档"></a>5. 参考文档</h2><blockquote>
 <p><strong>送人玫瑰，手有余香！</strong></p>
 </blockquote>
 <ul>
@@ -1175,7 +1220,7 @@ root        30    20  0 07:30 pts/1    00:00:00 <span class="token function">ps<
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1261.1k</span>
+                        class="white-color">1261.5k</span>
             
             
             
