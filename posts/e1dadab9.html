@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-05-09
+                    2022-09-13
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    352
+                    518
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    2 分
                 </div>
                 
 
@@ -508,16 +508,44 @@
 <h2 id="1-查看连接数变化"><a href="#1-查看连接数变化" class="headerlink" title="1. 查看连接数变化"></a>1. 查看连接数变化</h2><blockquote>
 <p><strong>查看数据库版本、查看连接数数量等操作</strong></p>
 </blockquote>
-<p><code>CPU</code> 利用率到达 <code>100%</code>，首先怀疑，是不是业务高峰活跃连接陡增，而数据库预留的资源不足造成的结果。我们需要查看下，问题发生时，活跃的连接数是否比平时多很多。对于 <code>RDS for PG</code>，数据库上的连接数变化，可以从控制台的监控信息中看到。而当前活跃的连接数可以直接连接数据库，使用下列查询语句得到：</p>
+<ul>
+<li><code>CPU</code> 利用率到达 <code>100%</code>，首先怀疑，是不是业务高峰活跃连接陡增，而数据库预留的资源不足造成的结果。我们需要查看下，问题发生时，活跃的连接数是否比平时多很多。对于 <code>RDS for PG</code>，数据库上的连接数变化，可以从控制台的监控信息中看到。而当前活跃的连接数可以直接连接数据库，使用下列查询语句得到：</li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看数据库版本</span>
 <span class="token operator">></span> <span class="token keyword">select</span> version<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token operator">></span> <span class="token keyword">select</span> * from alembic_version<span class="token punctuation">;</span>
 
 <span class="token comment" spellcheck="true"># 查看连接数数量</span>
-<span class="token operator">></span> <span class="token keyword">select</span> count<span class="token punctuation">(</span> * <span class="token punctuation">)</span> from pg_stat_activity where state not like <span class="token string">'%idle'</span><span class="token punctuation">;</span>
+<span class="token operator">></span> <span class="token keyword">select</span> count<span class="token punctuation">(</span>*<span class="token punctuation">)</span> from pg_stat_activity where state not like <span class="token string">'%idle'</span><span class="token punctuation">;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="2-数据库性能测试"><a href="#2-数据库性能测试" class="headerlink" title="2. 数据库性能测试"></a>2. 数据库性能测试</h2><blockquote>
+<h2 id="2-查询中文显示乱码"><a href="#2-查询中文显示乱码" class="headerlink" title="2. 查询中文显示乱码"></a>2. 查询中文显示乱码</h2><blockquote>
+<p><strong>通过 select 语句查询时，发现有中文时显示乱码！</strong></p>
+</blockquote>
+<p>默认情况下，<code>PostgreSQL</code> 数据库是不转换字符集的，如果你的数据库是 <code>UTF8</code> 的字符集，一般终端的中文字符集会设置为 <code>GBK</code> 或 <code>en_US</code>（查看终端的字符集可以看 <code>LANG</code> 环境变量的设置）。</p>
+<ul>
+<li>设置 <code>PostgreSQL</code> 的客户端编码</li>
+</ul>
+<pre class="line-numbers language-env"><code class="language-env"># 修改pgsql客户端字符集
+\encoding GBK
+\encoding UTF8
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>设置终端的环境变量</li>
+</ul>
+<pre class="line-numbers language-env"><code class="language-env"># 设置环境变量
+export PGCLIENTENCODING=GBK
+export PGCLIENTENCODING=UTF8
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>设置连接工具的字符编码</li>
+</ul>
+<pre class="line-numbers language-env"><code class="language-env"># 设置终端的编码
+# Option->SessionOption->外观->字符编码
+export LANG=zh_CN.UTF8
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="3-数据库性能测试"><a href="#3-数据库性能测试" class="headerlink" title="3. 数据库性能测试"></a>3. 数据库性能测试</h2><blockquote>
 <p><strong>主要是为了，压测部署服务器的机器性能！</strong></p>
 </blockquote>
 <ul>
@@ -1101,7 +1129,7 @@ $ pgbench -M simple -r -c 10 -j 10 -T 300 -l -U postgres -h 127.0.0.1 -p 5432 -d
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1261.5k</span>
+                        class="white-color">1261.7k</span>
             
             
             
