@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-08-01
+                    2022-09-13
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    6.6k
+                    8.1k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    27 分
+                    32 分
                 </div>
                 
 
@@ -1034,7 +1034,156 @@ real_ip_recursive on<span class="token punctuation">;</span>
 <li>在 <code>real_ip_recursive on</code> 的情况下，<code>128.22.189.11</code>、<code>192.168.2.100</code> 都出现在 <code>set_real_ip_from</code> 中,仅仅 <code>222.11.158.67</code> 没出现,那么这个 <code>IP</code> 就被认为是用户的 <code>IP</code> 地址，并且赋值到 <code>remote_addr</code> 变量。在 <code>real_ip_recursive off</code> 或者不设置的情况下，<code>192.168.2.100</code> 出现在了 <code>set_real_ip_from</code> 中会被排除掉，其它的 <code>IP</code> 地址便认为是用户的 <code>IP</code> 地址。</li>
 </ul>
 <hr>
-<h2 id="4-配置-TCP-UDP-代理转发"><a href="#4-配置-TCP-UDP-代理转发" class="headerlink" title="4. 配置 TCP/UDP 代理转发"></a>4. 配置 TCP/UDP 代理转发</h2><blockquote>
+<h2 id="4-配置服务高可用负载"><a href="#4-配置服务高可用负载" class="headerlink" title="4. 配置服务高可用负载"></a>4. 配置服务高可用负载</h2><blockquote>
+<p><strong>服务 5 求之后，客户端响应超时，并非必现场景！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 之前为了能够做到服务的高可用或者主备，需要使用 <code>KeepAlive</code> 的服务进行后端服务的心跳健康检查，或者使用 <code>Nginx·Plus</code> 企业版本，配置起来还是非常麻烦的。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">Syntax:    proxy_next_upstream error <span class="token operator">|</span> <span class="token function">timeout</span> <span class="token operator">|</span> invalid_header <span class="token operator">|</span> http_500 <span class="token operator">|</span> http_502 <span class="token operator">|</span> http_503 <span class="token operator">|</span> http_504 <span class="token operator">|</span> http_403 <span class="token operator">|</span> http_404 <span class="token operator">|</span> http_429 <span class="token operator">|</span> non_idempotent <span class="token operator">|</span> off <span class="token punctuation">..</span>.<span class="token punctuation">;</span>
+Default: proxy_next_upstream error <span class="token function">timeout</span><span class="token punctuation">;</span>
+Context:    http, server, location
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 现在已经可以借助 <a target="_blank" rel="noopener" href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_next_upstream">proxy_next_upstream</a> 来配置高可用服务。<ul>
+<li><strong>upstream</strong><ul>
+<li>在 <code>fail_timeout</code> 设定的时间内，某个 <code>server</code> 的请求失败次数达到 <code>max_fails</code> 之后，<code>upstream</code> 会认为该节点处于 <code>down</code> 状态，会从 <code>upstream</code> 中去除该节点。如果在 <code>fail_timeout</code> 时间内服务已经恢复了，会重新加回 <code>upstream</code> 中。</li>
+</ul>
+</li>
+<li><strong>proxy_next_upstream_xxx</strong><ul>
+<li><code>proxy_next_upstream_tries</code> 定义原始请求和重试请求的最大次数，此处表示 原始请求 <strong>1 次+重试 1 次</strong>，而 <code>proxy_next_upstream_timeout</code> 指重试请求所花的总时间，超过该定义后就不重试，所以需要结合 <code>upstream_tries</code> 定义合理值以免不断重试，默认 <code>0</code> 表示关闭该限制。</li>
+<li>此处特别注意 <code>proxy_next_upstream</code> 默认对于非幂等性方法不进行重试机制，需要设置 <code>non_idempotent</code> 参数才可以。但注意生产环境开启该参数带来的风险，例如前一个节点的 <code>post</code> 请求处理超时，导致 <code>next_upstream</code>，就会出现重复 <code>post</code> 的情况。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-yaml"><code class="language-yaml">upstream pdf_service <span class="token punctuation">{</span>
+  server 192.168.0.101<span class="token punctuation">:</span>8000 max_fails=1 fail_timeout=10s;
+  server 192.168.0.104<span class="token punctuation">:</span>8000 max_fails=1 fail_timeout=10s;
+<span class="token punctuation">}</span>
+
+server <span class="token punctuation">{</span>
+    listen       80;
+    server_name  localhost;
+
+    access_log  /var/log/nginx/access.log  main;
+    client_max_body_size    500m;
+    keepalive_timeout         65;
+    proxy_connect_timeout     60; <span class="token comment" spellcheck="true"># nginx与后端服务器建立连接超时时间</span>
+    proxy_read_timeout       600; <span class="token comment" spellcheck="true"># nginx从后端服务器读取响应超时时间</span>
+    proxy_send_timeout       600; <span class="token comment" spellcheck="true"># nginx往后端服务器发送请求的超时时间</span>
+
+  location /pdf <span class="token punctuation">{</span>
+    proxy_http_version 1.1;
+    proxy_pass_header Server;
+    proxy_set_header Host $http_host;
+    proxy_next_upstream error timeout http_502 http_504 non_idempotent;
+    proxy_next_upstream_tries 2;    <span class="token comment" spellcheck="true"># 该值定义原始请求和重试请求的最大次数</span>
+    proxy_next_upstream_timeout 0s; <span class="token comment" spellcheck="true"># 指重试请求所花的总时间超过该定义后就不重试</span>
+    proxy_pass http<span class="token punctuation">:</span>//pdf_service;
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="5-了解浏览器的缓存机制"><a href="#5-了解浏览器的缓存机制" class="headerlink" title="5. 了解浏览器的缓存机制"></a>5. 了解浏览器的缓存机制</h2><blockquote>
+<p><strong>缓存位置、缓存过程分析、缓存类型、缓存机制、缓存策略 - <a target="_blank" rel="noopener" href="https://juejin.cn/post/6844904023665934349">深入理解浏览器的缓存机制</a></strong></p>
+</blockquote>
+<p>浏览器缓存(<code>Browser Caching</code>)是为了节约网络的资源加速浏览，浏览器在用户磁盘上对最近请求过的文档进行存储，当访问者再次请求这个页面时，浏览器就可以从本地磁盘显示文档，这样就可以加速页面的阅览。</p>
+<p><img src="/images/linux-nginx-server-82.png" alt="Nginx服务之解决方案"></p>
+<hr>
+<p>从缓存位置上来说分为四种，并且各自有优先级，当依次查找缓存且都没有命中的时候，才会去请求网络。</p>
+<ul>
+<li><strong>[1] 缓存位置</strong><ul>
+<li><code>Service Worker</code></li>
+<li><code>Memory Cache</code> 内存缓存</li>
+<li><code>Disk Cache</code> 磁盘缓存</li>
+<li><code>Push Cache</code></li>
+</ul>
+</li>
+</ul>
+<p><code>Service Worker</code> 是运行在浏览器背后的独立线程，一般可以用来实现缓存功能。使用 <code>Service Worker</code> 的话，传输协议必须为 <code>HTTPS</code>。因为 <code>Service Worker</code> 中涉及到请求拦截，所以必须使用 <code>HTTPS</code> 协议来保障安全。</p>
+<p><code>Memory Cache</code> 也就是内存中的缓存，主要包含的是当前页面中已经抓取到的资源，例如页面上已经下载的样式、脚本、图片等。读取内存中的数据肯定比磁盘快，内存缓存虽然读取高效，可是缓存持续性很短，会随着进程的释放而释放（一旦我们关闭 <code>Tab</code> 页面，内存中的缓存也就被释放了）。</p>
+<p><code>Disk Cache</code> 也就是存储在硬盘中的缓存，读取速度虽然慢点，但是什么都能存储到磁盘中，与 <code>Memory Cache</code> 相比，优势是容量和存储时效性。它会根据 <code>HTTP Header</code> 中的字段判断哪些资源缓存，哪些资源可以不请求直接使用，哪些资源已经过期需要重新请求。并且即使在跨站点的情况下，相同地址的资源一旦被硬盘缓存下来，就不会再次去请求数据。</p>
+<p><code>Push Cache</code>(推送缓存)是 <code>HTTP/2</code> 中的内容，当以上三种缓存都没有命中时，它才会被使用。它只在会话(<code>Session</code>)中存在，一旦会话结束就被释放，并且缓存时间也很短暂。如果以上四种缓存都没有命中的话，那么只能发起请求来获取资源了。</p>
+<hr>
+<p>强缓存判断是否缓存的依据来自于是否超出某个时间或者某个时间段，而不关心服务器端文件是否已经更新，这可能会导致加载文件不是服务器端最新的内容，那我们如何获知服务器端内容是否已经发生了更新呢？此时我们需要用到协商缓存策略。</p>
+<ul>
+<li><strong>[2] 缓存过程分析</strong><ul>
+<li><strong>强缓存</strong><ul>
+<li><code>from disk cache</code>/<code>from memory cache</code></li>
+<li>不会向服务器发起请求，直接从缓存中读取资源，在 <code>Network</code> 中可以看到该请求返回 <code>200</code> 的状态码</li>
+<li>强缓存可以通过设置两种 <code>HTTP Header</code> 实现：<code>Expires</code> 和 <code>Cache-Control</code></li>
+</ul>
+</li>
+<li><strong>协商缓存</strong><ul>
+<li>协商缓存就是强制缓存失效后，浏览器携带缓存标识向服务器发起请求</li>
+<li>由服务器根据缓存标识决定是否使用缓存的过程，主要有两种情况(缓存生效<code>304</code>/缓存成功<code>200</code>)</li>
+<li>协商缓存可以通过设置两种 <code>HTTP Header</code> 实现：<code>Last-Modified</code> 和 <code>ETag</code></li>
+</ul>
+</li>
+<li><strong>强制缓存优先于协商缓存进行，若强制缓存生效则直接使用缓存，若不生效则进行协商缓存</strong></li>
+</ul>
+</li>
+</ul>
+<p>浏览器与服务器通信的方式为应答模式，浏览器每次发起请求都会先在浏览器缓存中查找该请求的结果以及缓存标识，浏览器每次拿到返回的请求结果都会将该结果和缓存标识存入浏览器缓存中。</p>
+<ul>
+<li><strong>强缓存</strong></li>
+</ul>
+<p><img src="/images/linux-nginx-server-83.png" alt="Nginx服务之解决方案"></p>
+<ul>
+<li><strong>协商缓存 - 协商缓存成功，返回 200 和请求结果</strong></li>
+</ul>
+<p><img src="/images/linux-nginx-server-85.png" alt="Nginx服务之解决方案"></p>
+<ul>
+<li><strong>协商缓存 - 协商缓存生效，返回 304 和 Not Modified</strong></li>
+</ul>
+<p><img src="/images/linux-nginx-server-84.png" alt="Nginx服务之解决方案"></p>
+<ul>
+<li><strong>缓存机制</strong></li>
+</ul>
+<p><img src="/images/linux-nginx-server-86.png" alt="Nginx服务之解决方案"></p>
+<hr>
+<ul>
+<li><strong>[3] 建议 Nginx 的缓存添加策略</strong></li>
+</ul>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">map</span> <span class="token variable">$sent_http_content_type</span> <span class="token variable">$cache_control_type</span> <span class="token punctuation">{</span>
+    default        <span class="token string">"private"</span><span class="token punctuation">;</span>
+    <span class="token operator">~</span>text<span class="token operator">/</span>html     <span class="token string">"no-store, no-transform"</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">add_header</span> Cache<span class="token operator">-</span>Control <span class="token variable">$cache_control_type</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<ul>
+<li><strong>[4] 头信息字段补充信息</strong></li>
+</ul>
+<p><code>Expires</code> 是 <code>Web</code> 服务器响应消息头字段，在响应 <code>http</code> 请求时告诉浏览器在过期时间前浏览器可以直接从浏览器缓存取数据，而无需再次请求。且其是 <code>HTTP/1.0</code> 的产物，受限于本地时间，如果修改了本地时间，可能会造成缓存失效。</p>
+<ul>
+<li><strong>Expires</strong><ul>
+<li>缓存过期时间，用来指定资源到期的时间，是服务端的具体时间点</li>
+<li><strong>Expires=max-age + 请求时间</strong>，需要和 <code>Last-modified</code> 结合使用</li>
+<li>已经是过时的产物，现阶段它的存在只是一种兼容性的写法</li>
+</ul>
+</li>
+</ul>
+<p>在 <code>HTTP/1.1</code> 中是最重要的规则，主要用于控制网页缓存，可以在请求头或者响应头中设置，并且可以组合使用多种指令。</p>
+<ul>
+<li><strong>Cache-Control</strong><ul>
+<li><strong>public</strong>: 表明响应可以被任何对象缓存；即使是通常不可缓存的内容</li>
+<li><strong>private</strong>: 表明响应只能被单个用户缓存，不能作为共享缓存(即代理服务器不能缓存它)</li>
+<li><strong>no-cache</strong>: 在发布缓存副本之前，强制要求缓存把请求提交给原始服务器进行验证</li>
+<li><strong>no-store</strong>: 缓存不应存储有关客户端请求或服务器响应的任何内容</li>
+<li><strong>max-age</strong>: 设置缓存存储的最大周期，超过这个时间缓存被认为过期</li>
+<li><strong>s-maxage</strong>: 覆盖 <code>max-age</code> 或者 <code>Expires</code> 头，但是仅适用于共享缓存(比如各个代理)</li>
+<li><strong>max-stale</strong>: 表明客户端愿意接收一个已经过期的资源</li>
+<li><strong>min-fresh</strong>: 表示客户端希望获取一个能在指定的秒数内保持其最新状态的响应</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/linux-nginx-server-87.png" alt="Nginx服务之解决方案"></p>
+<hr>
+<h2 id="6-配置-TCP-UDP-代理转发"><a href="#6-配置-TCP-UDP-代理转发" class="headerlink" title="6. 配置 TCP/UDP 代理转发"></a>6. 配置 TCP/UDP 代理转发</h2><blockquote>
 <p><strong>Nginx TCP/UDP Stream -&gt; 主流发行版都已经默认自带了</strong></p>
 </blockquote>
 <p>我们都知道 <code>nginx</code> 是一款优秀的反向代理服务，用过 nginx 的 <code>upstream</code> 一般都是用于 <code>http</code> 代理的，如果想对后端服务的 <code>TCP</code> 进行代理呢？这时候就需要使用到 <code>stream</code> 了，就可以用于代理 <code>mysql</code>、<code>redis</code> 等服务。可以参考，我之前的一篇 <a href="https://www.escapelife.site/posts/af961a30.html">使用 Nginx 实现 TCP 反向代理</a>。</p>
@@ -1089,58 +1238,6 @@ stream <span class="token punctuation">{</span>
     <span class="token keyword">proxy_pass</span> mysql_servers<span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<hr>
-<h2 id="5-配置服务高可用负载"><a href="#5-配置服务高可用负载" class="headerlink" title="5. 配置服务高可用负载"></a>5. 配置服务高可用负载</h2><blockquote>
-<p><strong>服务 5 求之后，客户端响应超时，并非必现场景！</strong></p>
-</blockquote>
-<ul>
-<li><strong>[问题起因]</strong> 之前为了能够做到服务的高可用或者主备，需要使用 <code>KeepAlive</code> 的服务进行后端服务的心跳健康检查，或者使用 <code>Nginx·Plus</code> 企业版本，配置起来还是非常麻烦的。</li>
-</ul>
-<pre class="line-numbers language-bash"><code class="language-bash">Syntax:    proxy_next_upstream error <span class="token operator">|</span> <span class="token function">timeout</span> <span class="token operator">|</span> invalid_header <span class="token operator">|</span> http_500 <span class="token operator">|</span> http_502 <span class="token operator">|</span> http_503 <span class="token operator">|</span> http_504 <span class="token operator">|</span> http_403 <span class="token operator">|</span> http_404 <span class="token operator">|</span> http_429 <span class="token operator">|</span> non_idempotent <span class="token operator">|</span> off <span class="token punctuation">..</span>.<span class="token punctuation">;</span>
-Default: proxy_next_upstream error <span class="token function">timeout</span><span class="token punctuation">;</span>
-Context:    http, server, location
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<ul>
-<li><strong>[解决方法]</strong> 现在已经可以借助 <a target="_blank" rel="noopener" href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_next_upstream">proxy_next_upstream</a> 来配置高可用服务。<ul>
-<li><strong>upstream</strong><ul>
-<li>在 <code>fail_timeout</code> 设定的时间内，某个 <code>server</code> 的请求失败次数达到 <code>max_fails</code> 之后，<code>upstream</code> 会认为该节点处于 <code>down</code> 状态，会从 <code>upstream</code> 中去除该节点。如果在 <code>fail_timeout</code> 时间内服务已经恢复了，会重新加回 <code>upstream</code> 中。</li>
-</ul>
-</li>
-<li><strong>proxy_next_upstream_xxx</strong><ul>
-<li><code>proxy_next_upstream_tries</code> 定义原始请求和重试请求的最大次数，此处表示 原始请求 <strong>1 次+重试 1 次</strong>，而 <code>proxy_next_upstream_timeout</code> 指重试请求所花的总时间，超过该定义后就不重试，所以需要结合 <code>upstream_tries</code> 定义合理值以免不断重试，默认 <code>0</code> 表示关闭该限制。</li>
-<li>此处特别注意 <code>proxy_next_upstream</code> 默认对于非幂等性方法不进行重试机制，需要设置 <code>non_idempotent</code> 参数才可以。但注意生产环境开启该参数带来的风险，例如前一个节点的 <code>post</code> 请求处理超时，导致 <code>next_upstream</code>，就会出现重复 <code>post</code> 的情况。</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<pre class="line-numbers language-yaml"><code class="language-yaml">upstream pdf_service <span class="token punctuation">{</span>
-  server 192.168.0.101<span class="token punctuation">:</span>8000 max_fails=1 fail_timeout=10s;
-  server 192.168.0.104<span class="token punctuation">:</span>8000 max_fails=1 fail_timeout=10s;
-<span class="token punctuation">}</span>
-
-server <span class="token punctuation">{</span>
-    listen       80;
-    server_name  localhost;
-
-    access_log  /var/log/nginx/access.log  main;
-    client_max_body_size    500m;
-    keepalive_timeout         65;
-    proxy_connect_timeout     60; <span class="token comment" spellcheck="true"># nginx与后端服务器建立连接超时时间</span>
-    proxy_read_timeout       600; <span class="token comment" spellcheck="true"># nginx从后端服务器读取响应超时时间</span>
-    proxy_send_timeout       600; <span class="token comment" spellcheck="true"># nginx往后端服务器发送请求的超时时间</span>
-
-  location /pdf <span class="token punctuation">{</span>
-    proxy_http_version 1.1;
-    proxy_pass_header Server;
-    proxy_set_header Host $http_host;
-    proxy_next_upstream error timeout http_502 http_504 non_idempotent;
-    proxy_next_upstream_tries 2;    <span class="token comment" spellcheck="true"># 该值定义原始请求和重试请求的最大次数</span>
-    proxy_next_upstream_timeout 0s; <span class="token comment" spellcheck="true"># 指重试请求所花的总时间超过该定义后就不重试</span>
-    proxy_pass http<span class="token punctuation">:</span>//pdf_service;
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="6-日常通常会设置的配置"><a href="#6-日常通常会设置的配置" class="headerlink" title="6. 日常通常会设置的配置"></a>6. 日常通常会设置的配置</h2><blockquote>
 <p><strong>记录日常使用通常会设置和优化的地方</strong></p>
@@ -1756,7 +1853,7 @@ server <span class="token punctuation">{</span>
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1262.2k</span>
+                        class="white-color">1263.7k</span>
             
             
             
