@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-04-29
+                    2022-09-29
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    5.4k
+                    5.5k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    21 分
+                    22 分
                 </div>
                 
 
@@ -517,10 +517,16 @@
 <ul>
 <li><strong>[1] 中间人攻击</strong></li>
 </ul>
-<p>这个过程本身是安全的，但是实施的时候存在一个风险：如果有人截获了登录请求，然后冒充远程主机，将伪造的公钥发送给用户，那么用户很难辨别真伪，安全机制也就荡然无存了。因为不像 <code>https</code>协议那样，<code>SSH</code> 协议的公钥是没有证书中心(<code>CA</code>)的，也就是说都是自己签发的。</p>
-<p><strong>第一步:</strong> 远程主机收到用户的登录请求并把自己的公钥发送给用户<br><strong>第二步:</strong> 用户使用这个公钥，将登录密码加密之后发送到远程主机<br><strong>第三步:</strong> 远程主机用自己的私钥解密登录密码，如果密码正确则同意用户登录</p>
+<p>这个过程本身是安全的，但是实施的时候存在一个风险：如果有人截获了登录请求，然后冒充远程主机，将伪造的公钥发送给用户，那么用户很难辨别真伪，安全机制也就荡然无存了。因为不像 <code>https</code> 协议那样，<code>SSH</code> 协议的公钥是没有证书中心(<code>CA</code>)的，也就是说都是自己签发的。</p>
+<p><strong>第一步:</strong> 远程主机收到用户的登录请求并把自己的公钥发送给用户(A &lt;- B)<br>**第二步:** 用户使用这个公钥，将登录密码加密之后发送到远程主机(A .-&gt; B)<br><strong>第三步:</strong> 远程主机用自己的私钥解密登录密码，如果密码正确则同意用户登录(A -&gt; B🤔)</p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ tree ~/.ssh
+├── authorized_keys  <span class="token comment" spellcheck="true"># 存储客户端公钥</span>
+├── id_rsa           <span class="token comment" spellcheck="true"># 私钥</span>
+├── id_rsa.pub       <span class="token comment" spellcheck="true"># 公钥</span>
+└──known_hosts       <span class="token comment" spellcheck="true"># 存储服务端公钥(防止中间人攻击|变更则有区别)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[2] 口令登录</strong></li>
+<li><strong>[2] 口令登录 - 用户保存服务端公钥(客户端 known_hosts 存储)</strong></li>
 </ul>
 <p>我们在第一次登录远程主机的时候，系统出现如下提示信息。大致意思就是告诉我们：无法确认主机的真实性，只知道它的<strong>公钥指纹</strong>，问你还想继续连接吗？因为公钥指纹的长度较长很难进行对比，所以对其进行了 <code>MD5</code> 加密，才能够真正的验证真伪。</p>
 <p>这里有一个问题就是，用户怎么知道远程主机的公钥指纹应该是多少？其实也没有什么好办法，除非将远程主机公钥指纹存放每个用户都能够访问的地方，之后让用户自行核对。</p>
@@ -530,12 +536,13 @@ RSA key fingerprint is 98:2e:d7:xx:xx:xx:xx:xx:28:c2:42:2d:ab:cd:58:4d.
 Are you sure you want to <span class="token keyword">continue</span> connecting <span class="token punctuation">(</span>yes/no<span class="token punctuation">)</span>?
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <p>假定经过风险衡量以后，用户决定接受这个远程主机的公钥。系统会出现一句提示，表示主机已经得到认可，然后会要求输入密码。该密码将会被远程主机的公钥加密，之后传送给远程主机，验证密码的合法性。</p>
-<pre class="line-numbers language-bash"><code class="language-bash">Are you sure you want to <span class="token keyword">continue</span> connecting <span class="token punctuation">(</span>yes/no<span class="token punctuation">)</span>? <span class="token function">yes</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># known_hosts</span>
+Are you sure you want to <span class="token keyword">continue</span> connecting <span class="token punctuation">(</span>yes/no<span class="token punctuation">)</span>? <span class="token function">yes</span>
 Warning: Permanently added <span class="token string">'host,192.168.31.191'</span> <span class="token punctuation">(</span>RSA<span class="token punctuation">)</span> to the list of known hosts.
 Password:
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[3] 公钥登录</strong></li>
+<li><strong>[3] 公钥登录 - 服务端保存客户公钥(服务端 authorized_keys 存储)</strong></li>
 </ul>
 <p>使用密码登录，则意味着每次登录的话都必须输入密码，非常麻烦。好在 <code>SSH</code> 还提供了公钥登录，可以省去输入密码的步骤。</p>
 <p>所谓<strong>“公钥登录”</strong>，原理很简单，就是用户将自己的公钥储存在远程主机上。登录的时候，远程主机会向用户发送一段随机字符串，用户用自己的私钥加密后，再发回来。远程主机用事先储存的公钥进行解密，如果成功，就证明用户是可信的，直接允许登录 <code>shell</code>，不再要求密码。这种方法要求用户必须提供自己的公钥。</p>
@@ -850,6 +857,9 @@ $ autossh -T -N -L 0.0.0.0:1234:12.12.12.12:1234 app@app.escapelife.site -4
 <p><strong>如果连接的服务器域名会动态变化的话，会导致连接异常！</strong></p>
 </blockquote>
 <p>我们首次建立远程连接的时候，双方主机会相互记录对方的公钥信息，在之后的连接过程中会查找这个信息的。然后，当 <code>ssh</code> 服务主机重装系统/访问地址修改等之后，公钥发生了改变，任以旧版本公钥的主机自然是无法与新系统连接的，所以这就会导致我们远程的时候会出问题。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://linuxhandbook.com/known-hosts-file/">Everything You Important You Should Know About the known_hosts file in Linux</a></li>
+</ul>
 <p>如果我们都没有修改的话，遇到上面问题，首先需要想到的是 <strong>主机被人黑了</strong>，其在消除入侵记录时对 <code>known_hosts</code> 文件做了改动，导致了上述问题的出现。解决的方法很简单，就是删除我们本地 <code>known_hosts</code> 中保留的对应主机的公钥信息，然后再次建立新的连接，即可获得新的公钥。</p>
 <ul>
 <li><strong>[1] 提示有冲突，但是并没有给出解决方法</strong></li>
@@ -1454,7 +1464,7 @@ UserKnownHostsFile /dev/null
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1263.8k</span>
+                        class="white-color">1263.9k</span>
             
             
             
