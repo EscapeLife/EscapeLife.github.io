@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-08-03
+                    2022-09-30
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    6k
+                    6.4k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    26 分
+                    28 分
                 </div>
                 
 
@@ -505,7 +505,27 @@
 </blockquote>
 <p><img src="../images/linux_use_problems.png" alt="Linux常见零碎问题汇总"></p>
 <hr>
-<h2 id="1-机器宕机问题排除思路"><a href="#1-机器宕机问题排除思路" class="headerlink" title="1. 机器宕机问题排除思路"></a>1. 机器宕机问题排除思路</h2><blockquote>
+<h2 id="1-Ubuntu-发行版的支持时间"><a href="#1-Ubuntu-发行版的支持时间" class="headerlink" title="1. Ubuntu 发行版的支持时间"></a>1. Ubuntu 发行版的支持时间</h2><blockquote>
+<p><strong>这里就是单纯记录下对应版本的官方支持时间，方便后续自己查看！</strong></p>
+</blockquote>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://ubuntu.com/about/release-cycle#ubuntu">Long term support and interim releases</a></li>
+</ul>
+<p><img src="../images/linux_use_problems_05.png" alt="Linux常见零碎问题汇总 - Ubuntu发行版的支持时间"></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://ubuntu.com/about/release-cycle#ubuntu-kernel-release-cycle">Ubuntu kernel release cycle</a></li>
+</ul>
+<p><img src="../images/linux_use_problems_06.png" alt="Linux常见零碎问题汇总 - Ubuntu发行版的支持时间"></p>
+<hr>
+<h2 id="2-Postgres-版本的支持时间"><a href="#2-Postgres-版本的支持时间" class="headerlink" title="2. Postgres 版本的支持时间"></a>2. Postgres 版本的支持时间</h2><blockquote>
+<p><strong>这里就是单纯记录下对应版本的官方支持时间，方便后续自己查看！</strong></p>
+</blockquote>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.postgresql.org/support/versioning/">PostgreSQL Versioning Policy</a></li>
+</ul>
+<p><img src="../images/linux_use_problems_08.png" alt="Linux常见零碎问题汇总 - Postgres版本的支持时间"></p>
+<hr>
+<h2 id="3-机器宕机问题排除思路"><a href="#3-机器宕机问题排除思路" class="headerlink" title="3. 机器宕机问题排除思路"></a>3. 机器宕机问题排除思路</h2><blockquote>
 <p><strong>简单记录一下系统宕机之后，主要排除思路和纪要！</strong></p>
 </blockquote>
 <ul>
@@ -564,7 +584,51 @@ $ nvidia-smi <span class="token punctuation">(</span>查看驱动版本/硬件�
 产生两个vmcore和vmcore-dmesg.txt文件
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="2-RPO-和-RTO-的区别"><a href="#2-RPO-和-RTO-的区别" class="headerlink" title="2. RPO 和 RTO 的区别"></a>2. RPO 和 RTO 的区别</h2><blockquote>
+<h2 id="4-显卡无法显示排除步骤"><a href="#4-显卡无法显示排除步骤" class="headerlink" title="4. 显卡无法显示排除步骤"></a>4. 显卡无法显示排除步骤</h2><blockquote>
+<p><strong>记录在显卡无法显示的时候，正确的排除方式和步骤！</strong></p>
+</blockquote>
+<ul>
+<li>如果使用 <code>nvidia-smi</code> 命令没有看到正常的显卡和驱动信息，不管什么报错，先看下是否显卡正常挂载了，然后再处理和搜索解决方法。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查询显卡是否正常挂载</span>
+$ lspci -k <span class="token operator">|</span> <span class="token function">grep</span> -e <span class="token string">"VGA"</span>
+18:00.0 VGA compatible controller: NVIDIA Corporation Device
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>然后根据安装 <code>*.run</code> 的时候提示的错误信息进行排除，并且建议安装新版本的驱动(因为其向后兼容)。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 安装驱动</span>
+<span class="token comment" spellcheck="true"># 日志文件: /var/log/nvidia-installer.log</span>
+$ <span class="token function">sudo</span> sh NVIDIA-Linux-x86_64-<span class="token variable">$DRIVER_VERSION</span>.run
+
+<span class="token comment" spellcheck="true"># 安装驱动时关闭X服务: -no-x-check</span>
+<span class="token comment" spellcheck="true"># 安装驱动时禁用nouveau: -no-nouveau-check</span>
+<span class="token comment" spellcheck="true"># 只安装驱动文件不安装OpenGL文件: -no-opengl-files</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>这里记录下，常见的相关报错信息，以及对应处理办法。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 问题一</span>
+<span class="token comment" spellcheck="true"># 尝试卸载之后重启安装</span>
+<span class="token comment" spellcheck="true"># 没试过 https://hellozhaozheng.github.io/z_post/%E5%85%B6%E4%BB%96-Ubuntu%E7%B3%BB%E7%BB%9F%E4%B8%8B%E5%AE%89%E8%A3%85NVIDIA%E9%A9%B1%E5%8A%A8/</span>
+Unable to load the kernel module <span class="token string">'nvidia.ko'</span><span class="token keyword">.</span>
+Please see the log entries <span class="token string">'Kernel module load error'</span> and <span class="token string">'Kernel messages'</span> at the end of the <span class="token function">file</span> <span class="token string">'xxx'</span>
+
+<span class="token comment" spellcheck="true"># 问题二</span>
+<span class="token comment" spellcheck="true"># 报错提示没有对应驱动匹配的显卡，就需要看下是否显卡正常挂载了</span>
+You <span class="token keyword">do</span> not appear to have an nvidia gpu supported by the 460.80 NVIDIA Linux graphics driver installed <span class="token keyword">in</span> this system.
+
+<span class="token comment" spellcheck="true"># 问题三</span>
+<span class="token comment" spellcheck="true"># 提示没有找到显卡驱动，考虑是否驱动正常运行</span>
+NVIDIA-SMI has failed because it could not communicate with the NVIDIA driver.
+Make sure that the latest NVIDIA driver is installed and running.
+
+<span class="token comment" spellcheck="true"># 问题一</span>
+<span class="token comment" spellcheck="true"># 没试过 https://blog.csdn.net/qq_34361099/article/details/108052465</span>
+Unable to determine the device handle <span class="token keyword">for</span> GPU 0000:05:00.0: Unknown Error
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="5-RPO-和-RTO-的区别"><a href="#5-RPO-和-RTO-的区别" class="headerlink" title="5. RPO 和 RTO 的区别"></a>5. RPO 和 RTO 的区别</h2><blockquote>
 <p><strong>故障发生时，需要了解两个指标！</strong></p>
 </blockquote>
 <ul>
@@ -582,78 +646,7 @@ $ nvidia-smi <span class="token punctuation">(</span>查看驱动版本/硬件�
 </li>
 </ul>
 <hr>
-<h2 id="3-普通用户执行特权指令"><a href="#3-普通用户执行特权指令" class="headerlink" title="3. 普通用户执行特权指令"></a>3. 普通用户执行特权指令</h2><blockquote>
-<p><strong>还是应该回顾下，之前掌握的基础知识！</strong></p>
-</blockquote>
-<ul>
-<li><strong>[问题起因]</strong> 自己在测试机器上面新建了一个普通用户，当我后续使用的时候，发现竟然可以执行 <code>newgrp</code> 命令。按照常理来说，执行 <code>newgrp</code> 命令的话是需要输入密码才对的。</li>
-</ul>
-<pre class="line-numbers language-bash"><code class="language-bash">➜ <span class="token function">ls</span> -lh /usr/bin/newgrp
--rwsr-xr-x 1 root root 40K Aug 21  2019 /usr/bin/newgrp
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<ul>
-<li><strong>[解决方法]</strong> 最终发现，是因为该用户在 <code>/etc/passwd</code> 和 <code>/etc/group</code> 文件中的权限不一致导致的(有可能是人为直接修改了配置文件导致的)，即虽然该用户没有特权权限，但是其对应组是可以执行特权命令的。所以后续管理用户需要使用命令进行操作，并且需要对用户和组进行监控和告警，放置后续问题的出现。<ul>
-<li><strong><code>pwck</code></strong> =&gt; 用来验证系统认证文件 <code>/etc/passwd</code> 和 <code>/etc/shadow</code> 的内容和格式的完整性</li>
-<li><strong><code>grpck</code></strong> =&gt; 用于验证组文件 <code>/etc/group</code> 和 <code>/etc/gshadow</code> 的完整性</li>
-</ul>
-</li>
-</ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 用来验证系统认证文件内容和格式的完整性</span>
-<span class="token comment" spellcheck="true"># -q: 仅报告错误信息</span>
-<span class="token comment" spellcheck="true"># -s: 以用户id排序文件</span>
-<span class="token comment" spellcheck="true"># -r: 只读方式运行指令</span>
-$ <span class="token function">sudo</span> pwck -q <span class="token punctuation">[</span>/etc/passwd /etc/shadow<span class="token punctuation">]</span>
-
-<span class="token comment" spellcheck="true"># 用于验证组文件的完整性</span>
-<span class="token comment" spellcheck="true"># -s: 以用户id排序文件</span>
-<span class="token comment" spellcheck="true"># -r: 只读方式运行指令</span>
-$ <span class="token function">sudo</span> grpck -q <span class="token punctuation">[</span>/etc/group /etc/gshadow<span class="token punctuation">]</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<ul>
-<li><code>Linux</code> 系统里的用户和群组密码，分别存放在 <code>/etc/passwd</code> 和 <code>/etc/group</code> 文件中。因系统运作所需，任何人都得以读取它们，造成安全上的破绽。投影密码将文件内的密码改存在 <code>/etc/shadow</code> 和 <code>/etc/gshadow</code> 文件内，只允许系统管理者读取，同时把原密码置换为 <code>x</code> 字符，只需执行 <code>grpconv</code> 就能开启群组投影密码。</li>
-</ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 默认系统都是开启的状态</span>
-$ <span class="token function">sudo</span> grpconv
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<hr>
-<h2 id="4-邮件被识别为垃圾邮件"><a href="#4-邮件被识别为垃圾邮件" class="headerlink" title="4. 邮件被识别为垃圾邮件"></a>4. 邮件被识别为垃圾邮件</h2><blockquote>
-<p><strong>此邮件类似于我们的垃圾邮件过滤器检测到的邮件</strong></p>
-</blockquote>
-<ul>
-<li><strong>[问题起因]</strong> 使用其他外域邮箱给特定域名邮箱发送邮件，会概率性被拒收或者收进垃圾箱的情况。</li>
-</ul>
-<p><img src="../images/linux_use_problems_01.png" alt="Linux常见零碎问题汇总 - 邮件被识别为垃圾邮件"></p>
-<ul>
-<li><strong>[解决方法]</strong> 查了下，发现官方建议需要进行 <code>SPF</code> 设置，将对于的域名加到 <code>DNS TXT</code> 解析里面，以下是 <code>QQ</code> 邮箱给出的示例，可以根据实际情况调整不同的域名信息。</li>
-</ul>
-<p><img src="../images/linux_use_problems_02.png" alt="Linux常见零碎问题汇总 - 邮件被识别为垃圾邮件"></p>
-<ul>
-<li>配置上之后可以通过如下命令进行检测是否已经添加成功了，如果还是有问题的话，可以排除下是否是因为有 <code>QoS</code> 策略导致的，比如会检测和过滤有些关键字等。</li>
-</ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 检测是否添加成功</span>
-$ <span class="token function">dig</span> @8.8.8.8 -t TXT escapelife.site
-<span class="token punctuation">;</span> <span class="token operator">&lt;&lt;</span><span class="token operator">>></span> DiG 9.10.6 <span class="token operator">&lt;&lt;</span><span class="token operator">>></span> @8.8.8.8 -t TXT escapelife.site
-<span class="token punctuation">;</span> <span class="token punctuation">(</span>1 server found<span class="token punctuation">)</span>
-<span class="token punctuation">;</span><span class="token punctuation">;</span> global options: +cmd
-<span class="token punctuation">;</span><span class="token punctuation">;</span> Got answer:
-<span class="token punctuation">;</span><span class="token punctuation">;</span> -<span class="token operator">>></span>HEADER<span class="token operator">&lt;&lt;</span>- opcode: QUERY, status: NOERROR, id: 1752
-<span class="token punctuation">;</span><span class="token punctuation">;</span> flags: qr rd ra<span class="token punctuation">;</span> QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 1
-
-<span class="token punctuation">;</span><span class="token punctuation">;</span> OPT PSEUDOSECTION:
-<span class="token punctuation">;</span> EDNS: version: 0, flags:<span class="token punctuation">;</span> udp: 512
-<span class="token punctuation">;</span><span class="token punctuation">;</span> QUESTION SECTION:
-<span class="token punctuation">;</span>escapelife.site.        IN    TXT
-
-<span class="token punctuation">;</span><span class="token punctuation">;</span> ANSWER SECTION:
-<span class="token punctuation">;</span>escapelife.site.        600    IN    TXT    <span class="token string">"v=spf1 include:spf.mail.qq.com ~all"</span>
-
-<span class="token punctuation">;</span><span class="token punctuation">;</span> Query time: 62 msec
-<span class="token punctuation">;</span><span class="token punctuation">;</span> SERVER: 8.8.8.8<span class="token comment" spellcheck="true">#53(8.8.8.8)</span>
-<span class="token punctuation">;</span><span class="token punctuation">;</span> WHEN: Thu Mar 10 11:31:03 CST 2022
-<span class="token punctuation">;</span><span class="token punctuation">;</span> MSG SIZE  rcvd: 109
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<hr>
-<h2 id="5-私有-CA-的创建流程"><a href="#5-私有-CA-的创建流程" class="headerlink" title="5. 私有 CA 的创建流程"></a>5. 私有 CA 的创建流程</h2><blockquote>
+<h2 id="6-私有-CA-的创建流程"><a href="#6-私有-CA-的创建流程" class="headerlink" title="6. 私有 CA 的创建流程"></a>6. 私有 CA 的创建流程</h2><blockquote>
 <p><strong>简单介绍私有 CA 证书以及签名的整体流程</strong></p>
 </blockquote>
 <p>为了 <a target="_blank" rel="noopener" href="https://www.kawabangga.com/posts/4649">用 <code>Nginx</code> 在公网上搭建加密数据通道</a>，首先可以使用 <code>mTLS</code> 技术进行双向的 <code>TLS</code> 验证，然后自己做 <code>CA</code> 给自己签发证书，然后搭建 <code>Nginx</code> 服务完成。</p>
@@ -838,7 +831,78 @@ server.crt: OK
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="6-在-Supervisor-中用符号"><a href="#6-在-Supervisor-中用符号" class="headerlink" title="6. 在 Supervisor 中用符号"></a>6. 在 Supervisor 中用符号</h2><blockquote>
+<h2 id="7-普通用户执行特权指令"><a href="#7-普通用户执行特权指令" class="headerlink" title="7. 普通用户执行特权指令"></a>7. 普通用户执行特权指令</h2><blockquote>
+<p><strong>还是应该回顾下，之前掌握的基础知识！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 自己在测试机器上面新建了一个普通用户，当我后续使用的时候，发现竟然可以执行 <code>newgrp</code> 命令。按照常理来说，执行 <code>newgrp</code> 命令的话是需要输入密码才对的。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">➜ <span class="token function">ls</span> -lh /usr/bin/newgrp
+-rwsr-xr-x 1 root root 40K Aug 21  2019 /usr/bin/newgrp
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 最终发现，是因为该用户在 <code>/etc/passwd</code> 和 <code>/etc/group</code> 文件中的权限不一致导致的(有可能是人为直接修改了配置文件导致的)，即虽然该用户没有特权权限，但是其对应组是可以执行特权命令的。所以后续管理用户需要使用命令进行操作，并且需要对用户和组进行监控和告警，放置后续问题的出现。<ul>
+<li><strong><code>pwck</code></strong> =&gt; 用来验证系统认证文件 <code>/etc/passwd</code> 和 <code>/etc/shadow</code> 的内容和格式的完整性</li>
+<li><strong><code>grpck</code></strong> =&gt; 用于验证组文件 <code>/etc/group</code> 和 <code>/etc/gshadow</code> 的完整性</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 用来验证系统认证文件内容和格式的完整性</span>
+<span class="token comment" spellcheck="true"># -q: 仅报告错误信息</span>
+<span class="token comment" spellcheck="true"># -s: 以用户id排序文件</span>
+<span class="token comment" spellcheck="true"># -r: 只读方式运行指令</span>
+$ <span class="token function">sudo</span> pwck -q <span class="token punctuation">[</span>/etc/passwd /etc/shadow<span class="token punctuation">]</span>
+
+<span class="token comment" spellcheck="true"># 用于验证组文件的完整性</span>
+<span class="token comment" spellcheck="true"># -s: 以用户id排序文件</span>
+<span class="token comment" spellcheck="true"># -r: 只读方式运行指令</span>
+$ <span class="token function">sudo</span> grpck -q <span class="token punctuation">[</span>/etc/group /etc/gshadow<span class="token punctuation">]</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><code>Linux</code> 系统里的用户和群组密码，分别存放在 <code>/etc/passwd</code> 和 <code>/etc/group</code> 文件中。因系统运作所需，任何人都得以读取它们，造成安全上的破绽。投影密码将文件内的密码改存在 <code>/etc/shadow</code> 和 <code>/etc/gshadow</code> 文件内，只允许系统管理者读取，同时把原密码置换为 <code>x</code> 字符，只需执行 <code>grpconv</code> 就能开启群组投影密码。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 默认系统都是开启的状态</span>
+$ <span class="token function">sudo</span> grpconv
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="8-邮件被识别为垃圾邮件"><a href="#8-邮件被识别为垃圾邮件" class="headerlink" title="8. 邮件被识别为垃圾邮件"></a>8. 邮件被识别为垃圾邮件</h2><blockquote>
+<p><strong>此邮件类似于我们的垃圾邮件过滤器检测到的邮件</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 使用其他外域邮箱给特定域名邮箱发送邮件，会概率性被拒收或者收进垃圾箱的情况。</li>
+</ul>
+<p><img src="../images/linux_use_problems_01.png" alt="Linux常见零碎问题汇总 - 邮件被识别为垃圾邮件"></p>
+<ul>
+<li><strong>[解决方法]</strong> 查了下，发现官方建议需要进行 <code>SPF</code> 设置，将对于的域名加到 <code>DNS TXT</code> 解析里面，以下是 <code>QQ</code> 邮箱给出的示例，可以根据实际情况调整不同的域名信息。</li>
+</ul>
+<p><img src="../images/linux_use_problems_02.png" alt="Linux常见零碎问题汇总 - 邮件被识别为垃圾邮件"></p>
+<ul>
+<li>配置上之后可以通过如下命令进行检测是否已经添加成功了，如果还是有问题的话，可以排除下是否是因为有 <code>QoS</code> 策略导致的，比如会检测和过滤有些关键字等。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 检测是否添加成功</span>
+$ <span class="token function">dig</span> @8.8.8.8 -t TXT escapelife.site
+<span class="token punctuation">;</span> <span class="token operator">&lt;&lt;</span><span class="token operator">>></span> DiG 9.10.6 <span class="token operator">&lt;&lt;</span><span class="token operator">>></span> @8.8.8.8 -t TXT escapelife.site
+<span class="token punctuation">;</span> <span class="token punctuation">(</span>1 server found<span class="token punctuation">)</span>
+<span class="token punctuation">;</span><span class="token punctuation">;</span> global options: +cmd
+<span class="token punctuation">;</span><span class="token punctuation">;</span> Got answer:
+<span class="token punctuation">;</span><span class="token punctuation">;</span> -<span class="token operator">>></span>HEADER<span class="token operator">&lt;&lt;</span>- opcode: QUERY, status: NOERROR, id: 1752
+<span class="token punctuation">;</span><span class="token punctuation">;</span> flags: qr rd ra<span class="token punctuation">;</span> QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 1
+
+<span class="token punctuation">;</span><span class="token punctuation">;</span> OPT PSEUDOSECTION:
+<span class="token punctuation">;</span> EDNS: version: 0, flags:<span class="token punctuation">;</span> udp: 512
+<span class="token punctuation">;</span><span class="token punctuation">;</span> QUESTION SECTION:
+<span class="token punctuation">;</span>escapelife.site.        IN    TXT
+
+<span class="token punctuation">;</span><span class="token punctuation">;</span> ANSWER SECTION:
+<span class="token punctuation">;</span>escapelife.site.        600    IN    TXT    <span class="token string">"v=spf1 include:spf.mail.qq.com ~all"</span>
+
+<span class="token punctuation">;</span><span class="token punctuation">;</span> Query time: 62 msec
+<span class="token punctuation">;</span><span class="token punctuation">;</span> SERVER: 8.8.8.8<span class="token comment" spellcheck="true">#53(8.8.8.8)</span>
+<span class="token punctuation">;</span><span class="token punctuation">;</span> WHEN: Thu Mar 10 11:31:03 CST 2022
+<span class="token punctuation">;</span><span class="token punctuation">;</span> MSG SIZE  rcvd: 109
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="9-在-Supervisor-中用符号"><a href="#9-在-Supervisor-中用符号" class="headerlink" title="9. 在 Supervisor 中用符号"></a>9. 在 Supervisor 中用符号</h2><blockquote>
 <p><strong>在 Supervisor 工具中添加环境变量如果存在百分比(%)的话，需要进行特殊的方式转义！</strong></p>
 </blockquote>
 <ul>
@@ -858,19 +922,7 @@ server.crt: OK
 <p><img src="../images/linux_use_problems_03.png" alt="Linux常见零碎问题汇总 - 在Supervisor中用符号"></p>
 <p><img src="../images/linux_use_problems_04.png" alt="Linux常见零碎问题汇总 - 在Supervisor中用符号"></p>
 <hr>
-<h2 id="7-Ubuntu-发行版的支持时间"><a href="#7-Ubuntu-发行版的支持时间" class="headerlink" title="7. Ubuntu 发行版的支持时间"></a>7. Ubuntu 发行版的支持时间</h2><blockquote>
-<p><strong>这里就是单纯记录下对应版本的官方支持时间，方便后续自己查看！</strong></p>
-</blockquote>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://ubuntu.com/about/release-cycle#ubuntu">Long term support and interim releases</a></li>
-</ul>
-<p><img src="../images/linux_use_problems_05.png" alt="Linux常见零碎问题汇总 - Ubuntu发行版的支持时间"></p>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://ubuntu.com/about/release-cycle#ubuntu-kernel-release-cycle">Ubuntu kernel release cycle</a></li>
-</ul>
-<p><img src="../images/linux_use_problems_06.png" alt="Linux常见零碎问题汇总 - Ubuntu发行版的支持时间"></p>
-<hr>
-<h2 id="8-Linux-系统启动性能分析"><a href="#8-Linux-系统启动性能分析" class="headerlink" title="8. Linux 系统启动性能分析"></a>8. Linux 系统启动性能分析</h2><blockquote>
+<h2 id="10-Linux-系统启动性能分析"><a href="#10-Linux-系统启动性能分析" class="headerlink" title="10. Linux 系统启动性能分析"></a>10. Linux 系统启动性能分析</h2><blockquote>
 <p><strong>分析系统性能，发现并解决引起性能不佳、启动时间长的问题</strong></p>
 </blockquote>
 <p><code>Linux</code> 启动过程是值得学习关注的地方，因为 <a target="_blank" rel="noopener" href="https://linux.cn/article-14462-1.html?utm_source=rss&amp;utm_medium=rss"><code>systemd-analyze</code></a> 工具很多功能聚焦在启动 <code>startup</code> 过程。但是首先，要理解引导 <code>boot</code> 和启动 <code>startup</code>。引导阶段从 <code>BIOS</code> 加电自检（<code>POST</code>）开始，结束于内核完成加载并控制主机系统，然后是开始了启动过程，也是 <code>systemd</code> 日志的开始点。</p>
@@ -974,7 +1026,7 @@ $ systemd-analyze verify /etc/systemd/system/backup.service
 $ systemd-analyze security display-manager
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="9-非交互下安装工具和软件"><a href="#9-非交互下安装工具和软件" class="headerlink" title="9. 非交互下安装工具和软件"></a>9. 非交互下安装工具和软件</h2><blockquote>
+<h2 id="11-非交互下安装工具和软件"><a href="#11-非交互下安装工具和软件" class="headerlink" title="11. 非交互下安装工具和软件"></a>11. 非交互下安装工具和软件</h2><blockquote>
 <p><strong>因为某些问题，我们不需要安装的时候遇到系统提示！</strong></p>
 </blockquote>
 <ul>
@@ -1048,7 +1100,7 @@ $ <span class="token function">apt-get</span> <span class="token function">insta
 DEBIAN_FRONTEND<span class="token operator">=</span>noninteractive
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="10-修复安装依赖报错问题"><a href="#10-修复安装依赖报错问题" class="headerlink" title="10. 修复安装依赖报错问题"></a>10. 修复安装依赖报错问题</h2><blockquote>
+<h2 id="12-修复安装依赖报错问题"><a href="#12-修复安装依赖报错问题" class="headerlink" title="12. 修复安装依赖报错问题"></a>12. 修复安装依赖报错问题</h2><blockquote>
 <p><strong>这是一种偷巧的方法，所以并不推荐使用！</strong></p>
 </blockquote>
 <ul>
@@ -1108,7 +1160,7 @@ $ <span class="token function">cat</span> /var/lib/dpkg/info/libnvpair3linux.lis
 /lib/x86_64-linux-gnu/libnvpair.so.3
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="11-在机器上使用-X11-做转发"><a href="#11-在机器上使用-X11-做转发" class="headerlink" title="11. 在机器上使用 X11 做转发"></a>11. 在机器上使用 X11 做转发</h2><blockquote>
+<h2 id="13-在机器上使用-X11-做转发"><a href="#13-在机器上使用-X11-做转发" class="headerlink" title="13. 在机器上使用 X11 做转发"></a>13. 在机器上使用 X11 做转发</h2><blockquote>
 <p><strong>远程机器，使用其图形化工具界面！</strong></p>
 </blockquote>
 <p><code>X11-forwarding</code> 说简单点就是，可以通过一个支持 <code>X Server</code> 的 <code>SSH</code> 客户端连接到远程 <code>Linux 服务器</code>，可以在本地运行、操作一个远程 <code>Linux</code> 服务器上有图形界面的程序。其中，<code>X11</code> 中的 <code>X</code> 指的就是 <code>X</code> 协议，而 <code>11</code> 指的是采用 <code>X</code> 协议的第 <code>11</code> 个版本。</p>
@@ -1156,7 +1208,7 @@ Unable to init server: Could not connect: Connection refused
 connect /tmp/.X11-unix/X10: No such <span class="token function">file</span> or directory
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="12-监控是哪个进程写的文件"><a href="#12-监控是哪个进程写的文件" class="headerlink" title="12. 监控是哪个进程写的文件"></a>12. 监控是哪个进程写的文件</h2><blockquote>
+<h2 id="14-监控是哪个进程写的文件"><a href="#14-监控是哪个进程写的文件" class="headerlink" title="14. 监控是哪个进程写的文件"></a>14. 监控是哪个进程写的文件</h2><blockquote>
 <p><strong><a target="_blank" rel="noopener" href="https://serverfault.com/questions/320716/find-out-which-process-is-changing-a-file">Find out which process is changing a file</a></strong></p>
 </blockquote>
 <ul>
@@ -1184,7 +1236,7 @@ type<span class="token operator">=</span>CWD msg<span class="token operator">=</
 type<span class="token operator">=</span>SYSCALL msg<span class="token operator">=</span>audit<span class="token punctuation">(</span>1653373992.503:379<span class="token punctuation">)</span>: arch<span class="token operator">=</span>c000003e syscall<span class="token operator">=</span>257 success<span class="token operator">=</span>yes exit<span class="token operator">=</span>15 a0<span class="token operator">=</span>ffffff9c a1<span class="token operator">=</span>7f0bd1206b4b a2<span class="token operator">=</span>442 a3<span class="token operator">=</span>1b6 items<span class="token operator">=</span>2 ppid<span class="token operator">=</span>1 pid<span class="token operator">=</span>1720 auid<span class="token operator">=</span>1000 uid<span class="token operator">=</span>1000 gid<span class="token operator">=</span>1001 euid<span class="token operator">=</span>1000 suid<span class="token operator">=</span>1000 fsuid<span class="token operator">=</span>1000 egid<span class="token operator">=</span>1001 sgid<span class="token operator">=</span>1001 fsgid<span class="token operator">=</span>1001 tty<span class="token operator">=</span><span class="token punctuation">(</span>none<span class="token punctuation">)</span> ses<span class="token operator">=</span>1 comm<span class="token operator">=</span><span class="token string">"fcitx"</span> exe<span class="token operator">=</span><span class="token string">"/usr/bin/fcitx"</span> subj<span class="token operator">==</span>unconfined key<span class="token operator">=</span><span class="token punctuation">(</span>null<span class="token punctuation">)</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="13-服务无法收到回调请求"><a href="#13-服务无法收到回调请求" class="headerlink" title="13. 服务无法收到回调请求"></a>13. 服务无法收到回调请求</h2><blockquote>
+<h2 id="15-服务无法收到回调请求"><a href="#15-服务无法收到回调请求" class="headerlink" title="15. 服务无法收到回调请求"></a>15. 服务无法收到回调请求</h2><blockquote>
 <p><strong>升级服务器或者调优的时候，需要只要对应参数到底代表着什么，不懂就表示你用不到！</strong></p>
 </blockquote>
 <ul>
@@ -1222,7 +1274,7 @@ net.ipv4.tcp_tw_recycle <span class="token operator">=</span> 0   <span class="t
 $ <span class="token function">sudo</span> sysctl -p
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="14-清华-Apt-源特殊设置"><a href="#14-清华-Apt-源特殊设置" class="headerlink" title="14. 清华 Apt 源特殊设置"></a>14. 清华 Apt 源特殊设置</h2><blockquote>
+<h2 id="16-清华-Apt-源特殊设置"><a href="#16-清华-Apt-源特殊设置" class="headerlink" title="16. 清华 Apt 源特殊设置"></a>16. 清华 Apt 源特殊设置</h2><blockquote>
 <p><strong>这个只针对于清华源，阿里云现在开始限速了(不讲武德)！</strong></p>
 </blockquote>
 <ul>
@@ -1810,7 +1862,7 @@ $ vim /etc/apt/sources.list
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1263.9k</span>
+                        class="white-color">1264.4k</span>
             
             
             
