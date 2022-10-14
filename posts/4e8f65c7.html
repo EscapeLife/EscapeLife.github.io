@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-05-27
+                    2022-10-14
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.1k
+                    2.6k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    7 分
+                    10 分
                 </div>
                 
 
@@ -626,6 +626,109 @@ ResolvConfPath: <span class="token string">"/var/lib/docker/containers/xxx/resol
 <ul>
 <li><strong>[解决方法]</strong> 后来发现是内存不足导致的，需要新增内存资源，即可。</li>
 </ul>
+<hr>
+<h2 id="6-K8S-临时文件挂载"><a href="#6-K8S-临时文件挂载" class="headerlink" title="6. K8S 临时文件挂载"></a>6. K8S 临时文件挂载</h2><blockquote>
+<p><strong>解决怎么在 K8S 平台上面挂载 /dev/shm 目录</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> <code>/dev/shm</code> 是 <code>linux</code> 非常有用的一个目录，就是所谓的 <code>tmpfs</code>，也可以称之为临时文件系统(不是块设备)，用于加速和优化系统。该目录并没有放在磁盘上，而在内存当中，因此直接使用 <code>/dev/shm</code> 就可以达到很好的效果。</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 在docker中默认的设置的shm大小为64M</span>
+root@123456789:/app<span class="token comment" spellcheck="true"># df -h</span>
+Filesystem              Size  Used Avail Use% Mounted on
+overlay                  17T  662G   15T   5% /
+shm                      64M     0   64M   0% /dev/shm
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Tmpfs优势</span>
+1.动态文件系统的大小
+2.读写速度快<span class="token punctuation">(</span>在RAM中<span class="token punctuation">)</span>，读写几乎是瞬间完成
+3.再Tmpfs中的数据在重新启动之后不会持久化保留
+
+<span class="token comment" spellcheck="true"># 临时调整tmpfs大小</span>
+$ <span class="token function">mount</span> –o size<span class="token operator">=</span>5128M –o nr_inodes<span class="token operator">=</span>1000000 –o noatime,nodiratime –o remount /dev/shm
+
+<span class="token comment" spellcheck="true"># 永久修改tmpfs大小</span>
+$ vim /etc/fstab
+tmpfs /dev/shm defaults,size<span class="token operator">=</span>1.5G 0 0
+$ <span class="token function">mount</span> –o remount /dev/shm
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 我们常会知道在 <code>docker-compose</code> 中设置 <code>shm</code> 的值，下面介绍如果在 <code>k8s</code> 中设置。在机器学习训练或需要高效率运行的其他应用场景中，应该根据实际情况调整 <code>shm</code> 的大小。设置太小，不能够满足高效率的要求，但是，一味地设置过大，容易导致宿主机内存(默认为 <code>shm</code> 是宿主机内存的 <code>1/2</code>)被占用过大，严重时会出现集群雪崩的问题。<ul>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/300957790">记一次 Kubernetes 解决 Shm 问题的前因后果</a></li>
+<li><a target="_blank" rel="noopener" href="https://askubuntu.com/questions/1264273/permission-denied-on-shared-memory-segments-in-dev-shm">Permission denied on shared memory segments in /dev/shm/</a></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># docker</span>
+$ docker run -it --name<span class="token operator">=</span>app --shm-size 1024M -v ./data:/app app
+
+<span class="token comment" spellcheck="true"># docker-compose</span>
+version: <span class="token string">"2.4"</span>
+services:
+  app:
+    restart: on-failure
+    container_name: app_demo
+    image: app:latest
+    cpu_percent: 60
+    mem_limit: 10G
+    ports:
+      - <span class="token string">"80:80"</span>
+    runtime: nvidia
+    shm_size: <span class="token string">'2gb'</span>
+    volumes:
+      - <span class="token string">"./data:/data"</span>
+    environment:
+      - NVIDIA_VISIBLE_DEVICES<span class="token operator">=</span>0
+    networks:
+      - app_network
+
+networks:
+  app_network:
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-yml"><code class="language-yml"># 不设置shm大小
+# 设置/dev/shm挂载emptyDir目录(大小与pod所在宿主机上面shm的大小一致)
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pd-shm
+spec:
+  containers:
+    - image: centos
+      name: centos
+      command: ["sleep", "1000000"]
+      imagePullPolicy: "IfNotPresent"
+      volumeMounts:
+        - mountPath: /dev/shm
+          name: cache-volume
+  volumes:
+    - name: cache-volume
+      emptyDir:
+        medium: Memory
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-yml"><code class="language-yml"># 设置shm大小
+# df看的话也为pod所在宿主机上shm的大小
+# 显示为宿主机大小，但是实际pod内部有自己的限制
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pd-shm
+spec:
+  containers:
+    - image: centos
+      name: centos
+      command: ["sleep", "1000000"]
+      imagePullPolicy: "IfNotPresent"
+      volumeMounts:
+        - mountPath: /dev/shm
+          name: cache-volume
+  volumes:
+    - name: cache-volume
+      emptyDir:
+        medium: Memory
+        sizeLimit: 128Mi
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1162,7 +1265,7 @@ ResolvConfPath: <span class="token string">"/var/lib/docker/containers/xxx/resol
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1264.7k</span>
+                        class="white-color">1265.3k</span>
             
             
             
