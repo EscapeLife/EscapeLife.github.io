@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-10-10
+                    2022-11-03
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    11.4k
+                    11.8k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    46 分
+                    47 分
                 </div>
                 
 
@@ -1650,6 +1650,32 @@ $ docker load -i app_0.1.tar
 $ docker <span class="token function">export</span> -o app_0.1.tar a404c6c174a2
 $ docker <span class="token function">import</span> app_0.1.tar
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="30-Docker-日志输出授权"><a href="#30-Docker-日志输出授权" class="headerlink" title="30. Docker 日志输出授权"></a>30. Docker 日志输出授权</h2><blockquote>
+<p><strong>EACCES：日志权限问题</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 在 <code>docker</code> 容器中，通过 <code>supervisor</code> 启动 <code>nginx</code> 服务时，提示如下错误信息：</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># supervisor服务启动报错</span>
+2022-10-29 15:08:44,427 INFO spawnerr: unknown error making dispatchers <span class="token keyword">for</span> <span class="token string">'nginx'</span><span class="token keyword">:</span> EACCES
+2022-10-29 15:08:44,427 INFO gave up: nginx entered FATAL state, too many start retries too quickly
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><p><strong>[分析思路]</strong> 注意到提示信息中包含 <code>EACCES</code>，所以大概率判断是因为文件或目录权限不对导致的，这时就需要排除配置文件中关于文件和目录相关的配置是否有权限问题。后来发现是因为在容器中服务使用的是普通用户，但是输出日志文件所在的权限是 <code>root</code> 用户的。解决之后，再次 <code>update</code>，问题解决！</p>
+</li>
+<li><p><strong>[分析思路]</strong> 但是我这里遇到的问题并不是普通文件，而是因为服务部署在类 <code>K8S</code> 的平台上面需要将日志输出到终端显示。发现输出到 <code>/dev/fd/1</code> 和 <code>/dev/stdout</code> 并不可以，总是提示上述问题，即便是修改了权限也无法正常使用。在下面这个链接上面看到，有人之前反馈这个问题。如果还是不行的话，就需要提前手动给下普通用户的权限。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/35273197/unable-to-start-service-with-nohup-due-to-info-spawnerr-unknown-error-making-d">‘INFO spawnerr: unknown error making dispatchers for ‘app_name’: EACCES’</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/moby/moby/issues/31243">/dev/stdout is inaccessible by an unprivileged user in a container started as root</a></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 启动前授权</span>
+<span class="token function">chown</span> app /dev/fd/1
+<span class="token function">chown</span> app /dev/stdout
+<span class="token function">chown</span> app /dev/stderr
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -2194,7 +2220,7 @@ $ docker <span class="token function">import</span> app_0.1.tar
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1266.3k</span>
+                        class="white-color">1266.9k</span>
             
             
             
