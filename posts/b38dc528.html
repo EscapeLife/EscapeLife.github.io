@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-09-13
+                    2022-12-01
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    5.4k
+                    6.3k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    21 分
+                    25 分
                 </div>
                 
 
@@ -1064,6 +1064,197 @@ $ sudo nginx <span class="token operator">-</span>s reload
     <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="13-文件路径相关的匹配"><a href="#13-文件路径相关的匹配" class="headerlink" title="13. 文件路径相关的匹配"></a>13. 文件路径相关的匹配</h2><blockquote>
+<p><strong>很多细小的需要注意的点，在用到的时候起到了关键作用！</strong></p>
+</blockquote>
+<ul>
+<li><p><strong>[问题起因]</strong> 在配置 <code>Nginx</code> 文件目录映射的时候（主要是前端代码、图片资源等），需要将用户请求的文件映射到对应目录下面。但是却发现，配置的代码并没有在合适的地方找到，就很诡异。</p>
+</li>
+<li><p><strong>[解决方法]</strong> 最后发现是因为 <code>root</code> 和 <code>alias</code> 指令用法不对导致的，这里简单记录下相关指令，以备后续查看和使用。</p>
+</li>
+</ul>
+<p><strong>【1】<code>root path;</code></strong></p>
+<ul>
+<li>作用域<ul>
+<li><code>http</code>、<code>server</code>、<code>location</code>、<code>if in location</code></li>
+</ul>
+</li>
+<li>含义解释<ul>
+<li>设置<code>Web</code>资源路径，用于指定请求的根文档目录</li>
+</ul>
+</li>
+<li>默认值<ul>
+<li><code>root html;</code></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># /index.html将由/www/htdocs/index.html文件来响应</span>
+<span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+    <span class="token keyword">root</span> <span class="token operator">/</span>www<span class="token operator">/</span>htdocs<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true"># /images/b.html将由/data/w3/images/b.html文件来响应</span>
+<span class="token keyword">location</span> <span class="token operator">/</span>images<span class="token operator">/</span> <span class="token punctuation">{</span>
+    <span class="token keyword">root</span> <span class="token operator">/</span>data<span class="token operator">/</span>w3<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>【2】<code>alias path;</code></strong></p>
+<ul>
+<li>作用域<ul>
+<li><code>location</code></li>
+</ul>
+</li>
+<li>含义解释<ul>
+<li>只能用于<code>location</code>中，用于路径别名</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># /i/top.gif将由/data/w3/images/top.gif文件来响应</span>
+<span class="token keyword">location</span> <span class="token operator">/</span>i<span class="token operator">/</span> <span class="token punctuation">{</span>
+    <span class="token keyword">alias</span> <span class="token operator">/</span>data<span class="token operator">/</span>w3<span class="token operator">/</span>images<span class="token operator">/</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true"># /images/b.html将由/data/w3/b.html文件来响应</span>
+<span class="token keyword">location</span> <span class="token operator">/</span>images<span class="token operator">/</span> <span class="token punctuation">{</span>
+    <span class="token keyword">alias</span> <span class="token operator">/</span>data<span class="token operator">/</span>w3<span class="token operator">/</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true"># /images/b.html将由/data/w3/images/b.html文件来响应</span>
+<span class="token keyword">location</span> <span class="token operator">/</span>images<span class="token operator">/</span> <span class="token punctuation">{</span>
+    <span class="token keyword">alias</span> <span class="token operator">/</span>data<span class="token operator">/</span>w3<span class="token operator">/</span>images<span class="token operator">/</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">location</span> <span class="token operator">~</span> <span class="token operator">^</span><span class="token operator">/</span>users<span class="token operator">/</span><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token operator">+</span>\<span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token operator">?</span><span class="token punctuation">:</span>gif<span class="token operator">|</span>jpe<span class="token operator">?</span>g<span class="token operator">|</span>png<span class="token punctuation">)</span><span class="token punctuation">)</span>$ <span class="token punctuation">{</span>
+    <span class="token keyword">alias</span> <span class="token operator">/</span>data<span class="token operator">/</span>w3<span class="token operator">/</span>images<span class="token operator">/</span>$<span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>【3】<code>index file ...;</code></strong></p>
+<ul>
+<li>作用域<ul>
+<li><code>http</code>、<code>server</code>、<code>location</code></li>
+</ul>
+</li>
+<li>含义解释<ul>
+<li>定义默认页面，可参跟多个值，列表中的最后一个元素可以是一个带有绝对路径的文件</li>
+<li>模块<code>ngx_http_index_module</code>处理以斜线字符<code>/</code>结尾的请求</li>
+</ul>
+</li>
+<li>默认值</li>
+<li><code>index index.html;</code></li>
+</ul>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+    <span class="token keyword">index</span> <span class="token keyword">index</span><span class="token punctuation">.</span><span class="token variable">$geo</span><span class="token punctuation">.</span>html <span class="token keyword">index</span><span class="token punctuation">.</span><span class="token number">0</span><span class="token punctuation">.</span>html <span class="token operator">/</span><span class="token keyword">index</span><span class="token punctuation">.</span>html<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 需要注意的是，index文件会引发内部重定向，请求可能会被其它location处理</span>
+<span class="token comment" spellcheck="true"># 如下面这个例子中，请求“/”实际上将会在第二个location中作为“/index.html”被处理</span>
+<span class="token keyword">location</span> <span class="token operator">=</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+    <span class="token keyword">index</span> <span class="token keyword">index</span><span class="token punctuation">.</span>html<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>【4】<code>error_page code ... [=[response]] uri</code></strong></p>
+<ul>
+<li>作用域<ul>
+<li><code>http</code>、<code>server</code>、<code>location</code>、<code>if in location</code></li>
+</ul>
+</li>
+<li>含义解释<ul>
+<li>定义错误页面重定向</li>
+<li>当对于某个请求返回错误时，如果匹配上了<code>error_page</code>指令中设定的<code>code</code>，则重定向到新的<code>URI</code>中</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 一般的设置方式</span>
+<span class="token keyword">error_page</span> <span class="token number">404</span>             <span class="token operator">/</span><span class="token number">404</span><span class="token punctuation">.</span>html<span class="token punctuation">;</span>
+<span class="token keyword">error_page</span> <span class="token number">500</span> <span class="token number">502</span> <span class="token number">503</span> <span class="token number">504</span> <span class="token operator">/</span>50x<span class="token punctuation">.</span>html<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true"># 可以使用=response语法改变响应状态码，响应的如果是404的话返回给用户200页面</span>
+<span class="token keyword">error_page</span> <span class="token number">404</span> <span class="token operator">=</span><span class="token number">200</span> <span class="token operator">/</span>empty<span class="token punctuation">.</span>gif<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true"># 也可以使用本指令对错误处理进行重定向</span>
+<span class="token keyword">error_page</span> <span class="token number">403</span>      <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>example<span class="token punctuation">.</span>com<span class="token operator">/</span>forbidden<span class="token punctuation">.</span>html<span class="token punctuation">;</span>
+<span class="token keyword">error_page</span> <span class="token number">404</span> <span class="token operator">=</span><span class="token number">301</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>example<span class="token punctuation">.</span>com<span class="token operator">/</span>notfound<span class="token punctuation">.</span>html<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true"># 如果内部跳转时无需改变URI，可以将错误处理转到一个命名路径</span>
+<span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+    <span class="token keyword">error_page</span> <span class="token number">404</span> <span class="token operator">=</span> @fallback<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">location</span> @fallback <span class="token punctuation">{</span>
+    <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>backend<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>【5】<code>try_files file ... uri;</code></strong></p>
+<ul>
+<li>作用域<ul>
+<li><code>server</code>、<code>location</code></li>
+</ul>
+</li>
+<li>含义解释<ul>
+<li>还有一种表达方式：<code>try_files file ... =code;</code></li>
+<li>自左至右尝试读取指定的路径，在第一次找到即停止并返回，如果所有路径均不存在，则返回最后一个<code>URI</code></li>
+<li>文件路径是根据<code>root</code>指令和<code>alias</code>指令，将<code>file</code>参数拼接而成</li>
+<li>可以在名字尾部添加斜线以检查目录是否存在，比如<code>$uri/</code></li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># $uri表示请求的路径</span>
+<span class="token keyword">location</span> <span class="token operator">/</span>images<span class="token operator">/</span> <span class="token punctuation">{</span>
+    <span class="token keyword">try_files</span> <span class="token variable">$uri</span> <span class="token operator">/</span>images<span class="token operator">/</span>default<span class="token punctuation">.</span>gif<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">location</span> <span class="token operator">=</span> <span class="token operator">/</span>images<span class="token operator">/</span>default<span class="token punctuation">.</span>gif <span class="token punctuation">{</span>
+    <span class="token keyword">expires</span> 30s<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># /documents/a.html请求，先查找/docu/a.html，在查找/temp.html</span>
+<span class="token keyword">location</span> <span class="token operator">~</span><span class="token operator">*</span> <span class="token operator">^</span><span class="token operator">/</span>documents<span class="token operator">/</span><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token operator">*</span><span class="token punctuation">)</span>$ <span class="token punctuation">{</span>
+    <span class="token keyword">root</span> <span class="token operator">/</span>www<span class="token operator">/</span>htdocs<span class="token punctuation">;</span>
+    <span class="token keyword">try_files</span> <span class="token variable">$uri</span> <span class="token operator">/</span>docu<span class="token operator">/</span>$<span class="token number">1</span> <span class="token operator">/</span>temp<span class="token punctuation">.</span>html<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true"># 从0.7.51版本开始，最后一个参数也可以是code</span>
+<span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+    <span class="token keyword">try_files</span> <span class="token variable">$uri</span> <span class="token variable">$uri</span><span class="token operator">/</span><span class="token keyword">index</span><span class="token punctuation">.</span>html <span class="token variable">$uri</span><span class="token punctuation">.</span>html <span class="token operator">=</span><span class="token number">404</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># 下面是代理Mongrel的例子</span>
+<span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+    <span class="token keyword">try_files</span> <span class="token operator">/</span>system<span class="token operator">/</span>maintenance<span class="token punctuation">.</span>html
+              <span class="token variable">$uri</span> <span class="token variable">$uri</span><span class="token operator">/</span><span class="token keyword">index</span><span class="token punctuation">.</span>html <span class="token variable">$uri</span><span class="token punctuation">.</span>html
+              @mongrel<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">location</span> @mongrel <span class="token punctuation">{</span>
+    <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>mongrel<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true"># 下面是Drupal用FastCGI的例子</span>
+<span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+    <span class="token keyword">try_files</span> <span class="token variable">$uri</span> <span class="token variable">$uri</span><span class="token operator">/</span> @drupal<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">location</span> <span class="token operator">~</span> \<span class="token punctuation">.</span>php$ <span class="token punctuation">{</span>
+    <span class="token keyword">try_files</span> <span class="token variable">$uri</span> @drupal<span class="token punctuation">;</span>
+    <span class="token keyword">fastcgi_pass</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">;</span>
+    <span class="token keyword">fastcgi_param</span> SCRIPT_FILENAME <span class="token operator">/</span>path<span class="token operator">/</span>to<span class="token variable">$fastcgi_script_name</span><span class="token punctuation">;</span>
+    <span class="token keyword">fastcgi_param</span> SCRIPT_NAME     <span class="token variable">$fastcgi_script_name</span><span class="token punctuation">;</span>
+    <span class="token keyword">fastcgi_param</span> QUERY_STRING    <span class="token variable">$args</span><span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> other <span class="token keyword">fastcgi_param</span>'s
+<span class="token punctuation">}</span>
+
+<span class="token keyword">location</span> @drupal <span class="token punctuation">{</span>
+    <span class="token keyword">fastcgi_pass</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">;</span>
+    <span class="token keyword">fastcgi_param</span> SCRIPT_FILENAME <span class="token operator">/</span>path<span class="token operator">/</span>to<span class="token operator">/</span><span class="token keyword">index</span><span class="token punctuation">.</span>php<span class="token punctuation">;</span>
+    <span class="token keyword">fastcgi_param</span> SCRIPT_NAME     <span class="token operator">/</span><span class="token keyword">index</span><span class="token punctuation">.</span>php<span class="token punctuation">;</span>
+    <span class="token keyword">fastcgi_param</span> QUERY_STRING    q<span class="token operator">=</span><span class="token variable">$uri</span><span class="token operator">&amp;</span><span class="token variable">$args</span><span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> other <span class="token keyword">fastcgi_param</span>'s
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1608,7 +1799,7 @@ $ sudo nginx <span class="token operator">-</span>s reload
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1287.3k</span>
+                        class="white-color">1288.2k</span>
             
             
             
