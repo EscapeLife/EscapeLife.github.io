@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-12-01
+                    2022-12-07
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    6.3k
+                    6.6k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    25 分
+                    26 分
                 </div>
                 
 
@@ -1255,6 +1255,57 @@ $ sudo nginx <span class="token operator">-</span>s reload
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> other <span class="token keyword">fastcgi_param</span>'s
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="14-协议转换导致-Post-请求丢失"><a href="#14-协议转换导致-Post-请求丢失" class="headerlink" title="14. 协议转换导致 Post 请求丢失"></a>14. 协议转换导致 Post 请求丢失</h2><blockquote>
+<p><strong>http 转发成 https 导致 post 请求变为 get 请求！</strong></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因]</strong> 越来越多的网站都从 <code>http</code> 迁移到了 <code>https</code> 协议。但迁移到 <code>https</code> 之前分发出去的链接都是 <code>http</code> 的，为了兼容以前的链接，就需要做一个 <code>redirect</code>，将 <code>http</code> 的请求 <code>redirect</code> 到 <code>https</code> 中。</li>
+</ul>
+<p><img src="../images/nginx-diseases-all-list-11.png" alt="Nginx疑难杂症汇总"></p>
+<ul>
+<li><strong>[解决方法]</strong> [方法一] 使用 <code>301 Moved Permanently</code> 将 <code>http</code> 重定向到 <code>https</code> 中。<ul>
+<li>对于普通的 <code>GET</code> 请求，这种方式是完全可以的。</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">listen</span>       <span class="token number">80</span><span class="token punctuation">;</span>
+    <span class="token keyword">server_name</span>  <span class="token operator">*</span><span class="token punctuation">.</span>xxx<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token number">301</span>   <span class="token keyword">https</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token operator">*</span><span class="token punctuation">.</span>xxx<span class="token punctuation">.</span>com<span class="token punctuation">;</span><span class="token variable">$request_uri</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">listen</span>       <span class="token number">443</span> <span class="token keyword">ssl</span> default_server<span class="token punctuation">;</span>
+    <span class="token keyword">server_name</span>  <span class="token operator">*</span><span class="token punctuation">.</span>xxx<span class="token punctuation">.</span>com<span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> [方法二] 所有 <code>Post</code> 请求通过 <code>307</code> 再转发就不会修改成 <code>get</code> 请求。<ul>
+<li>但当请求是 <code>POST</code> 的时候，由于一些历史原因，一些浏览器和库收到 <code>301/302</code> 时会将原本的 <code>POST</code> 请求转为 <code>GET</code> 请求发送。此时 <code>POST</code> 的 <code>body</code> 会丢失，导致请求出问题。这时就需要，使用 <code>307 Temporary Redirect</code> 来进行解决。</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token comment" spellcheck="true"># nginx 307</span>
+<span class="token comment" spellcheck="true"># This status code is similar to 302 (Found), except that it does not allow changing the request method from POST to GET.</span>
+
+sever <span class="token punctuation">{</span>
+    <span class="token keyword">listen</span> <span class="token number">80</span><span class="token punctuation">;</span>
+    <span class="token keyword">server_name</span> <span class="token operator">*</span><span class="token punctuation">.</span>xxx<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$request_method</span> <span class="token operator">~</span><span class="token operator">*</span> POST<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token number">307</span> <span class="token keyword">https</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token variable">$server_name</span><span class="token variable">$request_uri</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">rewrite</span> <span class="token operator">^</span><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token operator">*</span><span class="token punctuation">)</span> <span class="token keyword">https</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token variable">$host</span>$<span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">listen</span>       <span class="token number">443</span> <span class="token keyword">ssl</span> default_server<span class="token punctuation">;</span>
+    <span class="token keyword">server_name</span>  <span class="token operator">*</span><span class="token punctuation">.</span>xxx<span class="token punctuation">.</span>com<span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1799,7 +1850,7 @@ $ sudo nginx <span class="token operator">-</span>s reload
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1288.2k</span>
+                        class="white-color">1288.5k</span>
             
             
             
