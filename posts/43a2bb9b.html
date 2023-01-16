@@ -29,9 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.0">
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
+
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-11-22
+                    2023-01-13
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    12k
+                    12.6k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    48 分
+                    51 分
                 </div>
                 
 
@@ -693,6 +693,63 @@ tmpfs                    16487639    2521  16485118    1% /run
 /dev/sdc2               244162560 4788436 239374124    2% /
 tmpfs                    16487639       5  16487634    1% /dev/shm
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://www.manjusaka.blog/posts/2023/01/07/special-case-no-space-left-on-device/">排查一个特殊的 No space left on device</a></p>
+</blockquote>
+<ul>
+<li><strong>[问题起因四]</strong> 使用 <code>docker</code> 启动一个容器服务，然后发现启动后日志提示如下报错:<ul>
+<li>一个问题的闭环有两个特征：<ul>
+<li>定位到具体的异常代码</li>
+<li>有最小可复现版本确认我们找到 <code>root cause</code> 是符合预期的</li>
+</ul>
+</li>
+<li>符合预期，那么我们可以说这个问题的排查路径的因果关系链完整了，对于问题，不要预设结果，一步步的根据现象去逼近最终的结论！</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息</span>
+OSError: <span class="token punctuation">[</span>Errno 28<span class="token punctuation">]</span> No space left on device
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[排除问题的思路]</strong> 排查思路其实应该是很典型的线上问题的一步步分析 <code>root casue</code> 的过程。<ul>
+<li>原因是，<code>ext4</code> 基于的 <code>BTree</code> 索引，默认情况下只允许树的层高为 <code>2</code>，实际上就大概限制了目录下的文件数量大概在 <code>2k-3kw</code> 以内。经过确认，这个问题目录下的确有大量小文件。</li>
+<li>的确没有开启 <code>large_dir</code> 的选项，<code>ext4</code> 的 <code>large_dir</code> 在 <code>Linux 4.13</code> 中得到引入。</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 1.首先更加提示排除日志提示内容(检查磁盘空间是否足够) -> 整机的磁盘和inode数量足够</span>
+➜ <span class="token function">df</span> -ih
+Filesystem              Inodes IUsed IFree IUse% Mounted on
+/dev/root                 233M   13M  221M    6% /
+devtmpfs                   16M   744   16M    1% /dev
+tmpfs                      16M  5.1K   16M    1% /run
+
+<span class="token comment" spellcheck="true"># 2.涉及挂载则排查mount-bind方式挂载问题(手动试试) -> 没有问题；排除mount-bind缺陷</span>
+➜ fallocate -l 10G /cache/test
+
+<span class="token comment" spellcheck="true"># 3.排除存储提供方式(排除驱动的问题) -> ESSD；排除驱动问题</span>
+到底是本机磁盘存储？NAS存储？NSF挂载的呢？
+
+<span class="token comment" spellcheck="true"># 4.确认磁盘存储类型(考试文件系统问题) -> EXT4</span>
+➜ <span class="token function">fdisk</span> -l
+
+<span class="token comment" spellcheck="true"># 5.排除代码问题、权限问题(排除常见问题) -> 无果</span>
+一些常见的问题已经基本排除，那么我们来考虑文件系统本身的问题
+
+<span class="token comment" spellcheck="true"># 6.往文件系统异常的方向上靠(执行命令dmesg查看内核日志) -> 异常信息找到了</span>
+➜ <span class="token function">dmesg</span>
+EXT4-fs warning <span class="token punctuation">(</span>device sdd<span class="token punctuation">)</span>: ext4_dx_add_entry:2461: Directory <span class="token punctuation">(</span>ino: 3145729<span class="token punctuation">)</span> index full, reach max htree level :2
+EXT4-fs warning <span class="token punctuation">(</span>device sdd<span class="token punctuation">)</span>: ext4_dx_add_entry:2465: Large directory feature is not enabled on this filesystem
+
+<span class="token comment" spellcheck="true"># 7.验证问题并解决问题 -> 的确没有开启large_dir的选项</span>
+➜ tune2fs -l
+Filesystem revision <span class="token comment" spellcheck="true">#:    1 (dynamic)</span>
+Filesystem features:      has_journal ext_attr resize_inode dir_index filetype needs_recovery extent 64bit flex_bg sparse_super large_file huge_file dir_nlink extra_isize metadata_csum
+Filesystem flags:         signed_directory_hash
+
+➜ tune2fs -O large_dir /dev/sdd
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="3-Docker-缺共享链接库"><a href="#3-Docker-缺共享链接库" class="headerlink" title="3. Docker 缺共享链接库"></a>3. Docker 缺共享链接库</h2><blockquote>
 <p><strong>Docker 命令需要对/tmp 目录下面有访问权限</strong></p>
@@ -2246,7 +2303,7 @@ privileged: <span class="token boolean">true</span>
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1299k</span>
+                        class="white-color">1299.7k</span>
             
             
             
