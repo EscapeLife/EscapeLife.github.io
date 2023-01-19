@@ -29,9 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
-
+<meta name="generator" content="Hexo 5.4.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-11-03
+                    2023-01-19
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    3.6k
+                    3.7k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    14 分
+                    15 分
                 </div>
                 
 
@@ -505,7 +505,135 @@
 </blockquote>
 <p><img src="../images/python-use-problems.jpg" alt="Python常见零碎问题汇总"></p>
 <hr>
-<h2 id="1-Python-单元测试依赖问题"><a href="#1-Python-单元测试依赖问题" class="headerlink" title="1. Python 单元测试依赖问题"></a>1. Python 单元测试依赖问题</h2><blockquote>
+<h2 id="1-PIP-工具的最推荐使用方式"><a href="#1-PIP-工具的最推荐使用方式" class="headerlink" title="1. PIP 工具的最推荐使用方式"></a>1. PIP 工具的最推荐使用方式</h2><blockquote>
+<p><strong>需要修改服务框架的默认文件上传大小已适配不同的需求</strong></p>
+</blockquote>
+<ul>
+<li><strong>问题描述：</strong> 知名 <code>Python</code> 开发者 <code>Ned Batchelder</code> 在推上发了下面这个截图，意思就是：推荐使用在命令行中使用模块的方式安装依赖包。这时才知道，官方文档中已经很早就改用这种方式了。<ul>
+<li>使用 <code>pip</code> 安装了第三方库，但调用时却显示无法导入</li>
+<li>一般情况下出现上述问题，就是因为：使用的 <code>python</code> 和 <code>pip</code> 并不是一套</li>
+</ul>
+</li>
+</ul>
+<p><img src="../images/python-use-problems-04.png" alt="Python常见零碎问题汇总 - 单元测试依赖问题"></p>
+<ul>
+<li><strong>解决方法：</strong> 那问题俩了，上面两种方式到底有什么不同呢？使用 <code>python -m pip</code> 这样的方式到底有什么好处呢？我们都知道，只要包里面定义了 <code>main</code> 函数就可以使用在命令行导入模块的方式执行某些行为(没有什么高深莫测的技巧)。<ul>
+<li>比如使用 <code>python -m venv venv</code> 创建虚拟环境目录</li>
+<li>比如使用 <code>python -m flask run</code> 启动 <code>Flask</code> 应用</li>
+<li>比如使用 <code>python -m http.server</code> 启动一个简单的 <code>HTTP</code> 服务器</li>
+</ul>
+</li>
+<li>无论如何都应该使用 <code>python -m pip</code> 的方式安装第三方库，并且每个项目都应该使用自己的虚拟开发环境(比如 <code>pyenv</code> 等工具)，非必要不要安装包到全局的 <code>python</code> 环境中，才是合理的工程实践。<ul>
+<li><strong>[1]</strong> 如果因为某些原因导致使用的 <code>python</code> 和 <code>pip</code> 并不是一套，这时候使用 <code>pip install</code> 安装的话，就会出现开头遇到的问题，有可能对应的包安装到了全局环境中去了。但是使用 <code>python -m pip install</code> 的话，就无所谓是否已经激活了虚拟环境，因为其会确保了想要安装的包会和当前解释器是一个环境。</li>
+<li><strong>[2]</strong> 还有一个问题，就是当我们使用 <code>pip/pip3 install</code> 安装的时候，系统是可能会存在多个版本，到底其对应的是哪个版本呢？并没有显示的制定出来，且不好区分，所以 <code>python -m pip install</code> 是一个比较省心的选择。</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 参考链接地址</span>
+<span class="token comment" spellcheck="true"># https://www.dongwm.com/post/you-should-use-python-m-pip/</span>
+
+<span class="token comment" spellcheck="true"># 发现存在多个版本</span>
+$ pip<span class="token operator">&lt;</span>tab<span class="token operator">></span><span class="token operator">&lt;</span>tab<span class="token operator">></span>
+pip        pip2        pip2.7        pip2.7.14
+pip3       pip3.7      pip3.9.1      pip3.9.3
+
+<span class="token comment" spellcheck="true"># 创建别名</span>
+$ vim ~/.zshrc
+<span class="token function">alias</span> pip<span class="token operator">=</span><span class="token string">"python -m pip"</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="2-关于-pip-安装的相关报错"><a href="#2-关于-pip-安装的相关报错" class="headerlink" title="2. 关于 pip 安装的相关报错"></a>2. 关于 pip 安装的相关报错</h2><blockquote>
+<p><strong>收集有关 pip 安装和使用的相关报错和处理方式 - <a href="https://www.escapelife.site/posts/e9712f3c.html#toc-heading-6">参考地址</a></strong></p>
+</blockquote>
+<ul>
+<li><strong>[1] 创建虚拟环境</strong><ul>
+<li>可以通过 <code>pyenv</code> 来创建对应版本</li>
+<li>然后通过 <code>virtualenv</code> 命令进行创建</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">></span> pyenv local github
+<span class="token operator">></span> virtualenv -p <span class="token variable"><span class="token variable">$(</span><span class="token function">which</span> python3.6<span class="token variable">)</span></span> test3.6
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 关于正是信任关系</strong><ul>
+<li>就是站点的 <code>https</code> 证书过期了</li>
+<li>可以通过更新整数解决，或者直接加信任</li>
+<li>如果我们使用自建的一些服务，在配置 <code>SSL</code> 证书之后，使用 <code>pip</code> 安装包的话，就是提示一大堆告警信息，很影响输出和显示。</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息提示证书过期</span>
+SSLError<span class="token punctuation">(</span>SSLCertVerificationError<span class="token punctuation">(</span>1, <span class="token string">'[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (_ssl.c:1131)'</span><span class="token punctuation">))</span>
+
+<span class="token comment" spellcheck="true"># 显示链接服务器失败</span>
+Failed to establish a new connection: <span class="token punctuation">[</span>Errno 111<span class="token punctuation">]</span> Connection refused<span class="token string">')'</span><span class="token keyword">:</span> /simple/app/
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 直接加信任</span>
+<span class="token operator">></span> python -m pip <span class="token function">install</span> --upgrade pip --trusted-host app.escapelife.site
+
+<span class="token comment" spellcheck="true"># 全局禁用</span>
+$ pip <span class="token function">install</span> gensim config --global http.sslVerify <span class="token boolean">false</span>
+
+<span class="token comment" spellcheck="true"># 安装时忽略</span>
+$ pip <span class="token function">install</span> --trusted-host pypi.org  <span class="token operator">&lt;</span>package_name<span class="token operator">></span>
+
+<span class="token comment" spellcheck="true"># 配置文件忽略(pip.conf)</span>
+<span class="token punctuation">[</span>global<span class="token punctuation">]</span>
+trusted-host <span class="token operator">=</span> pypi.python.org pypi.org
+
+<span class="token comment" spellcheck="true"># 配置文件忽略(requirements)</span>
+--index-url https://xxx:xxx@xxx:xxx/simple --trusted-host xxx
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 循环搜索依赖包</strong><ul>
+<li>由于依赖库版本的不一致</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># --use-deprecated=legacy-resolver</span>
+$ pip3 <span class="token function">install</span> -r ./requirements.txt --upgrade --use-deprecated<span class="token operator">=</span>legacy-resolver
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] 本地安装包版本太老了</strong><ul>
+<li>删除提示中冲突的 <code>~</code> 开头的文件目录即可</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息</span>
+<span class="token comment" spellcheck="true"># 用distutils配置文件配置安装方案已被废弃</span>
+WARNING: Ignoring invalid distribution -ip <span class="token punctuation">(</span>/usr/local/lib/python3.9/site-packages<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 找到带~波浪线的临时文件夹，然后删除</span>
+$ <span class="token function">cd</span> /usr/local/lib/python3.9/site-packages <span class="token operator">&amp;&amp;</span> <span class="token function">rm</span> \~ip \~ip-21.0.1.dist-info
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] 服务器带宽速度限制</strong><ul>
+<li>私有部署内部镜像源，如果突然集中大量使用的话，可能因为带宽的问题导致使用端异常</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 客户端会出现很多超时的重试操作</span>
+WARNING: <span class="token punctuation">..</span>. connection broken by <span class="token string">'ReadTimeoutError("HTTPSConnectionPool(host='</span>py.escapelife.site<span class="token string">', port=1000): Read timed out. (read timeout=15)")'</span><span class="token keyword">:</span> /simple/app/
+
+<span class="token comment" spellcheck="true"># 可以看下服务器对应的流量是否超过了带宽</span>
+Total DISK READ <span class="token keyword">:</span>      213.41 M/s <span class="token operator">|</span> Total DISK WRITE <span class="token keyword">:</span>      113.62 M/s
+Actual DISK READ:      100.89 M/s <span class="token operator">|</span> Actual DISK WRITE:      213.99 M/s
+  TID  PRIO  USER     DISK READ  DISK WRITE  SWAPIN     IO<span class="token operator">></span>    COMMAND
+  977 be/4 root       82.89 K/s    0.00 B/s  0.00 % 10.78 % <span class="token punctuation">[</span>txg_sync<span class="token punctuation">]</span>
+
+<span class="token comment" spellcheck="true"># 可以通过对网卡进行限速</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Pypi服务端报错</span>
+raise OSError<span class="token punctuation">(</span>errno.EMFILE, <span class="token string">"inotify instance limit reached"</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 文件末尾添加以下参数</span>
+<span class="token comment" spellcheck="true"># 表示每个instatnces可监控的最大目录数量，如果监控的文件数目巨大，需要根据情况，适当增加此值的大小</span>
+$ <span class="token function">sudo</span> vim /etc/sysctl.conf
+fs.inotify.max_user_watches <span class="token operator">=</span> 524288  <span class="token comment" spellcheck="true"># 每个实例最多监控目录数</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="3-Python-单元测试依赖问题"><a href="#3-Python-单元测试依赖问题" class="headerlink" title="3. Python 单元测试依赖问题"></a>3. Python 单元测试依赖问题</h2><blockquote>
 <p><strong>因为 grpc 依赖 protobuf 包，但是指定了版本后并不会强制更新 protobuf 版本！</strong></p>
 </blockquote>
 <ul>
@@ -519,7 +647,7 @@
 ➜ pip3 <span class="token function">install</span> --upgrade protobuf
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="2-Python-dump-文件无法生成"><a href="#2-Python-dump-文件无法生成" class="headerlink" title="2. Python dump 文件无法生成"></a>2. Python dump 文件无法生成</h2><blockquote>
+<h2 id="4-Python-dump-文件无法生成"><a href="#4-Python-dump-文件无法生成" class="headerlink" title="4. Python dump 文件无法生成"></a>4. Python dump 文件无法生成</h2><blockquote>
 <p><strong>Python doesn’t dump core files！</strong></p>
 </blockquote>
 <ul>
@@ -603,7 +731,7 @@ $ <span class="token function">sleep</span> 120 <span class="token operator">&am
 $ <span class="token function">kill</span> -abrt <span class="token variable">$!</span><span class="token punctuation">;</span> <span class="token function">ls</span> core*
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="3-Python-创建虚拟环境异常"><a href="#3-Python-创建虚拟环境异常" class="headerlink" title="3. Python 创建虚拟环境异常"></a>3. Python 创建虚拟环境异常</h2><blockquote>
+<h2 id="5-Python-创建虚拟环境异常"><a href="#5-Python-创建虚拟环境异常" class="headerlink" title="5. Python 创建虚拟环境异常"></a>5. Python 创建虚拟环境异常</h2><blockquote>
 <p><strong>使用 Pyenv 工具创建出来的 Python 版本在执行和安装存在问题！</strong></p>
 </blockquote>
 <ul>
@@ -647,7 +775,7 @@ error: subprocess-exited-with-error
 $ <span class="token function">env</span> PYTHON_CONFIGURE_OPTS<span class="token operator">=</span><span class="token string">"--enable-shared"</span> pyenv <span class="token function">install</span> 3.5.0
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="4-Python-较安全的文件传输"><a href="#4-Python-较安全的文件传输" class="headerlink" title="4. Python 较安全的文件传输"></a>4. Python 较安全的文件传输</h2><blockquote>
+<h2 id="6-Python-较安全的文件传输"><a href="#6-Python-较安全的文件传输" class="headerlink" title="6. Python 较安全的文件传输"></a>6. Python 较安全的文件传输</h2><blockquote>
 <p><strong>虽然已经基本不怎么提交代码了，但是简单好用！</strong></p>
 </blockquote>
 <ul>
@@ -699,7 +827,7 @@ $ updog -d /data/app/core -p 9001 --password 12345678
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <p><img src="../images/python-use-problems-02.png" alt="Python常见零碎问题汇总 - 较安全的文件传输"></p>
 <hr>
-<h2 id="5-Python-服务上传文件异常"><a href="#5-Python-服务上传文件异常" class="headerlink" title="5. Python 服务上传文件异常"></a>5. Python 服务上传文件异常</h2><blockquote>
+<h2 id="7-Python-服务上传文件异常"><a href="#7-Python-服务上传文件异常" class="headerlink" title="7. Python 服务上传文件异常"></a>7. Python 服务上传文件异常</h2><blockquote>
 <p><strong>需要修改服务框架的默认文件上传大小已适配不同的需求</strong></p>
 </blockquote>
 <ul>
@@ -733,44 +861,7 @@ server<span class="token punctuation">.</span>bind<span class="token punctuation
 server<span class="token punctuation">.</span>start<span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="6-PIP-工具的最推荐使用方式"><a href="#6-PIP-工具的最推荐使用方式" class="headerlink" title="6. PIP 工具的最推荐使用方式"></a>6. PIP 工具的最推荐使用方式</h2><blockquote>
-<p><strong>需要修改服务框架的默认文件上传大小已适配不同的需求</strong></p>
-</blockquote>
-<ul>
-<li><strong>问题描述：</strong> 知名 <code>Python</code> 开发者 <code>Ned Batchelder</code> 在推上发了下面这个截图，意思就是：推荐使用在命令行中使用模块的方式安装依赖包。这时才知道，官方文档中已经很早就改用这种方式了。<ul>
-<li>使用 <code>pip</code> 安装了第三方库，但调用时却显示无法导入</li>
-<li>一般情况下出现上述问题，就是因为：使用的 <code>python</code> 和 <code>pip</code> 并不是一套</li>
-</ul>
-</li>
-</ul>
-<p><img src="../images/python-use-problems-04.png" alt="Python常见零碎问题汇总 - 单元测试依赖问题"></p>
-<ul>
-<li><strong>解决方法：</strong> 那问题俩了，上面两种方式到底有什么不同呢？使用 <code>python -m pip</code> 这样的方式到底有什么好处呢？我们都知道，只要包里面定义了 <code>main</code> 函数就可以使用在命令行导入模块的方式执行某些行为(没有什么高深莫测的技巧)。<ul>
-<li>比如使用 <code>python -m venv venv</code> 创建虚拟环境目录</li>
-<li>比如使用 <code>python -m flask run</code> 启动 <code>Flask</code> 应用</li>
-<li>比如使用 <code>python -m http.server</code> 启动一个简单的 <code>HTTP</code> 服务器</li>
-</ul>
-</li>
-<li>无论如何都应该使用 <code>python -m pip</code> 的方式安装第三方库，并且每个项目都应该使用自己的虚拟开发环境(比如 <code>pyenv</code> 等工具)，非必要不要安装包到全局的 <code>python</code> 环境中，才是合理的工程实践。<ul>
-<li><strong>[1]</strong> 如果因为某些原因导致使用的 <code>python</code> 和 <code>pip</code> 并不是一套，这时候使用 <code>pip install</code> 安装的话，就会出现开头遇到的问题，有可能对应的包安装到了全局环境中去了。但是使用 <code>python -m pip install</code> 的话，就无所谓是否已经激活了虚拟环境，因为其会确保了想要安装的包会和当前解释器是一个环境。</li>
-<li><strong>[2]</strong> 还有一个问题，就是当我们使用 <code>pip/pip3 install</code> 安装的时候，系统是可能会存在多个版本，到底其对应的是哪个版本呢？并没有显示的制定出来，且不好区分，所以 <code>python -m pip install</code> 是一个比较省心的选择。</li>
-</ul>
-</li>
-</ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 参考链接地址</span>
-<span class="token comment" spellcheck="true"># https://www.dongwm.com/post/you-should-use-python-m-pip/</span>
-
-<span class="token comment" spellcheck="true"># 发现存在多个版本</span>
-$ pip<span class="token operator">&lt;</span>tab<span class="token operator">></span><span class="token operator">&lt;</span>tab<span class="token operator">></span>
-pip        pip2        pip2.7        pip2.7.14
-pip3       pip3.7      pip3.9.1      pip3.9.3
-
-<span class="token comment" spellcheck="true"># 创建别名</span>
-$ vim ~/.zshrc
-<span class="token function">alias</span> pip<span class="token operator">=</span><span class="token string">"python -m pip"</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<hr>
-<h2 id="7-苹果上无法访问-Flask-程序"><a href="#7-苹果上无法访问-Flask-程序" class="headerlink" title="7. 苹果上无法访问 Flask 程序"></a>7. 苹果上无法访问 Flask 程序</h2><blockquote>
+<h2 id="8-苹果上无法访问-Flask-程序"><a href="#8-苹果上无法访问-Flask-程序" class="headerlink" title="8. 苹果上无法访问 Flask 程序"></a>8. 苹果上无法访问 Flask 程序</h2><blockquote>
 <p><strong>参考李辉老师的 <a target="_blank" rel="noopener" href="https://greyli.com/thank-you-apple/">《如果你在 macOS 上无法访问 Flask 程序》</a></strong></p>
 </blockquote>
 <ul>
@@ -804,7 +895,7 @@ $ flask run --port 8000
 $ <span class="token function">export</span> FLASK_RUN_PORT<span class="token operator">=</span>8000
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="8-找到-Python-的安装路径"><a href="#8-找到-Python-的安装路径" class="headerlink" title="8. 找到 Python 的安装路径"></a>8. 找到 Python 的安装路径</h2><blockquote>
+<h2 id="9-找到-Python-的安装路径"><a href="#9-找到-Python-的安装路径" class="headerlink" title="9. 找到 Python 的安装路径"></a>9. 找到 Python 的安装路径</h2><blockquote>
 <p><strong>参考 Frost 老师的 <a target="_blank" rel="noopener" href="https://frostming.com/2022/03-27/python-on-debian/">《系统上捉摸不定的 Python 路径》</a></strong></p>
 </blockquote>
 <p><code>Python</code> 中有一个叫做 <code>Install Schema</code> 的概念，可以简单理解为 <strong>安装蓝图</strong> ，意思就是提供了一个路径的集合，告诉 <code>Python</code> 包的安装器，什么文件应该放到哪个路径下。</p>
@@ -863,97 +954,29 @@ $ dpkg -L python3.8
 </ul>
 <p>这属于自己的设计，那么就需要改安装库和导入库的逻辑。<code>Debian</code> 维护了一系列的补丁来干这件事，改完之后，<code>sys.path</code> 会包含上面三个路径，<code>site-packages</code> 的路径从中去除了，而 <code>pip3</code> 也会安装包到第三个路径。所以要记住，发行版上自带的 <code>Python</code> 和 <code>pip</code> 都是特制的，你用从官网和 <code>PyPI</code> 上下载的去替换是会出问题。</p>
 <hr>
-<h2 id="9-关于-pip-安装的相关报错"><a href="#9-关于-pip-安装的相关报错" class="headerlink" title="9. 关于 pip 安装的相关报错"></a>9. 关于 pip 安装的相关报错</h2><blockquote>
-<p><strong>收集有关 pip 安装和使用的相关报错和处理方式 - <a href="https://www.escapelife.site/posts/e9712f3c.html#toc-heading-6">参考地址</a></strong></p>
+<h2 id="10-Python-代码编译成-so-问题"><a href="#10-Python-代码编译成-so-问题" class="headerlink" title="10. Python 代码编译成 so 问题"></a>10. Python 代码编译成 so 问题</h2><blockquote>
+<p><strong>Python 代码编译成 so 文件之后，就不用直接调用函数执行某些操作（比如传参、直接启动等）！</strong></p>
 </blockquote>
 <ul>
-<li><strong>[1] 创建虚拟环境</strong><ul>
-<li>可以通过 <code>pyenv</code> 来创建对应版本</li>
-<li>然后通过 <code>virtualenv</code> 命令进行创建</li>
+<li><strong>问题描述：</strong> 因为某些问题，导致原本是 <code>pyc</code> 文件的代码需要转成 <code>so</code> 文件(部分代码重构成为第三方模块来提供使用)，所以之前需要启动服务的命令无法使用。</li>
 </ul>
-</li>
-</ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token operator">></span> pyenv local github
-<span class="token operator">></span> virtualenv -p <span class="token variable"><span class="token variable">$(</span><span class="token function">which</span> python3.6<span class="token variable">)</span></span> test3.6
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 服务启动命令无法执行</span>
+<span class="token operator">></span> python3 -m app.run_server --port 9000
+supervisor: child process was not spawned
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>[2] 关于正是信任关系</strong><ul>
-<li>就是站点的 <code>https</code> 证书过期了</li>
-<li>可以通过更新整数解决，或者直接加信任</li>
-<li>如果我们使用自建的一些服务，在配置 <code>SSL</code> 证书之后，使用 <code>pip</code> 安装包的话，就是提示一大堆告警信息，很影响输出和显示。</li>
+<li><strong>解决方法：</strong> 因为编译(<code>so</code>)的原因，导致不能再这样使用了，而是要通过模块的使用方式(需要包一层 <code>py</code>)。</li>
 </ul>
-</li>
-</ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息提示证书过期</span>
-SSLError<span class="token punctuation">(</span>SSLCertVerificationError<span class="token punctuation">(</span>1, <span class="token string">'[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (_ssl.c:1131)'</span><span class="token punctuation">))</span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 启动方式</span>
+<span class="token operator">></span> python3 -c <span class="token string">"import app.run_server as p; p.main()"</span> --port 9000
 
-<span class="token comment" spellcheck="true"># 显示链接服务器失败</span>
-Failed to establish a new connection: <span class="token punctuation">[</span>Errno 111<span class="token punctuation">]</span> Connection refused<span class="token string">')'</span><span class="token keyword">:</span> /simple/app/
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 直接加信任</span>
-<span class="token operator">></span> python -m pip <span class="token function">install</span> --upgrade pip --trusted-host app.escapelife.site
+<span class="token comment" spellcheck="true"># app/run_server.py</span>
+def main<span class="token punctuation">(</span><span class="token punctuation">)</span>:
+    pass
 
-<span class="token comment" spellcheck="true"># 全局禁用</span>
-$ pip <span class="token function">install</span> gensim config --global http.sslVerify <span class="token boolean">false</span>
-
-<span class="token comment" spellcheck="true"># 安装时忽略</span>
-$ pip <span class="token function">install</span> --trusted-host pypi.org  <span class="token operator">&lt;</span>package_name<span class="token operator">></span>
-
-<span class="token comment" spellcheck="true"># 配置文件忽略(pip.conf)</span>
-<span class="token punctuation">[</span>global<span class="token punctuation">]</span>
-trusted-host <span class="token operator">=</span> pypi.python.org pypi.org
-
-<span class="token comment" spellcheck="true"># 配置文件忽略(requirements)</span>
---index-url https://xxx:xxx@xxx:xxx/simple --trusted-host xxx
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<ul>
-<li><strong>[3] 循环搜索依赖包</strong><ul>
-<li>由于依赖库版本的不一致</li>
-</ul>
-</li>
-</ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># --use-deprecated=legacy-resolver</span>
-$ pip3 <span class="token function">install</span> -r ./requirements.txt --upgrade --use-deprecated<span class="token operator">=</span>legacy-resolver
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<ul>
-<li><strong>[4] 本地安装包版本太老了</strong><ul>
-<li>删除提示中冲突的 <code>~</code> 开头的文件目录即可</li>
-</ul>
-</li>
-</ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息</span>
-<span class="token comment" spellcheck="true"># 用distutils配置文件配置安装方案已被废弃</span>
-WARNING: Ignoring invalid distribution -ip <span class="token punctuation">(</span>/usr/local/lib/python3.9/site-packages<span class="token punctuation">)</span>
-
-<span class="token comment" spellcheck="true"># 找到带~波浪线的临时文件夹，然后删除</span>
-$ <span class="token function">cd</span> /usr/local/lib/python3.9/site-packages <span class="token operator">&amp;&amp;</span> <span class="token function">rm</span> \~ip \~ip-21.0.1.dist-info
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<ul>
-<li><strong>[5] 服务器带宽速度限制</strong><ul>
-<li>私有部署内部镜像源，如果突然集中大量使用的话，可能因为带宽的问题导致使用端异常</li>
-</ul>
-</li>
-</ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 客户端会出现很多超时的重试操作</span>
-WARNING: <span class="token punctuation">..</span>. connection broken by <span class="token string">'ReadTimeoutError("HTTPSConnectionPool(host='</span>py.escapelife.site<span class="token string">', port=1000): Read timed out. (read timeout=15)")'</span><span class="token keyword">:</span> /simple/app/
-
-<span class="token comment" spellcheck="true"># 可以看下服务器对应的流量是否超过了带宽</span>
-Total DISK READ <span class="token keyword">:</span>      213.41 M/s <span class="token operator">|</span> Total DISK WRITE <span class="token keyword">:</span>      113.62 M/s
-Actual DISK READ:      100.89 M/s <span class="token operator">|</span> Actual DISK WRITE:      213.99 M/s
-  TID  PRIO  USER     DISK READ  DISK WRITE  SWAPIN     IO<span class="token operator">></span>    COMMAND
-  977 be/4 root       82.89 K/s    0.00 B/s  0.00 % 10.78 % <span class="token punctuation">[</span>txg_sync<span class="token punctuation">]</span>
-
-<span class="token comment" spellcheck="true"># 可以通过对网卡进行限速</span>
-
-```bash
-<span class="token comment" spellcheck="true"># Pypi服务端报错</span>
-raise OSError<span class="token punctuation">(</span>errno.EMFILE, <span class="token string">"inotify instance limit reached"</span><span class="token punctuation">)</span>
-
-<span class="token comment" spellcheck="true"># 文件末尾添加以下参数</span>
-<span class="token comment" spellcheck="true"># 表示每个instatnces可监控的最大目录数量，如果监控的文件数目巨大，需要根据情况，适当增加此值的大小</span>
-$ <span class="token function">sudo</span> vim /etc/sysctl.conf
-fs.inotify.max_user_watches <span class="token operator">=</span> 524288  <span class="token comment" spellcheck="true"># 每个实例最多监控目录数</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token keyword">:</span>
+    main<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1506,7 +1529,7 @@ fs.inotify.max_user_watches <span class="token operator">=</span> 524288  <span 
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1299.7k</span>
+                        class="white-color">1299.9k</span>
             
             
             
