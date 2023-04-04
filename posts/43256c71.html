@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-09-09
+                    2023-04-04
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.7k
+                    1.9k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    6 分
+                    7 分
                 </div>
                 
 
@@ -503,11 +503,12 @@
                 <blockquote>
 <p><strong>纸上得来终觉浅，绝知此事要躬行。=&gt; <a target="_blank" rel="noopener" href="https://github.com/chaifeng/ufw-docker">ufw-docker</a></strong></p>
 </blockquote>
+<p><code>UFW</code>（Uncomplicated Firewall）是一种用户友好的 <code>Linux</code> 防火墙管理工具，可以轻松地配置和管理系统的网络安全。对于 <code>Docker</code> 容器，使用 <code>UFW</code> 可以方便地管理容器的网络访问权限。</p>
 <p><img src="../images/docker-ufw-iptable.webp" alt="Docker防火墙管理"></p>
 <h2 id="1-问题描述"><a href="#1-问题描述" class="headerlink" title="1. 问题描述"></a>1. 问题描述</h2><blockquote>
 <p><strong>现在的 Docker 防火墙存在什么问题？</strong></p>
 </blockquote>
-<p><code>UFW</code> 是 <code>Ubuntu</code> 上很流行的一个 <code>iptables</code> 前端，可以非常方便的管理防火墙的规则。但是当安装了 <code>Docker</code> 之后，<code>UFW</code> 就无法管理 <code>Docker</code> 发布出来的端口了。具体现象，如下所示：</p>
+<p><code>UFW</code> 是 <code>Ubuntu</code> 上很流行的一个 <code>iptables</code> 前端（毕竟 ufw 其实也是在操作 <code>iptables</code> 的），可以非常方便的管理防火墙的规则。但是当安装了 <code>Docker</code> 之后，<code>UFW</code> 就无法管理 <code>Docker</code> 发布出来的端口了。具体现象，如下所示：</p>
 <ol>
 <li>在一个对外提供服务的服务器上启用了 <code>UFW</code> 进行防火墙管理，并且默认阻止所有未被允许的传入连接。</li>
 <li>运行了一个 <code>Docker</code> 容器，并且使用 <code>-p</code> 选项来把该容器的某个端口发布到服务器的所有 <code>IP</code> 地址上。</li>
@@ -517,7 +518,7 @@
 <span class="token comment" spellcheck="true"># 将容器的80端口发布到服务器的8080端口上</span>
 $ docker run -d --name httpd -p 0.0.0.0:8080:80 httpd:alpine
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<p>这个问题其实挺严重的，这意味着本来只是为了在<strong>内部提供服务的一个端口被暴露在公共网络上</strong>。在网络上搜索 <strong>ufw docker</strong> 可以发现很多的讨论，都是在说这个问题的。基本上可以找到的解决办法就是首先禁用 <code>docker</code> 的 <code>iptables</code> 功能，但这也意味着放弃了 <code>docker</code> 的网络管理功能，很典型的现象就是<strong>容器将无法访问外部网络</strong>。在有的文章中也提到了可以在 <code>UFW</code> 的配置文件中手工添加一条规则，比如 <code>-A POSTROUTING ! -o docker0 -s 172.17.0.0/16 -j MASQUERADE</code>。但这也只是允许了 <code>172.17.0.0/16</code> 这个网络。如果有了新增的网络，我们也必须<strong>手工再为新增的网络添加这样类似的 <code>iptables</code> 规则</strong>。</p>
+<p>这个问题其实挺严重的，这意味着本来只是为了在 <strong>内部提供服务的一个端口被暴露在公共网络上</strong>。在网络上搜索 <strong>ufw docker</strong> 可以发现很多的讨论，都是在说这个问题的。基本上可以找到的解决办法就是首先禁用 <code>docker</code> 的 <code>iptables</code> 功能，但这也意味着放弃了 <code>docker</code> 的网络管理功能，很典型的现象就是 <strong>容器将无法访问外部网络</strong>。在有的文章中也提到了可以在 <code>UFW</code> 的配置文件中手工添加一条规则，比如 <code>-A POSTROUTING ! -o docker0 -s 172.17.0.0/16 -j MASQUERADE</code>。但这也只是允许了 <code>172.17.0.0/16</code> 这个网络。如果有了新增的网络，我们也必须 <strong>手工再为新增的网络添加这样类似的 <code>iptables</code> 规则</strong>。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 禁用docker的iptables功能</span>
 <span class="token comment" spellcheck="true"># start docker with --iptables=false</span>
 在启动docker容器的时候，在DOCKER_OPTS添加--iptables<span class="token operator">=</span>false来禁止
@@ -526,6 +527,14 @@ $ docker run -d --name httpd -p 0.0.0.0:8080:80 httpd:alpine
 <span class="token comment" spellcheck="true"># FORWARD chain policy set to ACCEPT</span>
 $ <span class="token function">sudo</span> iptables -t nat -A POSTROUTING <span class="token operator">!</span> -o docker0 -s 172.17.0.0/16 -j MASQUERADE
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>因为 <code>docker</code> 的话，会新建一个 <code>DOCKER</code> 的链，如果容器使用 <code>-p</code> 绑定了端口，那么 <code>docker</code> 会自动去修改对应的 <code>iptables</code> 规则，所以从现象上来看就是 <code>docker</code> 在你的防火墙上打了一个洞。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">Chain DOCKER <span class="token punctuation">(</span>12 references<span class="token punctuation">)</span>
+target     prot opt <span class="token function">source</span>               destination
+ACCEPT     tcp  --  0.0.0.0/0            172.16.1.2           tcp dpt:8001
+ACCEPT     tcp  --  0.0.0.0/0            172.16.7.2           tcp dpt:8000
+ACCEPT     tcp  --  0.0.0.0/0            172.16.8.2           tcp dpt:8000
+<span class="token punctuation">..</span><span class="token punctuation">..</span><span class="token punctuation">..</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="2-期望目标"><a href="#2-期望目标" class="headerlink" title="2. 期望目标"></a>2. 期望目标</h2><blockquote>
 <p><strong>现在有什么解决方式呢？</strong></p>
@@ -600,6 +609,15 @@ $ <span class="token function">sudo</span> ufw route allow log-all 53 comment <s
 <p>同样的，如果只针对一个特定的容器，比如 <code>IP</code> 地址为 <code>172.17.0.2</code>。</p>
 <pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> ufw route allow proto udp from any to 172.17.0.2 port 53
 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<hr>
+<h2 id="4-参考链接"><a href="#4-参考链接" class="headerlink" title="4. 参考链接"></a>4. 参考链接</h2><blockquote>
+<p><strong>送人玫瑰，手有余香！</strong></p>
+</blockquote>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/chaifeng/ufw-docker">github repo ufw-docker</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/chaifeng/ufw-docker#%E5%A4%AA%E9%95%BF%E4%B8%8D%E6%83%B3%E8%AF%BB">github wiki ufw-docker </a></li>
+<li><a target="_blank" rel="noopener" href="https://dmesg.app/ufw-vs-docker.html">使用 docker 时如何拒绝非 cloudflare 访问</a></li>
+</ul>
 
                 
             </div>
@@ -1148,7 +1166,7 @@ $ <span class="token function">sudo</span> ufw route allow log-all 53 comment <s
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1300.2k</span>
+                        class="white-color">1300.4k</span>
             
             
             
