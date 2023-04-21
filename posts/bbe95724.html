@@ -507,14 +507,14 @@
 <ul>
 <li><strong>[问题起因]</strong> 需要在 <code>GoCD</code> 的 <code>agent</code> 机器上面，执行 <code>etcd</code> 服务设置对应的键值对，但是通过在 <code>Command</code> 中设置之后，提示了如下报错。提示在系统的 <code>PATH</code> 中并没有找到对应的 <code>etcdctl</code> 命令，但是直接在节点手动执行的话，却是没有问题的。</li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 报错信息</span>
-<span class="token comment" spellcheck="true"># --user=xxx:xxxxxx --endpoints=xxx.xxx.xxx.xxx:xxx</span>
-<span class="token punctuation">[</span>go<span class="token punctuation">]</span> Task: ETCDCTL_API<span class="token operator">=</span>3 etcdctl put name <span class="token variable">${name:0:8}</span>took: 0.24s
-Error happened <span class="token keyword">while</span> attempting to execute <span class="token string">'ETCDCTL_API=3 etcdctl put name <span class="token variable">${name:0:8}</span>'</span><span class="token keyword">.</span>
-Please <span class="token function">make</span> sure <span class="token punctuation">[</span>ETCDCTL_API<span class="token operator">=</span>3 etcdctl put name <span class="token variable">${name:0:8}</span><span class="token punctuation">]</span> can be executed on this agent.
-<span class="token punctuation">[</span>Debug Information<span class="token punctuation">]</span> Environment variable PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
-<span class="token punctuation">[</span>go<span class="token punctuation">]</span> Task status: failed, took: 0.24s
-<span class="token punctuation">[</span>go<span class="token punctuation">]</span> Current job status: failed
+<pre class="line-numbers language-log"><code class="language-log"># 报错信息
+# --user=xxx:xxxxxx --endpoints=xxx.xxx.xxx.xxx:xxx
+[go] Task: ETCDCTL_API=3 etcdctl put name ${name:0:8}took: 0.24s
+Error happened while attempting to execute 'ETCDCTL_API=3 etcdctl put name ${name:0:8}'.
+Please make sure [ETCDCTL_API=3 etcdctl put name ${name:0:8}] can be executed on this agent.
+[Debug Information] Environment variable PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
+[go] Task status: failed, took: 0.24s
+[go] Current job status: failed
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>[解决方法]</strong> 后来在其 <code>github</code> 的 <a target="_blank" rel="noopener" href="https://github.com/gocd/gocd/issues/810"><code>issus-810</code></a> 和 <a target="_blank" rel="noopener" href="https://github.com/gocd/gocd/issues/4313"><code>issus-4313</code></a> 中，找到了解决方法。原来是因为通过 <code>agent</code> 执行的默认 <code>shell</code> 并不是系统常见的 <code>/bin/bash</code> 而是 <code>/bin/sh</code> 的终端，在其 <code>$PATH</code> 中没有找到对应命令的安装路径，所以会提示并没有知道对应的命令。官方开发者建议，如果客户需要大量执行命令的话，可以将其保存到文件中去，然后再进行执行。或者直接通过 <code>bash -c</code> 进行声明式终端执行对应命令。</li>
@@ -1068,7 +1068,7 @@ ETCDCTL_API<span class="token operator">=</span>3 etcdctl version
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1300.5k</span>
+                        class="white-color">1300.6k</span>
             
             
             
