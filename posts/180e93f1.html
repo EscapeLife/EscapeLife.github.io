@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-07-01
+                    2023-10-12
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    4.9k
+                    5.4k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    24 分
+                    27 分
                 </div>
                 
 
@@ -521,10 +521,11 @@ node2                     running <span class="token punctuation">(</span>virtua
 vagrant@k8s-master:~$ hostnamectl
    Static hostname: k8s-master
 
-<span class="token comment" spellcheck="true"># hosts</span>
+<span class="token comment" spellcheck="true"># hosts 主机名不要重复</span>
 vagrant@k8s-master:~$ <span class="token function">cat</span> /etc/hosts
 127.0.0.1        localhost
 127.0.1.1        vagrant.vm    vagrant
+192.168.30.30    cluster-endpoint
 192.168.30.30    k8s-master
 192.168.30.31    k8s-node1
 192.168.30.32    k8s-node2
@@ -533,7 +534,7 @@ vagrant@k8s-master:~$ <span class="token function">cat</span> /etc/hosts
 vagrant@k8s-master:~$ <span class="token function">ping</span> k8s-node1
 PING k8s-node1 <span class="token punctuation">(</span>192.168.30.31<span class="token punctuation">)</span> 56<span class="token punctuation">(</span>84<span class="token punctuation">)</span> bytes of data.
 64 bytes from k8s-node1 <span class="token punctuation">(</span>192.168.30.31<span class="token punctuation">)</span>: icmp_seq<span class="token operator">=</span>1 ttl<span class="token operator">=</span>64 time<span class="token operator">=</span>0.689 ms
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h3 id="1-2-阿里源配置"><a href="#1-2-阿里源配置" class="headerlink" title="1.2 阿里源配置"></a>1.2 阿里源配置</h3><ul>
 <li><strong>配置 Ubuntu 的阿里源来加速安装速度</strong><ul>
@@ -542,7 +543,7 @@ PING k8s-node1 <span class="token punctuation">(</span>192.168.30.31<span class=
 </li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 登录服务器</span>
-➜ vgssh master/node1/nod2
+➜ vagrant <span class="token function">ssh</span> master/node1/node2
 Welcome to Ubuntu 18.04.2 LTS <span class="token punctuation">(</span>GNU/Linux 4.15.0-50-generic x86_64<span class="token punctuation">)</span>
 
 <span class="token comment" spellcheck="true"># 设置阿里云Ubuntu镜像</span>
@@ -566,12 +567,57 @@ $ <span class="token function">sudo</span> apt update
 $ <span class="token function">sudo</span> apt dist-upgrade
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h3 id="1-3-基础工具安装"><a href="#1-3-基础工具安装" class="headerlink" title="1.3 基础工具安装"></a>1.3 基础工具安装</h3><ul>
+<h3 id="1-3-操作系统配置"><a href="#1-3-操作系统配置" class="headerlink" title="1.3 操作系统配置"></a>1.3 操作系统配置</h3><ul>
+<li><strong>操作系统相关配置</strong><ul>
+<li>关闭缓存 - 部署要求</li>
+<li>关闭 <code>SELinux</code> 策略 - 默认并没有开启</li>
+<li>配置内核参数 - 部署要求</li>
+<li>调整系统时区 - 部署要求</li>
+<li>升级内核版本(默认为<code>4.15.0</code>的版本) - 部署要求</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 关闭缓存</span>
+$ <span class="token function">sudo</span> swapoff -a                               <span class="token comment" spellcheck="true"># 临时禁用</span>
+$ <span class="token function">sudo</span> <span class="token function">sed</span> -ri <span class="token function">sed</span> <span class="token string">"s/.*swap.*/# &amp;/"</span> /etc/fstab # 永久禁用
+
+<span class="token comment" spellcheck="true"># 为K8S来调整内核参数</span>
+$ <span class="token function">sudo</span> <span class="token function">touch</span> /etc/sysctl.d/kubernetes.conf
+$ <span class="token function">sudo</span> <span class="token function">cat</span> <span class="token operator">></span> /etc/sysctl.d/kubernetes.conf <span class="token operator">&lt;&lt;</span><span class="token string">EOF
+net.bridge.bridge-nf-call-iptables = 1  # 开启网桥模式(必须)
+net.bridge.bridge-nf-call-ip6tables = 1 # 开启网桥模式(必须)
+net.ipv6.conf.all.disable_ipv6 = 1      # 关闭IPv6协议(必须)
+net.ipv4.ip_forward = 1                 # 转发模式(默认开启)
+vm.panic_on_oom=0                       # 开启OOM(默认开启)
+vm.swappiness = 0                       # 禁止使用swap空间
+vm.overcommit_memory=1                  # 不检查物理内存是否够用
+fs.inotify.max_user_instances=8192
+fs.inotify.max_user_watches=1048576
+fs.file-max = 52706963                  # 设置文件句柄数量
+fs.nr_open = 52706963                   # 设置文件的最大打开数量
+net.netfilter.nf_conntrack_max = 2310720
+EOF</span>
+
+<span class="token comment" spellcheck="true"># 查看系统内核参数的方式</span>
+$ <span class="token function">sudo</span> sysctl -a <span class="token operator">|</span> <span class="token function">grep</span> xxx
+
+<span class="token comment" spellcheck="true"># 使内核参数配置文件生效</span>
+$ <span class="token function">sudo</span> sysctl -p /etc/sysctl.d/kubernetes.conf
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 设置系统时区为中国/上海</span>
+$ <span class="token function">sudo</span> timedatectl set-timezone Asia/Shanghai
+
+<span class="token comment" spellcheck="true"># 将当前的UTC时间写入硬件时钟</span>
+$ <span class="token function">sudo</span> timedatectl set-local-rtc 0
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="1-4-基础工具安装"><a href="#1-4-基础工具安装" class="headerlink" title="1.4 基础工具安装"></a>1.4 基础工具安装</h3><p><code>kubelet</code> 启用之后，现在每隔几秒就会重启，这是因为它陷入了一个等待 <code>kubeadm</code> 指令死循环了。</p>
+<ul>
 <li><strong>部署阶段的基础工具安装</strong><ul>
-<li>基础组件 <code>docker</code></li>
-<li>部署工具 <code>kubeadm</code></li>
-<li>路由规则 <code>ipvsadm</code></li>
-<li>时间同步 <code>ntp</code></li>
+<li>基础组件 <code>docker</code> - 主要是需要 <code>runtime</code> 运行时环境</li>
+<li>部署工具 <code>kubeadm</code> - 安装工具</li>
+<li>路由规则 <code>ipvsadm</code> - 可选且非默认； 默认为 <code>iptables</code> 工具</li>
+<li>时间同步 <code>ntp</code> - 时间同步</li>
 </ul>
 </li>
 </ul>
@@ -585,56 +631,12 @@ $ <span class="token function">sudo</span> apt <span class="token function">inst
 <span class="token comment" spellcheck="true"># 将当前普通用户加入docker组(需重新登录)</span>
 $ <span class="token function">sudo</span> <span class="token function">usermod</span> -a -G docker <span class="token variable">$USER</span>
 
-<span class="token comment" spellcheck="true"># 服务启用</span>
-$ <span class="token function">sudo</span> systemctl <span class="token function">enable</span> docker.service
-$ <span class="token function">sudo</span> systemctl start docker.service
-$ <span class="token function">sudo</span> systemctl <span class="token function">enable</span> kubelet.service
-$ <span class="token function">sudo</span> systemctl start kubelet.service
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token comment" spellcheck="true"># 服务启用(立即生效)</span>
+$ <span class="token function">sudo</span> systemctl <span class="token function">enable</span> docker.service --now
+$ <span class="token function">sudo</span> systemctl <span class="token function">enable</span> kubelet.service --now
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h3 id="1-4-操作系统配置"><a href="#1-4-操作系统配置" class="headerlink" title="1.4 操作系统配置"></a>1.4 操作系统配置</h3><ul>
-<li><strong>操作系统相关配置</strong><ul>
-<li>关闭缓存</li>
-<li>配置内核参数</li>
-<li>调整系统时区</li>
-<li>升级内核版本(默认为<code>4.15.0</code>的版本)</li>
-</ul>
-</li>
-</ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 关闭缓存</span>
-$ <span class="token function">sudo</span> swapoff -a
-
-<span class="token comment" spellcheck="true"># 为K8S来调整内核参数</span>
-$ <span class="token function">sudo</span> <span class="token function">touch</span> /etc/sysctl.d/kubernetes.conf
-$ <span class="token function">sudo</span> <span class="token function">cat</span> <span class="token operator">></span> /etc/sysctl.d/kubernetes.conf <span class="token operator">&lt;&lt;</span><span class="token string">EOF
-net.bridge.bridge-nf-call-iptables = 1 # 开启网桥模式(必须)
-net.bridge.bridge-nf-call-ip6tables = 1 # 开启网桥模式(必须)
-net.ipv6.conf.all.disable_ipv6 = 1 # 关闭IPv6协议(必须)
-net.ipv4.ip_forward = 1 # 转发模式(默认开启)
-vm.panic_on_oom=0 # 开启OOM(默认开启)
-vm.swappiness = 0 # 禁止使用swap空间
-vm.overcommit_memory=1 # 不检查物理内存是否够用
-fs.inotify.max_user_instances=8192
-fs.inotify.max_user_watches=1048576
-fs.file-max = 52706963 # 设置文件句柄数量
-fs.nr_open = 52706963 # 设置文件的最大打开数量
-net.netfilter.nf_conntrack_max = 2310720
-EOF</span>
-
-<span class="token comment" spellcheck="true"># 查看系统内核参数的方式</span>
-$ <span class="token function">sudo</span> sysctl -a <span class="token operator">|</span> <span class="token function">grep</span> xxx
-
-<span class="token comment" spellcheck="true"># 使内核参数配置文件生效</span>
-$ <span class="token function">sudo</span> sysctl -p /etc/sysctl.d/kubernetes.conf
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 设置系统时区为中国/上海</span>
-$ <span class="token function">sudo</span> timedatectl set-timezone Asia/Shanghai
-
-<span class="token comment" spellcheck="true"># 将当前的UTC时间写入硬件时钟</span>
-$ <span class="token function">sudo</span> timedatectl set-local-rtc 0
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<hr>
-<h3 id="1-5-开启-ipvs-服务"><a href="#1-5-开启-ipvs-服务" class="headerlink" title="1.5 开启 ipvs 服务"></a>1.5 开启 ipvs 服务</h3><ul>
+<h3 id="1-5-开启-ipvs-iptables-服务"><a href="#1-5-开启-ipvs-iptables-服务" class="headerlink" title="1.5 开启 ipvs/iptables 服务"></a>1.5 开启 ipvs/iptables 服务</h3><ul>
 <li><strong>开启 ipvs 服务</strong><ul>
 <li><code>kube-proxy</code> 开启 <code>ipvs</code> 的前置条件</li>
 </ul>
@@ -644,67 +646,124 @@ $ <span class="token function">sudo</span> timedatectl set-local-rtc 0
 $ modprobe br_netfilter
 
 <span class="token comment" spellcheck="true"># 修改配置</span>
-$ <span class="token function">cat</span> <span class="token operator">></span> /etc/sysconfig/modules/ipvs.modules <span class="token operator">&lt;&lt;</span><span class="token string">EOF
-#!/bin/bash
+$ <span class="token function">cat</span> <span class="token operator">&lt;&lt;</span>EOF <span class="token operator">|</span> <span class="token function">sudo</span> <span class="token function">tee</span> /etc/sysconfig/modules/ipvs.modules
+<span class="token comment" spellcheck="true">#!/bin/bash</span>
 modprobe -- ip_vs
 modprobe -- ip_vs_rr
 modprobe -- ip_vs_wrr
 modprobe -- ip_vs_sh
 modprobe -- nf_conntrack_ipv
-EOF</span>
+EOF
 
 <span class="token comment" spellcheck="true"># 加载配置</span>
-$ <span class="token function">chmod</span> 755 /etc/sysconfig/modules/ipvs.modules \
-    <span class="token operator">&amp;&amp;</span> <span class="token function">bash</span> /etc/sysconfig/modules/ipvs.modules \
-    <span class="token operator">&amp;&amp;</span> lsmod <span class="token operator">|</span> <span class="token function">grep</span> -e ip_vs -e nf_conntrack_ipv
+$ <span class="token function">sudo</span> <span class="token function">chmod</span> 755 /etc/sysconfig/modules/ipvs.modules \
+    <span class="token operator">&amp;&amp;</span> <span class="token function">sudo</span> <span class="token function">bash</span> /etc/sysconfig/modules/ipvs.modules \
+    <span class="token operator">&amp;&amp;</span> <span class="token function">sudo</span> lsmod <span class="token operator">|</span> <span class="token function">grep</span> -e ip_vs -e nf_conntrack_ipv
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>开启 iptables 服务</strong><ul>
+<li><code>kube-proxy</code> 开启 <code>iptables</code> 的前置条件</li>
+</ul>
+</li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">cat</span> <span class="token operator">&lt;&lt;</span>EOF <span class="token operator">|</span> <span class="token function">sudo</span> <span class="token function">tee</span> /etc/modules-load.d/k8s.conf
+br_netfilter
+EOF
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="2-部署-Master-节点"><a href="#2-部署-Master-节点" class="headerlink" title="2. 部署 Master 节点"></a>2. 部署 Master 节点</h2><blockquote>
 <p><strong>节点最低配置: <code>2C+2G</code> 内存；从节点资源尽量充足</strong></p>
 </blockquote>
-<p><code>kubeadm</code> 工具的 <code>init</code> 命令，即可初始化以单节点部署的 <code>master</code>。为了避免翻墙，这里可以使用阿里云的谷歌源来代替。在执行 <code>kubeadm</code> 部署命令的时候，指定对应地址即可。当然，可以将其加入本地的镜像库之中，更易维护。</p>
+<p>安装如果存在异常的话，就去官方文档进行查阅，防止走偏了。</p>
+<hr>
+<h3 id="2-1-设置镜像源"><a href="#2-1-设置镜像源" class="headerlink" title="2.1 设置镜像源"></a>2.1 设置镜像源</h3><p>因为 <code>WAF</code> 的原因，可以提前配置国内的 <code>Google Container</code> 镜像站，提前下载对应镜像包，也可以后续通过 <code>--image-repository</code> 命令命令指定下载。</p>
 <ul>
-<li><strong>注意事项</strong><ul>
+<li><strong>国内镜像</strong><ul>
+<li><code>https://kubernetes.feisky.xyz/appendix/mirrors</code></li>
+</ul>
+</li>
+<li><strong>docker</strong> - 目前 <code>Proxy Server</code> 仅限于 <code>Azure China IP </code>使用<ul>
+<li><code>docker pull dockerhub.azk8s.cn/library/nginx</code></li>
+<li><code>docker pull quay.mirrors.ustc.edu.cn/coreos/kube-state-metrics:v1.5.0</code></li>
+</ul>
+</li>
+<li><strong>google</strong> - 目前 <code>Proxy Server</code> 仅限于 <code>Azure China IP </code>使用<ul>
+<li><code>docker pull registry.aliyuncs.com/google_containers/kube-apiserver:v1.18.0</code></li>
+<li><code>docker pull gcr.azk8s.cn/google_containers/pause-amd64:3.1</code></li>
+</ul>
+</li>
+<li><strong>参考链接</strong><ul>
 <li><a href="registry.aliyuncs.com/google_containers">阿里云谷歌源地址</a></li>
 <li><a target="_blank" rel="noopener" href="https://kubernetes.io/zh/docs/setup/production-environment/tools/kubeadm/control-plane-flags/">使用 kubeadm 定制控制平面配置</a></li>
 </ul>
 </li>
 </ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 生成下载脚本</span>
+$ <span class="token function">cat</span> <span class="token operator">&lt;&lt;</span>EOF <span class="token operator">|</span> <span class="token function">sudo</span> <span class="token function">tee</span> ./download_images.sh
+<span class="token comment" spellcheck="true">#!/bin/bash</span>
+images<span class="token operator">=</span><span class="token punctuation">(</span>
+kube-apiserver:v1.20.9
+kube-proxy:v1.20.9
+kube-controller-manager:v1.20.9
+kube-scheduler:v1.20.9
+coredns:1.7.0
+etcd:3.4.13-0
+pause:3.2
+<span class="token punctuation">)</span>
+<span class="token keyword">for</span> imageName <span class="token keyword">in</span> <span class="token variable">${images[@]}</span><span class="token punctuation">;</span> <span class="token keyword">do</span>
+  docker pull gcr.azk8s.cn/google_containers/<span class="token variable">$imageName</span>
+<span class="token keyword">done</span>
+EOF
+
+<span class="token comment" spellcheck="true"># 执行脚本下载</span>
+$ <span class="token function">bash</span> ./download_images.sh
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-2-命令行方式部署"><a href="#2-2-命令行方式部署" class="headerlink" title="2.2 命令行方式部署"></a>2.2 命令行方式部署</h3><p><code>kubeadm</code> 工具的 <code>init</code> 命令，即可初始化以单节点部署的 <code>master</code>。为了避免翻墙，这里可以使用阿里云的谷歌源来代替。在执行 <code>kubeadm</code> 部署命令的时候，指定对应地址即可。当然，可以将其加入本地的镜像库之中，更易维护。</p>
+<ul>
+<li><strong>命令行方式定义</strong> - 择其一即可<ul>
+<li><code>--control-plane-endpoint</code> 设置集群的入口节点，即 <code>master</code> 地址，可通过 <code>hosts</code> 的方式映射，也可直接指定 <code>ip</code> 地址</li>
+<li><code>server</code> 和 <code>pod</code> 的集群网络地址范围不能够冲突，也不能和部署节点的 <code>ip</code> 地址重叠，否则会部署失败</li>
+</ul>
+</li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 登录服务器</span>
-➜ vgssh master
+➜ vagrant <span class="token function">ssh</span> master
 Welcome to Ubuntu 18.04.2 LTS <span class="token punctuation">(</span>GNU/Linux 4.15.0-50-generic x86_64<span class="token punctuation">)</span>
 
 <span class="token comment" spellcheck="true"># 部署节点(命令行)</span>
 <span class="token comment" spellcheck="true"># 注意pod和service的地址需要不同(否则会报错)</span>
 $ <span class="token function">sudo</span> kubeadm init \
-    --kubernetes-version<span class="token operator">=</span>1.20.2 \
-    --image-repository registry.aliyuncs.com/google_containers \
     --apiserver-advertise-address<span class="token operator">=</span>192.168.30.30 \
-    --pod-network-cidr<span class="token operator">=</span>10.244.0.0/16 \
-    --service-cidr<span class="token operator">=</span>10.245.0.0/16
+    --control-plane-endpoint<span class="token operator">=</span>cluster-endpoint \
+    --image-repository registry.aliyuncs.com/google_containers \
+    --kubernetes-version<span class="token operator">=</span>1.20.9 \
+    --service-cidr<span class="token operator">=</span>10.245.0.0/16 \
+    --pod-network-cidr<span class="token operator">=</span>10.244.0.0/16
 
 <span class="token comment" spellcheck="true"># 部署镜像配置(配置文件)</span>
 $ <span class="token function">sudo</span> kubeadm init --config ./kubeadm-config.yaml
 Your Kubernetes control-plane has initialized successfully<span class="token operator">!</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看IP段是否生效(iptable)</span>
 $ ip route show
 10.244.0.0/24 dev cni0 proto kernel scope <span class="token function">link</span> src 10.244.0.1
 10.244.1.0/24 via 10.244.1.0 dev flannel.1 onlink
 10.244.2.0/24 via 10.244.2.0 dev flannel.1 onlink
 
-<span class="token comment" spellcheck="true"># # 查看IP段是否生效(ipvs)</span>
+<span class="token comment" spellcheck="true"># 查看IP段是否生效(ipvs)</span>
 $ ipvsadm -L -n
 IP Virtual Server version 1.2.1 <span class="token punctuation">(</span>size<span class="token operator">=</span>4096<span class="token punctuation">)</span>
 Prot LocalAddress:Port Scheduler Flags
   -<span class="token operator">></span> RemoteAddress:Port           Forward Weight ActiveConn InActConn
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<ul>
-<li><strong>配置文件定义</strong><ul>
+<hr>
+<h3 id="2-3-配置文件方式部署"><a href="#2-3-配置文件方式部署" class="headerlink" title="2.3 配置文件方式部署"></a>2.3 配置文件方式部署</h3><ul>
+<li><strong>[2] 配置文件定义</strong> - 择其一即可<ul>
 <li>接口使用了 <code>v1beta2</code> 版本</li>
 <li>配置主节点 <code>IP</code> 地址为 <code>192.168.30.30</code></li>
 <li>为 <code>flannel</code> 分配的是 <code>10.244.0.0/16</code> 网段</li>
-<li>选择的 <code>kubernetes</code> 是当前最新的 <code>1.20.2</code> 版本</li>
+<li>选择的 <code>kubernetes</code> 是当前最新的 <code>1.20.9</code> 版本</li>
 <li>加入了 <code>controllerManager</code> 的水平扩容功能</li>
 </ul>
 </li>
@@ -714,7 +773,7 @@ Prot LocalAddress:Port Scheduler Flags
 <span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> kubeadm.k8s.io/v1beta2
 <span class="token key atrule">imageRepository</span><span class="token punctuation">:</span> registry.aliyuncs.com/google_containers
 <span class="token key atrule">kind</span><span class="token punctuation">:</span> ClusterConfiguration
-<span class="token key atrule">kubernetesVersion</span><span class="token punctuation">:</span> v1.20.2
+<span class="token key atrule">kubernetesVersion</span><span class="token punctuation">:</span> v1.20.9
 <span class="token key atrule">apiServer</span><span class="token punctuation">:</span>
   <span class="token key atrule">extraArgs</span><span class="token punctuation">:</span>
     <span class="token key atrule">advertise-address</span><span class="token punctuation">:</span> 192.168.30.30
@@ -725,11 +784,16 @@ Prot LocalAddress:Port Scheduler Flags
     <span class="token key atrule">horizontal-pod-autoscaler-use-rest-clients</span><span class="token punctuation">:</span> <span class="token string">"true"</span>
     <span class="token key atrule">horizontal-pod-autoscaler-sync-period</span><span class="token punctuation">:</span> <span class="token string">"10s"</span>
     <span class="token key atrule">node-monitor-grace-period</span><span class="token punctuation">:</span> <span class="token string">"10s"</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<span class="token comment" spellcheck="true"># 部署</span>
+$ kubectl apply <span class="token punctuation">-</span>f kubeadm<span class="token punctuation">-</span>config.yaml
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="2-4-节点加入集群"><a href="#2-4-节点加入集群" class="headerlink" title="2.4 节点加入集群"></a>2.4 节点加入集群</h3><p>主节点执行完毕后，屏幕会输入很多信息，可以按照输出信息，完成多主节点的添加和多从节点的添加。</p>
 <ul>
 <li><strong>执行成功之后会输出如下信息，需要按照如下步骤操作下</strong><ul>
-<li><strong>第一步</strong> 在 <code>kubectl</code> 默认控制和操作集群节点的时候，需要使用到 <code>CA</code> 的密钥，传输过程是通过 <code>TLS</code> 协议保障通讯的安全性。通过下面 <code>3</code> 行命令拷贝密钥信息到当前用户家目录下，这样 <code>kubectl</code> 执行时会首先访问 <code>.kube</code> 目录，使用这些授权信息访问集群。</li>
-<li><strong>第二步</strong> 之后添加 <code>worker</code> 节点时，要通过 <code>token</code> 才能保障安全性。因此，先把显示的这行命令保存下来，以备后续使用会用到。</li>
+<li><strong>第一步</strong> 在 <code>kubectl</code> 默认控制和操作集群节点的时候，需要使用到 <code>CA</code> 的密钥，传输过程是通过 <code>TLS</code> 协议保障通讯的安全性。通过下面 <code>3</code> 行命令拷贝密钥信息到当前用户家目录下，这样 <code>kubectl</code> 执行时会首先访问 <code>.kube</code> 目录，使用这些授权信息访问集群</li>
+<li><strong>第二步</strong> 之后添加 <code>worker</code> 节点时，要通过 <code>token</code> 才能保障安全性。因此，先把显示的这行命令保存下来，以备后续使用会用到</li>
 </ul>
 </li>
 </ul>
@@ -754,7 +818,7 @@ kubeadm <span class="token function">join</span> 192.168.30.30:6443 \
   sha256:6c79fd83825d7b2b0c3bed9e10c428acf8ffcd615a1d7b258e9b500848c20cae
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>将子节点加入主节点中</strong></li>
+<li><strong>查看和重新生成 token 令牌</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash">$ kubectl get nodes
 NAME         STATUS     ROLES                  AGE   VERSION
@@ -772,13 +836,10 @@ $ <span class="token function">sudo</span> kubeadm token create
 $ openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt \
     <span class="token operator">|</span> openssl rsa -pubin -outform der 2<span class="token operator">></span>/dev/null \
     <span class="token operator">|</span> openssl dgst -sha256 -hex <span class="token operator">|</span> <span class="token function">sed</span> <span class="token string">'s/^.* //'</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 生成一个新的 token 令牌(比上面的方便)</span>
-$ kubeadm token generate
 
-<span class="token comment" spellcheck="true"># 直接生成 join 命令(比上面的方便)</span>
-$ kubeadm token create <span class="token operator">&lt;</span>token_generate<span class="token operator">></span> --print-join-command --ttl<span class="token operator">=</span>0
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token comment" spellcheck="true"># 直接生成join命令(比上面的方便)</span>
+$ kubeadm token create --print-join-command
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>执行完成之后可以通过如下命令，查看主节点信息</strong><ul>
 <li>默认生成四个命名空间<ul>
@@ -1111,13 +1172,9 @@ $ <span class="token function">sudo</span> kubeadm init
 $ kubectl apply -f ./kube-dashboard.yaml
 
 <span class="token comment" spellcheck="true"># 如果部署出现问题可通过如下命令查看日志</span>
-$ kubectl logs \
-    kubernetes-dashboard-c9fb67ffc-nknpj \
-    --namespace<span class="token operator">=</span>kubernetes-dashboard
-$ kubectl describe pod \
-    kubernetes-dashboard-c9fb67ffc-nknpj \
-    --namespace<span class="token operator">=</span>kubernetes-dashboard
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ kubectl logs kubernetes-dashboard-c9fb67ffc-nknpj --namespace<span class="token operator">=</span>kubernetes-dashboard
+$ kubectl describe pod kubernetes-dashboard-c9fb67ffc-nknpj --namespace<span class="token operator">=</span>kubernetes-dashboard
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash">$ kubectl get svc -n kubernetes-dashboard
 NAME                        TYPE        CLUSTER-IP      EXTERNAL-IP   PORT<span class="token punctuation">(</span>S<span class="token punctuation">)</span>    AGE
 dashboard-metrics-scraper   ClusterIP   10.245.214.11    <span class="token operator">&lt;</span>none<span class="token operator">></span>        8000/TCP   26s
@@ -2129,7 +2186,7 @@ $ kubectl describe secrets -n kube-system \
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1314.3k</span>
+                        class="white-color">1314.9k</span>
             
             
             
