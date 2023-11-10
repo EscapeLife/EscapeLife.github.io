@@ -473,14 +473,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    6.7k
+                    8k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    29 分
+                    33 分
                 </div>
                 
 
@@ -1342,6 +1342,96 @@ $ <span class="token function">tar</span> -tf test.tar.gz
 <p><strong>记录下常见的工具，对应代理的变量设置！</strong></p>
 </blockquote>
 <p><img src="../images/linux_use_problems_09.jpg" alt="Linux常见零碎问题汇总 - 常见命令代理设置记录"></p>
+<hr>
+<h2 id="19-常规服务发布模式"><a href="#19-常规服务发布模式" class="headerlink" title="19. 常规服务发布模式"></a>19. 常规服务发布模式</h2><blockquote>
+<p><strong>记录下常见的发布模式！</strong></p>
+</blockquote>
+<p>在一般情况下，升级服务器端应用，需要将应用源码或程序包上传到服务器，然后停止掉老版本服务，再启动新版本。但是这种简单的发布方式存在两个问题，一方面，在新版本升级过程中，服务是暂时中断的，另一方面，如果新版本有 BUG，升级失败，回滚起来也非常麻烦，容易造成更长时间的服务不可用。</p>
+<p>蓝绿发布、滚动发布、灰度发布是常用的软件部署发布方式。它们在软件部署的方式和策略上有所不同，以达到在发布新版本时最小化影响，最大化保证服务的可用性和稳定性的目的。</p>
+<ul>
+<li><strong>蓝绿发布 - Blue-Green Deployment</strong><ul>
+<li>优点：便于服务异常时的回退操作；减少停机时间</li>
+<li>缺点：运行完整的两个版本资源双倍；全局状态的应用(缓存等)需考虑如何同步数据</li>
+</ul>
+</li>
+</ul>
+<p>所谓蓝绿部署，是指同时运行两个版本的应用，蓝绿部署的时候，并不停止掉老版本，而是直接部署一套新版本，等新版本运行起来后，再将流量切换到新版本上。但是蓝绿部署要求在升级过程中，同时运行两套程序，对硬件的要求就是日常所需的二倍，比如日常运行时，需要 10 台服务器支撑业务，那么使用蓝绿部署，你就需要购置二十台服务器。</p>
+<ul>
+<li><strong>滚动发布</strong><ul>
+<li>优点：解决资源双倍的问题；保证升级过程中不会停机且服务不会中断</li>
+<li>缺点：为了防止更新过程中的不稳定；需要实现流量控制能力及回滚策略</li>
+</ul>
+</li>
+</ul>
+<p>所谓滚动升级，就是在升级过程中，并不一下子启动所有新版本，是先启动一台新版本，再停止一台老版本，然后再启动一台新版本，再停止一台老版本，直到升级完成，这样的话，如果日常需要 10 台服务器，那么升级过程中也就只需要 11 台就行了。</p>
+<p>但是滚动升级有一个问题，在开始滚动升级后，流量会直接流向已经启动起来的新版本，但是这个时候，新版本是不一定可用的，比如需要进一步的测试才能确认。那么在滚动升级期间，整个系统就处于非常不稳定的状态，如果发现了问题，也比较难以确定是新版本还是老版本造成的问题。</p>
+<ul>
+<li><strong>灰度发布</strong><ul>
+<li>优点：减少了对用户的影响(流量控制)；增加了部署的灵活性；提高了发布的质量</li>
+<li>缺点：部署成本较高(部署和流量控制等机制)；需要更多的测试和监控；增加管理难度</li>
+</ul>
+</li>
+</ul>
+<p>灰度发布也叫金丝雀发布，在灰度发布开始后，先启动一个新版本应用，但是并不直接将流量切过来，而是测试人员对新版本进行线上测试，启动的这个新版本应用，就是我们的金丝雀。如果没有问题，那么可以将少量的用户流量导入到新版本上，然后再对新版本做运行状态观察，收集各种运行时数据，如果此时对新旧版本做各种数据对比，就是所谓的 A/B 测试。</p>
+<p>当确认新版本运行良好后，再逐步将更多的流量导入到新版本上，在此期间，还可以不断地调整新旧两个版本的运行的服务器副本数量，以使得新版本能够承受越来越大的流量压力。直到将 100%的流量都切换到新版本上，最后关闭剩下的老版本服务，完成灰度发布。</p>
+<hr>
+<h2 id="20-Shebang-是什么"><a href="#20-Shebang-是什么" class="headerlink" title="20. Shebang 是什么"></a>20. Shebang 是什么</h2><blockquote>
+<p><strong><a target="_blank" rel="noopener" href="https://linuskarlsson.se/blog/shebang-shenanigans/">参考链接</a></strong></p>
+</blockquote>
+<p>我们常常在 <code>shell</code> 脚本中看到顶部的以 <code>#!</code> 作为开头的 <code>shebang</code>，其中初始字符 <code>#!</code> 告诉操作系统这不是常规二进制文件，而是需要通过解释器运行的东西，即 &nbsp;<code>#!</code>&nbsp; 之后的解释器。因此，你可以看到类似 &nbsp;<code>#!/usr/bin/python</code>&nbsp;、&nbsp;<code>#!/usr/bin/awk</code> 的行。</p>
+<p>执行像 &nbsp;<code>./test.sh</code>&nbsp; 这样的文件(<code>#!/bin/sh</code>)，类似于调用以下命令：&nbsp;<code>/bin/sh ./test.sh</code>。但是，我们可能会在其他脚本里面看到 <code>shebang</code> 之后还有参数，比如：</p>
+<ul>
+<li><code>#!/usr/bin/awk -f</code> - 以脚本文件的形式传递脚本代码</li>
+<li><code>#!/usr/bin/python -u</code> - 以启用无缓冲输出</li>
+</ul>
+<p>如果我们想为脚本添加额外参数的话，理想情况下就想到将其加到 <code>shebang</code> 里面，但是发现不起作用，将所有标志混合成一个字符串，不是我想要的所以也就不对了。</p>
+<ul>
+<li><code>#!/usr/bin/awk -i inplace -f</code> -翻译-&gt; <code>awk "-i inplace -f" file.awk</code></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>argv[0]</th>
+<th>argv[1]</th>
+<th>argv[2]</th>
+<th>argv[3]</th>
+<th>argv[4]</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Linux</td>
+<td><code>/usr/local/bin/args</code></td>
+<td><code>-a -b --something</code></td>
+<td><code>./file.txt</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>FreeBSD OpenBSD</td>
+<td><code>/usr/local/bin/args</code></td>
+<td><code>-a -b --something</code></td>
+<td><code>./file.txt</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>macOS</td>
+<td><code>/usr/local/bin/args</code></td>
+<td><code>-a</code></td>
+<td><code>-b</code></td>
+<td><code>--something</code></td>
+<td><code>./file.txt</code></td>
+</tr>
+<tr>
+<td>OpenIndiana</td>
+<td><code>/usr/local/bin/args</code></td>
+<td><code>-a</code></td>
+<td><code>./file.txt</code></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
 
                 
             </div>
@@ -1898,7 +1988,7 @@ $ <span class="token function">tar</span> -tf test.tar.gz
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1384.4k</span>
+                        class="white-color">1402.7k</span>
             
             
             
