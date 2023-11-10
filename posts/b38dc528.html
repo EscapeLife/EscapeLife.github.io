@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2023-01-13
+                    2023-11-10
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    6.9k
+                    7.5k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    28 分
+                    30 分
                 </div>
                 
 
@@ -1354,6 +1354,96 @@ sever <span class="token punctuation">{</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="17-Nginx-日志写错文件"><a href="#17-Nginx-日志写错文件" class="headerlink" title="17. Nginx 日志写错文件"></a>17. Nginx 日志写错文件</h2><blockquote>
+<p><strong>具体问题值得深究一下</strong></p>
+</blockquote>
+<p>通过 <code>logrotate</code> 工具触发 <code>Nginx</code> 的日志轮转，因为是 <code>Ubuntu</code> 系统，所以对应的配置如下所示：</p>
+<ol>
+<li>创建 <code>/etc/logrotate.d/nginx</code> 的文件，用于指定 <code>Nginx</code> 日志轮转。</li>
+</ol>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># ubuntu</span>
+$ <span class="token function">sudo</span> vim /etc/logrotate.d/nginx
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ol start="2">
+<li>添加配置文件内容。<ol>
+<li><code>*.log</code> -&gt; 指定要轮转的 <code>Nginx</code> 日志文件</li>
+<li><code>daily</code> -&gt; 设置日志轮转的时间间隔为一天(<code>weekly</code>/<code>monthly</code>/<code>yearly</code>)</li>
+<li><code>missingok</code> -&gt; 如果日志文件不存在则忽略它并继续运行</li>
+<li><code>rotate 60</code> -&gt; 保留 <code>60</code> 个轮转后的日志文件</li>
+<li><code>delaycompress</code> -&gt; 在轮转压缩之前保持一个旧的未压缩的文件</li>
+<li><code>notifempty</code> -&gt; 在日志文件为空时不轮转该文件</li>
+<li><code>create</code> -&gt; 创建新的日志文件使用的访问权限和用户组</li>
+<li><code>sharedscripts</code> -&gt; 在运行指定命令之前和之后只运行一次 <code>postrotate</code> 命令</li>
+<li><code>prerotate</code> -&gt; 执行轮命令之前的预处理操作</li>
+<li><code>postrotate</code> -&gt; 重新打开 <code>Nginx</code> 日志文件进行日志轮转</li>
+</ol>
+</li>
+</ol>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 配置文件格式</span>
+/var/log/nginx/*.log <span class="token punctuation">{</span>
+    daily
+    missingok
+    rotate 60
+    compress
+    delaycompress
+    notifempty
+    create 0640 www-data adm
+    sharedscripts
+    prerotate
+        <span class="token keyword">if</span> <span class="token punctuation">[</span> -d /etc/logrotate.d/httpd-prerotate <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span> \
+            run-parts /etc/logrotate.d/httpd-prerotate<span class="token punctuation">;</span> \
+        <span class="token keyword">fi</span> \
+    endscript
+    postrotate
+        invoke-rc.d nginx rotate <span class="token operator">></span>/dev/null 2<span class="token operator">></span><span class="token operator">&amp;</span>1
+    endscript
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true"># 手动强制轮转</span>
+$ <span class="token function">sudo</span> invoke-rc.d nginx rotate
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>我们会在其他系统上面看到，<code>postrotate</code> 字段可能是 <code>kill -USR1</code> 的形式，两个命令实现的功能是相同的，都用于手动触发 <code>Nginx</code> 日志轮转。不同的是，前者是使用 <code>Debian</code> 工具来执行轮转，而后者是直接使用 <code>Linux shell</code> 命令进行操作。</p>
+<ol>
+<li><code>invoke-rc.d nginx rotate</code><ol>
+<li><code>invoke-rc.d</code> -&gt; 用于执行 <code>Debian</code> 系统服务控制脚本的工具</li>
+<li><code>nginx</code> -&gt; 要执行操作的服务名称</li>
+<li><code>rotate</code> -&gt; 轮转操作的指令参数</li>
+<li><code>&gt;/dev/null 2&gt;&amp;1</code> -&gt; 不输出任何日志内容</li>
+</ol>
+</li>
+<li><code>kill -USR1 $(cat /var/run/nginx.pid)</code><ol>
+<li><code>[ -f /var/run/nginx.pid ]</code> -&gt; 检查 <code>Nginx</code> 进程是否在运行</li>
+<li><code>kill -USR1</code> -&gt; 向 <code>Nginx</code> 进程发送 <code>USR1</code> 信号以触发日志轮转操作</li>
+<li><code>USR1</code> -&gt; 是一个自定义的信号，表示 <code>Nginx</code> 收到这个就会触发轮转</li>
+</ol>
+</li>
+</ol>
+<hr>
+<h2 id="18-Nginx-配置-WS-请求"><a href="#18-Nginx-配置-WS-请求" class="headerlink" title="18. Nginx 配置 WS 请求"></a>18. Nginx 配置 WS 请求</h2><blockquote>
+<p><strong>分享一个把 ws 和 http 放到一个 location 的方法</strong></p>
+</blockquote>
+<pre class="line-numbers language-nginx"><code class="language-nginx"><span class="token keyword">map</span> <span class="token variable">$http_upgrade</span> <span class="token variable">$connection_upgrade</span> <span class="token punctuation">{</span>
+    default upgrade<span class="token punctuation">;</span>
+    <span class="token string">''</span>      close<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">listen</span>   <span class="token number">80</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+        <span class="token keyword">proxy_http_version</span> <span class="token number">1.1</span><span class="token punctuation">;</span>
+        <span class="token keyword">proxy_pass_header</span> <span class="token keyword">Server</span><span class="token punctuation">;</span>
+        <span class="token keyword">proxy_set_header</span> Host <span class="token variable">$http_host</span><span class="token punctuation">;</span>
+        <span class="token keyword">proxy_set_header</span> X<span class="token operator">-</span>Real<span class="token operator">-</span>IP <span class="token variable">$remote_addr</span><span class="token punctuation">;</span>
+        <span class="token keyword">proxy_set_header</span> X<span class="token operator">-</span>Scheme <span class="token variable">$http_scheme</span><span class="token punctuation">;</span>
+        <span class="token keyword">proxy_set_header</span> Upgrade <span class="token variable">$http_upgrade</span><span class="token punctuation">;</span>
+        <span class="token keyword">proxy_set_header</span> Connection <span class="token variable">$connection_upgrade</span><span class="token punctuation">;</span>
+        <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">127.0</span><span class="token punctuation">.</span><span class="token number">0.1</span><span class="token punctuation">:</span><span class="token number">8000</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1898,7 +1988,7 @@ sever <span class="token punctuation">{</span>
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1402.7k</span>
+                        class="white-color">1404.9k</span>
             
             
             
