@@ -466,14 +466,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-09-29
+                    2023-11-27
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    5.5k
+                    5.6k
                 </div>
                 
 
@@ -914,6 +914,26 @@ Host key verification failed.
 StrictHostKeyChecking no
 UserKnownHostsFile /dev/null
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h3 id="6-5-默认不再支持-rsa-私钥"><a href="#6-5-默认不再支持-rsa-私钥" class="headerlink" title="6.5 默认不再支持 rsa 私钥"></a>6.5 默认不再支持 rsa 私钥</h3><blockquote>
+<p><strong>简言之就是 ssh client 更新了，<a target="_blank" rel="noopener" href="https://www.the5fire.com/permission-denied.html">不支持 rsa 的私钥</a>，导致无法登陆。</strong></p>
+</blockquote>
+<p>使用 <code>ssh</code> 登陆服务器，出现类似下面的提示：</p>
+<pre class="line-numbers language-bash"><code class="language-bash">debug3: authmethod_is_enabled publickey
+debug1: Next authentication method: publickey
+debug1: Offering public key: /home/user/.ssh/id_rsa RSA <span class="token punctuation">..</span>. agent
+debug1: send_pubkey_test: no mutual signature algorithm <span class="token operator">&lt;</span>-- ssh-rsa is not enabled
+debug1: No <span class="token function">more</span> authentication methods to try.
+user@hostname: Permission denied <span class="token punctuation">(</span>publickey<span class="token punctuation">)</span>.
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>本来以为是 <code>key</code> 弄错了，加上 <code>-v</code> 参数才发现问题。解决方案也很简单，就是在 <code>~/.ssh/config</code> 中增加:</p>
+<pre class="line-numbers language-bash"><code class="language-bash">Host *
+    ServerAliveInterval 30
+    PubkeyAcceptedKeyTypes +ssh-rsa
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>如果是出现：<code>no matching host key type found. Their offer: ssh-rsa,ssh-dss</code> 的错误，还需要配置：</p>
+<pre class="line-numbers language-bash"><code class="language-bash">HostKeyAlgorithms<span class="token operator">=</span>ssh-rsa,ssh-dss
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <hr>
 <h2 id="7-命令常用参数总结"><a href="#7-命令常用参数总结" class="headerlink" title="7. 命令常用参数总结"></a>7. 命令常用参数总结</h2><blockquote>
 <p><strong>OpenSource: 总结的快捷键使用文档</strong></p>
@@ -1464,7 +1484,7 @@ UserKnownHostsFile /dev/null
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1420.2k</span>
+                        class="white-color">1420.4k</span>
             
             
             
