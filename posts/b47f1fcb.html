@@ -462,7 +462,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-12-18
+                    2024-09-05
                 </div>
                 
 
@@ -867,7 +867,7 @@ $ psql -U postgres -h 127.0.0.1 -p 5432 -d app
 <ul>
 <li><strong>[2] 新时间线的出现场景</strong></li>
 </ul>
-<p>第一种就是：**即时恢复(PITR)配置 recovery.conf 文件 =&gt;**设置好 <code>recovery.conf</code> 文件后，启动数据库，将会产生新的 <code>timeline</code>，而且会生成一个新的 <code>history</code> 文件。恢复的默认行为是沿着与当前基本备份相同的时间线恢复。如果你想恢复到某些时间线，你需要指定的 <code>recovery.conf</code> 目标时间线 <code>recovery_target_timeline</code>，不能恢复到早于基本备份分支的时间点。</p>
+<p>第一种就是：<strong>即时恢复(PITR)配置 recovery.conf 文件 =&gt;</strong> 设置好 <code>recovery.conf</code> 文件后，启动数据库，将会产生新的 <code>timeline</code>，而且会生成一个新的 <code>history</code> 文件。恢复的默认行为是沿着与当前基本备份相同的时间线恢复。如果你想恢复到某些时间线，你需要指定的 <code>recovery.conf</code> 目标时间线 <code>recovery_target_timeline</code>，不能恢复到早于基本备份分支的时间点。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 从归档目录恢复日志</span>
 restore_command <span class="token operator">=</span> <span class="token string">'cp /mnt/server/archivedir/%f %p'</span>
 <span class="token comment" spellcheck="true"># 指定归档时间点，如没指定恢复到故障前的最后一完成的事务</span>
@@ -877,7 +877,7 @@ recovery_target_timeline <span class="token operator">=</span> <span class="toke
 <span class="token comment" spellcheck="true"># 打开后将会以备库身份启动，而不是即时恢复</span>
 standby_mode <span class="token operator">=</span> <span class="token string">'off'</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>第二种就是：**standby promote 搭建一个 PG 主备，然后停止主库，在备库机器执行 =&gt;**这时候备库将会升为主备，同时产生一个新的 <code>timeline</code>，同样生成一个新的 <code>history</code> 文件。</p>
+<p>第二种就是：<strong>standby promote 搭建一个 PG 主备，然后停止主库，在备库机器执行 =&gt;</strong> 这时候备库将会升为主备，同时产生一个新的 <code>timeline</code>，同样生成一个新的 <code>history</code> 文件。</p>
 <pre class="line-numbers language-bash"><code class="language-bash">$ pg_ctl promote –D <span class="token variable">$PGDATA</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <ul>
@@ -934,7 +934,7 @@ $ <span class="token function">cat</span> 00000004.history
 <li><strong>[方法一] 流复制(使用本地存储)</strong></li>
 </ul>
 <p><img src="/../images/postgres-backup-restore-1.png" alt="Postgres数据库归档热备份"></p>
-<p>第一种方法，**流复制(使用本地存储)**是最常见的方法。你有一个主节点，主节点具有表的数据和预写日志(<code>WAL</code>)。当您修改 <code>Postgres</code> 中的行时，更改首先会被提交到仅附加重做日志，此重做日志称为预写日志或<code>WAL</code>。然后，此 <code>Postgres</code> 的 <code>WAL</code> 日志将流式传输到辅助节点。</p>
+<p>第一种方法，<strong>流复制(使用本地存储)</strong> 是最常见的方法。你有一个主节点，主节点具有表的数据和预写日志(<code>WAL</code>)。当您修改 <code>Postgres</code> 中的行时，更改首先会被提交到仅附加重做日志，此重做日志称为预写日志或<code>WAL</code>。然后，此 <code>Postgres</code> 的 <code>WAL</code> 日志将流式传输到辅助节点。</p>
 <p>在第一种方法中，当您构建新的辅助节点时，新的辅助节点需要从主节点重播整个状态 - 从时间开始。然后，重放操作可能在主节点上引入显着负载。如果数据库的主节点提供实时流量，则此负载变得更加重要。</p>
 <p>在此方法中，您可以使用本地磁盘或将持久 <code>volume</code> 附加到实例。在上图中，我们使用的是本地磁盘，因为这是更典型的设置。</p>
 <ul>
