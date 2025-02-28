@@ -29,9 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.2"><link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
-
+<meta name="generator" content="Hexo 5.4.2">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -462,21 +462,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-08-02
+                    2025-03-01
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    3k
+                    3.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    11 分
+                    12 分
                 </div>
                 
 
@@ -592,12 +592,78 @@
 $ <span class="token function">wget</span> https://github.com/fatedier/frp/releases/download/v0.37.0/frp_0.37.0_linux_amd64.tar.gz
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <p>编写配置文件，先通过下面提供的命令来启动服务端和客户端。如果需要在后台长期运行，建议结合其他工具使用，例如 <code>systemd</code> 和 <code>supervisor</code> 工具。</p>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 启动服务端</span>
-$ ./frps -c ./frps.ini
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 安装</span>
+$ <span class="token function">sudo</span> apt <span class="token function">install</span> systemd
 
-<span class="token comment" spellcheck="true"># 启动客户端</span>
-$ ./frpc -c ./frpc.ini
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token comment" spellcheck="true"># 设置frps开机自启动</span>
+$ <span class="token function">sudo</span> systemctl <span class="token function">enable</span> frps
+
+<span class="token comment" spellcheck="true"># frp的相关执行方式</span>
+$ <span class="token function">sudo</span> systemctl start/stop/restart/status frps
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>启动服务端</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 启动服务端</span>
+$ ./frps -c ./frps.toml
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 服务端配置文件(frps.toml)</span>
+bindPort <span class="token operator">=</span> 7777
+auth.token <span class="token operator">=</span> <span class="token string">"token_value"</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> vim /etc/systemd/system/frps.service
+<span class="token punctuation">[</span>Unit<span class="token punctuation">]</span>
+Description <span class="token operator">=</span> frp server
+After <span class="token operator">=</span> network.target syslog.target
+Wants <span class="token operator">=</span> network.target
+
+<span class="token punctuation">[</span>Service<span class="token punctuation">]</span>
+Type <span class="token operator">=</span> simple
+ExecStart <span class="token operator">=</span> /data/frp/frp_0.61.1/frps -c /data/frp/frp_0.61.1/frps.toml
+
+<span class="token punctuation">[</span>Install<span class="token punctuation">]</span>
+WantedBy <span class="token operator">=</span> multi-user.target
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>启动客户端</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 启动客户端</span>
+$ ./frpc -c ./frpc.toml
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 客户端配置文件(frpc.toml)</span>
+<span class="token comment" spellcheck="true"># frpc.toml</span>
+serverAddr <span class="token operator">=</span> <span class="token string">"127.0.0.1"</span>
+serverPort <span class="token operator">=</span> 7777
+auth.token <span class="token operator">=</span> <span class="token string">"token_value"</span>
+
+<span class="token punctuation">[</span><span class="token punctuation">[</span>proxies<span class="token punctuation">]</span><span class="token punctuation">]</span>
+name <span class="token operator">=</span> <span class="token string">"gitlab"</span>
+<span class="token function">type</span> <span class="token operator">=</span> <span class="token string">"https"</span>
+customDomains <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">"gitlab.escapelife.com"</span><span class="token punctuation">]</span>
+
+<span class="token punctuation">[</span>proxies.plugin<span class="token punctuation">]</span>
+<span class="token function">type</span> <span class="token operator">=</span> <span class="token string">"https2http"</span>
+localAddr <span class="token operator">=</span> <span class="token string">"127.0.0.1:8077"</span>
+
+<span class="token comment" spellcheck="true"># HTTPS 证书相关的配置</span>
+crtPath <span class="token operator">=</span> <span class="token string">"./server.crt"</span>
+keyPath <span class="token operator">=</span> <span class="token string">"./server.key"</span>
+hostHeaderRewrite <span class="token operator">=</span> <span class="token string">"127.0.0.1"</span>
+requestHeaders.set.x-from-where <span class="token operator">=</span> <span class="token string">"frp"</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">sudo</span> vim /etc/systemd/system/frpc.service
+<span class="token punctuation">[</span>Unit<span class="token punctuation">]</span>
+Description <span class="token operator">=</span> frp client
+After <span class="token operator">=</span> network.target syslog.target
+Wants <span class="token operator">=</span> network.target
+
+<span class="token punctuation">[</span>Service<span class="token punctuation">]</span>
+Type <span class="token operator">=</span> simple
+ExecStart <span class="token operator">=</span> /data/frp/frp_0.61.1/frpc -c /data/frp/frp_0.61.1/frpc.toml
+
+<span class="token punctuation">[</span>Install<span class="token punctuation">]</span>
+WantedBy <span class="token operator">=</span> multi-user.target
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="4-Frp-的配置文件"><a href="#4-Frp-的配置文件" class="headerlink" title="4. Frp 的配置文件"></a>4. Frp 的配置文件</h2><blockquote>
 <p><strong>配置文件如何编写可以参考示例中的内容</strong></p>
@@ -1486,7 +1552,7 @@ bandwidth_limit <span class="token operator">=</span> 1MB
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1467.7k</span>
+                        class="white-color">1467.9k</span>
             
             
             
