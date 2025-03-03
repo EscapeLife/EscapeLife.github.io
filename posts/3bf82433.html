@@ -473,14 +473,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1k
+                    2.1k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    4 分
+                    8 分
                 </div>
                 
 
@@ -503,50 +503,51 @@
                 <blockquote>
 <p><strong>DERP 是一个开源的、高性能的、基于 UDP 的 NAT 穿透解决方案，它可以帮助你在内网环境中搭建一个 VPN 服务。</strong></p>
 </blockquote>
-<p><code>Tailscale</code> 是一个组网神器，可以让自己处于不同位置、不同网络环境的机器组成一个私有的局域网。但是，由于中转节点基本处于国外，导致在国内使用的话，延迟非常高。网络不好的话，甚至不可用。所以，可以自建 <code>Tailscale</code> 的中转节点(<strong>DERP节点</strong>)方法。让一台国内具有公网地址的机器作为中转服务，从而提高局域网访问速度。</p>
-<p><img src="/images/derp-server-to-vpn.png" alt="自建DerpServer中转节点"></p>
+<p><code>Tailscale</code> 是一个组网神器，可以让自己处于不同位置、不同网络环境的机器组成一个私有的局域网。但是，由于官方内置的 DERP 中转节点惟独不包含中国大陆，导致在国内使用的话，延迟非常高。网络不好的话，甚至不可用。所以，可以自建 <code>Tailscale</code> 的中转节点(<strong>DERP节点</strong>)方法。</p>
+<p><img src="../images/derp-server-to-vpn.png" alt="自建DerpServer中转节点"></p>
 <hr>
 <h2 id="1-服务介绍"><a href="#1-服务介绍" class="headerlink" title="1.服务介绍"></a>1.服务介绍</h2><blockquote>
-<p><strong>DerpServer</strong></p>
+<p><strong>DERP 是 Tailscale 自研的一个协议！</strong></p>
 </blockquote>
-<p><strong>DERP</strong>(<code>DERP Overlay Routing Protocol</code>)是 <code>Tailscale</code> 用于在不同网络环境中建立安全、可靠的点对点连接的协议。它通过在网络中建立一个覆盖网络，让所有连接到这个网络的设备都可以直接通信，而不需要经过传统的路由器。</p>
+<p><code>Tailscale</code> 的终极目标是让多台处于网络上的任何位置的机器建立点对点直连效果，但是现实世界错综复杂，并不是所有设备都能直接通信，而且大部份情况下机器都位于 NAT 和防火墙后面，这时候就需要通过打洞来实现直连。为了解决这个问题，引入了 <strong>DERP</strong> 服务器作为中间节点，帮助在不同网络环境下的机器建立安全、可靠的点对点连接。</p>
+<p><strong>DERP</strong>(<code>DERP Overlay Routing Protocol</code>)是 <code>Tailscale</code> 自研的一个协议，它根据目的公钥来中继加密的流量。其是 <code>Tailscale</code> 用于在不同网络环境中建立安全、可靠的点对点连接的协议。它通过在网络中建立一个覆盖网络，让所有连接到这个网络的设备都可以直接通信，而不需要经过传统的路由器。</p>
 <p><strong>降低延迟</strong>：将 <code>DERP</code> 服务器部署在本地或靠近用户的地区，可以有效减少网络延迟。<strong>提高稳定性</strong>：自建服务器可以避免因官方服务器故障或网络波动导致的连接不稳定问题。<strong>增强安全性</strong>：通过自建服务器，可以更好地控制数据传输的安全性。</p>
-<pre class="line-numbers language-bash"><code class="language-bash">active<span class="token punctuation">;</span> relay <span class="token string">"tok"</span>, tx 296 rx 0
-active<span class="token punctuation">;</span> direct 222.90.103.96:41641, tx 5996 rx 4764
-
-include /etc/nginx/conf.d/*.conf<span class="token punctuation">;</span>
-include /etc/nginx/sites-enabled/*<span class="token punctuation">;</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-bash"><code class="language-bash">$ tailscale status
+x1  default  macOS  active<span class="token punctuation">;</span> direct xxx:2756<span class="token punctuation">;</span> offline, tx 50424 rx 34056
+x2  default  linux  active<span class="token punctuation">;</span> direct xxx:2834<span class="token punctuation">;</span> offline, tx 1403688 rx 1217620
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <hr>
-<h2 id="2-服务部署-需要域名"><a href="#2-服务部署-需要域名" class="headerlink" title="2. 服务部署(需要域名)"></a>2. 服务部署(需要域名)</h2><blockquote>
-<p><strong>DerpServer</strong></p>
+<h2 id="2-服务部署-域名方案"><a href="#2-服务部署-域名方案" class="headerlink" title="2. 服务部署(域名方案)"></a>2. 服务部署(域名方案)</h2><blockquote>
+<p><strong>自建私有 DERP 中继节点</strong></p>
 </blockquote>
+<p>为了实现低延迟、高安全性，我们可以参考 <a target="_blank" rel="noopener" href="https://tailscale.com/kb/1111/derp-servers/">Tailscale 官方文档</a> 来搭建私有化的 DERP 服务器。有两种部署模式，一种是基于域名，另外一种不需要域名，可以直接使用 IP。</p>
 <ul>
-<li><strong>自建DERP服务器步骤</strong><ul>
-<li><strong>需要能够公网访问</strong><ul>
-<li>让各个节点可以直接访问到该 DERP 服务器</li>
-<li>以此来，便于进行后续的流量转发等操作做基础</li>
+<li><strong>先置条件</strong></li>
 </ul>
-</li>
-<li><strong>需要运行 HTTPS 服务</strong><ul>
-<li>为了在传输数据给 DERP 服务器时数据可以通过 TLS 加密</li>
-<li>DERP 服务器只认&nbsp;<code>Let's Encrypt</code>&nbsp;这家服务商颁发的证书</li>
-<li>这实际上就隐含了一个条件：<strong>还需要一个公共域名</strong></li>
+<p>首先，服务器需要有公网 <code>IP</code> 地址。其次，如果服务器在国内则域名需要备案，如果服务器在国外则不需要备案。</p>
+<pre class="line-numbers language-bash"><code class="language-bash">1.域名
+2.SSL证书
+3.准备一台或多台云服务器
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>容器化部署</strong>(推荐)</li>
 </ul>
-</li>
-<li><strong>必须分配 80 端口来运行 HTTP 服务</strong></li>
-<li><strong>需要额外暴露两个端口来运行 HTTPS 和 STUN 服务</strong></li>
-<li><strong>必须允许 ICMP 流量的出入</strong></li>
+<p>默认情况下会开启 STUN 服务，对应的 UDP 端口是 3478；能用 443 端口尽量用 443 端口，实在不行再用别的端口也行；并且申请的域名需要和证书名称进行适配。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 可以自行构建镜像</span>
+$ docker run --restart always \
+  --name derper -p 443:443 -p 3478:3478/udp \
+  -v /etc/letsencrypt/live/demain_name:/app/certs \
+  -e DERP_CERT_MODE<span class="token operator">=</span>manual \
+  -e DERP_ADDR<span class="token operator">=</span>:443 \
+  -e DERP_DOMAIN<span class="token operator">=</span>derper.example.com \
+  -d xxx/derper:latest
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>直接系统服务部署</strong></li>
 </ul>
-</li>
-</ul>
-<p><strong>准备一台服务器</strong>：有公网 <code>IP</code> 地址的服务器，并在在服务器上安装 <code>Tailscale</code> 客户端，将服务器加入到你的 <code>Tailscale</code> 网络中。<strong>配置DERP服务器</strong>：开放必要的端口：33445/TCP, 33446/TCP, 3478/UDP。<strong>验证DERP服务器</strong>：在 <code>Tailscale</code> 控制面板中，查看你的DERP服务器是否在线，并检查其状态。</p>
-<p><a target="_blank" rel="noopener" href="https://pkgs.tailscale.com/">https://pkgs.tailscale.com/</a></p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 下载</span>
-$ curl -o derper \
-    https://pkgs.tailscale.com/derper/latest/derper-linux-amd64
-$ <span class="token function">chmod</span> +x derper
-$ <span class="token function">sudo</span> <span class="token function">mv</span> derper /usr/local/bin/
+$ go <span class="token function">install</span> tailscale.com/cmd/derper@latest
+$ <span class="token function">cp</span> ~/go/bin/derper /usr/local/bin/
 
 <span class="token comment" spellcheck="true"># 配置</span>
 $ <span class="token function">sudo</span> <span class="token function">mkdir</span> -p /etc/derper
@@ -555,11 +556,17 @@ $ <span class="token function">sudo</span> vim /etc/derper/config.json
   <span class="token string">"RegionID"</span><span class="token keyword">:</span> 900,
   <span class="token string">"RegionCode"</span><span class="token keyword">:</span> <span class="token string">"evh"</span>,
   <span class="token string">"RegionName"</span><span class="token keyword">:</span> <span class="token string">"Escape VPN Host"</span>,
-  <span class="token string">"DerpPort"</span><span class="token keyword">:</span> 443,
+  <span class="token string">"DerpPort"</span><span class="token keyword">:</span> 1443,
   <span class="token string">"StunPort"</span><span class="token keyword">:</span> 3478,
   <span class="token string">"VerifyClients"</span><span class="token keyword">:</span> <span class="token boolean">true</span>
 <span class="token punctuation">}</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<span class="token comment" spellcheck="true"># 验证客户端信息</span>
+$ <span class="token function">sudo</span> derper --hostname<span class="token operator">=</span>derper.xxx.com --verify-clients
+
+<span class="token comment" spellcheck="true"># 域名添加证书信息</span>
+$ <span class="token function">sudo</span> derper -certmode manual -certdir ./
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 创建服务文件</span>
 $ <span class="token function">sudo</span> <span class="token function">sudo</span> /etc/systemd/system/derper.service
 <span class="token punctuation">[</span>Unit<span class="token punctuation">]</span>
@@ -590,46 +597,122 @@ $ <span class="token function">sudo</span> ufw allow 3478/udp
 $ <span class="token function">sudo</span> ufw reload
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 申请域名</span>
-$ apt <span class="token function">install</span> certbot
-$ <span class="token function">sudo</span> certbot certonly --standalone -d summary.escapelife.site
-
 $ apt <span class="token function">install</span> certbot python3-certbot-nginx
-$ <span class="token function">sudo</span> certbot certonly --nginx -d summary.escapelife.site
+$ <span class="token function">sudo</span> certbot certonly --nginx -d derper.xxx.com
 
-2781870238@qq.com
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token comment" spellcheck="true"># 配置证书(必须配置)</span>
+<span class="token comment" spellcheck="true"># https://github.com/tailscale/tailscale/issues/4072</span>
+$ <span class="token function">sudo</span> vim /etc/nginx/sites-available/derper.xxx.com
+server <span class="token punctuation">{</span>
+    listen 80<span class="token punctuation">;</span>
+    listen 443 ssl<span class="token punctuation">;</span>
+    server_name derper.xxx.com<span class="token punctuation">;</span>
+
+    ssl_certificate     /etc/letsencrypt/live/derper.xxx.com.crt<span class="token punctuation">;</span>
+    ssl_certificate_key /etc/letsencrypt/live/derper.xxx.com/privkey.key<span class="token punctuation">;</span>
+
+    location / <span class="token punctuation">{</span>
+        client_max_body_size 50MB<span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true"># websockets</span>
+        proxy_http_version 1.1<span class="token punctuation">;</span>
+        proxy_set_header Upgrade <span class="token variable">$http_upgrade</span><span class="token punctuation">;</span>
+        proxy_set_header Connection <span class="token string">"Upgrade"</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true"># other settings</span>
+        proxy_set_header Host <span class="token variable">$host</span><span class="token punctuation">;</span>
+        proxy_set_header X-Real-IP <span class="token variable">$remote_addr</span><span class="token punctuation">;</span>
+        proxy_set_header X-Forwarded-For <span class="token variable">$proxy_add_x_forwarded_for</span><span class="token punctuation">;</span>
+        proxy_set_header X-Forwarded-Proto <span class="token variable">$scheme</span><span class="token punctuation">;</span>
+        proxy_pass http://127.0.0.1:1443<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="3-服务部署-无需域名"><a href="#3-服务部署-无需域名" class="headerlink" title="3. 服务部署(无需域名)"></a>3. 服务部署(无需域名)</h2><blockquote>
-<p><strong>DerpServer</strong></p>
+<p><strong>自建私有 DERP 中继节点</strong></p>
 </blockquote>
-<p>无需域名的derper服务<br><a target="_blank" rel="noopener" href="https://github.com/yangchuansheng/ip_derper">https://github.com/yangchuansheng/ip_derper</a></p>
-<pre class="line-numbers language-bash"><code class="language-bash">$ docker run --name derper -d \
-    --restart always --net host \
-    ghcr.io/yangchuansheng/ip_derper:latest
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>为了实现低延迟、高安全性，我们可以参考 <a target="_blank" rel="noopener" href="https://tailscale.com/kb/1111/derp-servers/">Tailscale 官方文档</a> 来搭建私有化的 DERP 服务器。有两种部署模式，一种是基于域名，另外一种不需要域名，可以直接使用 IP。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 参考地址</span>
+https://github.com/yangchuansheng/ip_derper
+
+<span class="token comment" spellcheck="true"># 自签证书</span>
+https://github.com/yangchuansheng/ip_derper/blob/main/build_cert.sh
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>先置条件</strong></li>
+</ul>
+<p>对很多人来说，就算有自己的域名，如果没有备案，也是没办法部署在国内服务器上使用的。这个时候我们就只能从 <code>derper</code> 源码上动手脚了，找到 <code>tailscale</code> 仓库中的 <code>cmd/derper/cert.go</code> 文件，将与域名验证相关的内容删除或注释，然后自谦证书就可以了。</p>
+<pre class="line-numbers language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>manualCertManager<span class="token punctuation">)</span> <span class="token function">getCertificate</span><span class="token punctuation">(</span>hi <span class="token operator">*</span>tls<span class="token punctuation">.</span>ClientHelloInfo<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token operator">*</span>tls<span class="token punctuation">.</span>Certificate<span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//if hi.ServerName != m.hostname {</span>
+    <span class="token comment" spellcheck="true">//    return nil, fmt.Errorf("cert mismatch with hostname: %q", hi.ServerName)</span>
+    <span class="token comment" spellcheck="true">//}</span>
+    <span class="token keyword">return</span> m<span class="token punctuation">.</span>cert<span class="token punctuation">,</span> <span class="token boolean">nil</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>容器化部署</strong>(推荐)</li>
+</ul>
+<p>需要注意的是，使用 <code>IP</code> 的话，需要将 <code>InsecureForTests</code> 设置为 <code>true</code>，以跳过域名验证，并且 <code>hostName</code> 字段需要设置为 <code>IP</code> 地址。<br>然后，暴露在暴露出来需要使用端口，比如 <code>13443</code> 和 <code>13478</code>，前者是 HTTPS 端口，后者是 STUN 端口。浏览器访问 <a href="https://ip:13443，忽略证书安全看到下面内容表示安装成功。">https://ip:13443，忽略证书安全看到下面内容表示安装成功。</a></p>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">cat</span> docker-compose.yml
+services:
+  tailscale:
+    restart: on-failure
+    name: tailscale_agent
+    container_name: tailscale/tailscale:v1.80.0
+    environment:
+      - TS_HOSTNAME<span class="token operator">=</span>tailscale-docker
+      - TS_AUTH_ONCE<span class="token operator">=</span>true
+      - TS_STATE_DIR<span class="token operator">=</span>/data
+    volumes:
+      - <span class="token string">"tailscale:/var/run/tailscale"</span>
+      - <span class="token string">"tailscale_data:/data"</span>
+
+  derper:
+    restart: on-failure
+    container_name: derper_server
+    image: yangchuansheng/ip_derper
+    ports:
+      - 13443:443
+      - 13478:3478/udp
+    environment:
+      - DERP_VERIFY_CLIENTS<span class="token operator">=</span>true
+    volumes:
+      - <span class="token string">"tailscale:/var/run/tailscale"</span>
+    depends_on:
+      - tailscale
+
+volumes:
+  tailscale:
+  tailscale_data:
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="4-配置Tailscale"><a href="#4-配置Tailscale" class="headerlink" title="4. 配置Tailscale"></a>4. 配置Tailscale</h2><blockquote>
-<p><strong>Tailscale</strong></p>
+<p><strong>Tailscale 的配置文件简单了解就行了</strong></p>
 </blockquote>
-<p>进入Admin console配置ACL<br><a target="_blank" rel="noopener" href="https://login.tailscale.com/admin/acls/file">https://login.tailscale.com/admin/acls/file</a></p>
+<p>服务部署完毕之后，就可以在 <code>Tailscale</code>/<code>Headscale</code> 中配置 <code>DERP</code> 节点了。一种是在线 URL 是 JSON 格式的，另外一种是本地文件是 YAML 格式的。这里，以在 <code>Tailscale</code> 中配置 <code>DERP</code> 节点为例。</p>
+<ul>
+<li>进入 Admin console 配置 ACL，在 “ssh” 节点下方增加以下内容并保存。</li>
+<li><a target="_blank" rel="noopener" href="https://login.tailscale.com/admin/acls/file">https://login.tailscale.com/admin/acls/file</a></li>
+</ul>
 <pre class="line-numbers language-json"><code class="language-json"><span class="token punctuation">{</span>
     <span class="token property">"derpMap"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
         // 可以设置为<span class="token boolean">true</span>值
         // 这样不会下发官方的derper节点；测试或实际使用都可考虑打开
-        <span class="token property">"OmitDefaultRegions"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span> 
+        <span class="token property">"OmitDefaultRegions"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
         <span class="token property">"Regions"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
             <span class="token property">"900"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
                 // tailscale的<span class="token number">900</span>-<span class="token number">999</span>是保留给自定义derper的
                 <span class="token property">"RegionID"</span><span class="token operator">:</span> <span class="token number">900</span><span class="token punctuation">,</span>
-                <span class="token property">"RegionCode"</span><span class="token operator">:</span> <span class="token string">"evh"</span><span class="token punctuation">,</span>
+                <span class="token property">"RegionCode"</span><span class="token operator">:</span> <span class="token string">"escape_derper"</span><span class="token punctuation">,</span>
                 <span class="token property">"RegionName"</span><span class="token operator">:</span> <span class="token string">"Escape VPN Host"</span><span class="token punctuation">,</span>
                 <span class="token property">"Nodes"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
                     <span class="token punctuation">{</span>
-                        <span class="token property">"Name"</span><span class="token operator">:</span> <span class="token string">"evh-1"</span><span class="token punctuation">,</span>
+                        <span class="token property">"Name"</span><span class="token operator">:</span> <span class="token string">"escape_derper_1"</span><span class="token punctuation">,</span>
                         <span class="token property">"RegionID"</span><span class="token operator">:</span> <span class="token number">900</span><span class="token punctuation">,</span>
-                        <span class="token property">"hostName"</span><span class="token operator">:</span> <span class="token string">"&lt;域名>"</span><span class="token punctuation">,</span>
-                        <span class="token property">"DERPPort"</span><span class="token operator">:</span> <span class="token number">443</span><span class="token punctuation">,</span>
-                        <span class="token property">"STUNPort"</span><span class="token operator">:</span> <span class="token number">3478</span><span class="token punctuation">,</span>
+                        <span class="token property">"hostName"</span><span class="token operator">:</span> <span class="token string">"&lt;域名/IP>"</span><span class="token punctuation">,</span>
+                        <span class="token property">"DERPPort"</span><span class="token operator">:</span> <span class="token number">13443</span><span class="token punctuation">,</span>
+                        <span class="token property">"STUNPort"</span><span class="token operator">:</span> <span class="token number">13478</span><span class="token punctuation">,</span>
                         // 自建DERP公网IP地址
                         <span class="token property">"IPv4"</span><span class="token operator">:</span> <span class="token string">"xxx.xxx.xxx.xxx"</span><span class="token punctuation">,</span>
                         // 如果你的服务器没有IPv6
@@ -643,10 +726,55 @@ $ <span class="token function">sudo</span> certbot certonly --nginx -d summary.e
     <span class="token punctuation">}</span><span class="token punctuation">,</span>
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p><a target="_blank" rel="noopener" href="https://seepine.com/ops/tailscale/derper/">https://seepine.com/ops/tailscale/derper/</a><br><a target="_blank" rel="noopener" href="https://jiajunhuang.com/articles/2024_11_20-tailscale_derp.md.html">https://jiajunhuang.com/articles/2024_11_20-tailscale_derp.md.html</a></p>
+<p>这里，官方也给出了移除官方自带节点的配置，如下所示：</p>
+<pre class="line-numbers language-json"><code class="language-json"><span class="token punctuation">{</span>
+  // ... other parts of tailnet policy file
+  <span class="token property">"derpMap"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"Regions"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"1"</span><span class="token operator">:</span> <span class="token null">null</span> <span class="token punctuation">}</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>tailscale netcheck</code> 实际上只检测 <code>3478/udp</code> 的端口， 就算 <code>netcheck</code> 显示能连，也不一定代表 <code>443</code> 端口可以转发流量。最简单的办法是直接打开 <code>DERP</code> 服务器的 <code>https://xxx:13443</code>。页面显示正常且地址栏的 <code>SSL</code> 证书标签显示正常可用，那才是真没问题了。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看DERP节点是否生效</span>
 $ tailscale netcheck
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+Report:
+    * Time: 2025-03-03T10:19:09.035162866Z
+    * UDP: <span class="token boolean">true</span>
+    * IPv4: yes, xxx.xxx.xxx.xxx:36830
+    * IPv6: no, but OS has support
+    * MappingVariesByDestIP: <span class="token boolean">false</span>
+    * PortMapping:
+    * CaptivePortal: <span class="token boolean">false</span>
+    * Nearest DERP: evh
+    * DERP latency:
+        - evh: 600µs   <span class="token punctuation">(</span>evh<span class="token punctuation">)</span>
+        - tok: 139.5ms <span class="token punctuation">(</span>Tokyo<span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="5-防止白嫖"><a href="#5-防止白嫖" class="headerlink" title="5. 防止白嫖"></a>5. 防止白嫖</h2><blockquote>
+<p><strong>开启安全验证，保护服务安全。</strong></p>
+</blockquote>
+<p>默认情况下，自己的 DERP 服务节点是可以被任何人使用的，如果不想让其他人使用自己的节点，可以设置 <code>DERP_VERIFY_CLIENTS=true</code>(默认是关闭的) 来限制只有经过认证的客户端才能连接。不然如果你的服务器是使用流量计费的方式，很快就会被别人用光了。需要注意的是，只有域名部署的方式才需要设置。</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 步骤一：在DERP服务器上安装Tailscale</span>
+就是上面的那个 docker-compose.yml 的部分，再部署的机器安装并验证。
+
+<span class="token comment" spellcheck="true"># 步骤二：Derper服务上添加参数</span>
+$ derper --hostname<span class="token operator">=</span><span class="token variable">$DERP_DOMAIN</span> \
+    --certmode<span class="token operator">=</span><span class="token variable">$DERP_CERT_MODE</span> \
+    --certdir<span class="token operator">=</span><span class="token variable">$DERP_CERT_DIR</span> \
+    --a<span class="token operator">=</span><span class="token variable">$DERP_ADDR</span> \
+    --stun<span class="token operator">=</span><span class="token variable">$DERP_STUN</span>  \
+    --http-port<span class="token operator">=</span><span class="token variable">$DERP_HTTP_PORT</span> \
+    --verify-clients<span class="token operator">=</span><span class="token variable">$DERP_VERIFY_CLIENTS</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="6-参考文档"><a href="#6-参考文档" class="headerlink" title="6. 参考文档"></a>6. 参考文档</h2><blockquote>
+<p><strong>送人玫瑰，手留余香。</strong></p>
+</blockquote>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://tailscale.com/kb/1111/derp-servers/">Tailscale 官方文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://icloudnative.io/posts/custom-derp-servers/">部署私有 DERP 中继服务器</a></li>
+<li><a target="_blank" rel="noopener" href="https://seepine.com/ops/tailscale/derper/">Tailscale 自建中转节点 Derper</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/yangchuansheng/ip_derper/">Github ip_derper 项目</a></li>
+</ul>
 
                 
             </div>
@@ -1201,7 +1329,7 @@ $ tailscale netcheck
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1472.5k</span>
+                        class="white-color">1473.6k</span>
             
             
             
