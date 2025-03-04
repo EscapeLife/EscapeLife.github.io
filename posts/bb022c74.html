@@ -29,9 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.2"><link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
-
+<meta name="generator" content="Hexo 5.4.2">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2025-03-03
+                    2025-03-04
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.5k
+                    3.3k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    9 分
+                    12 分
                 </div>
                 
 
@@ -503,7 +503,7 @@
                 <blockquote>
 <p><strong>Tailscale：基于 WireGuard 异地组建虚拟局域网</strong></p>
 </blockquote>
-<p><code>Tailscale</code> 是一种基于 <code>WireGuard</code> 的虚拟组网工具，它能帮助我们把安装了 <code>Tailscale</code> 服务的机器，都放到同一个局域网内，即公司或者家里的 <code>PC</code> 机器连到同一网络，甚至云服务器都能放到同一个局域网。</p>
+<p><code>Tailscale</code> 是一种基于 <code>WireGuard</code> 的虚拟组网工具，能帮助我们把安装了 <code>Tailscale</code> 服务的机器都放到同一个局域网内，即公司或者家里的 <code>PC</code> 机器连到同一网络，甚至云服务器都能放到同一个局域网。区别于传统的 <code>VPN</code> 服务不同，<code>Tailscale</code> 没有中心服务器，所有节点以全互联方式连接，在保证安全的前提下尽可能提高速度。</p>
 <ul>
 <li><a target="_blank" rel="noopener" href="https://tailscale.com/">Tailscale 官网</a></li>
 <li><a target="_blank" rel="noopener" href="https://tailscale.com/kb/guides/">Tailscale 文档</a></li>
@@ -644,6 +644,7 @@ $ <span class="token function">sudo</span> tailscale up --advertise-routes<span 
 <li><strong>[4] 代理服务 - 科学上网</strong></li>
 </ul>
 <p>比如我在境外服务器上安装一个 <code>tailscale</code> 的节点，然后再在境外服务器上安装一个 <code>cow</code>（用来做 <code>http proxy server</code>）。 那我就可以在任意一台机器上，访问境外服务器的 <code>tailscale</code> 子网 <code>IP + cow</code> 端口的形式实现 <code>HTTP/SOCKS</code> 代理。</p>
+<p>需要注意的是，<code>cow</code> 这个项目已经很久没有维护了，所有建议使用其他代理服务。比如，<a target="_blank" rel="noopener" href="https://github.com/apernet/hysteria"><code>hysteria</code></a> 或者 <a target="_blank" rel="noopener" href="https://github.com/XTLS/Xray-core"><code>xray</code></a> 等。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 安装cow工具(梯子机器)</span>
 $ curl -L git.io/cow <span class="token operator">|</span> <span class="token function">bash</span>
 
@@ -704,14 +705,152 @@ WantedBy<span class="token operator">=</span>multi-user.target
 </ul>
 <p><img src="../images/tailscale-to-vpn-09.png" alt="使用Tailscale远程访问局域网"></p>
 <ul>
-<li><strong>示例演示</strong></li>
+<li><strong>[1] 登录和注销</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 首次连接(生成注册链)</span>
+$ tailscale up
+$ tailscale login <span class="token comment" spellcheck="true"># 连接官网</span>
+
+<span class="token comment" spellcheck="true"># 修改主机名</span>
+$ tailscale up --hostname <span class="token string">"host1"</span>
+
+<span class="token comment" spellcheck="true"># 指定身份验证(无需交互)</span>
+<span class="token comment" spellcheck="true"># 管理后台创建: https://login.tailscale.com/admin/settings/keys</span>
+$ tailscale up --authkey<span class="token operator">=</span><span class="token operator">&lt;</span>keys<span class="token operator">></span>
+
+<span class="token comment" spellcheck="true"># 强制通过DERP中继(调试)</span>
+$ tailscale up --force-derp
+
+<span class="token comment" spellcheck="true"># 指定首选中继区域</span>
+$ <span class="token function">sudo</span> tailscale up --derp<span class="token operator">=</span>us
+
+<span class="token comment" spellcheck="true"># 将某台设备作为出口节点(Exit Node)</span>
+<span class="token comment" spellcheck="true"># 让其他设备的流量通过它转发，类似VPN设备通过它上网</span>
+$ tailscale up --advertise-exit-node
+$ tailscale up --exit-node<span class="token operator">=</span>192.168.1.100
+<span class="token comment" spellcheck="true"># 取消出口节点</span>
+$ tailscale up --exit-node<span class="token operator">=</span>
+
+<span class="token comment" spellcheck="true"># 临时断开/彻底注销</span>
+$ tailscale down
+$ tailscale <span class="token function">logout</span>
+
+<span class="token comment" spellcheck="true"># 启动之后也可以通过set命令调整上述参数</span>
+$ tailscale <span class="token keyword">set</span> --hostname<span class="token operator">=</span><span class="token string">"host2"</span>
+<span class="token comment" spellcheck="true"># 添加节点注释</span>
+$ tailscale edit --notes <span class="token string">"db_server"</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[2] 查看服务状态</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查询部署到局域网的节点IP地址</span>
 $ tailscale status
 
 <span class="token comment" spellcheck="true"># 终端查看tailscale分配到的IP地址</span>
 $ tailscale ip
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<span class="token comment" spellcheck="true"># 检测网络</span>
+$ tailscale netcheck
+
+<span class="token comment" spellcheck="true"># 查询Tailscale设备信息</span>
+$ tailscale whois 100.64.0.3
+
+<span class="token comment" spellcheck="true"># 更新客户端</span>
+$ tailscale update
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[3] 网络相关设置</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 获取Tailscale设备IP</span>
+$ tailscale ip
+$ tailscale ip -4/-6
+
+<span class="token comment" spellcheck="true"># 锁定某台设备防止未经授权的访问</span>
+$ tailscale lock
+$ tailscale lock unlock
+
+<span class="token comment" spellcheck="true"># 网络调试工具</span>
+$ tailscale nc 100.64.0.3 8080
+$ tailscale <span class="token function">ping</span> 100.64.0.3
+$ tailscale <span class="token function">ssh</span> user@100.64.0.3
+
+<span class="token comment" spellcheck="true"># 查看和管理DNS</span>
+$ tailscale dns
+
+<span class="token comment" spellcheck="true"># 切换到新的Tailnet网络</span>
+$ tailscale switch company.com
+$ tailscale switch --qr <span class="token comment" spellcheck="true"># 二维码</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[4] 轻量级HTTP服务器</strong> - <a target="_blank" rel="noopener" href="https://tailscale.com/kb/1118/serve">官方文档</a></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 基本用法(激活magicDNS+激活https)</span>
+<span class="token comment" spellcheck="true"># 在同一Tailnet中共享网页、API或本地服务</span>
+<span class="token comment" spellcheck="true"># tailscale serve &lt;端口> &lt;服务类型> &lt;路径></span>
+
+<span class="token comment" spellcheck="true"># 代理本地服务</span>
+<span class="token comment" spellcheck="true"># 主要用于将本地服务私有化分享，只对你自己的tailnet内的设备和用户开放</span>
+$ tailscale serve --bg 3000
+$ tailscale serve --https 3000 <span class="token comment" spellcheck="true"># default</span>
+$ tailscale serve --http<span class="token operator">=</span>80 localhost:3000
+$ tailscale serve --tcp 80 tcp://localhost:3000
+$ tailscale serve /home/alice/blog/index.html
+$ tailscale serve --https<span class="token operator">=</span>443 /home/alice/blog/index.html
+
+<span class="token comment" spellcheck="true"># 查看当前服务</span>
+$ tailscale serve status
+
+<span class="token comment" spellcheck="true"># 停止服务</span>
+$ tailscale serve reset
+$ tailscale serve --https<span class="token operator">=</span>443 /home/alice/blog/index.html off
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[5] 公开Web访问</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 公开你的Tailscale设备上的服务到互联网</span>
+
+<span class="token comment" spellcheck="true"># 自动从Tailscale网络打开端口8080并创建一个公开URL</span>
+<span class="token comment" spellcheck="true"># 这样我们就可以从: https://your-device-name.ts.net:8000 访问服务</span>
+$ tailscale serve --http<span class="token operator">=</span>80 localhost:8000
+$ tailscale funnel 3000
+$ tailscale funnel --bg 3000
+
+<span class="token comment" spellcheck="true"># 查看当前服务</span>
+$ tailscale funnel status
+
+<span class="token comment" spellcheck="true"># 关闭Funnel转发</span>
+$ tailscale funnel reset
+$ tailscale funnel 3000 off
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[6] 获取SSL证书</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Tailscale内部域名(*.ts.net)生成免费的TLS证书</span>
+<span class="token comment" spellcheck="true"># myserver.ts.net.crt/myserver.ts.net.key</span>
+$ tailscale cert host.ts.net
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[7] 打开Web控制面板</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 打开Tailscale本地管理界面</span>
+$ tailscale web
+$ tailscale web --bg
+$ tailscale web --bg --port 80
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>[8] 文件传输</strong> - <a target="_blank" rel="noopener" href="https://tailscale.com/kb/1106/taildrop">官方链接</a></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 发送文件到设备(发送到设备wells_home的默认目录)</span>
+$ tailscale <span class="token function">file</span> <span class="token function">cp</span> ./my-file.txt my-phone:
+
+<span class="token comment" spellcheck="true"># 接收文件(在接收设备运行；将文件下载到当前目录)</span>
+$ <span class="token function">sudo</span> tailscale <span class="token function">file</span> get <span class="token keyword">.</span>
+
+<span class="token comment" spellcheck="true"># 用于在Tailscale设备之间共享文件(云存储)</span>
+$ tailscale drive up   <span class="token comment" spellcheck="true"># 启用</span>
+$ tailscale drive list <span class="token comment" spellcheck="true"># 查看</span>
+$ tailscale drive get <span class="token operator">&lt;</span>文件名<span class="token operator">></span> <span class="token comment" spellcheck="true"># 下载</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="5-参考链接"><a href="#5-参考链接" class="headerlink" title="5. 参考链接"></a>5. 参考链接</h2><blockquote>
 <p><strong>送人玫瑰，手有余香！</strong></p>
@@ -1271,7 +1410,7 @@ $ tailscale ip
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1473.6k</span>
+                        class="white-color">1475.9k</span>
             
             
             

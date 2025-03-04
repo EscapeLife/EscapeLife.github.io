@@ -29,9 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.2"><link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
-
+<meta name="generator" content="Hexo 5.4.2">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -466,21 +466,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2025-03-03
+                    2025-03-04
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.6k
+                    2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    6 分
+                    8 分
                 </div>
                 
 
@@ -501,8 +501,10 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <blockquote>
-<p><strong>Tailscale：基于 WireGuard 异地组建虚拟局域网</strong></p>
+<p><strong>Headscale：Tailscale 控制服务器的开源替代方案！</strong></p>
 </blockquote>
+<p>Tailscale 是一个基于 WireGuard 协议的商业 VPN 服务，提供简单、安全的组网功能，支持跨设备、跨网络的点对点连接。虽然客户端开源，但核心控制服务器(<code>Control Plane</code>)是闭源的。</p>
+<p>Headscale 是一个开源项目，它实现了 Tailscale 控制平面的核心功能。简单来说，Tailscale 使用云托管的控制服务器来管理设备间的安全连接，而 Headscale 则允许你自己搭建并管理这一控制服务器，从而实现自托管的 Tailscale 网络环境。这对于那些希望拥有更多控制权、数据隐私或不依赖第三方服务的用户来说，是一个非常有吸引力的替代方案。</p>
 <p><img src="../images/headscale-to-vpn.png" alt="自建Headscale控制服务器"></p>
 <hr>
 <h2 id="1-工具介绍"><a href="#1-工具介绍" class="headerlink" title="1. 工具介绍"></a>1. 工具介绍</h2><blockquote>
@@ -510,6 +512,7 @@
 </blockquote>
 <p><code>Headscale</code> 是一个开源的的 <code>Tailscale</code> 控制服务器，由欧洲航天局的 <code>Juan Font</code> 使用 <code>Go</code> 语言开发。在 <code>BSD</code> 许可下发布，实现了 <code>Tailscale</code> 控制服务器的所有主要功能，并且可以部署在企业内部。</p>
 <p><code>Headscale</code> 设计的主要目的，就是为了提供一个 <code>Tailscale</code> 控制服务器替代产品，其没有设备数量限制，并且所有网络流量都由你自己控制。你可以把它看作是一个更灵活、更可定制化的 <code>Tailscale</code> 替代品。</p>
+<p><img src="../images/headscale-to-vpn-01.png" alt="自建Headscale控制服务器"></p>
 <hr>
 <h2 id="2-功能特点"><a href="#2-功能特点" class="headerlink" title="2. 功能特点"></a>2. 功能特点</h2><blockquote>
 <p><strong>列举该工具的主要功能和特点</strong></p>
@@ -528,14 +531,11 @@
 <p><strong>家庭网络</strong>：建立一个安全的家庭网络，实现设备之间的互联。<strong>企业内网</strong>：为企业构建一个私有网络，实现远程办公。<strong>云服务器管理</strong>：管理多个云服务器，实现统一配置和管理。</p>
 <hr>
 <h2 id="3-准备工作"><a href="#3-准备工作" class="headerlink" title="3. 准备工作"></a>3. 准备工作</h2><blockquote>
-<p><strong>准备工作</strong></p>
-</blockquote>
-<blockquote>
-<p><strong>准备工作</strong></p>
+<p><strong>这里简单了解下，部署服务需要准备的环境和资源。</strong></p>
 </blockquote>
 <p>首先，需要一个配置了公网 <code>IP</code> 地址(<code>IPv4</code>/<code>IPv6</code>)的 <code>Linux</code> 服务器。其次，还需要开通 <code>443</code> 端口以备 <code>Headscale</code> 服务部署使用。然后，最好新建一个 <code>headscale</code> 的用户来运行服务。</p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 默认用户名称</span>
-headscale
+/usr/bin/headscale
 
 <span class="token comment" spellcheck="true"># 默认配置文件</span>
 /etc/headscale/config.yaml
@@ -544,24 +544,16 @@ headscale
 /var/lib/headscale
 
 <span class="token comment" spellcheck="true"># 默认数据库</span>
-SQLite
+/var/lib/headscale/db.sqlite
 
 <span class="token comment" spellcheck="true"># 推荐操作系统</span>
 Debian/Ubuntu
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="4-配置文件"><a href="#4-配置文件" class="headerlink" title="4. 配置文件"></a>4. 配置文件</h2><blockquote>
-<p><strong>配置文件</strong></p>
+<p><strong>配置文件可以参考 Github 仓库或者官方文档中，查看对应配置具体含义。</strong></p>
 </blockquote>
-<blockquote>
-<p><strong>配置文件</strong></p>
-</blockquote>
-<p><a target="_blank" rel="noopener" href="https://headscale.net/stable/ref/configuration/">https://headscale.net/stable/ref/configuration/</a></p>
-<p><a target="_blank" rel="noopener" href="https://github.com/GoodiesHQ/headscale-admin">https://github.com/GoodiesHQ/headscale-admin</a></p>
-<p><a href="https://www.escapelife.site/posts/bb022c74.html">https://www.escapelife.site/posts/bb022c74.html</a></p>
-<p><a target="_blank" rel="noopener" href="https://icloudnative.io/posts/how-to-set-up-or-migrate-headscale/#%E5%9C%A8-linux-%E4%B8%8A%E9%83%A8%E7%BD%B2">https://icloudnative.io/posts/how-to-set-up-or-migrate-headscale/#%E5%9C%A8-linux-%E4%B8%8A%E9%83%A8%E7%BD%B2</a></p>
 <p>安装完成以后，我们需要在&nbsp;<code>/etc/headscale/config.yaml</code>&nbsp;中配置 Headscale 的启动配置，以下为配置样例以及解释，仅列出重要配置。</p>
-<p><a target="_blank" rel="noopener" href="https://www.hi-linux.com/posts/33684.html">https://www.hi-linux.com/posts/33684.html</a></p>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Headscale服务器的访问地址</span>
 <span class="token comment" spellcheck="true"># /etc/headscale/config.yaml</span>
 
@@ -630,12 +622,12 @@ randomize_client_port: <span class="token boolean">false</span>
 <h2 id="5-服务安装"><a href="#5-服务安装" class="headerlink" title="5. 服务安装"></a>5. 服务安装</h2><blockquote>
 <p><strong>安装服务</strong></p>
 </blockquote>
-<p><a target="_blank" rel="noopener" href="https://wangyan.org/running-tailscale-linux">https://wangyan.org/running-tailscale-linux</a></p>
+<p>推荐使用容器化部署服务，会方便很多。但是如果需要直接在服务器上面部署服务，也推荐直接通过 <code>apt</code> 安装 <code>.deb</code> 包的方式，这样省去了创建配置文件、服务启动配置、默认数据库和用户等繁琐的步骤。</p>
 <ul>
 <li><strong>Using packages for Debian/Ubuntu</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 下载最新版本</span>
-$ HEADSCALE_VERSION<span class="token operator">=</span><span class="token string">"0.23.0"</span>
+$ HEADSCALE_VERSION<span class="token operator">=</span><span class="token string">"0.25.0"</span>
 $ HEADSCALE_ARCH<span class="token operator">=</span><span class="token string">"amd64"</span>
 $ <span class="token function">wget</span> --output-document<span class="token operator">=</span>headscale.deb \ <span class="token string">"https://github.com/juanfont/headscale/releases/download/v<span class="token variable">${HEADSCALE_VERSION}</span>/headscale_<span class="token variable">${HEADSCALE_VERSION}</span>_linux_<span class="token variable">${HEADSCALE_ARCH}</span>.deb"</span>
 
@@ -648,12 +640,15 @@ $ <span class="token function">sudo</span> vim /etc/headscale/config.yaml
 <span class="token comment" spellcheck="true"># 启动服务</span>
 $ <span class="token function">sudo</span> systemctl <span class="token function">enable</span> --now headscale
 $ <span class="token function">sudo</span> systemctl status headscale
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<span class="token comment" spellcheck="true"># 查看占用端口</span>
+$ <span class="token function">sudo</span> ss -tulnp <span class="token operator">|</span> <span class="token function">grep</span> headscale
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
 <li><strong>Using standalone binaries</strong></li>
 </ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 二进制文件下载</span>
-$ HEADSCALE_VERSION<span class="token operator">=</span><span class="token string">"0.23.0"</span>
+$ HEADSCALE_VERSION<span class="token operator">=</span><span class="token string">"0.25.0"</span>
 $ HEADSCALE_ARCH<span class="token operator">=</span><span class="token string">"amd64"</span>
 $ <span class="token function">sudo</span> <span class="token function">wget</span> --output-document<span class="token operator">=</span>/usr/local/bin/headscale \
 https://github.com/juanfont/headscale/releases/download/v<span class="token variable">${HEADSCALE_VERSION}</span>/headscale_<span class="token variable">${HEADSCALE_VERSION}</span>_linux_<span class="token variable">${HEADSCALE_ARCH}</span>
@@ -668,9 +663,11 @@ $ <span class="token function">sudo</span> <span class="token function">useradd<
  headscale
 
 <span class="token comment" spellcheck="true"># 修改配置文件</span>
+<span class="token comment" spellcheck="true"># https://github.com/juanfont/headscale/raw/main/config-example.yaml</span>
 $ <span class="token function">sudo</span> <span class="token function">mkdir</span> -p /etc/headscale
 $ <span class="token function">sudo</span> vim /etc/headscale/config.yaml
-unix_socket: /var/run/headscale/headscale.sock
+base_domain: headscale.escape.cloud
+listen_addr: 127.0.0.1:8181
 
 <span class="token comment" spellcheck="true"># 制作启动脚本</span>
 https://headscale.net/stable/packaging/headscale.systemd.service
@@ -679,14 +676,17 @@ https://headscale.net/stable/packaging/headscale.systemd.service
 $ systemctl daemon-reload
 $ systemctl <span class="token function">enable</span> --now headscale
 $ systemctl status headscale
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<span class="token comment" spellcheck="true"># 查看占用端口</span>
+$ <span class="token function">sudo</span> ss -tulnp <span class="token operator">|</span> <span class="token function">grep</span> headscale
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="6-容器部署"><a href="#6-容器部署" class="headerlink" title="6. 容器部署"></a>6. 容器部署</h2><blockquote>
 <p><strong>使用容器部署服务</strong></p>
 </blockquote>
-<blockquote>
-<p><strong>服务安装 - 容器版本</strong></p>
-</blockquote>
+<ul>
+<li><strong>docker</strong></li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 创建配置文件</span>
 $ <span class="token function">mkdir</span> -pv ./headscale/config <span class="token operator">&amp;&amp;</span> <span class="token function">cd</span> ./headscale
 
@@ -704,6 +704,9 @@ $ docker logs --follow headscale
 <span class="token comment" spellcheck="true"># 确保可用</span>
 $ curl http://127.0.0.1:9090/metrics
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>docker-compose</strong></li>
+</ul>
 <pre class="line-numbers language-yaml"><code class="language-yaml"><span class="token key atrule">services</span><span class="token punctuation">:</span>
   <span class="token key atrule">headscale</span><span class="token punctuation">:</span>
     <span class="token key atrule">restart</span><span class="token punctuation">:</span> unless<span class="token punctuation">-</span>stopped
@@ -717,41 +720,45 @@ $ curl http://127.0.0.1:9090/metrics
     <span class="token key atrule">command</span><span class="token punctuation">:</span> serve
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
-<blockquote>
-<p><strong>服务安装 - Sealos云服务</strong></p>
+<h2 id="7-注册流程"><a href="#7-注册流程" class="headerlink" title="7. 注册流程"></a>7. 注册流程</h2><blockquote>
+<p><strong>介绍如何将本地机器纳管到 headscale 服务中。</strong></p>
 </blockquote>
-<p><a target="_blank" rel="noopener" href="https://icloudnative.io/en/posts/how-to-set-up-or-migrate-headscale/">Deploy headscale as service on Sealos.</a></p>
-<hr>
-<h2 id="7-使用方式"><a href="#7-使用方式" class="headerlink" title="7. 使用方式"></a>7. 使用方式</h2><blockquote>
-<p><strong>使用该工具的步骤和方法</strong></p>
-</blockquote>
-<blockquote>
-<p><strong>使用方式</strong></p>
-</blockquote>
+<ul>
+<li><strong>使用方式</strong></li>
+</ul>
 <p>通过 <a target="_blank" rel="noopener" href="https://tailscale.com/download/mac">tailscale</a> 官方客户端下载，自己需要客户端即可。桌面端的话，需要通过命令进行注册，成功后才可以访问。当然，如果是手机端或者提供了桌面应用的话，双击添加服务器地址，即可。</p>
-<p><strong>注册机器 - 自生成</strong>：</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># install with one command</span>
+$ curl -fsSL https://tailscale.com/install.sh <span class="token operator">|</span> sh
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>注册机器 - 自生成</strong></li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 命令行添加</span>
 $ tailscale login --login-server <span class="token operator">&lt;</span>YOUR_HEADSCALE_URL<span class="token operator">></span>
 YOUR_MACHINE_KEY
 
 <span class="token comment" spellcheck="true"># 创建用户</span>
-$ headscale <span class="token function">users</span> create myfirstuser
-$ headscale nodes register --user myfirstuser --key <span class="token operator">&lt;</span>YOUR_MACHINE_KEY<span class="token operator">></span>
+$ headscale <span class="token function">users</span> create my_first_user
+$ headscale nodes register --user my_first_user --key <span class="token operator">&lt;</span>YOUR_MACHINE_KEY<span class="token operator">></span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p><strong>注册机器 - 预设值</strong>：</p>
+<ul>
+<li><strong>注册机器 - 预设值</strong></li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 生成一个预设Key</span>
-$ headscale preauthkeys create --user myfirstuser --reusable --expiration 24h
+$ headscale preauthkeys create --user my_first_user --reusable --expiration 24h
 YOUR_AUTH_KEY
 
 <span class="token comment" spellcheck="true"># 用户注册使用预设值</span>
 $ tailscale up --login-server <span class="token operator">&lt;</span>YOUR_HEADSCALE_URL<span class="token operator">></span> --authkey <span class="token operator">&lt;</span>YOUR_AUTH_KEY<span class="token operator">></span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>调试的话，可以使用 <code>debug</code> 的镜像。</p>
+<ul>
+<li><strong>调试的话，可以使用 <code>debug</code> 的镜像</strong></li>
+</ul>
 <pre class="line-numbers language-bash"><code class="language-bash">$ docker run -it headscale/headscale:x.x.x-debug sh
 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <hr>
-<blockquote>
-<p><strong>使用方式</strong></p>
+<h2 id="8-命令管理"><a href="#8-命令管理" class="headerlink" title="8. 命令管理"></a>8. 命令管理</h2><blockquote>
+<p><strong>介绍 headscale 命令的具体使用方式。</strong></p>
 </blockquote>
 <ul>
 <li><strong>帮助信息</strong></li>
@@ -770,22 +777,63 @@ $ headscale <span class="token function">users</span> create <span class="token 
 
 <span class="token comment" spellcheck="true"># 列出现有用户</span>
 $ headscale <span class="token function">users</span> list
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<span class="token comment" spellcheck="true"># 删除现有用户</span>
+$ headscale <span class="token function">users</span> destroy <span class="token operator">&lt;</span>USER<span class="token operator">></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
-<li><strong>节点注册</strong></li>
+<li><strong>节点管理</strong></li>
 </ul>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 常规方式</span>
-$ tailscale up --login-server <span class="token operator">&lt;</span>YOUR_HEADSCALE_URL<span class="token operator">></span>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 查看节点</span>
+$ headscale nodes list
 
-<span class="token comment" spellcheck="true"># 常规方式</span>
-$ headscale nodes register --user <span class="token operator">&lt;</span>USER<span class="token operator">></span> --key <span class="token operator">&lt;</span>YOUR_MACHINE_KEY<span class="token operator">></span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 预设值方式</span>
-$ headscale preauthkeys create --user <span class="token operator">&lt;</span>USER<span class="token operator">></span>
+<span class="token comment" spellcheck="true"># 注册节点</span>
+$ headscale nodes register --user <span class="token operator">&lt;</span>USER<span class="token operator">></span> --key <span class="token operator">&lt;</span>KEY<span class="token operator">></span>
 
-<span class="token comment" spellcheck="true"># 预设值方式</span>
-$ tailscale up --login-server <span class="token operator">&lt;</span>YOUR_HEADSCALE_URL<span class="token operator">></span> --authkey <span class="token operator">&lt;</span>YOUR_AUTH_KEY<span class="token operator">></span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token comment" spellcheck="true"># 删除节点</span>
+$ headscale nodes destroy <span class="token operator">&lt;</span>NODE_ID<span class="token operator">></span>
+
+<span class="token comment" spellcheck="true"># 移动节点</span>
+$ headscale nodes remove <span class="token operator">&lt;</span>NODE_ID<span class="token operator">></span> --user <span class="token operator">&lt;</span>USER<span class="token operator">></span>
+
+<span class="token comment" spellcheck="true"># 重命名节点</span>
+$ headscale nodes <span class="token function">rename</span> <span class="token operator">&lt;</span>NODE_ID<span class="token operator">></span> <span class="token operator">&lt;</span>NEWLINE_NAME<span class="token operator">></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="9-远程管理"><a href="#9-远程管理" class="headerlink" title="9. 远程管理"></a>9. 远程管理</h2><blockquote>
+<p><strong>介绍如何使用 headscale <a target="_blank" rel="noopener" href="https://headscale.net/stable/ref/tls/">远程管理机器</a>。</strong></p>
+</blockquote>
+<p>远程控制需要开启 <code>remote CLI</code> 功能，必须开启 <code>headscale</code> 服务器内置的 <code>tls</code> 支持，通过 <code>nginx</code> 反代实现的 <code>ssl</code> 是不行的。</p>
+<ul>
+<li><strong>修改配置文件</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash">$ <span class="token function">cat</span> /etc/headscale/config.yaml
+<span class="token comment" spellcheck="true"># 启用TLS</span>
+tls_cert_path: <span class="token string">""</span>
+tls_key_path: <span class="token string">""</span>
+
+<span class="token comment" spellcheck="true"># 需要ACME申请证书</span>
+tls_letsencrypt_hostname: <span class="token string">""</span>
+tls_letsencrypt_listen: <span class="token string">":http"</span>
+tls_letsencrypt_cache_dir: <span class="token string">".cache"</span>
+tls_letsencrypt_challenge_type: HTTP-01
+
+<span class="token comment" spellcheck="true"># 启用gRPC</span>
+grpc_listen_addr: 0.0.0.0:50443
+grpc_allow_insecure: <span class="token boolean">false</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><strong>创建APIKey</strong></li>
+</ul>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 创建</span>
+$ headscale apikeys create --expiration 180d
+
+<span class="token comment" spellcheck="true"># 列表</span>
+$ headscale apikeys list
+
+<span class="token comment" spellcheck="true"># 吊销</span>
+$ headscale apikeys expire --prefix <span class="token string">"&lt;PREFIX>"</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1035,12 +1083,12 @@ $ tailscale up --login-server <span class="token operator">&lt;</span>YOUR_HEADS
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/posts/3bf82433.html">
+                <a href="/posts/a1beaa94.html">
                     <div class="card-image">
                         
-                        <img src="/images/derp-server-to-vpn.png" class="responsive-img" alt="自建DerpServer中转节点">
+                        <img src="/images/learn-derp-to-vpn.png" class="responsive-img" alt="了解DERP协议的原理">
                         
-                        <span class="card-title">自建DerpServer中转节点</span>
+                        <span class="card-title">了解DERP协议的原理</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -1051,7 +1099,7 @@ $ tailscale up --login-server <span class="token operator">&lt;</span>YOUR_HEADS
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2025-03-03
+                            <i class="far fa-clock fa-fw icon-date"></i>2025-03-01
                         </span>
                         <span class="publish-author">
                             
@@ -1338,7 +1386,7 @@ $ tailscale up --login-server <span class="token operator">&lt;</span>YOUR_HEADS
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1473.6k</span>
+                        class="white-color">1475.9k</span>
             
             
             
