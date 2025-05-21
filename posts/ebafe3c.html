@@ -29,9 +29,9 @@
 
     <script src="/libs/jquery/jquery.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.2">
+<meta name="generator" content="Hexo 5.4.2"><link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
+
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="alternate" href="/atom.xml" title="Escape" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
 
@@ -469,14 +469,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    669
+                    1.1k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    2 分
+                    4 分
                 </div>
                 
 
@@ -521,11 +521,48 @@
 <p>使用微信扫码，申请 <a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login">公众号测试账户</a> 来测试企业公众号的全部功能。进入页面以后，我们来获取如下代码所需信息，以备后续使用。</p>
 <p><img src="../images/wechat-me-add-ai-03.png" alt="WeChat"></p>
 <p><img src="../images/wechat-me-add-ai-04.png" alt="WeChat"></p>
+<p>要使用公众号模板消息或订阅消息主动推送的话，需要获取以下两个关键参数：即关注你公众号用户的 <strong>OpenID</strong>，以及需要发送的 <strong>template_id</strong> 模版。</p>
+<p><strong>含义解释</strong>：<code>touser</code> 是用户的 <strong>OpenID</strong>，表示你要推送消息的目标用户。<strong>如何获取</strong>：需要让用户 <strong>关注你的公众号</strong> 并与你产生交互(例如发送一条消息)，然后你可以通过微信的消息推送或用户列表 API 获取 <code>OpenID</code>。</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 方式一：从用户发给你消息中提取</span>
+<span class="token comment" spellcheck="true"># 用户发送消息给公众号时，微信会把POST请求发给你的服务器(获取OpenID)</span>
+msg <span class="token operator">=</span> parse_message<span class="token punctuation">(</span>request<span class="token punctuation">.</span>data<span class="token punctuation">)</span>
+touser <span class="token operator">=</span> msg<span class="token punctuation">.</span>source <span class="token comment" spellcheck="true"># 用户的OpenID</span>
+
+<span class="token comment" spellcheck="true"># 方式二：用access_token获取所有关注用户的列表</span>
+client <span class="token operator">=</span> WeChatClient<span class="token punctuation">(</span>APPID<span class="token punctuation">,</span> APPSECRET<span class="token punctuation">)</span>
+users <span class="token operator">=</span> client<span class="token punctuation">.</span>user<span class="token punctuation">.</span>get_followers<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>users<span class="token punctuation">[</span><span class="token string">'data'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'openid'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># 列表</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>含义解释</strong>：<code>template_id</code> 是你在公众号后台申请的模板消息的 <strong>唯一标识</strong>。<strong>如何获取</strong>：登录 微信公众平台，点击左侧菜单「模板消息」或「订阅消息」，选择已有模板或申请新的模板，模板名称右侧会显示其 <code>template_id</code>，复制下来使用。</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> wechatpy <span class="token keyword">import</span> WeChatClient
+
+APPID <span class="token operator">=</span> <span class="token string">"你的appid"</span>
+APPSECRET <span class="token operator">=</span> <span class="token string">"你的secret"</span>
+
+client <span class="token operator">=</span> WeChatClient<span class="token punctuation">(</span>APPID<span class="token punctuation">,</span> APPSECRET<span class="token punctuation">)</span>
+
+data <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">"first"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"value"</span><span class="token punctuation">:</span> <span class="token string">"您好，您有一条提醒！"</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">"keyword1"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"value"</span><span class="token punctuation">:</span> <span class="token string">"订单已发货"</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">"keyword2"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"value"</span><span class="token punctuation">:</span> <span class="token string">"2024-05-09"</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string">"remark"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">"value"</span><span class="token punctuation">:</span> <span class="token string">"感谢您的支持。"</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+res <span class="token operator">=</span> client<span class="token punctuation">.</span>message<span class="token punctuation">.</span>send_template<span class="token punctuation">(</span>
+    user_id<span class="token operator">=</span><span class="token string">"用户的openid"</span><span class="token punctuation">,</span>
+    template_id<span class="token operator">=</span><span class="token string">"你的template_id"</span><span class="token punctuation">,</span>
+    data<span class="token operator">=</span>data<span class="token punctuation">,</span>
+    url<span class="token operator">=</span><span class="token string">"https://yourdomain.com/order"</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span>res<span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <hr>
 <h2 id="4-服务部署"><a href="#4-服务部署" class="headerlink" title="4. 服务部署"></a>4. 服务部署</h2><blockquote>
 <p><strong>这里部署，我们自己影视更新推送服务！</strong></p>
 </blockquote>
 <p>公众号目前，只支持 <strong>服务器</strong> 和 <strong>docker</strong> 环境部署。我们这里只说下微信公众号的推送认证逻辑，后续可以使用类似于 <a target="_blank" rel="noopener" href="https://github.com/wechatpy/wechatpy">WeChatPY</a> 这样的封装好的接口，更方便一些。具体更多功能，可以参考微信官方接口文档，或者上述库文档。</p>
+<p><strong>1. 验证服务器地址</strong>：微信后台将发起 GET 请求验证你的 <code>Token</code> 和 <code>URL</code>；<strong>2. 处理消息</strong>：用户发送消息，微信会 POST 数据到你配置的 URL；<strong>3. 发送响应</strong>：你需要返回 XML 响应或调用微信接口主动发送；<strong>4. 接入高级功能</strong>：如自定义菜单、客服、素材管理等，通过 access_token 接口调用。</p>
 <p><strong>1. 获取微信 access_token -&gt; 认证校验</strong></p>
 <pre class="line-numbers language-python"><code class="language-python">url <span class="token operator">=</span> <span class="token string">"https://api.weixin.qq.com/cgi-bin/token"</span>
 params <span class="token operator">=</span> <span class="token punctuation">{</span>
@@ -1103,7 +1140,7 @@ params <span class="token operator">=</span> <span class="token punctuation">{</
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1481.3k</span>
+                        class="white-color">1484.9k</span>
             
             
             
